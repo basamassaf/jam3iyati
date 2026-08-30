@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام إدارة الجمعية - الأعضاء</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
@@ -55,10 +53,6 @@
         .export-buttons button { flex: 1; min-width: 150px; }
         #loginScreen, #dashboard, #membersSection { display: none; }
         #loginScreen.active, #dashboard.active, #membersSection.active { display: block; }
-        @media print {
-            .no-print { display: none !important; }
-            .member-card { break-inside: avoid; page-break-inside: avoid; }
-        }
     </style>
 </head>
 <body>
@@ -93,7 +87,7 @@
     <!-- قسم الأعضاء -->
     <div id="membersSection">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2> إدارة الأعضاء</h2>
+            <h2>👥 إدارة الأعضاء</h2>
             <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
         </div>
         
@@ -107,27 +101,25 @@
 
         <!-- استيراد/تصدير -->
         <div class="import-section no-print">
-            <h3>📥📤 استيراد وتصدير البيانات</h3>
+            <h3>📥 استيراد وتصدير البيانات</h3>
             <div class="form-row">
                 <div>
-                    <label>استيراد من Excel/CSV:</label>
-                    <input type="file" id="importFile" accept=".xlsx,.xls,.csv" onchange="handleImport(event)">
-                    <small style="color: #666;">📋 حمّل ملف Excel بالأعمدة: الكود، الاسم، القطاع، الهاتف، تاريخ الميلاد، نوع الاشتراك...</small>
+                    <label>استيراد من Excel:</label>
+                    <input type="file" id="importFile" accept=".xlsx,.xls" onchange="handleImport(event)">
+                    <small style="color: #666;">📋 حمّل ملف Excel لاستيراد الأعضاء</small>
                 </div>
                 <div>
                     <label>تصدير البيانات:</label>
                     <div class="export-buttons">
-                        <button class="btn btn-info btn-small" onclick="exportToExcel()">📊 Excel</button>
-                        <button class="btn btn-success btn-small" onclick="exportPDFIndividual()">📄 PDF فردي</button>
-                        <button class="btn btn-warning btn-small" onclick="exportPDFCollective()"> PDF جماعي</button>
-                        <button class="btn btn-danger btn-small" onclick="exportPDFTable()">📋 PDF جدول</button>
+                        <button class="btn btn-info btn-small" onclick="exportToExcel()">📊 Excel الكل</button>
+                        <button class="btn btn-warning btn-small" onclick="exportFilteredMembers()"> Excel النشطين فقط</button>
                     </div>
                 </div>
             </div>
         </div>
         
         <div class="filter-row no-print">
-            <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم أو الكود أو الهاتف..." oninput="searchMembers()">
+            <input type="text" id="searchInput" placeholder=" ابحث بالاسم أو الكود أو الهاتف..." oninput="searchMembers()">
         </div>
         
         <div class="filter-row no-print">
@@ -156,7 +148,7 @@
         
         <div class="export-buttons no-print">
             <button class="btn btn-success" onclick="openAddMemberModal()">+ إضافة عضو جديد</button>
-            <button class="btn btn-info" onclick="sendWhatsAppBulk()">📱 واتساب جماعي</button>
+            <button class="btn btn-info" onclick="sendWhatsAppBulk()"> واتساب جماعي</button>
         </div>
         
         <div id="membersList" style="margin-top: 20px;"></div>
@@ -176,7 +168,7 @@
             <div class="form-row">
                 <div class="input-group">
                     <label>كود الأسرة *</label>
-                    <input type="text" id="familyCode" required placeholder="A005">
+                    <input type="text" id="familyCode" required placeholder="A001">
                 </div>
                 <div class="input-group">
                     <label>كود الفرد *</label>
@@ -391,7 +383,7 @@ function calculateAge() {
     else document.getElementById('memberType').value = 'normal';
 }
 
-// === استيراد من Excel/CSV ===
+// === استيراد من Excel (مطابق للشيت الفعلي) ===
 function handleImport(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -404,45 +396,97 @@ function handleImport(event) {
             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
             const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
             
-            // تخطي الرأس (الصف الأول)
+            // قراءة رؤوس الأعمدة
             const headers = jsonData[0];
-            const membersData = jsonData.slice(1);
+            console.log('رؤوس الأعمدة:', headers);
             
+            // البحث عن أرقام الأعمدة تلقائياً
+            const colIndex = {
+                memberCode: headers.findIndex(h => h && h.toString().includes('رقم') && h.toString().includes('الفرد')),
+                familyCode: headers.findIndex(h => h && h.toString().includes('كود') && h.toString().includes('الأسرة')),
+                name: headers.findIndex(h => h && h.toString().includes('الاسم') && h.toString().includes('الثلاثي')),
+                status: headers.findIndex(h => h && h.toString().includes('حالة') && h.toString().includes('العضو')),
+                relation: headers.findIndex(h => h && h.toString().includes('صلة') && h.toString().includes('القرابة')),
+                gender: headers.findIndex(h => h && h.toString().includes('الجنس')),
+                sector: headers.findIndex(h => h && h.toString().includes('القطاع')),
+                birthDate: headers.findIndex(h => h && h.toString().includes('تاريخ') && h.toString().includes('الميلاد')),
+                age: headers.findIndex(h => h && h.toString().includes('العمر')),
+                subscriptionType: headers.findIndex(h => h && h.toString().includes('نوع') && h.toString().includes('الاشتراك')),
+                joinDate: headers.findIndex(h => h && h.toString().includes('تاريخ') && h.toString().includes('الاشتراك')),
+                phone: headers.findIndex(h => h && h.toString().includes('الجوال')),
+                notes: headers.findIndex(h => h && h.toString().includes('ملاحظات'))
+            };
+            
+            console.log('أرقام الأعمدة:', colIndex);
+            
+            const membersData = jsonData.slice(1);
             let imported = 0;
             let errors = 0;
             
             membersData.forEach((row, index) => {
-                if (!row[0] || !row[1] || !row[2]) {
+                if (!row[colIndex.memberCode] || !row[colIndex.familyCode] || !row[colIndex.name]) {
                     errors++;
                     return;
                 }
                 
+                // قراءة حالة_العضو من العمود الصحيح
+                const memberStatusRaw = row[colIndex.status] || 'نشط';
+                let memberStatus = 'active'; // القيمة الافتراضية
+                
+                // تحويل الحالة من العربية إلى الإنجليزية
+                if (memberStatusRaw === 'نشط') memberStatus = 'active';
+                else if (memberStatusRaw === 'معفي') memberStatus = 'exempt';
+                else if (memberStatusRaw === 'متوقف') memberStatus = 'suspended';
+                else if (memberStatusRaw === 'منسحب') memberStatus = 'withdrawn';
+                else if (memberStatusRaw === 'متوفي') memberStatus = 'deceased';
+                
+                // قراءة نوع الاشتراك
+                const subTypeRaw = row[colIndex.subscriptionType] || '';
+                let hasAssociation = false;
+                let hasDeath = false;
+                
+                if (subTypeRaw.includes('جمعية') || subTypeRaw.includes('كلاهما')) hasAssociation = true;
+                if (subTypeRaw.includes('وفاة') || subTypeRaw.includes('كلاهما')) hasDeath = true;
+                
+                // قراءة القطاع
+                const sectorRaw = row[colIndex.sector] || '';
+                let sectorMapped = sectorRaw;
+                
+                // تحويل أسماء القطاعات إذا لزم الأمر
+                if (sectorRaw.includes('الحارة') || sectorRaw.includes('حارة')) {
+                    if (sectorRaw.includes('1')) sectorMapped = 'الحارة 1';
+                    else if (sectorRaw.includes('2')) sectorMapped = 'الحارة 2';
+                }
+                
                 const memberData = {
-                    familyCode: row[0] || '',
-                    memberCode: row[1] || '',
-                    name: row[2] || '',
-                    relation: row[3] || 'رب أسرة',
-                    sector: row[4] || '',
-                    phone: row[5] || '',
-                    email: row[6] || '',
-                    birthDate: row[7] ? new Date(row[7]).toISOString().split('T')[0] : '',
-                    memberAge: row[8] || 0,
-                    memberType: row[9] || 'normal',
-                    job: row[10] || '',
-                    address: row[11] || '',
-                    joinDate: row[12] ? new Date(row[12]).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-                    hasAssociation: row[13] === 'نعم' || row[13] === true || row[13] === 1,
-                    hasDeath: row[14] === 'نعم' || row[14] === true || row[14] === 1,
-                    associationDate: row[15] ? new Date(row[15]).toISOString().split('T')[0] : '',
-                    deathDate: row[16] ? new Date(row[16]).toISOString().split('T')[0] : '',
-                    status: row[17] || 'active',
-                    notes: row[18] || '',
+                    familyCode: row[colIndex.familyCode] || '',
+                    memberCode: row[colIndex.memberCode] || '',
+                    name: row[colIndex.name] || '',
+                    relation: row[colIndex.relation] || 'رب أسرة',
+                    gender: row[colIndex.gender] || '',
+                    sector: sectorMapped,
+                    phone: row[colIndex.phone] || '',
+                    birthDate: row[colIndex.birthDate] ? formatDate(row[colIndex.birthDate]) : '',
+                    memberAge: row[colIndex.age] || 0,
+                    memberType: 'normal',
+                    job: '',
+                    address: '',
+                    joinDate: row[colIndex.joinDate] ? formatDate(row[colIndex.joinDate]) : new Date().toISOString().split('T')[0],
+                    hasAssociation: hasAssociation,
+                    hasDeath: hasDeath,
+                    associationDate: '',
+                    deathDate: '',
+                    status: memberStatus,
+                    notes: row[colIndex.notes] || '',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 
                 db.collection('members').add(memberData)
                     .then(() => { imported++; })
-                    .catch(() => { errors++; });
+                    .catch((err) => { 
+                        console.error('خطأ في الصف', index + 2, err);
+                        errors++; 
+                    });
             });
             
             setTimeout(() => {
@@ -452,12 +496,37 @@ function handleImport(event) {
             
         } catch (error) {
             alert('❌ خطأ في قراءة الملف: ' + error.message);
+            console.error('Error:', error);
         }
     };
     reader.readAsArrayBuffer(file);
 }
 
-// === تصدير إلى Excel ===
+// === تحويل التاريخ من Excel ===
+function formatDate(dateValue) {
+    if (!dateValue) return '';
+    
+    // إذا كان النص
+    if (typeof dateValue === 'string') {
+        // محاولة تحليل التاريخ
+        const parts = dateValue.split('/');
+        if (parts.length === 3) {
+            // DD/MM/YYYY
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return dateValue;
+    }
+    
+    // إذا كان رقم (تاريخ Excel)
+    if (typeof dateValue === 'number') {
+        const date = new Date(Math.round((dateValue - 25569) * 86400 * 1000));
+        return date.toISOString().split('T')[0];
+    }
+    
+    return '';
+}
+
+// === تصدير إلى Excel (الكل) ===
 function exportToExcel() {
     const data = allMembers.map(m => ({
         'كود الأسرة': m.familyCode,
@@ -477,7 +546,7 @@ function exportToExcel() {
         'اشتراك وفاة': m.hasDeath ? 'نعم' : 'لا',
         'تاريخ اشتراك جمعية': m.associationDate,
         'تاريخ اشتراك وفاة': m.deathDate,
-        'الحالة': m.status,
+        'حالة_العضو': { 'active': 'نشط', 'exempt': 'معفي', 'suspended': 'متوقف', 'withdrawn': 'منسحب', 'deceased': 'متوفي' }[m.status] || m.status,
         'ملاحظات': m.notes
     }));
     
@@ -487,135 +556,44 @@ function exportToExcel() {
     XLSX.writeFile(wb, `أعضاء_الجمعية_${new Date().toISOString().split('T')[0]}.xlsx`);
 }
 
-// === تصدير PDF فردي ===
-function exportPDFIndividual() {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    let yPos = 20;
+// === تصدير Excel للنشطين فقط (الفلتر) ===
+function exportFilteredMembers() {
+    // الفلتر: حالة_العضو لا تساوي فراغ
+    const filteredMembers = allMembers.filter(m => m.status && m.status.trim() !== '');
     
-    allMembers.forEach((m, index) => {
-        if (index > 0) pdf.addPage();
-        
-        const fullCode = `${m.familyCode}-${m.memberCode}`;
-        const subText = (m.hasAssociation && m.hasDeath) ? 'مزدوج' : 
-                       (m.hasAssociation ? 'جمعية' : (m.hasDeath ? 'وفاة' : 'غير مشترك'));
-        
-        // رأس البطاقة
-        pdf.setFontSize(16);
-        pdf.text('نظام إدارة الجمعية', 105, yPos, { align: 'center' });
-        yPos += 10;
-        pdf.setFontSize(14);
-        pdf.text('بطاقة عضو', 105, yPos, { align: 'center' });
-        yPos += 15;
-        
-        // المعلومات
-        pdf.setFontSize(12);
-        pdf.text(`الاسم: ${m.name}`, 20, yPos);
-        yPos += 8;
-        pdf.text(`الكود: ${fullCode}`, 20, yPos);
-        yPos += 8;
-        pdf.text(`القطاع: ${m.sector || '-'}`, 20, yPos);
-        yPos += 8;
-        pdf.text(`العمر: ${m.memberAge || '-'} سنة`, 20, yPos);
-        yPos += 8;
-        pdf.text(`الهاتف: ${m.phone || '-'}`, 20, yPos);
-        yPos += 8;
-        pdf.text(`الاشتراك: ${subText}`, 20, yPos);
-        yPos += 8;
-        pdf.text(`تاريخ الانضمام: ${m.joinDate || '-'}`, 20, yPos);
-        
-        yPos = 20;
-    });
+    if (filteredMembers.length === 0) {
+        alert('لا يوجد أعضاء نشطين للتصدير');
+        return;
+    }
     
-    pdf.save(`بطاقات_الأعضاء_${new Date().toISOString().split('T')[0]}.pdf`);
-}
-
-// === تصدير PDF جماعي (قائمة) ===
-function exportPDFCollective() {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
+    const exportData = filteredMembers.map(m => ({
+        'كود الأسرة': m.familyCode,
+        'كود الفرد': m.memberCode,
+        'الاسم الثلاثي': m.name,
+        'صلة القرابة': m.relation || '',
+        'القطاع': m.sector || '',
+        'رقم الجوال': m.phone || '',
+        'البريد الإلكتروني': m.email || '',
+        'تاريخ الميلاد': m.birthDate || '',
+        'العمر': m.memberAge || '',
+        'نوع العضو': { 'young': 'شاب', 'senior': 'كبير', 'normal': 'عادي', 'disabled': 'معاق' }[m.memberType] || 'عادي',
+        'المهنة': m.job || '',
+        'العنوان': m.address || '',
+        'تاريخ الانضمام': m.joinDate || '',
+        'مشترك جمعية': m.hasAssociation ? 'نعم' : 'لا',
+        'مشترك وفاة': m.hasDeath ? 'نعم' : 'لا',
+        'تاريخ اشتراك جمعية': m.associationDate || '',
+        'تاريخ اشتراك وفاة': m.deathDate || '',
+        'حالة_العضو': { 'active': 'نشط', 'exempt': 'معفي', 'suspended': 'متوقف', 'withdrawn': 'منسحب', 'deceased': 'متوفي' }[m.status] || m.status,
+        'ملاحظات': m.notes || ''
+    }));
     
-    pdf.setFontSize(18);
-    pdf.text('قائمة أعضاء الجمعية', 105, 20, { align: 'center' });
-    pdf.setFontSize(12);
-    pdf.text(`التاريخ: ${new Date().toLocaleDateString('ar-SY')}`, 105, 30, { align: 'center' });
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'الأعضاء النشطين');
+    XLSX.writeFile(wb, `الأعضاء_النشطين_${new Date().toISOString().split('T')[0]}.xlsx`);
     
-    const tableData = allMembers.map(m => [
-        `${m.familyCode}-${m.memberCode}`,
-        m.name,
-        m.sector || '-',
-        m.phone || '-',
-        m.memberAge || '-',
-        (m.hasAssociation && m.hasDeath) ? 'مزدوج' : (m.hasAssociation ? 'جمعية' : (m.hasDeath ? 'وفاة' : '-'))
-    ]);
-    
-    pdf.autoTable({
-        startY: 40,
-        head: [['الكود', 'الاسم', 'القطاع', 'الهاتف', 'العمر', 'الاشتراك']],
-        body: tableData,
-        theme: 'grid',
-        headStyles: { fillColor: [102, 126, 234], textColor: 255 },
-        styles: { font: 'amiri', fontSize: 10, cellPadding: 3 },
-        columnStyles: {
-            0: { cellWidth: 25 },
-            1: { cellWidth: 50 },
-            2: { cellWidth: 30 },
-            3: { cellWidth: 30 },
-            4: { cellWidth: 15 },
-            5: { cellWidth: 25 }
-        }
-    });
-    
-    pdf.save(`قائمة_الأعضاء_${new Date().toISOString().split('T')[0]}.pdf`);
-}
-
-// === تصدير PDF جدول مفصل ===
-function exportPDFTable() {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape
-    
-    pdf.setFontSize(16);
-    pdf.text('الجدول المفصل لأعضاء الجمعية', 148, 15, { align: 'center' });
-    
-    const tableData = allMembers.map(m => [
-        `${m.familyCode}-${m.memberCode}`,
-        m.name,
-        m.relation || '-',
-        m.sector || '-',
-        m.phone || '-',
-        m.birthDate || '-',
-        m.memberAge || '-',
-        m.memberType || 'عادي',
-        m.joinDate || '-',
-        (m.hasAssociation ? 'نعم' : 'لا'),
-        (m.hasDeath ? 'نعم' : 'لا'),
-        m.status || 'active'
-    ]);
-    
-    pdf.autoTable({
-        startY: 25,
-        head: [['الكود', 'الاسم', 'القرابة', 'القطاع', 'الهاتف', 'الميلاد', 'العمر', 'النوع', 'الانضمام', 'جمعية', 'وفاة', 'الحالة']],
-        body: tableData,
-        theme: 'striped',
-        headStyles: { fillColor: [102, 126, 234], textColor: 255, fontSize: 9 },
-        styles: { font: 'amiri', fontSize: 8, cellPadding: 2 },
-        columnStyles: {
-            0: { cellWidth: 20 },
-            1: { cellWidth: 35 },
-            2: { cellWidth: 15 },
-            3: { cellWidth: 20 },
-            4: { cellWidth: 25 },
-            5: { cellWidth: 20 },
-            6: { cellWidth: 12 },
-            7: { cellWidth: 15 },
-            8: { cellWidth: 20 },
-            9: { cellWidth: 12 },
-            10: { cellWidth: 12 },
-            11: { cellWidth: 15 }
-        }
-    });
-    
-    pdf.save(`جدول_الأعضاء_المفصل_${new Date().toISOString().split('T')[0]}.pdf`);
+    alert(`✅ تم تصدير ${filteredMembers.length} عضو نشط إلى Excel`);
 }
 
 // === واتساب جماعي ===
@@ -639,7 +617,7 @@ function sendWhatsAppBulk() {
             if (count === phones.length) {
                 alert(`✅ تم فتح ${count} محادثة واتساب`);
             }
-        }, index * 2000); // فتح كل 2 ثانية
+        }, index * 2000);
     });
 }
 
@@ -722,13 +700,13 @@ function displayMembers(members) {
         html += `
             <div class="member-card">
                 <h4>${m.name} ${typeBadge} <span class="badge badge-active">${statusText}</span></h4>
-                <p>🔑 <strong>${fullCode}</strong> | 🏢 ${m.sector || '-'} | 🎂 ${m.memberAge || '-'} سنة</p>
-                <p> ${m.phone || '-'} ${m.phone ? `<button class="whatsapp-btn" onclick="sendWhatsApp('${m.phone}', '${m.name}')">واتساب</button>` : ''}</p>
-                <p>📋 الاشتراك: ${subText} | 📅 الانضمام: ${m.joinDate || '-'}</p>
+                <p> <strong>${fullCode}</strong> | 🏢 ${m.sector || '-'} |  ${m.memberAge || '-'} سنة</p>
+                <p>📱 ${m.phone || '-'} ${m.phone ? `<button class="whatsapp-btn" onclick="sendWhatsApp('${m.phone}', '${m.name}')">واتساب</button>` : ''}</p>
+                <p> الاشتراك: ${subText} |  الانضمام: ${m.joinDate || '-'}</p>
                 ${m.notes ? `<p>📝 ${m.notes}</p>` : ''}
                 <div class="member-actions">
                     <button class="btn btn-info btn-small" onclick="viewMember('${m.id}')">عرض</button>
-                    <button class="btn btn-warning btn-small" onclick="editMember('${m.id}')">✏️ تعديل</button>
+                    <button class="btn btn-warning btn-small" onclick="editMember('${m.id}')">️ تعديل</button>
                     <button class="btn btn-danger btn-small" onclick="deleteMember('${m.id}')">🗑️ حذف</button>
                 </div>
             </div>
