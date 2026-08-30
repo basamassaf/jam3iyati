@@ -66,7 +66,7 @@
         <h1>مرحباً، <span id="userName"></span></h1>
         <p class="subtitle"> مدير عام</p>
         
-        <button class="btn" onclick="showMembers()">👥 إدارة الأعضاء</button>
+        <button class="btn" onclick="showMembers()"> إدارة الأعضاء</button>
         <button class="btn btn-secondary" onclick="doLogout()" style="margin-top: 10px;">تسجيل الخروج</button>
     </div>
 
@@ -268,20 +268,25 @@ function loadMembers() {
     const container = document.getElementById('membersList');
     container.innerHTML = '<div class="loading" style="display:block;">جاري تحميل الأعضاء...</div>';
     
-    db.collection('members')
-        .orderBy('familyCode')
-        .orderBy('memberCode')
-        .get()
+    db.collection('members').get()
         .then(snapshot => {
             allMembers = [];
             snapshot.forEach(doc => {
                 allMembers.push({ id: doc.id, ...doc.data() });
             });
+            
+            // ترتيب يدوي حسب الكود
+            allMembers.sort((a, b) => {
+                const codeA = (a.familyCode || '') + (a.memberCode || '');
+                const codeB = (b.familyCode || '') + (b.memberCode || '');
+                return codeA.localeCompare(codeB);
+            });
+            
             displayMembers(allMembers);
         })
         .catch(error => {
-            console.error('Error loading members:', error);
-            container.innerHTML = '<p style="text-align:center;color:#e74c3c;">خطأ في التحميل</p>';
+            console.error('Error:', error);
+            container.innerHTML = '<p style="text-align:center;color:#e74c3c;">خطأ: ' + error.message + '</p>';
         });
 }
 
@@ -313,11 +318,11 @@ function displayMembers(members) {
                 <h4>${m.name} <span class="badge badge-active">${statusText}</span></h4>
                 <p>🔑 <strong>${fullCode}</strong> | 🏢 ${m.sector || '-'}</p>
                 <p>📱 ${m.phone || 'غير متوفر'}</p>
-                <p>📋 الاشتراك: ${subText}</p>
-                <p> اشتراك الجمعية: ${m.associationDate || '-'} | الوفاة: ${m.deathDate || '-'}</p>
+                <p> الاشتراك: ${subText}</p>
+                <p>📅 اشتراك الجمعية: ${m.associationDate || '-'} | الوفاة: ${m.deathDate || '-'}</p>
                 ${m.notes ? `<p>📝 ${m.notes}</p>` : ''}
                 <div class="member-actions">
-                    <button class="btn btn-warning btn-small" onclick="editMember('${m.id}')">️ تعديل</button>
+                    <button class="btn btn-warning btn-small" onclick="editMember('${m.id}')">✏️ تعديل</button>
                     <button class="btn btn-danger btn-small" onclick="deleteMember('${m.id}')">🗑️ حذف</button>
                 </div>
             </div>
