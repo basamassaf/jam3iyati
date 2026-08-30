@@ -7,7 +7,7 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
         body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
         h1 { text-align: center; color: #2c3e50; margin-bottom: 10px; }
         .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 30px; }
         .input-group { margin-bottom: 20px; }
@@ -20,6 +20,7 @@
         .btn-success { background: #27ae60; }
         .btn-warning { background: #f39c12; }
         .btn-danger { background: #e74c3c; }
+        .btn-info { background: #3498db; }
         .btn-small { width: auto; padding: 8px 15px; font-size: 14px; margin: 5px; display: inline-block; }
         .error { background: #fee; color: #c33; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; }
         .success { background: #efe; color: #3a3; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; }
@@ -30,6 +31,8 @@
         .member-actions { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
         .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-right: 5px; }
         .badge-active { background: #d4edda; color: #155724; }
+        .badge-young { background: #d1ecf1; color: #0c5460; }
+        .badge-senior { background: #fff3cd; color: #856404; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
@@ -37,6 +40,13 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
         .search-box { margin-bottom: 20px; }
+        .filter-row { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .filter-row select { flex: 1; min-width: 150px; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: #e3f2fd; padding: 15px; border-radius: 10px; text-align: center; }
+        .stat-box h4 { font-size: 24px; color: #1976d2; }
+        .stat-box p { font-size: 12px; color: #666; }
+        .whatsapp-btn { background: #25D366; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-right: 5px; }
         #loginScreen, #dashboard, #membersSection { display: none; }
         #loginScreen.active, #dashboard.active, #membersSection.active { display: block; }
     </style>
@@ -64,21 +74,53 @@
     <!-- لوحة التحكم -->
     <div id="dashboard">
         <h1>مرحباً، <span id="userName"></span></h1>
-        <p class="subtitle"> مدير عام</p>
+        <p class="subtitle">👑 مدير عام</p>
         
-        <button class="btn" onclick="showMembers()"> إدارة الأعضاء</button>
+        <button class="btn" onclick="showMembers()">👥 إدارة الأعضاء</button>
         <button class="btn btn-secondary" onclick="doLogout()" style="margin-top: 10px;">تسجيل الخروج</button>
     </div>
 
     <!-- قسم الأعضاء -->
     <div id="membersSection">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2> إدارة الأعضاء</h2>
+            <h2>👥 إدارة الأعضاء</h2>
             <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
         </div>
         
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم أو الكود..." oninput="searchMembers()">
+        <!-- إحصائيات سريعة -->
+        <div class="stats-row">
+            <div class="stat-box"><h4 id="totalCount">0</h4><p>إجمالي الأعضاء</p></div>
+            <div class="stat-box"><h4 id="youngCount">0</h4><p>أعضاء شباب</p></div>
+            <div class="stat-box"><h4 id="seniorCount">0</h4><p>كبار السن</p></div>
+            <div class="stat-box"><h4 id="activeCount">0</h4><p>نشطين</p></div>
+        </div>
+        
+        <div class="filter-row">
+            <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم أو الكود أو الهاتف..." oninput="searchMembers()">
+        </div>
+        
+        <div class="filter-row">
+            <select id="filterSector" onchange="filterMembers()">
+                <option value="">كل القطاعات</option>
+                <option value="الحارة 1">الحارة 1</option>
+                <option value="الحارة 2">الحارة 2</option>
+                <option value="الوادي">الوادي</option>
+                <option value="المنصورة">المنصورة</option>
+                <option value="الجبل">الجبل</option>
+                <option value="دمر">دمر</option>
+            </select>
+            <select id="filterType" onchange="filterMembers()">
+                <option value="">كل الأنواع</option>
+                <option value="young">شاب (أقل من 30)</option>
+                <option value="senior">كبير (فوق 60)</option>
+                <option value="normal">عادي</option>
+            </select>
+            <select id="filterStatus" onchange="filterMembers()">
+                <option value="">كل الحالات</option>
+                <option value="active">نشط</option>
+                <option value="exempt">معفي</option>
+                <option value="suspended">متوقف</option>
+            </select>
         </div>
         
         <button class="btn btn-success" onclick="openAddMemberModal()">+ إضافة عضو جديد</button>
@@ -100,11 +142,11 @@
             <div class="form-row">
                 <div class="input-group">
                     <label>كود الأسرة *</label>
-                    <input type="text" id="familyCode" required placeholder="مثال: A005">
+                    <input type="text" id="familyCode" required placeholder="A005">
                 </div>
                 <div class="input-group">
                     <label>كود الفرد *</label>
-                    <input type="text" id="memberCode" required placeholder="مثال: F001">
+                    <input type="text" id="memberCode" required placeholder="F001">
                 </div>
             </div>
             
@@ -115,6 +157,26 @@
             
             <div class="form-row">
                 <div class="input-group">
+                    <label>تاريخ الميلاد</label>
+                    <input type="date" id="birthDate" onchange="calculateAge()">
+                </div>
+                <div class="input-group">
+                    <label>العمر (يُحسب تلقائياً)</label>
+                    <input type="number" id="memberAge" readonly placeholder="0">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="input-group">
+                    <label>نوع العضو</label>
+                    <select id="memberType">
+                        <option value="normal">عادي</option>
+                        <option value="young">شاب (أقل من 30)</option>
+                        <option value="senior">كبير السن (فوق 60)</option>
+                        <option value="disabled">معاق</option>
+                    </select>
+                </div>
+                <div class="input-group">
                     <label>صلة القرابة</label>
                     <select id="relation">
                         <option value="رب أسرة">رب أسرة</option>
@@ -123,22 +185,45 @@
                         <option value="بنت">بنت</option>
                     </select>
                 </div>
+            </div>
+            
+            <div class="input-group">
+                <label>القطاع</label>
+                <select id="memberSector">
+                    <option value="الحارة 1">الحارة 1</option>
+                    <option value="الحارة 2">الحارة 2</option>
+                    <option value="الوادي">الوادي</option>
+                    <option value="المنصورة">المنصورة</option>
+                    <option value="الجبل">الجبل</option>
+                    <option value="دمر">دمر</option>
+                </select>
+            </div>
+            
+            <div class="form-row">
                 <div class="input-group">
-                    <label>القطاع</label>
-                    <select id="memberSector">
-                        <option value="الحارة 1">الحارة 1</option>
-                        <option value="الحارة 2">الحارة 2</option>
-                        <option value="الوادي">الوادي</option>
-                        <option value="المنصورة">المنصورة</option>
-                        <option value="الجبل">الجبل</option>
-                        <option value="دمر">دمر</option>
-                    </select>
+                    <label>رقم الجوال</label>
+                    <input type="tel" id="memberPhone" placeholder="09xxxxxxxx">
+                </div>
+                <div class="input-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="memberEmail" placeholder="email@example.com">
                 </div>
             </div>
             
             <div class="input-group">
-                <label>رقم الجوال</label>
-                <input type="tel" id="memberPhone" placeholder="09xxxxxxxx">
+                <label>العنوان التفصيلي</label>
+                <textarea id="memberAddress" rows="2" placeholder="العنوان الكامل"></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="input-group">
+                    <label>المهنة</label>
+                    <input type="text" id="memberJob" placeholder="المهنة">
+                </div>
+                <div class="input-group">
+                    <label>تاريخ الانضمام</label>
+                    <input type="date" id="joinDate">
+                </div>
             </div>
             
             <div class="input-group">
@@ -202,14 +287,9 @@ const db = firebase.firestore();
 let currentUser = null;
 let allMembers = [];
 
-// التحقق من تسجيل الدخول
 auth.onAuthStateChanged(user => {
-    if (user) {
-        currentUser = user;
-        showDashboard();
-    } else {
-        showLogin();
-    }
+    if (user) { currentUser = user; showDashboard(); }
+    else { showLogin(); }
 });
 
 function showLogin() {
@@ -222,9 +302,7 @@ function showDashboard() {
     document.getElementById('loginScreen').classList.remove('active');
     document.getElementById('membersSection').classList.remove('active');
     document.getElementById('dashboard').classList.add('active');
-    if (currentUser) {
-        document.getElementById('userName').textContent = currentUser.email.split('@')[0];
-    }
+    if (currentUser) document.getElementById('userName').textContent = currentUser.email.split('@')[0];
 }
 
 function showMembers() {
@@ -248,9 +326,7 @@ function doLogin() {
     
     loading.style.display = 'block';
     auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-            loading.style.display = 'none';
-        })
+        .then(() => { loading.style.display = 'none'; })
         .catch(error => {
             errorMsg.textContent = '❌ خطأ: ' + error.message;
             errorMsg.style.display = 'block';
@@ -258,8 +334,32 @@ function doLogin() {
         });
 }
 
-function doLogout() {
-    auth.signOut();
+function doLogout() { auth.signOut(); }
+
+// حساب العمر تلقائياً
+function calculateAge() {
+    const birthDate = document.getElementById('birthDate').value;
+    if (!birthDate) return;
+    
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+    }
+    
+    document.getElementById('memberAge').value = age;
+    
+    // تحديد نوع العضو تلقائياً
+    if (age < 30) {
+        document.getElementById('memberType').value = 'young';
+    } else if (age > 60) {
+        document.getElementById('memberType').value = 'senior';
+    } else {
+        document.getElementById('memberType').value = 'normal';
+    }
 }
 
 // === قسم الأعضاء ===
@@ -275,13 +375,13 @@ function loadMembers() {
                 allMembers.push({ id: doc.id, ...doc.data() });
             });
             
-            // ترتيب يدوي حسب الكود
             allMembers.sort((a, b) => {
                 const codeA = (a.familyCode || '') + (a.memberCode || '');
                 const codeB = (b.familyCode || '') + (b.memberCode || '');
                 return codeA.localeCompare(codeB);
             });
             
+            updateStats();
             displayMembers(allMembers);
         })
         .catch(error => {
@@ -290,11 +390,33 @@ function loadMembers() {
         });
 }
 
+function updateStats() {
+    const today = new Date();
+    let youngCount = 0, seniorCount = 0, activeCount = 0;
+    
+    allMembers.forEach(m => {
+        if (m.status === 'active') activeCount++;
+        
+        if (m.birthDate) {
+            const birth = new Date(m.birthDate);
+            const age = today.getFullYear() - birth.getFullYear();
+            if (age < 30) youngCount++;
+            else if (age > 60) seniorCount++;
+        } else if (m.memberType === 'young') youngCount++;
+        else if (m.memberType === 'senior') seniorCount++;
+    });
+    
+    document.getElementById('totalCount').textContent = allMembers.length;
+    document.getElementById('youngCount').textContent = youngCount;
+    document.getElementById('seniorCount').textContent = seniorCount;
+    document.getElementById('activeCount').textContent = activeCount;
+}
+
 function displayMembers(members) {
     const container = document.getElementById('membersList');
     
     if (members.length === 0) {
-        container.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">لا يوجد أعضاء - اضغط "إضافة عضو جديد"</p>';
+        container.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">لا يوجد أعضاء</p>';
         return;
     }
     
@@ -313,15 +435,21 @@ function displayMembers(members) {
             'deceased': 'متوفي'
         }[m.status] || m.status;
         
+        const typeBadge = m.memberType === 'young' ? '<span class="badge badge-young">شاب</span>' : 
+                         m.memberType === 'senior' ? '<span class="badge badge-senior">كبير</span>' : '';
+        
+        const ageText = m.memberAge ? ` (${m.memberAge} سنة)` : '';
+        
         html += `
             <div class="member-card">
-                <h4>${m.name} <span class="badge badge-active">${statusText}</span></h4>
-                <p>🔑 <strong>${fullCode}</strong> | 🏢 ${m.sector || '-'}</p>
-                <p>📱 ${m.phone || 'غير متوفر'}</p>
-                <p> الاشتراك: ${subText}</p>
-                <p>📅 اشتراك الجمعية: ${m.associationDate || '-'} | الوفاة: ${m.deathDate || '-'}</p>
-                ${m.notes ? `<p>📝 ${m.notes}</p>` : ''}
+                <h4>${m.name} ${typeBadge} <span class="badge badge-active">${statusText}</span></h4>
+                <p>🔑 <strong>${fullCode}</strong> |  ${m.sector || '-'} | 🎂 ${m.memberAge || '-'}${ageText}</p>
+                <p>📱 ${m.phone || '-'} ${m.phone ? `<button class="whatsapp-btn" onclick="sendWhatsApp('${m.phone}', '${m.name}')">واتساب</button>` : ''}</p>
+                <p>📋 الاشتراك: ${subText} | 📅 الانضمام: ${m.joinDate || '-'}</p>
+                <p>🏠 اشتراك الجمعية: ${m.associationDate || '-'} | الوفاة: ${m.deathDate || '-'}</p>
+                ${m.notes ? `<p> ${m.notes}</p>` : ''}
                 <div class="member-actions">
+                    <button class="btn btn-info btn-small" onclick="viewMember('${m.id}')">عرض</button>
                     <button class="btn btn-warning btn-small" onclick="editMember('${m.id}')">✏️ تعديل</button>
                     <button class="btn btn-danger btn-small" onclick="deleteMember('${m.id}')">🗑️ حذف</button>
                 </div>
@@ -334,26 +462,43 @@ function displayMembers(members) {
 
 function searchMembers() {
     const term = document.getElementById('searchInput').value.toLowerCase().trim();
-    
-    if (!term) {
-        displayMembers(allMembers);
-        return;
-    }
+    if (!term) { displayMembers(allMembers); return; }
     
     const filtered = allMembers.filter(m => {
         const fullCode = `${m.familyCode}-${m.memberCode}`.toLowerCase();
         return m.name.toLowerCase().includes(term) || 
                fullCode.includes(term) ||
-               (m.phone && m.phone.includes(term));
+               (m.phone && m.phone.includes(term)) ||
+               (m.email && m.email.toLowerCase().includes(term));
     });
     
     displayMembers(filtered);
+}
+
+function filterMembers() {
+    const sector = document.getElementById('filterSector').value;
+    const type = document.getElementById('filterType').value;
+    const status = document.getElementById('filterStatus').value;
+    
+    let filtered = allMembers;
+    if (sector) filtered = filtered.filter(m => m.sector === sector);
+    if (type) filtered = filtered.filter(m => m.memberType === type);
+    if (status) filtered = filtered.filter(m => m.status === status);
+    
+    displayMembers(filtered);
+}
+
+function sendWhatsApp(phone, name) {
+    const text = `مرحباً ${name}،\n\nهذه رسالة من نظام إدارة الجمعية.`;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
 }
 
 function openAddMemberModal() {
     document.getElementById('modalTitle').textContent = 'إضافة عضو جديد';
     document.getElementById('memberForm').reset();
     document.getElementById('memberId').value = '';
+    document.getElementById('joinDate').value = new Date().toISOString().split('T')[0];
     document.getElementById('memberModal').classList.add('active');
 }
 
@@ -369,9 +514,16 @@ function saveMember(event) {
         familyCode: document.getElementById('familyCode').value,
         memberCode: document.getElementById('memberCode').value,
         name: document.getElementById('memberName').value,
+        birthDate: document.getElementById('birthDate').value,
+        memberAge: parseInt(document.getElementById('memberAge').value) || 0,
+        memberType: document.getElementById('memberType').value,
         relation: document.getElementById('relation').value,
         sector: document.getElementById('memberSector').value,
         phone: document.getElementById('memberPhone').value,
+        email: document.getElementById('memberEmail').value,
+        address: document.getElementById('memberAddress').value,
+        job: document.getElementById('memberJob').value,
+        joinDate: document.getElementById('joinDate').value,
         hasAssociation: document.getElementById('subAssociation').checked,
         hasDeath: document.getElementById('subDeath').checked,
         associationDate: document.getElementById('associationDate').value,
@@ -382,7 +534,6 @@ function saveMember(event) {
     };
     
     if (memberId) {
-        // تعديل عضو موجود
         db.collection('members').doc(memberId).update(memberData)
             .then(() => {
                 alert('✅ تم تعديل العضو بنجاح');
@@ -390,11 +541,10 @@ function saveMember(event) {
                 loadMembers();
             })
             .catch(error => {
-                console.error('Error updating member:', error);
-                alert('❌ خطأ في التعديل: ' + error.message);
+                console.error('Error:', error);
+                alert(' خطأ: ' + error.message);
             });
     } else {
-        // إضافة عضو جديد
         memberData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
         db.collection('members').add(memberData)
             .then(() => {
@@ -403,10 +553,36 @@ function saveMember(event) {
                 loadMembers();
             })
             .catch(error => {
-                console.error('Error adding member:', error);
-                alert('❌ خطأ في الإضافة: ' + error.message);
+                console.error('Error:', error);
+                alert('❌ خطأ: ' + error.message);
             });
     }
+}
+
+function viewMember(memberId) {
+    db.collection('members').doc(memberId).get()
+        .then(doc => {
+            if (doc.exists) {
+                const m = doc.data();
+                const fullCode = `${m.familyCode}-${m.memberCode}`;
+                alert(`
+الاسم: ${m.name}
+الكود: ${fullCode}
+تاريخ الميلاد: ${m.birthDate || '-'}
+العمر: ${m.memberAge || '-'} سنة
+النوع: ${m.memberType || 'عادي'}
+القطاع: ${m.sector || '-'}
+الهاتف: ${m.phone || '-'}
+البريد: ${m.email || '-'}
+العنوان: ${m.address || '-'}
+المهنة: ${m.job || '-'}
+تاريخ الانضمام: ${m.joinDate || '-'}
+الاشتراك: ${(m.hasAssociation ? 'جمعية ' : '') + (m.hasDeath ? 'وفاة' : '') || 'غير مشترك'}
+الحالة: ${m.status}
+ملاحظات: ${m.notes || '-'}
+                `);
+            }
+        });
 }
 
 function editMember(memberId) {
@@ -419,9 +595,16 @@ function editMember(memberId) {
                 document.getElementById('familyCode').value = m.familyCode || '';
                 document.getElementById('memberCode').value = m.memberCode || '';
                 document.getElementById('memberName').value = m.name || '';
+                document.getElementById('birthDate').value = m.birthDate || '';
+                document.getElementById('memberAge').value = m.memberAge || '';
+                document.getElementById('memberType').value = m.memberType || 'normal';
                 document.getElementById('relation').value = m.relation || 'رب أسرة';
                 document.getElementById('memberSector').value = m.sector || 'الحارة 1';
                 document.getElementById('memberPhone').value = m.phone || '';
+                document.getElementById('memberEmail').value = m.email || '';
+                document.getElementById('memberAddress').value = m.address || '';
+                document.getElementById('memberJob').value = m.job || '';
+                document.getElementById('joinDate').value = m.joinDate || '';
                 document.getElementById('subAssociation').checked = m.hasAssociation || false;
                 document.getElementById('subDeath').checked = m.hasDeath || false;
                 document.getElementById('associationDate').value = m.associationDate || '';
@@ -429,13 +612,11 @@ function editMember(memberId) {
                 document.getElementById('memberStatus').value = m.status || 'active';
                 document.getElementById('memberNotes').value = m.notes || '';
                 document.getElementById('memberModal').classList.add('active');
-            } else {
-                alert('❌ العضو غير موجود');
             }
         })
         .catch(error => {
-            console.error('Error loading member:', error);
-            alert('❌ خطأ في تحميل البيانات: ' + error.message);
+            console.error('Error:', error);
+            alert('❌ خطأ: ' + error.message);
         });
 }
 
@@ -443,22 +624,19 @@ function deleteMember(memberId) {
     if (confirm('هل أنت متأكد من حذف هذا العضو؟')) {
         db.collection('members').doc(memberId).delete()
             .then(() => {
-                alert('✅ تم حذف العضو بنجاح');
+                alert('✅ تم الحذف');
                 loadMembers();
             })
             .catch(error => {
-                console.error('Error deleting member:', error);
-                alert('❌ خطأ في الحذف: ' + error.message);
+                console.error('Error:', error);
+                alert('❌ خطأ: ' + error.message);
             });
     }
 }
 
-// إغلاق النوافذ عند النقر خارجها
 document.querySelectorAll('.modal').forEach(modal => {
     modal.addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.classList.remove('active');
-        }
+        if (e.target === this) this.classList.remove('active');
     });
 });
 </script>
