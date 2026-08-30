@@ -10,14 +10,11 @@
             font-family: 'Segoe UI', Tahoma, Arial, sans-serif; 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
             min-height: 100vh; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
             padding: 20px;
         }
         .container { 
             max-width: 900px; 
-            width: 100%;
+            margin: 0 auto;
             background: #fff; 
             padding: 30px; 
             border-radius: 20px; 
@@ -27,55 +24,113 @@
         .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 30px; font-size: 14px; }
         .input-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50; font-size: 14px; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; }
-        input:focus, select:focus { outline: none; border-color: #667eea; }
-        .btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #ddd; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; }
+        .btn { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 10px; 
+            font-family: inherit;
+        }
         .btn:active { transform: scale(0.98); }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-secondary { background: #95a5a6; }
         .btn-success { background: #27ae60; }
         .btn-danger { background: #e74c3c; }
         .btn-info { background: #3498db; }
+        .btn-small { width: auto; padding: 8px 15px; font-size: 14px; margin: 0 5px; }
         .error { background: #fee; color: #c33; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; text-align: center; }
         .success { background: #efe; color: #3a3; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; text-align: center; }
         .loading { text-align: center; color: #667eea; margin-top: 15px; display: none; }
-        .dashboard { display: none; }
+        
+        /* إخفاء كل الشاشات افتراضياً */
+        #loginScreen, #dashboard, .section { display: none; }
+        #loginScreen.active, #dashboard.active, .section.active { display: block; }
+        
         .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .stat-box { background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center; }
         .stat-box h3 { font-size: 12px; color: #7f8c8d; margin-bottom: 5px; }
         .stat-box p { font-size: 24px; font-weight: bold; color: #2c3e50; }
         .menu { margin-top: 20px; }
-        .menu-item { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s; }
+        .menu-item { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin-bottom: 10px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        }
         .menu-item:hover { background: #e9ecef; transform: translateY(-2px); }
         .menu-item h4 { color: #2c3e50; margin-bottom: 5px; }
         .menu-item p { color: #7f8c8d; font-size: 12px; }
         .logout { background: #e74c3c; margin-top: 20px; }
-        .section { display: none; margin-top: 20px; }
-        .section.active { display: block; }
-        .member-card { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-right: 4px solid #667eea; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .member-card { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin-bottom: 10px; 
+            border-right: 4px solid #667eea; 
+        }
         .member-card h4 { color: #2c3e50; margin-bottom: 5px; }
         .member-card p { color: #7f8c8d; font-size: 13px; margin: 3px 0; }
-        .member-actions { display: flex; gap: 10px; margin-top: 10px; }
-        .member-actions button { flex: 1; padding: 8px; font-size: 14px; }
+        .member-actions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
         .search-box { margin-bottom: 20px; }
         .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
         .badge-active { background: #d4edda; color: #155724; }
         .badge-inactive { background: #f8d7da; color: #721c24; }
-        .back-btn { background: #6c757d; margin-bottom: 15px; }
         .form-group { margin-bottom: 15px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: 1fr; }
+        }
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
+        }
         .modal.active { display: flex; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            max-width: 500px; 
+            width: 100%; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-header h3 { color: #2c3e50; }
         .close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .info-box { background: #e3f2fd; color: #1976d2; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <!-- شاشة تسجيل الدخول -->
-    <div id="loginScreen">
+    <div id="loginScreen" class="active">
         <h1>🏛️ نظام إدارة الجمعية</h1>
         <p class="subtitle">تسجيل دخول المستخدمين</p>
         <div class="error" id="errorMsg"></div>
@@ -92,9 +147,9 @@
     </div>
 
     <!-- لوحة التحكم الرئيسية -->
-    <div id="dashboard" class="dashboard">
+    <div id="dashboard">
         <h1>مرحباً، <span id="userName"></span></h1>
-        <p class="subtitle" id="userRole">جاري التحميل...</p>
+        <p class="subtitle" id="userRole">👑 مدير عام</p>
         
         <div class="stats">
             <div class="stat-box"><h3>الأعضاء النشطين</h3><p id="activeMembers">0</p></div>
@@ -107,7 +162,7 @@
                 <p>إضافة، تعديل، بحث</p>
             </div>
             <div class="menu-item" onclick="showSection('payments')">
-                <h4> تسجيل دفعة</h4>
+                <h4>💰 تسجيل دفعة</h4>
                 <p>تسجيل دفعة جديدة</p>
             </div>
             <div class="menu-item" onclick="showSection('reports')">
@@ -120,40 +175,55 @@
 
     <!-- قسم إدارة الأعضاء -->
     <div id="membersSection" class="section">
-        <button class="btn back-btn" onclick="showDashboard()">← رجوع</button>
-        <h2>👥 إدارة الأعضاء</h2>
+        <div class="section-header">
+            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
+            <h2>👥 إدارة الأعضاء</h2>
+        </div>
         
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم أو الهاتف..." oninput="searchMembers()">
+            <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم أو كود الأسرة أو كود الفرد..." oninput="searchMembers()">
         </div>
 
         <button class="btn btn-success" onclick="openAddMemberModal()">+ إضافة عضو جديد</button>
         
         <div id="membersList" style="margin-top: 20px;">
-            <div class="loading">جاري تحميل الأعضاء...</div>
+            <div class="loading" style="display:block;">جاري تحميل الأعضاء...</div>
         </div>
     </div>
 
     <!-- قسم تسجيل الدفعات -->
     <div id="paymentsSection" class="section">
-        <button class="btn back-btn" onclick="showDashboard()">← رجوع</button>
-        <h2>💰 تسجيل دفعة جديدة</h2>
+        <div class="section-header">
+            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
+            <h2>💰 تسجيل دفعة جديدة</h2>
+        </div>
         <div id="paymentForm">
             <div class="form-group">
                 <label>اختر العضو:</label>
                 <select id="memberSelect"></select>
             </div>
-            <div class="form-group">
-                <label>المبلغ (ل.س):</label>
-                <input type="number" id="paymentAmount" placeholder="0">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>المبلغ (ل.س):</label>
+                    <input type="number" id="paymentAmount" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>التاريخ:</label>
+                    <input type="date" id="paymentDate">
+                </div>
             </div>
             <div class="form-group">
-                <label>التاريخ:</label>
-                <input type="date" id="paymentDate">
+                <label>نوع الدفعة:</label>
+                <select id="paymentType">
+                    <option value="monthly">اشتراك شهري</option>
+                    <option value="yearly">اشتراك سنوي</option>
+                    <option value="donation">تبرع</option>
+                    <option value="other">أخرى</option>
+                </select>
             </div>
             <div class="form-group">
                 <label>ملاحظات:</label>
-                <input type="text" id="paymentNotes" placeholder="اختياري">
+                <textarea id="paymentNotes" placeholder="اختياري" rows="3"></textarea>
             </div>
             <button class="btn btn-success" onclick="savePayment()">حفظ الدفعة</button>
         </div>
@@ -161,10 +231,12 @@
 
     <!-- قسم التقارير -->
     <div id="reportsSection" class="section">
-        <button class="btn back-btn" onclick="showDashboard()">← رجوع</button>
-        <h2> التقارير والإحصائيات</h2>
+        <div class="section-header">
+            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
+            <h2>📊 التقارير والإحصائيات</h2>
+        </div>
         <div id="reportsContent">
-            <div class="loading">جاري تحميل التقارير...</div>
+            <div class="loading" style="display:block;">جاري تحميل التقارير...</div>
         </div>
     </div>
 </div>
@@ -178,30 +250,74 @@
         </div>
         <form id="memberForm" onsubmit="saveMember(event)">
             <input type="hidden" id="memberId">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>كود الأسرة *</label>
+                    <input type="text" id="familyCode" required placeholder="مثال: F001">
+                </div>
+                <div class="form-group">
+                    <label>كود الفرد *</label>
+                    <input type="text" id="memberCode" required placeholder="مثال: M001">
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>الاسم الكامل *</label>
-                <input type="text" id="memberName" required placeholder="أدخل الاسم">
+                <input type="text" id="memberName" required placeholder="أدخل الاسم الكامل">
             </div>
+
             <div class="form-group">
                 <label>رقم الهاتف *</label>
                 <input type="tel" id="memberPhone" required placeholder="09xxxxxxxx">
             </div>
+
             <div class="form-group">
-                <label>القطاع:</label>
-                <select id="memberSector">
-                    <option value="all">عام</option>
-                    <option value="education">تعليم</option>
-                    <option value="health">صحة</option>
-                    <option value="social">اجتماعي</option>
-                </select>
+                <label>العنوان:</label>
+                <input type="text" id="memberAddress" placeholder="العنوان (اختياري)">
             </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>نوع الاشتراك:</label>
+                    <select id="subscriptionType">
+                        <option value="monthly">شهري</option>
+                        <option value="yearly">سنوي</option>
+                        <option value="quarterly">ربع سنوي</option>
+                        <option value="none">بدون اشتراك</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الاشتراك:</label>
+                    <input type="date" id="subscriptionDate">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>القطاع:</label>
+                    <select id="memberSector">
+                        <option value="general">عام</option>
+                        <option value="education">تعليم</option>
+                        <option value="health">صحة</option>
+                        <option value="social">اجتماعي</option>
+                        <option value="economic">اقتصادي</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>الحالة:</label>
+                    <select id="memberStatus">
+                        <option value="active">نشط</option>
+                        <option value="inactive">غير نشط</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="form-group">
-                <label>الحالة:</label>
-                <select id="memberStatus">
-                    <option value="active">نشط</option>
-                    <option value="inactive">غير نشط</option>
-                </select>
+                <label>ملاحظات:</label>
+                <textarea id="memberNotes" placeholder="ملاحظات إضافية" rows="2"></textarea>
             </div>
+
             <button type="submit" class="btn btn-success">حفظ</button>
             <button type="button" class="btn btn-secondary" onclick="closeMemberModal()">إلغاء</button>
         </form>
@@ -233,11 +349,45 @@
     auth.onAuthStateChanged(user => {
         if (user) {
             currentUser = user;
-            showDashboard(user);
+            showDashboard();
         } else {
             showLogin();
         }
     });
+
+    function showLogin() {
+        document.getElementById('loginScreen').classList.add('active');
+        document.getElementById('dashboard').classList.remove('active');
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    }
+
+    function showDashboard() {
+        document.getElementById('loginScreen').classList.remove('active');
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById('dashboard').classList.add('active');
+        
+        if (currentUser) {
+            document.getElementById('userName').textContent = currentUser.email.split('@')[0];
+        }
+        loadStats();
+    }
+
+    function showSection(sectionName) {
+        document.getElementById('loginScreen').classList.remove('active');
+        document.getElementById('dashboard').classList.remove('active');
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        
+        if (sectionName === 'members') {
+            document.getElementById('membersSection').classList.add('active');
+            loadMembers();
+        } else if (sectionName === 'payments') {
+            document.getElementById('paymentsSection').classList.add('active');
+            loadMembersForSelect();
+        } else if (sectionName === 'reports') {
+            document.getElementById('reportsSection').classList.add('active');
+            loadReports();
+        }
+    }
 
     function doLogin() {
         const email = document.getElementById('email').value.trim();
@@ -260,6 +410,7 @@
         auth.signInWithEmailAndPassword(email, password)
             .then(userCredential => {
                 loading.style.display = 'none';
+                loginBtn.disabled = false;
             })
             .catch(error => {
                 let msg = '❌ خطأ في تسجيل الدخول';
@@ -274,57 +425,20 @@
             });
     }
 
-    function showDashboard(user) {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('userName').textContent = user.email.split('@')[0];
-        document.getElementById('userRole').textContent = '👑 مدير عام';
-        
-        loadStats();
-    }
-
-    function showLogin() {
-        document.getElementById('loginScreen').style.display = 'block';
-        document.getElementById('dashboard').style.display = 'none';
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    }
-
     function doLogout() {
         auth.signOut();
-    }
-
-    function showSection(sectionName) {
-        document.getElementById('dashboard').style.display = 'none';
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        
-        if (sectionName === 'members') {
-            document.getElementById('membersSection').classList.add('active');
-            loadMembers();
-        } else if (sectionName === 'payments') {
-            document.getElementById('paymentsSection').classList.add('active');
-            loadMembersForSelect();
-        } else if (sectionName === 'reports') {
-            document.getElementById('reportsSection').classList.add('active');
-            loadReports();
-        }
-    }
-
-    function showDashboard() {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById('dashboard').style.display = 'block';
-        loadStats();
     }
 
     // إدارة الأعضاء
     function loadMembers() {
         const membersList = document.getElementById('membersList');
-        membersList.innerHTML = '<div class="loading">جاري تحميل الأعضاء...</div>';
+        membersList.innerHTML = '<div class="loading" style="display:block;">جاري تحميل الأعضاء...</div>';
 
         db.collection('members').orderBy('createdAt', 'desc').get()
             .then(snapshot => {
                 allMembers = [];
                 if (snapshot.empty) {
-                    membersList.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">لا يوجد أعضاء</p>';
+                    membersList.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">لا يوجد أعضاء - اضغط "إضافة عضو جديد" للبدء</p>';
                     return;
                 }
 
@@ -352,16 +466,20 @@
         members.forEach(member => {
             const statusClass = member.status === 'active' ? 'badge-active' : 'badge-inactive';
             const statusText = member.status === 'active' ? 'نشط' : 'غير نشط';
+            const subTypes = { 'monthly': 'شهري', 'yearly': 'سنوي', 'quarterly': 'ربع سنوي', 'none': 'بدون' };
             
             html += `
                 <div class="member-card">
                     <h4>${member.name}</h4>
+                    <p>🔑 كود الأسرة: <strong>${member.familyCode || '-'}</strong> | كود الفرد: <strong>${member.memberCode || '-'}</strong></p>
                     <p>📱 ${member.phone || 'غير متوفر'}</p>
-                    <p>🏢 القطاع: ${member.sector || 'عام'}</p>
+                    <p>🏢 القطاع: ${member.sector || 'عام'} | الاشتراك: ${subTypes[member.subscriptionType] || 'غير محدد'}</p>
+                    <p> تاريخ الاشتراك: ${member.subscriptionDate || 'غير محدد'}</p>
                     <p>الحالة: <span class="badge ${statusClass}">${statusText}</span></p>
+                    ${member.notes ? `<p>📝 ${member.notes}</p>` : ''}
                     <div class="member-actions">
-                        <button class="btn btn-info" onclick="editMember('${member.id}')">تعديل</button>
-                        <button class="btn btn-danger" onclick="deleteMember('${member.id}')">حذف</button>
+                        <button class="btn btn-info btn-small" onclick="editMember('${member.id}')">تعديل</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteMember('${member.id}')">حذف</button>
                     </div>
                 </div>
             `;
@@ -379,7 +497,9 @@
 
         const filtered = allMembers.filter(m => 
             m.name.toLowerCase().includes(searchTerm) ||
-            (m.phone && m.phone.includes(searchTerm))
+            (m.phone && m.phone.includes(searchTerm)) ||
+            (m.familyCode && m.familyCode.toLowerCase().includes(searchTerm)) ||
+            (m.memberCode && m.memberCode.toLowerCase().includes(searchTerm))
         );
 
         displayMembers(filtered);
@@ -389,6 +509,7 @@
         document.getElementById('modalTitle').textContent = 'إضافة عضو جديد';
         document.getElementById('memberForm').reset();
         document.getElementById('memberId').value = '';
+        document.getElementById('subscriptionDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('memberModal').classList.add('active');
     }
 
@@ -401,15 +522,20 @@
         
         const memberId = document.getElementById('memberId').value;
         const memberData = {
+            familyCode: document.getElementById('familyCode').value,
+            memberCode: document.getElementById('memberCode').value,
             name: document.getElementById('memberName').value,
             phone: document.getElementById('memberPhone').value,
+            address: document.getElementById('memberAddress').value,
+            subscriptionType: document.getElementById('subscriptionType').value,
+            subscriptionDate: document.getElementById('subscriptionDate').value,
             sector: document.getElementById('memberSector').value,
             status: document.getElementById('memberStatus').value,
+            notes: document.getElementById('memberNotes').value,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
         if (memberId) {
-            // تعديل عضو موجود
             db.collection('members').doc(memberId).update(memberData)
                 .then(() => {
                     alert('✅ تم تعديل العضو بنجاح');
@@ -421,7 +547,6 @@
                     alert('❌ خطأ في تعديل العضو');
                 });
         } else {
-            // إضافة عضو جديد
             memberData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
             memberData.createdBy = currentUser.uid;
             
@@ -445,10 +570,16 @@
                     const data = doc.data();
                     document.getElementById('modalTitle').textContent = 'تعديل بيانات العضو';
                     document.getElementById('memberId').value = memberId;
+                    document.getElementById('familyCode').value = data.familyCode || '';
+                    document.getElementById('memberCode').value = data.memberCode || '';
                     document.getElementById('memberName').value = data.name || '';
                     document.getElementById('memberPhone').value = data.phone || '';
-                    document.getElementById('memberSector').value = data.sector || 'all';
+                    document.getElementById('memberAddress').value = data.address || '';
+                    document.getElementById('subscriptionType').value = data.subscriptionType || 'monthly';
+                    document.getElementById('subscriptionDate').value = data.subscriptionDate || '';
+                    document.getElementById('memberSector').value = data.sector || 'general';
                     document.getElementById('memberStatus').value = data.status || 'active';
+                    document.getElementById('memberNotes').value = data.notes || '';
                     document.getElementById('memberModal').classList.add('active');
                 }
             })
@@ -480,7 +611,7 @@
             .then(snapshot => {
                 snapshot.forEach(doc => {
                     const member = doc.data();
-                    select.innerHTML += `<option value="${doc.id}">${member.name}</option>`;
+                    select.innerHTML += `<option value="${doc.id}">${member.name} (${member.familyCode}-${member.memberCode})</option>`;
                 });
             })
             .catch(error => {
@@ -492,6 +623,7 @@
         const memberId = document.getElementById('memberSelect').value;
         const amount = parseFloat(document.getElementById('paymentAmount').value);
         const date = document.getElementById('paymentDate').value;
+        const paymentType = document.getElementById('paymentType').value;
         const notes = document.getElementById('paymentNotes').value;
 
         if (!memberId || !amount || amount <= 0) {
@@ -503,6 +635,7 @@
             memberId: memberId,
             amount: amount,
             date: date || new Date().toISOString().split('T')[0],
+            paymentType: paymentType,
             notes: notes,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             createdBy: currentUser.uid
@@ -521,7 +654,6 @@
     }
 
     function loadStats() {
-        // تحميل إحصائيات سريعة
         db.collection('members').where('status', '==', 'active').get()
             .then(snapshot => {
                 document.getElementById('activeMembers').textContent = snapshot.size;
@@ -539,7 +671,7 @@
 
     function loadReports() {
         const content = document.getElementById('reportsContent');
-        content.innerHTML = '<div class="loading">جاري التحميل...</div>';
+        content.innerHTML = '<div class="loading" style="display:block;">جاري التحميل...</div>';
 
         Promise.all([
             db.collection('members').get(),
@@ -550,8 +682,9 @@
             let totalPayments = 0;
             let totalAmount = 0;
 
-            membersSnap.forEach(() => {
+            membersSnap.forEach(doc => {
                 totalMembers++;
+                if (doc.data().status === 'active') activeMembers++;
             });
 
             paymentsSnap.forEach(doc => {
@@ -562,22 +695,12 @@
 
             content.innerHTML = `
                 <div class="stats">
-                    <div class="stat-box">
-                        <h3>إجمالي الأعضاء</h3>
-                        <p>${totalMembers}</p>
-                    </div>
-                    <div class="stat-box">
-                        <h3>إجمالي الدفعات</h3>
-                        <p>${totalPayments}</p>
-                    </div>
-                    <div class="stat-box">
-                        <h3>إجمالي المحصّل</h3>
-                        <p>${totalAmount.toLocaleString()} ل.س</p>
-                    </div>
-                    <div class="stat-box">
-                        <h3>متوسط الدفعة</h3>
-                        <p>${totalPayments > 0 ? Math.round(totalAmount / totalPayments).toLocaleString() : 0} ل.س</p>
-                    </div>
+                    <div class="stat-box"><h3>إجمالي الأعضاء</h3><p>${totalMembers}</p></div>
+                    <div class="stat-box"><h3>الأعضاء النشطين</h3><p>${activeMembers}</p></div>
+                    <div class="stat-box"><h3>إجمالي الدفعات</h3><p>${totalPayments}</p></div>
+                    <div class="stat-box"><h3>إجمالي المحصّل</h3><p>${totalAmount.toLocaleString()} ل.س</p></div>
+                    <div class="stat-box"><h3>متوسط الدفعة</h3><p>${totalPayments > 0 ? Math.round(totalAmount / totalPayments).toLocaleString() : 0} ل.س</p></div>
+                    <div class="stat-box"><h3>الأعضاء غير النشطين</h3><p>${totalMembers - activeMembers}</p></div>
                 </div>
             `;
         }).catch(error => {
@@ -586,12 +709,17 @@
         });
     }
 
-    // Set today's date as default
+    // تعيين تاريخ اليوم كافتراضي
     document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
 
-    // Enter key support
+    // دعم مفتاح Enter
     document.getElementById('password').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') doLogin();
+    });
+
+    // إغلاق النافذة عند النقر خارجها
+    document.getElementById('memberModal').addEventListener('click', function(e) {
+        if (e.target === this) closeMemberModal();
     });
 </script>
 
