@@ -27,7 +27,6 @@
         .success { background: #efe; color: #3a3; padding: 8px; border-radius: 6px; margin-bottom: 10px; display: none; text-align: center; font-size: 13px; }
         .loading { text-align: center; color: #667eea; margin: 15px 0; font-size: 14px; }
         
-        /* بطاقة مضغوطة */
         .member-card { 
             background: #f8f9fa; 
             padding: 6px 10px; 
@@ -99,7 +98,7 @@
 
 <div class="container">
     <div id="loginScreen" class="active">
-        <h1>🏛️ نظام إدارة الجمعية</h1>
+        <h1>️ نظام إدارة الجمعية</h1>
         <p class="subtitle">تسجيل دخول المستخدمين</p>
         <div class="error" id="errorMsg"></div>
         <div class="input-group">
@@ -116,7 +115,7 @@
     <div id="dashboard">
         <h1>مرحباً، <span id="userName"></span></h1>
         <p class="subtitle" id="userRole">👑 مدير عام</p>
-        <button class="btn" onclick="showMembers()"> إدارة الأعضاء</button>
+        <button class="btn" onclick="showMembers()">👥 إدارة الأعضاء</button>
         <button class="btn btn-secondary" onclick="doLogout()" style="margin-top: 10px;">تسجيل الخروج</button>
     </div>
 
@@ -126,7 +125,6 @@
             <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
         </div>
         
-        <!-- إحصائيات -->
         <div class="stats-row" id="statsRow">
             <div class="stat-box" onclick="quickFilter('all')"><h4 id="totalCount">0</h4><p>الكل</p></div>
             <div class="stat-box" onclick="quickFilter('active')"><h4 id="activeCount">0</h4><p>نشط</p></div>
@@ -138,9 +136,8 @@
             <div class="stat-box" onclick="quickFilter('new_members')"><h4 id="newCount">0</h4><p>جدد</p></div>
         </div>
 
-        <!-- اختيار القطاع (للمعتمد) -->
         <div class="sector-selector" id="sectorSelector">
-            <h4> اختر القطاع للعرض:</h4>
+            <h4>🎯 اختر القطاع للعرض:</h4>
             <div class="sector-buttons">
                 <button class="btn btn-small" onclick="selectSector('all')" id="sector-all">الكل</button>
                 <button class="btn btn-small" onclick="selectSector('الحارة 1')" id="sector-الحارة 1">الحارة 1</button>
@@ -152,12 +149,10 @@
             </div>
         </div>
 
-        <!-- بحث -->
         <div class="filter-row">
-            <input type="text" id="searchInput" placeholder=" ابحث بالاسم، الكود، الهاتف..." oninput="debounceSearch()">
+            <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم، الكود، الهاتف..." oninput="doSearch()">
         </div>
         
-        <!-- فلاتر -->
         <div class="filter-row">
             <select id="filterStatus" onchange="applyFilters()">
                 <option value="">كل الحالات</option>
@@ -194,13 +189,13 @@
 
         <div class="view-toggle">
             <button class="btn btn-small active" id="viewIndividual" onclick="setView('individual')">👤 أفراد</button>
-            <button class="btn btn-small" id="viewFamily" onclick="setView('family')">👨‍👩‍👧‍ أسر</button>
+            <button class="btn btn-small" id="viewFamily" onclick="setView('family')">👨👩‍👧‍ أسر</button>
         </div>
 
         <div class="export-buttons">
             <button class="btn btn-success btn-small" onclick="openAddMemberModal()">+ إضافة</button>
-            <button class="btn btn-info btn-small" onclick="exportToExcel()">📊 Excel</button>
-            <button class="btn btn-warning btn-small" onclick="resetFilters()">🔄 إعادة</button>
+            <button class="btn btn-info btn-small" onclick="exportToExcel()"> Excel</button>
+            <button class="btn btn-warning btn-small" onclick="resetFilters()"> إعادة</button>
         </div>
         
         <div class="results-count" id="resultsCount">جاري التحميل...</div>
@@ -208,7 +203,6 @@
     </div>
 </div>
 
-<!-- نافذة إضافة/تعديل -->
 <div id="memberModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -311,9 +305,9 @@ let currentUser = null;
 let allMembers = [];
 let filteredMembers = [];
 let currentView = 'individual';
-let currentSector = 'all'; // القطاع المختار حالياً
+let currentSector = 'all';
+let userRole = 'admin';
 let searchTimeout = null;
-let userRole = 'admin'; // admin أو trustee
 
 auth.onAuthStateChanged(user => {
     if (user) { 
@@ -325,7 +319,6 @@ auth.onAuthStateChanged(user => {
     }
 });
 
-// تحميل دور المستخدم وقطاعه
 async function loadUserRole() {
     try {
         const doc = await db.collection('users').doc(currentUser.uid).get();
@@ -335,8 +328,6 @@ async function loadUserRole() {
             currentSector = data.sector || 'all';
             document.getElementById('userRole').textContent = 
                 userRole === 'admin' ? '👑 مدير عام' : `👔 معتمد - ${currentSector}`;
-            
-            // تحديث اختيار القطاع الافتراضي
             updateSectorButtons();
         }
     } catch (error) {
@@ -370,25 +361,24 @@ function doLogin() {
     const errorMsg = document.getElementById('errorMsg');
     
     if (!email || !password) {
-        errorMsg.textContent = '️ أدخل البريد وكلمة المرور';
+        errorMsg.textContent = '⚠️ أدخل البريد وكلمة المرور';
         errorMsg.style.display = 'block';
         return;
     }
     
     auth.signInWithEmailAndPassword(email, password)
         .catch(error => {
-            errorMsg.textContent = '❌ خطأ: ' + error.message;
+            errorMsg.textContent = ' خطأ: ' + error.message;
             errorMsg.style.display = 'block';
         });
 }
 
 function doLogout() { auth.signOut(); }
 
-// ========== تحميل الأعضاء ==========
 async function loadMembers() {
     const container = document.getElementById('membersList');
     const resultsCount = document.getElementById('resultsCount');
-    resultsCount.textContent = '⏳ جاري التحميل...';
+    resultsCount.textContent = ' جاري التحميل...';
     container.innerHTML = '<div class="loading">جاري تحميل الأعضاء...</div>';
     
     try {
@@ -411,7 +401,6 @@ async function loadMembers() {
     }
 }
 
-// ========== اختيار القطاع ==========
 function selectSector(sector) {
     currentSector = sector;
     updateSectorButtons();
@@ -428,7 +417,6 @@ function updateSectorButtons() {
     });
 }
 
-// ========== حساب العمر ==========
 function calculateAge() {
     const birthDate = document.getElementById('birthDate').value;
     if (!birthDate) return;
@@ -449,15 +437,14 @@ function calculateAge() {
     else document.getElementById('memberType').value = 'normal';
 }
 
-// ========== البحث ==========
-function debounceSearch() {
+// ✅ البحث الفوري - يعمل بالحرف
+function doSearch() {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
         applyFilters();
-    }, 300);
+    }, 200);
 }
 
-// ========== الفلترة السريعة ==========
 function quickFilter(type) {
     document.getElementById('filterStatus').value = '';
     document.getElementById('filterSubscription').value = '';
@@ -471,25 +458,11 @@ function quickFilter(type) {
     else if (type === 'sub_both') document.getElementById('filterSubscription').value = 'both';
     else if (type === 'sub_assoc') document.getElementById('filterSubscription').value = 'association';
     else if (type === 'sub_death') document.getElementById('filterSubscription').value = 'death';
-    else if (type === 'new_members') {
-        // فلتر مخصص للجدد
-        filteredMembers = allMembers.filter(m => {
-            if (currentSector !== 'all' && m.sector !== currentSector) return false;
-            if (m.joinDate) {
-                const joinYear = new Date(m.joinDate).getFullYear();
-                return joinYear >= 2024;
-            }
-            return false;
-        });
-        updateStats();
-        displayMembers();
-        return;
-    }
     
     applyFilters();
 }
 
-// ========== تطبيق الفلاتر ==========
+// ✅ تطبيق الفلاتر - البحث يعمل بالحرف
 function applyFilters() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
     const status = document.getElementById('filterStatus').value;
@@ -497,20 +470,27 @@ function applyFilters() {
     const relation = document.getElementById('filterRelation').value;
     const type = document.getElementById('filterType').value;
     
-    // ✅ نبدأ دائماً من allMembers
+    console.log('🔍 بحث:', searchTerm);
+    
     filteredMembers = allMembers.filter(m => {
         // فلتر القطاع
         if (currentSector !== 'all' && m.sector !== currentSector) return false;
         
-        // البحث
-        if (searchTerm) {
-            const fullCode = `${m.familyCode}-${m.memberCode}`.toLowerCase();
-            const searchMatch = 
-                m.name.toLowerCase().includes(searchTerm) || 
-                fullCode.includes(searchTerm) ||
-                (m.phone && m.phone.includes(searchTerm)) ||
-                (m.sector && m.sector.toLowerCase().includes(searchTerm));
-            if (!searchMatch) return false;
+        // ✅ البحث الفوري بالحرف
+        if (searchTerm && searchTerm.length > 0) {
+            const name = (m.name || '').toLowerCase();
+            const code = `${m.familyCode}-${m.memberCode}`.toLowerCase();
+            const phone = (m.phone || '').toLowerCase();
+            const sector = (m.sector || '').toLowerCase();
+            
+            const foundInName = name.includes(searchTerm);
+            const foundInCode = code.includes(searchTerm);
+            const foundInPhone = phone.includes(searchTerm);
+            const foundInSector = sector.includes(searchTerm);
+            
+            if (!foundInName && !foundInCode && !foundInPhone && !foundInSector) {
+                return false;
+            }
         }
         
         if (status && m.status !== status) return false;
@@ -529,11 +509,11 @@ function applyFilters() {
         return true;
     });
     
+    console.log('✅ النتائج:', filteredMembers.length);
     updateStats();
     displayMembers();
 }
 
-// ========== إعادة تعيين ==========
 function resetFilters() {
     document.getElementById('searchInput').value = '';
     document.getElementById('filterStatus').value = '';
@@ -545,7 +525,6 @@ function resetFilters() {
     applyFilters();
 }
 
-// ========== تحديث الإحصائيات ==========
 function updateStats() {
     const today = new Date();
     let youngCount = 0, seniorCount = 0, activeCount = 0;
@@ -584,7 +563,6 @@ function updateStats() {
     document.getElementById('newCount').textContent = newCount;
 }
 
-// ========== تغيير العرض ==========
 function setView(view) {
     currentView = view;
     document.getElementById('viewIndividual').classList.toggle('active', view === 'individual');
@@ -592,7 +570,6 @@ function setView(view) {
     displayMembers();
 }
 
-// ========== عرض الأعضاء ==========
 function displayMembers() {
     const container = document.getElementById('membersList');
     const resultsCount = document.getElementById('resultsCount');
@@ -659,7 +636,7 @@ function displayFamilyView(container) {
         const familyName = head ? head.name : familyCode;
         
         html += `<div class="family-group">`;
-        html += `<h4>👨‍👩‍‍👦 ${familyCode} - ${familyName} (${members.length})</h4>`;
+        html += `<h4>👨‍👩‍👧‍ ${familyCode} - ${familyName} (${members.length})</h4>`;
         
         members.forEach(m => {
             const fullCode = `${m.familyCode}-${m.memberCode}`;
@@ -671,7 +648,7 @@ function displayFamilyView(container) {
                 <div class="family-member" onclick="viewMember('${m.id}')" style="cursor:pointer;">
                     <strong>${m.name}</strong> ${headBadge}
                     <span class="badge badge-active">${m.status === 'active' ? 'نشط' : m.status}</span>
-                    <small>${fullCode} | ${subText} | 📱 ${m.phone || '-'}</small>
+                    <small>${fullCode} | ${subText} |  ${m.phone || '-'}</small>
                 </div>
             `;
         });
@@ -682,7 +659,6 @@ function displayFamilyView(container) {
     container.innerHTML = html;
 }
 
-// ========== تصدير Excel ==========
 function exportToExcel() {
     const data = filteredMembers.map(m => ({
         'كود الأسرة': m.familyCode,
@@ -708,14 +684,12 @@ function exportToExcel() {
     alert(`✅ تم تصدير ${data.length} عضو`);
 }
 
-// ========== واتساب ==========
 function sendWhatsApp(phone, name) {
     const message = `مرحباً ${name}،\n\nهذه رسالة من نظام إدارة الجمعية.`;
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
 }
 
-// ========== إدارة الأعضاء ==========
 function openAddMemberModal() {
     document.getElementById('modalTitle').textContent = 'إضافة عضو جديد';
     document.getElementById('memberForm').reset();
@@ -780,13 +754,13 @@ function viewMember(memberId) {
     alert(`
 👤 ${m.name}
 🔑 ${fullCode}
-🏢 ${m.sector || '-'} |  ${m.relation || '-'}
+🏢 ${m.sector || '-'} | 👥 ${m.relation || '-'}
 🎂 ${m.birthDate || '-'} (${m.memberAge || '-'} سنة)
 📱 ${m.phone || '-'}
 📧 ${m.email || '-'}
-📋 الاشتراك: ${subText}
+ الاشتراك: ${subText}
 📅 الانضمام: ${m.joinDate || '-'}
-📊 الحالة: ${m.status}
+ الحالة: ${m.status}
 📝 ${m.notes || 'لا ملاحظات'}
     `.trim());
 }
