@@ -3,67 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الجمعية</title>
+    <title>نظام إدارة الجمعية - الأعضاء</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
         body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1100px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-        h1 { text-align: center; color: #2c3e50; margin-bottom: 10px; font-size: 24px; }
-        .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 30px; font-size: 14px; }
+        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 30px; }
         .input-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50; font-size: 14px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #2c3e50; }
         input, select, textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; }
         .btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn:active { transform: scale(0.98); }
         .btn-secondary { background: #95a5a6; }
         .btn-success { background: #27ae60; }
-        .btn-danger { background: #e74c3c; }
-        .btn-info { background: #3498db; }
         .btn-warning { background: #f39c12; }
+        .btn-danger { background: #e74c3c; }
         .btn-small { width: auto; padding: 8px 15px; font-size: 14px; margin: 5px; display: inline-block; }
-        .error { background: #fee; color: #c33; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; text-align: center; }
-        .success { background: #efe; color: #3a3; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; text-align: center; }
-        .loading { text-align: center; color: #667eea; margin-top: 15px; display: none; }
-        #loginScreen, #dashboard, .section { display: none; }
-        #loginScreen.active, #dashboard.active, .section.active { display: block; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
-        .stat-box { background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center; }
-        .stat-box h3 { font-size: 12px; color: #7f8c8d; margin-bottom: 5px; }
-        .stat-box p { font-size: 20px; font-weight: bold; color: #2c3e50; }
-        .menu { margin-top: 20px; }
-        .menu-item { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s; }
-        .menu-item:hover { background: #e9ecef; transform: translateY(-2px); }
-        .menu-item h4 { color: #2c3e50; margin-bottom: 5px; }
-        .menu-item p { color: #7f8c8d; font-size: 12px; }
-        .logout { background: #e74c3c; margin-top: 20px; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .member-card { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-right: 4px solid #667eea; position: relative; }
+        .error { background: #fee; color: #c33; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; }
+        .success { background: #efe; color: #3a3; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; }
+        .loading { text-align: center; color: #667eea; margin: 15px 0; display: none; }
+        .member-card { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-right: 4px solid #667eea; }
         .member-card h4 { color: #2c3e50; margin-bottom: 5px; }
         .member-card p { color: #7f8c8d; font-size: 13px; margin: 3px 0; }
         .member-actions { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
-        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin: 2px; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-right: 5px; }
         .badge-active { background: #d4edda; color: #155724; }
-        .badge-late { background: #f8d7da; color: #721c24; }
-        .badge-trustee { background: #d1ecf1; color: #0c5460; }
-        .form-group { margin-bottom: 15px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
         .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-header h3 { color: #2c3e50; }
         .close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
-        .tab-container { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 2px solid #ddd; flex-wrap: wrap; }
-        .tab { padding: 10px 20px; cursor: pointer; border-bottom: 3px solid transparent; }
-        .tab.active { border-bottom-color: #667eea; color: #667eea; font-weight: bold; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .info-box { background: #e3f2fd; color: #1976d2; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; }
-        .filter-row { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
-        .filter-row select { flex: 1; min-width: 150px; }
-        .whatsapp-btn { background: #25D366; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
-        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr 1fr; } }
+        .search-box { margin-bottom: 20px; }
+        #loginScreen, #dashboard, #membersSection { display: none; }
+        #loginScreen.active, #dashboard.active, #membersSection.active { display: block; }
     </style>
 </head>
 <body>
@@ -89,285 +64,120 @@
     <!-- لوحة التحكم -->
     <div id="dashboard">
         <h1>مرحباً، <span id="userName"></span></h1>
-        <p class="subtitle" id="userRole">👑 مدير عام</p>
+        <p class="subtitle"> مدير عام</p>
         
-        <div class="stats">
-            <div class="stat-box"><h3>الأعضاء النشطين</h3><p id="activeMembers">0</p></div>
-            <div class="stat-box"><h3>إجمالي الأعضاء</h3><p id="totalMembers">0</p></div>
-            <div class="stat-box"><h3>إجمالي المحصّل</h3><p id="totalCollected">0 ل.س</p></div>
-            <div class="stat-box"><h3>عدد الوفيات</h3><p id="deathCount">0</p></div>
-        </div>
-
-        <div class="menu">
-            <div class="menu-item" onclick="showSection('members')"><h4>👥 إدارة الأعضاء</h4><p>إضافة، تعديل، بحث، فرز</p></div>
-            <div class="menu-item" onclick="showSection('payments')"><h4>💰 الدفعات</h4><p>تسجيل الدفعات</p></div>
-            <div class="menu-item" onclick="showSection('inout')"><h4>📥📤 الوارد والصادر</h4><p>سجل الحركات</p></div>
-            <div class="menu-item" onclick="showSection('trustees')"><h4> المعتمدين</h4><p>التسليمات والصلاحيات</p></div>
-            <div class="menu-item" onclick="showSection('deaths')"><h4>️ سجل الوفيات</h4><p>تسجيل ومتابعة</p></div>
-            <div class="menu-item" onclick="showSection('meetings')"><h4>📋 الاجتماعات</h4><p>تسجيل وحضور وقرارات</p></div>
-            <div class="menu-item" onclick="showSection('inventory')"><h4>🏪 المستودع</h4><p>جرد، تأجير، بيع</p></div>
-            <div class="menu-item" onclick="showSection('rates')"><h4> الثوابت</h4><p>الاشتراكات السنوية</p></div>
-            <div class="menu-item" onclick="showSection('reports')"><h4>📈 التقارير</h4><p>الإحصائيات</p></div>
-        </div>
-        <button class="btn logout" onclick="doLogout()">تسجيل الخروج</button>
+        <button class="btn" onclick="showMembers()">👥 إدارة الأعضاء</button>
+        <button class="btn btn-secondary" onclick="doLogout()" style="margin-top: 10px;">تسجيل الخروج</button>
     </div>
 
-    <!-- الأعضاء -->
-    <div id="membersSection" class="section">
-        <div class="section-header">
-            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
+    <!-- قسم الأعضاء -->
+    <div id="membersSection">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2> إدارة الأعضاء</h2>
+            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
         </div>
-        <div class="info-box"> الجميع يستطيع تسجيل الدفعات | المشترك القديم لا يدفع رسوم انضمام | المستحقات حسب تاريخ الاشتراك</div>
         
-        <div class="filter-row">
+        <div class="search-box">
             <input type="text" id="searchInput" placeholder="🔍 ابحث بالاسم أو الكود..." oninput="searchMembers()">
-            <select id="filterSector" onchange="filterMembers()">
-                <option value="">كل القطاعات</option>
-                <option value="الحارة 1">الحارة 1</option>
-                <option value="الحارة 2">الحارة 2</option>
-                <option value="الوادي">الوادي</option>
-                <option value="المنصورة">المنصورة</option>
-                <option value="الجبل">الجبل</option>
-                <option value="دمر">دمر</option>
-            </select>
-            <select id="filterStatus" onchange="filterMembers()">
-                <option value="">كل الحالات</option>
-                <option value="active">نشط</option>
-                <option value="late">متأخر</option>
-                <option value="exempt">معفي</option>
-            </select>
         </div>
         
         <button class="btn btn-success" onclick="openAddMemberModal()">+ إضافة عضو جديد</button>
+        
         <div id="membersList" style="margin-top: 20px;"></div>
     </div>
-
-    <!-- الدفعات -->
-    <div id="paymentsSection" class="section">
-        <div class="section-header">
-            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
-            <h2>💰 تسجيل دفعة</h2>
-        </div>
-        <div class="form-group"><label>اختر العضو:</label><select id="paymentMemberSelect" onchange="calculatePayment()"></select></div>
-        <div class="form-group"><label>نوع الدفعة:</label>
-            <select id="paymentType" onchange="calculatePayment()">
-                <option value="association">قسط جمعية</option>
-                <option value="death">قسط وفاة</option>
-                <option value="donation">تبرع</option>
-                <option value="joining_fee">رسوم انضمام (لمرة واحدة)</option>
-                <option value="fine">غرامة (كسر/تأخير)</option>
-            </select>
-        </div>
-        <div class="form-row">
-            <div class="form-group"><label>المبلغ (ل.س):</label><input type="number" id="paymentAmount" placeholder="0"></div>
-            <div class="form-group"><label>التاريخ:</label><input type="date" id="paymentDate"></div>
-        </div>
-        <div class="form-group"><label>ملاحظات:</label><textarea id="paymentNotes" rows="3"></textarea></div>
-        <div class="form-group"><label>إرسال واتساب:</label><input type="checkbox" id="sendWhatsApp"> <label for="sendWhatsApp">نعم، أرسل إشعار للعضو</label></div>
-        <button class="btn btn-success" onclick="savePayment()">حفظ الدفعة</button>
-        <div id="paymentsHistory" style="margin-top: 20px;"></div>
-    </div>
-
-    <!-- الوارد والصادر -->
-    <div id="inoutSection" class="section">
-        <div class="section-header">
-            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
-            <h2>📤 الوارد والصادر</h2>
-        </div>
-        <div class="tab-container">
-            <div class="tab active" onclick="switchTab('incoming')">الوارد</div>
-            <div class="tab" onclick="switchTab('outgoing')">الصادر</div>
-        </div>
-        <div id="incoming" class="tab-content">
-            <button class="btn btn-success" onclick="openInOutModal('incoming')" style="margin-bottom: 15px;">+ وارد جديد</button>
-            <div id="incomingList"></div>
-        </div>
-        <div id="outgoing" class="tab-content">
-            <button class="btn btn-danger" onclick="openInOutModal('outgoing')" style="margin-bottom: 15px;">+ صادر جديد</button>
-            <div id="outgoingList"></div>
-        </div>
-    </div>
-
-    <!-- المعتمدين -->
-    <div id="trusteesSection" class="section">
-        <div class="section-header">
-            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
-            <h2>👔 المعتمدين والتسليمات</h2>
-        </div>
-        <div class="info-box"> المعتمدون يمكنهم تسجيل الدفعات من أي قطاع | التسليم يتم للأمين</div>
-        <button class="btn btn-success" onclick="openTrusteeModal()" style="margin-bottom: 15px;">+ معتمد جديد</button>
-        <div id="trusteesList"></div>
-        <h3 style="margin-top: 30px;">سجل التسليمات</h3>
-        <div id="deliveriesList" style="margin-top: 15px;"></div>
-    </div>
-
-    <!-- سجل الوفيات -->
-    <div id="deathsSection" class="section">
-        <div class="section-header">
-            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
-            <h2>⚰️ سجل الوفيات</h2>
-        </div>
-        <button class="btn btn-danger" onclick="openDeathModal()" style="margin-bottom: 15px;">+ تسجيل وفاة</button>
-        <div id="deathsList"></div>
-    </div>
-
-    <!-- الاجتماعات -->
-    <div id="meetingsSection" class="section">
-        <div class="section-header">
-            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
-            <h2>📋 الاجتماعات والقرارات</h2>
-        </div>
-        <button class="btn btn-success" onclick="openMeetingModal()" style="margin-bottom: 15px;">+ اجتماع جديد</button>
-        <div id="meetingsList"></div>
-    </div>
-
-    <!-- المستودع -->
-    <div id="inventorySection" class="section">
-        <div class="section-header">
-            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
-            <h2>🏪 المستودع</h2>
-        </div>
-        <div class="tab-container">
-            <div class="tab active" onclick="switchTab('inventoryList')">الجرد</div>
-            <div class="tab" onclick="switchTab('inventoryRent')">التأجير</div>
-            <div class="tab" onclick="switchTab('inventorySale')">البيع</div>
-        </div>
-        <div id="inventoryListTab" class="tab-content active"></div>
-        <div id="inventoryRent" class="tab-content"></div>
-        <div id="inventorySale" class="tab-content"></div>
-    </div>
-
-    <!-- الثوابت -->
-    <div id="ratesSection" class="section">
-        <div class="section-header">
-            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
-            <h2>📊 ثوابت الاشتراكات</h2>
-        </div>
-        <button class="btn btn-success" onclick="openAddRateModal()" style="margin-bottom: 15px;">+ سنة جديدة</button>
-        <div id="ratesList"></div>
-    </div>
-
-    <!-- التقارير -->
-    <div id="reportsSection" class="section">
-        <div class="section-header">
-            <button class="btn btn-secondary btn-small" onclick="showDashboard()">← رجوع</button>
-            <h2>📈 التقارير</h2>
-        </div>
-        <div id="reportsContent"></div>
-    </div>
 </div>
 
-<!-- نوافذ منبثقة -->
+<!-- نافذة إضافة/تعديل عضو -->
 <div id="memberModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3 id="modalTitle">إضافة عضو</h3><button class="close-modal" onclick="closeMemberModal()">×</button></div>
+        <div class="modal-header">
+            <h3 id="modalTitle">إضافة عضو جديد</h3>
+            <button class="close-modal" onclick="closeMemberModal()">×</button>
+        </div>
         <form id="memberForm" onsubmit="saveMember(event)">
             <input type="hidden" id="memberId">
+            
             <div class="form-row">
-                <div class="form-group"><label>كود الأسرة *</label><input type="text" id="familyCode" required></div>
-                <div class="form-group"><label>كود الفرد *</label><input type="text" id="memberCode" required></div>
+                <div class="input-group">
+                    <label>كود الأسرة *</label>
+                    <input type="text" id="familyCode" required placeholder="مثال: A005">
+                </div>
+                <div class="input-group">
+                    <label>كود الفرد *</label>
+                    <input type="text" id="memberCode" required placeholder="مثال: F001">
+                </div>
             </div>
-            <div class="form-group"><label>الاسم الثلاثي *</label><input type="text" id="memberName" required></div>
+            
+            <div class="input-group">
+                <label>الاسم الثلاثي *</label>
+                <input type="text" id="memberName" required placeholder="الاسم الكامل">
+            </div>
+            
             <div class="form-row">
-                <div class="form-group"><label>صلة القرابة</label><select id="relation"><option value="رب أسرة">رب أسرة</option><option value="زوجة">زوجة</option><option value="ابن">ابن</option><option value="بنت">بنت</option></select></div>
-                <div class="form-group"><label>القطاع</label><select id="memberSector"><option value="الحارة 1">الحارة 1</option><option value="الحارة 2">الحارة 2</option><option value="الوادي">الوادي</option><option value="المنصورة">المنصورة</option><option value="الجبل">الجبل</option><option value="دمر">دمر</option></select></div>
+                <div class="input-group">
+                    <label>صلة القرابة</label>
+                    <select id="relation">
+                        <option value="رب أسرة">رب أسرة</option>
+                        <option value="زوجة">زوجة</option>
+                        <option value="ابن">ابن</option>
+                        <option value="بنت">بنت</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>القطاع</label>
+                    <select id="memberSector">
+                        <option value="الحارة 1">الحارة 1</option>
+                        <option value="الحارة 2">الحارة 2</option>
+                        <option value="الوادي">الوادي</option>
+                        <option value="المنصورة">المنصورة</option>
+                        <option value="الجبل">الجبل</option>
+                        <option value="دمر">دمر</option>
+                    </select>
+                </div>
             </div>
-            <div class="form-group"><label>رقم الجوال</label><input type="tel" id="memberPhone" placeholder="لإرسال واتساب"></div>
-            <div class="form-group"><label>نوع الاشتراك:</label><div style="display:flex;gap:15px;margin:10px 0;"><label><input type="checkbox" id="subAssociation"> جمعية</label><label><input type="checkbox" id="subDeath"> وفاة</label></div></div>
+            
+            <div class="input-group">
+                <label>رقم الجوال</label>
+                <input type="tel" id="memberPhone" placeholder="09xxxxxxxx">
+            </div>
+            
+            <div class="input-group">
+                <label>نوع الاشتراك:</label>
+                <div style="display: flex; gap: 15px; margin: 10px 0;">
+                    <label><input type="checkbox" id="subAssociation"> جمعية</label>
+                    <label><input type="checkbox" id="subDeath"> وفاة</label>
+                </div>
+            </div>
+            
             <div class="form-row">
-                <div class="form-group"><label>تاريخ اشتراك الجمعية</label><input type="date" id="associationDate"></div>
-                <div class="form-group"><label>تاريخ اشتراك الوفاة</label><input type="date" id="deathDate"></div>
+                <div class="input-group">
+                    <label>تاريخ اشتراك الجمعية</label>
+                    <input type="date" id="associationDate">
+                </div>
+                <div class="input-group">
+                    <label>تاريخ اشتراك الوفاة</label>
+                    <input type="date" id="deathDate">
+                </div>
             </div>
-            <div class="form-group"><label>حالة العضو:</label><select id="memberStatus"><option value="active">نشط</option><option value="exempt">معفي</option><option value="suspended">متوقف</option><option value="withdrawn">منسحب</option><option value="deceased">متوفي</option></select></div>
-            <div class="form-group"><label>ملاحظات:</label><textarea id="memberNotes" rows="2"></textarea></div>
+            
+            <div class="input-group">
+                <label>حالة العضو:</label>
+                <select id="memberStatus">
+                    <option value="active">نشط</option>
+                    <option value="exempt">معفي</option>
+                    <option value="suspended">متوقف</option>
+                    <option value="withdrawn">منسحب</option>
+                    <option value="deceased">متوفي</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label>ملاحظات:</label>
+                <textarea id="memberNotes" rows="2"></textarea>
+            </div>
+            
             <button type="submit" class="btn btn-success">حفظ</button>
             <button type="button" class="btn btn-secondary" onclick="closeMemberModal()">إلغاء</button>
-        </form>
-    </div>
-</div>
-
-<div id="rateModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><h3>ثوابت سنة جديدة</h3><button class="close-modal" onclick="closeRateModal()">×</button></div>
-        <form id="rateForm" onsubmit="saveRate(event)">
-            <input type="hidden" id="rateId">
-            <div class="form-group"><label>السنة *</label><input type="number" id="rateYear" required placeholder="2025"></div>
-            <div class="form-row">
-                <div class="form-group"><label>قسط جمعية</label><input type="number" id="rateAssociation" placeholder="24000"></div>
-                <div class="form-group"><label>قسط وفاة (للواحد)</label><input type="number" id="rateDeath" placeholder="5000"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>عدد الوفيات</label><input type="number" id="deathCount" placeholder="5" onchange="calculateDeathTotal()"></div>
-                <div class="form-group"><label>إجمالي قسط وفاة</label><input type="number" id="deathTotal" readonly></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>رسوم انضمام جمعية</label><input type="number" id="joiningAssociation" placeholder="49000"></div>
-                <div class="form-group"><label>رسوم انضمام وفاة</label><input type="number" id="joiningDeath" placeholder="75000"></div>
-            </div>
-            <div class="form-group"><label>مستحقات الوفاة السنوية</label><input type="number" id="deathBenefits" placeholder="25000"></div>
-            <button type="submit" class="btn btn-success">حفظ</button>
-            <button type="button" class="btn btn-secondary" onclick="closeRateModal()">إلغاء</button>
-        </form>
-    </div>
-</div>
-
-<div id="deathModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><h3>تسجيل وفاة</h3><button class="close-modal" onclick="closeDeathModal()">×</button></div>
-        <form id="deathForm" onsubmit="saveDeath(event)">
-            <div class="form-group"><label>العضو المتوفي *</label><select id="deathMember" required></select></div>
-            <div class="form-group"><label>تاريخ الوفاة *</label><input type="date" id="deathDateInput" required></div>
-            <div class="form-group"><label>ملاحظات:</label><textarea id="deathNotes" rows="2"></textarea></div>
-            <button type="submit" class="btn btn-danger">حفظ الوفاة</button>
-            <button type="button" class="btn btn-secondary" onclick="closeDeathModal()">إلغاء</button>
-        </form>
-    </div>
-</div>
-
-<div id="meetingModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><h3>اجتماع جديد</h3><button class="close-modal" onclick="closeMeetingModal()">×</button></div>
-        <form id="meetingForm" onsubmit="saveMeeting(event)">
-            <div class="form-group"><label>عنوان الاجتماع *</label><input type="text" id="meetingTitle" required></div>
-            <div class="form-row">
-                <div class="form-group"><label>التاريخ</label><input type="date" id="meetingDate"></div>
-                <div class="form-group"><label>الوقت</label><input type="time" id="meetingTime"></div>
-            </div>
-            <div class="form-group"><label>الحاضرون:</label><textarea id="meetingAttendees" rows="3" placeholder="أسماء الحاضرون، كل اسم في سطر"></textarea></div>
-            <div class="form-group"><label>جدول الأعمال:</label><textarea id="meetingAgenda" rows="3"></textarea></div>
-            <div class="form-group"><label>القرارات:</label><textarea id="meetingDecisions" rows="4" placeholder="القرارات المتخذة"></textarea></div>
-            <button type="submit" class="btn btn-success">حفظ</button>
-            <button type="button" class="btn btn-secondary" onclick="closeMeetingModal()">إلغاء</button>
-        </form>
-    </div>
-</div>
-
-<div id="trusteeModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><h3>معتمد جديد</h3><button class="close-modal" onclick="closeTrusteeModal()">×</button></div>
-        <form id="trusteeForm" onsubmit="saveTrustee(event)">
-            <div class="form-group"><label>اسم المعتمد *</label><input type="text" id="trusteeName" required></div>
-            <div class="form-group"><label>القطاع المسؤول *</label><select id="trusteeSector" required><option value="الحارة 1">الحارة 1</option><option value="الحارة 2">الحارة 2</option><option value="الوادي">الوادي</option><option value="المنصورة">المنصورة</option><option value="الجبل">الجبل</option><option value="دمر">دمر</option></select></div>
-            <div class="form-group"><label>رقم الجوال:</label><input type="tel" id="trusteePhone"></div>
-            <div class="form-group"><label>صلاحيات:</label><div style="display:flex;gap:15px;margin:10px 0;"><label><input type="checkbox" id="trusteeCanCollect" checked> تحصيل</label><label><input type="checkbox" id="trusteeCanDeliver"> تسليم للأمين</label></div></div>
-            <button type="submit" class="btn btn-success">حفظ</button>
-            <button type="button" class="btn btn-secondary" onclick="closeTrusteeModal()">إلغاء</button>
-        </form>
-    </div>
-</div>
-
-<div id="inOutModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header"><h3 id="inOutTitle">وارد جديد</h3><button class="close-modal" onclick="closeInOutModal()">×</button></div>
-        <form id="inOutForm" onsubmit="saveInOut(event)">
-            <input type="hidden" id="inOutType">
-            <div class="form-group"><label>المبلغ *</label><input type="number" id="inOutAmount" required></div>
-            <div class="form-group"><label>التاريخ</label><input type="date" id="inOutDate"></div>
-            <div class="form-group"><label>البيان:</label><textarea id="inOutDescription" rows="3" required></textarea></div>
-            <div class="form-group"><label>الصندوق:</label><select id="inOutFund"><option value="association">صندوق الجمعية</option><option value="death">صندوق الوفاة</option></select></div>
-            <button type="submit" class="btn btn-success">حفظ</button>
-            <button type="button" class="btn btn-secondary" onclick="closeInOutModal()">إلغاء</button>
         </form>
     </div>
 </div>
@@ -391,41 +201,37 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 let currentUser = null;
 let allMembers = [];
-let allRates = [];
 
+// التحقق من تسجيل الدخول
 auth.onAuthStateChanged(user => {
-    if (user) { currentUser = user; showDashboard(); }
-    else { showLogin(); }
+    if (user) {
+        currentUser = user;
+        showDashboard();
+    } else {
+        showLogin();
+    }
 });
 
 function showLogin() {
     document.getElementById('loginScreen').classList.add('active');
     document.getElementById('dashboard').classList.remove('active');
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('membersSection').classList.remove('active');
 }
 
 function showDashboard() {
     document.getElementById('loginScreen').classList.remove('active');
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('membersSection').classList.remove('active');
     document.getElementById('dashboard').classList.add('active');
-    if (currentUser) document.getElementById('userName').textContent = currentUser.email.split('@')[0];
-    loadStats();
+    if (currentUser) {
+        document.getElementById('userName').textContent = currentUser.email.split('@')[0];
+    }
 }
 
-function showSection(name) {
+function showMembers() {
     document.getElementById('loginScreen').classList.remove('active');
     document.getElementById('dashboard').classList.remove('active');
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(name + 'Section').classList.add('active');
-    if (name === 'members') loadMembers();
-    else if (name === 'payments') { loadMembersForPayment(); loadPaymentsHistory(); }
-    else if (name === 'inout') { loadInOut(); }
-    else if (name === 'trustees') { loadTrustees(); loadDeliveries(); }
-    else if (name === 'deaths') loadDeaths();
-    else if (name === 'meetings') loadMeetings();
-    else if (name === 'inventory') loadInventory();
-    else if (name === 'rates') loadRates();
-    else if (name === 'reports') loadReports();
+    document.getElementById('membersSection').classList.add('active');
+    loadMembers();
 }
 
 function doLogin() {
@@ -435,14 +241,16 @@ function doLogin() {
     const loading = document.getElementById('loading');
     
     if (!email || !password) {
-        errorMsg.textContent = '️ أدخل البريد وكلمة المرور';
+        errorMsg.textContent = '⚠️ أدخل البريد وكلمة المرور';
         errorMsg.style.display = 'block';
         return;
     }
     
     loading.style.display = 'block';
     auth.signInWithEmailAndPassword(email, password)
-        .then(() => { loading.style.display = 'none'; })
+        .then(() => {
+            loading.style.display = 'none';
+        })
         .catch(error => {
             errorMsg.textContent = '❌ خطأ: ' + error.message;
             errorMsg.style.display = 'block';
@@ -450,80 +258,89 @@ function doLogin() {
         });
 }
 
-function doLogout() { auth.signOut(); }
+function doLogout() {
+    auth.signOut();
+}
 
-// الأعضاء
+// === قسم الأعضاء ===
+
 function loadMembers() {
     const container = document.getElementById('membersList');
-    container.innerHTML = '<div class="loading" style="display:block;">جاري التحميل...</div>';
+    container.innerHTML = '<div class="loading" style="display:block;">جاري تحميل الأعضاء...</div>';
     
-    db.collection('members').orderBy('familyCode').orderBy('memberCode').get()
+    db.collection('members')
+        .orderBy('familyCode')
+        .orderBy('memberCode')
+        .get()
         .then(snapshot => {
             allMembers = [];
-            snapshot.forEach(doc => allMembers.push({ id: doc.id, ...doc.data() }));
+            snapshot.forEach(doc => {
+                allMembers.push({ id: doc.id, ...doc.data() });
+            });
             displayMembers(allMembers);
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error loading members:', error);
             container.innerHTML = '<p style="text-align:center;color:#e74c3c;">خطأ في التحميل</p>';
         });
 }
 
 function displayMembers(members) {
     const container = document.getElementById('membersList');
+    
     if (members.length === 0) {
-        container.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">لا يوجد أعضاء</p>';
+        container.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">لا يوجد أعضاء - اضغط "إضافة عضو جديد"</p>';
         return;
     }
     
     let html = '';
     members.forEach(m => {
         const fullCode = `${m.familyCode}-${m.memberCode}`;
-        const subText = (m.hasAssociation && m.hasDeath) ? 'مزدوج' : (m.hasAssociation ? 'جمعية' : (m.hasDeath ? 'وفاة' : 'غير مشترك'));
-        const statusText = { 'active': 'نشط', 'exempt': 'معفي', 'suspended': 'متوقف', 'withdrawn': 'منسحب', 'deceased': 'متوفي' }[m.status] || m.status;
-        const isLate = m.status === 'late';
+        const subText = (m.hasAssociation && m.hasDeath) ? 'مزدوج' : 
+                       (m.hasAssociation ? 'جمعية' : 
+                       (m.hasDeath ? 'وفاة' : 'غير مشترك'));
+        
+        const statusText = {
+            'active': 'نشط',
+            'exempt': 'معفي',
+            'suspended': 'متوقف',
+            'withdrawn': 'منسحب',
+            'deceased': 'متوفي'
+        }[m.status] || m.status;
         
         html += `
-            <div class="member-card" style="border-right-color: ${isLate ? '#e74c3c' : '#667eea'};">
-                <h4>${m.name} 
-                    <span class="badge ${isLate ? 'badge-late' : 'badge-active'}">${statusText}</span>
-                    ${m.sector ? `<span class="badge badge-trustee">${m.sector}</span>` : ''}
-                </h4>
-                <p>🔑 ${fullCode} | 🏢 ${m.sector || '-'}</p>
-                <p>📱 ${m.phone || '-'} ${m.phone ? `<button class="whatsapp-btn" onclick="sendWhatsApp('${m.phone}', '${m.name}')">واتساب</button>` : ''}</p>
+            <div class="member-card">
+                <h4>${m.name} <span class="badge badge-active">${statusText}</span></h4>
+                <p>🔑 <strong>${fullCode}</strong> | 🏢 ${m.sector || '-'}</p>
+                <p>📱 ${m.phone || 'غير متوفر'}</p>
                 <p>📋 الاشتراك: ${subText}</p>
                 <p> اشتراك الجمعية: ${m.associationDate || '-'} | الوفاة: ${m.deathDate || '-'}</p>
                 ${m.notes ? `<p>📝 ${m.notes}</p>` : ''}
                 <div class="member-actions">
-                    <button class="btn btn-info btn-small" onclick="viewMember('${m.id}')">عرض</button>
-                    <button class="btn btn-warning btn-small" onclick="editMember('${m.id}')">تعديل</button>
-                    <button class="btn btn-danger btn-small" onclick="deleteMember('${m.id}')">حذف</button>
+                    <button class="btn btn-warning btn-small" onclick="editMember('${m.id}')">️ تعديل</button>
+                    <button class="btn btn-danger btn-small" onclick="deleteMember('${m.id}')">🗑️ حذف</button>
                 </div>
             </div>
         `;
     });
+    
     container.innerHTML = html;
 }
 
 function searchMembers() {
-    const term = document.getElementById('searchInput').value.toLowerCase();
-    if (!term) { displayMembers(allMembers); return; }
-    const filtered = allMembers.filter(m => 
-        m.name.toLowerCase().includes(term) ||
-        (m.familyCode + '-' + m.memberCode).toLowerCase().includes(term) ||
-        (m.phone && m.phone.includes(term))
-    );
-    displayMembers(filtered);
-}
-
-function filterMembers() {
-    const sector = document.getElementById('filterSector').value;
-    const status = document.getElementById('filterStatus').value;
+    const term = document.getElementById('searchInput').value.toLowerCase().trim();
     
-    let filtered = allMembers;
-    if (sector) filtered = filtered.filter(m => m.sector === sector);
-    if (status === 'late') filtered = filtered.filter(m => m.status === 'late');
-    else if (status) filtered = filtered.filter(m => m.status === status);
+    if (!term) {
+        displayMembers(allMembers);
+        return;
+    }
+    
+    const filtered = allMembers.filter(m => {
+        const fullCode = `${m.familyCode}-${m.memberCode}`.toLowerCase();
+        return m.name.toLowerCase().includes(term) || 
+               fullCode.includes(term) ||
+               (m.phone && m.phone.includes(term));
+    });
     
     displayMembers(filtered);
 }
@@ -535,12 +352,15 @@ function openAddMemberModal() {
     document.getElementById('memberModal').classList.add('active');
 }
 
-function closeMemberModal() { document.getElementById('memberModal').classList.remove('active'); }
+function closeMemberModal() {
+    document.getElementById('memberModal').classList.remove('active');
+}
 
-function saveMember(e) {
-    e.preventDefault();
+function saveMember(event) {
+    event.preventDefault();
+    
     const memberId = document.getElementById('memberId').value;
-    const data = {
+    const memberData = {
         familyCode: document.getElementById('familyCode').value,
         memberCode: document.getElementById('memberCode').value,
         name: document.getElementById('memberName').value,
@@ -557,561 +377,85 @@ function saveMember(e) {
     };
     
     if (memberId) {
-        db.collection('members').doc(memberId).update(data).then(() => {
-            alert('✅ تم التعديل');
-            closeMemberModal();
-            loadMembers();
-        }).catch(err => alert(' خطأ: ' + err.message));
-    } else {
-        data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-        db.collection('members').add(data).then(() => {
-            alert('✅ تم الإضافة');
-            closeMemberModal();
-            loadMembers();
-        }).catch(err => alert('❌ خطأ: ' + err.message));
-    }
-}
-
-function viewMember(id) {
-    db.collection('members').doc(id).get().then(doc => {
-        if (doc.exists) {
-            const m = doc.data();
-            alert(`الاسم: ${m.name}\nالكود: ${m.familyCode}-${m.memberCode}\nالقطاع: ${m.sector}\nالهاتف: ${m.phone || '-'}\nالاشتراك: ${m.hasAssociation ? 'جمعية' : ''} ${m.hasDeath ? 'وفاة' : ''}\nالحالة: ${m.status}`);
-        }
-    });
-}
-
-function editMember(id) {
-    db.collection('members').doc(id).get().then(doc => {
-        if (doc.exists) {
-            const m = doc.data();
-            document.getElementById('modalTitle').textContent = 'تعديل عضو';
-            document.getElementById('memberId').value = id;
-            document.getElementById('familyCode').value = m.familyCode || '';
-            document.getElementById('memberCode').value = m.memberCode || '';
-            document.getElementById('memberName').value = m.name || '';
-            document.getElementById('relation').value = m.relation || 'رب أسرة';
-            document.getElementById('memberSector').value = m.sector || 'الحارة 1';
-            document.getElementById('memberPhone').value = m.phone || '';
-            document.getElementById('subAssociation').checked = m.hasAssociation || false;
-            document.getElementById('subDeath').checked = m.hasDeath || false;
-            document.getElementById('associationDate').value = m.associationDate || '';
-            document.getElementById('deathDate').value = m.deathDate || '';
-            document.getElementById('memberStatus').value = m.status || 'active';
-            document.getElementById('memberNotes').value = m.notes || '';
-            document.getElementById('memberModal').classList.add('active');
-        }
-    }).catch(err => alert('❌ خطأ: ' + err.message));
-}
-
-function deleteMember(id) {
-    if (confirm('حذف العضو؟')) {
-        db.collection('members').doc(id).delete().then(() => {
-            alert('✅ تم الحذف');
-            loadMembers();
-        }).catch(err => alert(' خطأ: ' + err.message));
-    }
-}
-
-// واتساب
-function sendWhatsApp(phone, name) {
-    const text = `مرحباً ${name}،\n\nهذه رسالة من نظام إدارة الجمعية.`;
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
-}
-
-// الدفعات
-function loadMembersForPayment() {
-    const select = document.getElementById('paymentMemberSelect');
-    select.innerHTML = '<option value="">اختر العضو...</option>';
-    db.collection('members').where('status', '==', 'active').orderBy('name').get()
-        .then(snapshot => {
-            snapshot.forEach(doc => {
-                const m = doc.data();
-                select.innerHTML += `<option value="${doc.id}">${m.name} (${m.familyCode}-${m.memberCode})</option>`;
+        // تعديل عضو موجود
+        db.collection('members').doc(memberId).update(memberData)
+            .then(() => {
+                alert('✅ تم تعديل العضو بنجاح');
+                closeMemberModal();
+                loadMembers();
+            })
+            .catch(error => {
+                console.error('Error updating member:', error);
+                alert('❌ خطأ في التعديل: ' + error.message);
             });
-        });
+    } else {
+        // إضافة عضو جديد
+        memberData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        db.collection('members').add(memberData)
+            .then(() => {
+                alert('✅ تم إضافة العضو بنجاح');
+                closeMemberModal();
+                loadMembers();
+            })
+            .catch(error => {
+                console.error('Error adding member:', error);
+                alert('❌ خطأ في الإضافة: ' + error.message);
+            });
+    }
 }
 
-function calculatePayment() {
-    const memberId = document.getElementById('paymentMemberSelect').value;
-    const type = document.getElementById('paymentType').value;
-    if (!memberId) return;
-    
-    const currentYear = new Date().getFullYear();
-    db.collection('subscriptionRates').doc(currentYear.toString()).get()
+function editMember(memberId) {
+    db.collection('members').doc(memberId).get()
         .then(doc => {
             if (doc.exists) {
-                const r = doc.data();
-                let amount = 0;
-                if (type === 'association') amount = r.association || 0;
-                else if (type === 'death') amount = (r.death || 0) * (r.deathCount || 1);
-                else if (type === 'joining_fee') amount = r.joiningAssociation || 0;
-                
-                if (amount > 0 && type !== 'fine') document.getElementById('paymentAmount').value = amount;
-            }
-        });
-}
-
-function savePayment() {
-    const memberId = document.getElementById('paymentMemberSelect').value;
-    const amount = parseFloat(document.getElementById('paymentAmount').value);
-    const type = document.getElementById('paymentType').value;
-    const date = document.getElementById('paymentDate').value;
-    const notes = document.getElementById('paymentNotes').value;
-    const sendWA = document.getElementById('sendWhatsApp').checked;
-    
-    if (!memberId || !amount) { alert('⚠️ أكمل البيانات'); return; }
-    
-    db.collection('members').doc(memberId).get().then(doc => {
-        if (doc.exists) {
-            const m = doc.data();
-            const payment = {
-                memberId: memberId,
-                memberName: m.name,
-                memberCode: `${m.familyCode}-${m.memberCode}`,
-                memberPhone: m.phone,
-                type: type,
-                amount: amount,
-                date: date || new Date().toISOString().split('T')[0],
-                notes: notes,
-                year: new Date().getFullYear(),
-                createdBy: currentUser.uid,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            
-            db.collection('payments').add(payment).then(() => {
-                alert('✅ تم حفظ الدفعة');
-                if (sendWA && m.phone) {
-                    const text = `مرحباً ${m.name}،\n\nتم تسجيل دفعة بمبلغ ${amount} ل.س\nالنوع: ${type}\nالتاريخ: ${payment.date}\n\nشكراً لك`;
-                    const url = `https://wa.me/${m.phone}?text=${encodeURIComponent(text)}`;
-                    window.open(url, '_blank');
-                }
-                document.getElementById('paymentAmount').value = '';
-                document.getElementById('paymentNotes').value = '';
-                loadPaymentsHistory();
-            });
-        }
-    });
-}
-
-function loadPaymentsHistory() {
-    const container = document.getElementById('paymentsHistory');
-    container.innerHTML = '<h3>سجل الدفعات</h3><div class="loading" style="display:block;">جاري التحميل...</div>';
-    
-    db.collection('payments').orderBy('date', 'desc').limit(20).get()
-        .then(snapshot => {
-            if (snapshot.empty) { container.innerHTML += '<p style="text-align:center;color:#999;">لا توجد دفعات</p>'; return; }
-            let html = '';
-            snapshot.forEach(doc => {
-                const p = doc.data();
-                const typeText = { 'association': 'قسط جمعية', 'death': 'قسط وفاة', 'donation': 'تبرع', 'joining_fee': 'رسوم انضمام', 'fine': 'غرامة' }[p.type] || p.type;
-                html += `
-                    <div class="member-card">
-                        <h4>${p.memberName} - ${typeText}</h4>
-                        <p>💰 ${p.amount.toLocaleString()} ل.س | 📅 ${p.date}</p>
-                        ${p.notes ? `<p>📝 ${p.notes}</p>` : ''}
-                    </div>
-                `;
-            });
-            container.innerHTML += html;
-        });
-}
-
-// الوارد والصادر
-function openInOutModal(type) {
-    document.getElementById('inOutType').value = type;
-    document.getElementById('inOutTitle').textContent = type === 'incoming' ? 'وارد جديد' : 'صادر جديد';
-    document.getElementById('inOutForm').reset();
-    document.getElementById('inOutDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('inOutModal').classList.add('active');
-}
-
-function closeInOutModal() { document.getElementById('inOutModal').classList.remove('active'); }
-
-function saveInOut(e) {
-    e.preventDefault();
-    const type = document.getElementById('inOutType').value;
-    const data = {
-        type: type,
-        amount: parseFloat(document.getElementById('inOutAmount').value),
-        date: document.getElementById('inOutDate').value,
-        description: document.getElementById('inOutDescription').value,
-        fund: document.getElementById('inOutFund').value,
-        createdBy: currentUser.uid,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    db.collection('inout').add(data).then(() => {
-        alert('✅ تم الحفظ');
-        closeInOutModal();
-        loadInOut();
-    });
-}
-
-function loadInOut() {
-    ['incoming', 'outgoing'].forEach(type => {
-        const container = document.getElementById(type + 'List');
-        container.innerHTML = '<div class="loading" style="display:block;">جاري التحميل...</div>';
-        
-        db.collection('inout').where('type', '==', type).orderBy('date', 'desc').get()
-            .then(snapshot => {
-                if (snapshot.empty) { container.innerHTML = '<p style="text-align:center;color:#999;">لا يوجد بيانات</p>'; return; }
-                let html = '';
-                snapshot.forEach(doc => {
-                    const d = doc.data();
-                    const fundText = d.fund === 'association' ? 'الجمعية' : 'الوفاة';
-                    html += `
-                        <div class="member-card">
-                            <h4>${type === 'incoming' ? '📥' : '📤'} ${d.amount.toLocaleString()} ل.س</h4>
-                            <p>📅 ${d.date} | صندوق: ${fundText}</p>
-                            <p>${d.description}</p>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-            });
-    });
-}
-
-// المعتمدين
-function openTrusteeModal() {
-    document.getElementById('trusteeForm').reset();
-    document.getElementById('trusteeModal').classList.add('active');
-}
-
-function closeTrusteeModal() { document.getElementById('trusteeModal').classList.remove('active'); }
-
-function saveTrustee(e) {
-    e.preventDefault();
-    const data = {
-        name: document.getElementById('trusteeName').value,
-        sector: document.getElementById('trusteeSector').value,
-        phone: document.getElementById('trusteePhone').value,
-        canCollect: document.getElementById('trusteeCanCollect').checked,
-        canDeliver: document.getElementById('trusteeCanDeliver').checked,
-        createdBy: currentUser.uid,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    db.collection('trustees').add(data).then(() => {
-        alert('✅ تم حفظ المعتمد');
-        closeTrusteeModal();
-        loadTrustees();
-    });
-}
-
-function loadTrustees() {
-    const container = document.getElementById('trusteesList');
-    container.innerHTML = '<div class="loading" style="display:block;">جاري التحميل...</div>';
-    
-    db.collection('trustees').get()
-        .then(snapshot => {
-            if (snapshot.empty) { container.innerHTML = '<p style="text-align:center;color:#999;">لا يوجد معتمدين</p>'; return; }
-            let html = '';
-            snapshot.forEach(doc => {
-                const t = doc.data();
-                html += `
-                    <div class="member-card">
-                        <h4>${t.name} <span class="badge badge-trustee">${t.sector}</span></h4>
-                        <p>📱 ${t.phone || '-'}</p>
-                        <p>الصلاحيات: ${t.canCollect ? 'تحصيل' : ''} ${t.canDeliver ? '| تسليم' : ''}</p>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        });
-}
-
-function loadDeliveries() {
-    const container = document.getElementById('deliveriesList');
-    container.innerHTML = '<div class="loading" style="display:block;">جاري التحميل...</div>';
-    
-    db.collection('deliveries').orderBy('date', 'desc').get()
-        .then(snapshot => {
-            if (snapshot.empty) { container.innerHTML = '<p style="text-align:center;color:#999;">لا توجد تسليمات</p>'; return; }
-            let html = '';
-            snapshot.forEach(doc => {
-                const d = doc.data();
-                html += `
-                    <div class="member-card">
-                        <h4>تسليم من ${d.trusteeName}</h4>
-                        <p>💰 ${d.amount.toLocaleString()} ل.س | 📅 ${d.date}</p>
-                        <p>الحالة: ${d.status === 'pending' ? 'بانتظار التأكيد' : 'تم التأكيد'}</p>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        });
-}
-
-// سجل الوفيات
-function openDeathModal() {
-    const select = document.getElementById('deathMember');
-    select.innerHTML = '<option value="">اختر العضو...</option>';
-    db.collection('members').get().then(snapshot => {
-        snapshot.forEach(doc => {
-            const m = doc.data();
-            select.innerHTML += `<option value="${doc.id}">${m.name} (${m.familyCode}-${m.memberCode})</option>`;
-        });
-    });
-    document.getElementById('deathForm').reset();
-    document.getElementById('deathDateInput').value = new Date().toISOString().split('T')[0];
-    document.getElementById('deathModal').classList.add('active');
-}
-
-function closeDeathModal() { document.getElementById('deathModal').classList.remove('active'); }
-
-function saveDeath(e) {
-    e.preventDefault();
-    const memberId = document.getElementById('deathMember').value;
-    if (!memberId) { alert('اختر العضو'); return; }
-    
-    const data = {
-        memberId: memberId,
-        deathDate: document.getElementById('deathDateInput').value,
-        notes: document.getElementById('deathNotes').value,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    db.collection('deaths').add(data).then(() => {
-        // تحديث حالة العضو
-        db.collection('members').doc(memberId).update({ status: 'deceased' });
-        alert('✅ تم تسجيل الوفاة');
-        closeDeathModal();
-        loadDeaths();
-    });
-}
-
-function loadDeaths() {
-    const container = document.getElementById('deathsList');
-    container.innerHTML = '<div class="loading" style="display:block;">جاري التحميل...</div>';
-    
-    db.collection('deaths').orderBy('deathDate', 'desc').get()
-        .then(snapshot => {
-            if (snapshot.empty) { container.innerHTML = '<p style="text-align:center;color:#999;">لا توجد وفيات</p>'; return; }
-            let html = '';
-            snapshot.forEach(doc => {
-                const d = doc.data();
-                html += `
-                    <div class="member-card" style="border-right-color: #e74c3c;">
-                        <h4>⚰️ وفاة</h4>
-                        <p>📅 ${d.deathDate}</p>
-                        ${d.notes ? `<p>📝 ${d.notes}</p>` : ''}
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        });
-}
-
-// الاجتماعات
-function openMeetingModal() {
-    document.getElementById('meetingForm').reset();
-    document.getElementById('meetingDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('meetingModal').classList.add('active');
-}
-
-function closeMeetingModal() { document.getElementById('meetingModal').classList.remove('active'); }
-
-function saveMeeting(e) {
-    e.preventDefault();
-    const data = {
-        title: document.getElementById('meetingTitle').value,
-        date: document.getElementById('meetingDate').value,
-        time: document.getElementById('meetingTime').value,
-        attendees: document.getElementById('meetingAttendees').value,
-        agenda: document.getElementById('meetingAgenda').value,
-        decisions: document.getElementById('meetingDecisions').value,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    db.collection('meetings').add(data).then(() => {
-        alert('✅ تم حفظ الاجتماع');
-        closeMeetingModal();
-        loadMeetings();
-    });
-}
-
-function loadMeetings() {
-    const container = document.getElementById('meetingsList');
-    container.innerHTML = '<div class="loading" style="display:block;">جاري التحميل...</div>';
-    
-    db.collection('meetings').orderBy('date', 'desc').get()
-        .then(snapshot => {
-            if (snapshot.empty) { container.innerHTML = '<p style="text-align:center;color:#999;">لا توجد اجتماعات</p>'; return; }
-            let html = '';
-            snapshot.forEach(doc => {
                 const m = doc.data();
-                html += `
-                    <div class="member-card">
-                        <h4>${m.title}</h4>
-                        <p>📅 ${m.date} ${m.time ? '⏰ ' + m.time : ''}</p>
-                        <p>📋 ${m.agenda || ''}</p>
-                        <p>✅ القرارات: ${m.decisions || ''}</p>
-                    </div>
-                `;
+                document.getElementById('modalTitle').textContent = 'تعديل عضو';
+                document.getElementById('memberId').value = memberId;
+                document.getElementById('familyCode').value = m.familyCode || '';
+                document.getElementById('memberCode').value = m.memberCode || '';
+                document.getElementById('memberName').value = m.name || '';
+                document.getElementById('relation').value = m.relation || 'رب أسرة';
+                document.getElementById('memberSector').value = m.sector || 'الحارة 1';
+                document.getElementById('memberPhone').value = m.phone || '';
+                document.getElementById('subAssociation').checked = m.hasAssociation || false;
+                document.getElementById('subDeath').checked = m.hasDeath || false;
+                document.getElementById('associationDate').value = m.associationDate || '';
+                document.getElementById('deathDate').value = m.deathDate || '';
+                document.getElementById('memberStatus').value = m.status || 'active';
+                document.getElementById('memberNotes').value = m.notes || '';
+                document.getElementById('memberModal').classList.add('active');
+            } else {
+                alert('❌ العضو غير موجود');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading member:', error);
+            alert('❌ خطأ في تحميل البيانات: ' + error.message);
+        });
+}
+
+function deleteMember(memberId) {
+    if (confirm('هل أنت متأكد من حذف هذا العضو؟')) {
+        db.collection('members').doc(memberId).delete()
+            .then(() => {
+                alert('✅ تم حذف العضو بنجاح');
+                loadMembers();
+            })
+            .catch(error => {
+                console.error('Error deleting member:', error);
+                alert('❌ خطأ في الحذف: ' + error.message);
             });
-            container.innerHTML = html;
-        });
-}
-
-// المستودع
-function loadInventory() {
-    document.getElementById('inventoryListTab').innerHTML = '<p style="text-align:center;color:#999;padding:20px;">الجرد - يمكن إضافة الأصناف لاحقاً</p>';
-    document.getElementById('inventoryRent').innerHTML = '<p style="text-align:center;color:#999;padding:20px;">التأجير - سجل التأجير</p>';
-    document.getElementById('inventorySale').innerHTML = '<p style="text-align:center;color:#999;padding:20px;">البيع - سجل المبيعات</p>';
-}
-
-// الثوابت
-function calculateDeathTotal() {
-    const death = parseFloat(document.getElementById('rateDeath').value) || 0;
-    const count = parseInt(document.getElementById('deathCount').value) || 0;
-    document.getElementById('deathTotal').value = death * count;
-}
-
-function openAddRateModal() {
-    document.getElementById('rateForm').reset();
-    document.getElementById('rateId').value = '';
-    document.getElementById('rateYear').value = new Date().getFullYear();
-    document.getElementById('rateModal').classList.add('active');
-}
-
-function closeRateModal() { document.getElementById('rateModal').classList.remove('active'); }
-
-function saveRate(e) {
-    e.preventDefault();
-    const year = document.getElementById('rateYear').value;
-    const rate = {
-        year: parseInt(year),
-        association: parseFloat(document.getElementById('rateAssociation').value) || 0,
-        death: parseFloat(document.getElementById('rateDeath').value) || 0,
-        deathCount: parseInt(document.getElementById('deathCount').value) || 0,
-        joiningAssociation: parseFloat(document.getElementById('joiningAssociation').value) || 0,
-        joiningDeath: parseFloat(document.getElementById('joiningDeath').value) || 0,
-        deathBenefits: parseFloat(document.getElementById('deathBenefits').value) || 0,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    db.collection('subscriptionRates').doc(year).set(rate).then(() => {
-        alert('✅ تم حفظ الثوابت');
-        closeRateModal();
-        loadRates();
-    });
-}
-
-function loadRates() {
-    const container = document.getElementById('ratesList');
-    container.innerHTML = '<div class="loading" style="display:block;">جاري التحميل...</div>';
-    
-    db.collection('subscriptionRates').orderBy('year', 'desc').get()
-        .then(snapshot => {
-            if (snapshot.empty) { container.innerHTML = '<p style="text-align:center;color:#999;">لا توجد ثوابت</p>'; return; }
-            let html = '';
-            snapshot.forEach(doc => {
-                const r = doc.data();
-                const deathTotal = (r.death || 0) * (r.deathCount || 0);
-                html += `
-                    <div class="member-card" style="border-right-color:#f39c12;">
-                        <h4>📊 ثوابت سنة ${r.year}</h4>
-                        <p>💰 قسط جمعية: ${(r.association || 0).toLocaleString()} ل.س</p>
-                        <p>⚰️ قسط وفاة: ${(r.death || 0).toLocaleString()} × ${r.deathCount || 0} = <strong>${deathTotal.toLocaleString()} ل.س</strong></p>
-                        <p>📝 رسوم انضمام جمعية: ${(r.joiningAssociation || 0).toLocaleString()} ل.س</p>
-                        <p>📝 رسوم انضمام وفاة: ${(r.joiningDeath || 0).toLocaleString()} ل.س</p>
-                        <div class="member-actions">
-                            <button class="btn btn-warning btn-small" onclick="editRate('${r.year}')">تعديل</button>
-                            <button class="btn btn-danger btn-small" onclick="deleteRate('${r.year}')">حذف</button>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        });
-}
-
-function editRate(year) {
-    db.collection('subscriptionRates').doc(year).get().then(doc => {
-        if (doc.exists) {
-            const r = doc.data();
-            document.getElementById('rateYear').value = r.year;
-            document.getElementById('rateAssociation').value = r.association || '';
-            document.getElementById('rateDeath').value = r.death || '';
-            document.getElementById('deathCount').value = r.deathCount || '';
-            document.getElementById('deathTotal').value = (r.death || 0) * (r.deathCount || 0);
-            document.getElementById('joiningAssociation').value = r.joiningAssociation || '';
-            document.getElementById('joiningDeath').value = r.joiningDeath || '';
-            document.getElementById('deathBenefits').value = r.deathBenefits || '';
-            document.getElementById('rateModal').classList.add('active');
-        }
-    });
-}
-
-function deleteRate(year) {
-    if (confirm('حذف ثوابت سنة ' + year + '؟')) {
-        db.collection('subscriptionRates').doc(year).delete().then(() => {
-            alert('✅ تم الحذف');
-            loadRates();
-        });
     }
 }
 
-// التقارير
-function loadReports() {
-    const container = document.getElementById('reportsContent');
-    container.innerHTML = '<div class="loading" style="display:block;">جاري التحميل...</div>';
-    
-    Promise.all([
-        db.collection('members').get(),
-        db.collection('payments').get()
-    ]).then(([membersSnap, paymentsSnap]) => {
-        let totalMembers = 0, activeMembers = 0;
-        let totalAmount = 0, associationTotal = 0, deathTotal = 0, donationTotal = 0;
-        
-        membersSnap.forEach(() => { totalMembers++; });
-        
-        paymentsSnap.forEach(doc => {
-            const p = doc.data();
-            totalAmount += p.amount || 0;
-            if (p.type === 'association') associationTotal += p.amount || 0;
-            else if (p.type === 'death') deathTotal += p.amount || 0;
-            else if (p.type === 'donation') donationTotal += p.amount || 0;
-        });
-        
-        container.innerHTML = `
-            <div class="stats">
-                <div class="stat-box"><h3>إجمالي الأعضاء</h3><p>${totalMembers}</p></div>
-                <div class="stat-box"><h3>إجمالي المحصّل</h3><p>${totalAmount.toLocaleString()} ل.س</p></div>
-                <div class="stat-box"><h3>أقساط الجمعية</h3><p>${associationTotal.toLocaleString()} ل.س</p></div>
-                <div class="stat-box"><h3>أقساط الوفاة</h3><p>${deathTotal.toLocaleString()} ل.س</p></div>
-                <div class="stat-box"><h3>التبرعات</h3><p>${donationTotal.toLocaleString()} ل.س</p></div>
-            </div>
-        `;
+// إغلاق النوافذ عند النقر خارجها
+document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
     });
-}
-
-function loadStats() {
-    db.collection('members').where('status', '==', 'active').get()
-        .then(s => { document.getElementById('activeMembers').textContent = s.size; });
-    db.collection('members').get()
-        .then(s => { document.getElementById('totalMembers').textContent = s.size; });
-    db.collection('payments').get()
-        .then(s => {
-            let total = 0;
-            s.forEach(doc => { total += doc.data().amount || 0; });
-            document.getElementById('totalCollected').textContent = total.toLocaleString() + ' ل.س';
-        });
-}
-
-function switchTab(tabName) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
-    document.getElementById(tabName).classList.add('active');
-}
-
-document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
-document.getElementById('password').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
-document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); }));
+});
 </script>
 
 </body>
