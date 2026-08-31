@@ -3,171 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مقبرة النازحين - قرية زعورة</title>
+    <title>قرية زعورة - شجرة العائلة والمقبرة</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; padding: 15px; }
-        .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        body { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); min-height: 100vh; padding: 10px; }
+        .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
         
-        .header { background: linear-gradient(135deg, #2c3e50 0%, #4a6274 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
-        .header h1 { font-size: 28px; margin-bottom: 5px; }
-        .header p { font-size: 14px; opacity: 0.9; }
+        .header { background: linear-gradient(135deg, #2c3e50 0%, #4a6274 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
+        .header h1 { font-size: 22px; margin-bottom: 5px; }
+        .header p { font-size: 13px; opacity: 0.9; }
         
-        .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 3px solid #e0e0e0; flex-wrap: wrap; }
-        .tab { padding: 12px 20px; cursor: pointer; border: none; background: none; font-size: 14px; font-weight: bold; color: #7f8c8d; border-bottom: 3px solid transparent; margin-bottom: -3px; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 3px solid #e0e0e0; flex-wrap: wrap; }
+        .tab { padding: 10px 15px; cursor: pointer; border: none; background: none; font-size: 13px; font-weight: bold; color: #7f8c8d; border-bottom: 3px solid transparent; margin-bottom: -3px; }
         .tab.active { color: #2c3e50; border-bottom-color: #667eea; }
         .tab:hover { background: #f5f5f5; }
         
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .stat-box { padding: 15px; border-radius: 10px; text-align: center; color: white; }
-        .stat-box h3 { font-size: 28px; margin-bottom: 5px; }
-        .stat-box p { font-size: 12px; opacity: 0.9; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 15px; }
+        .stat-box { padding: 10px; border-radius: 8px; text-align: center; color: white; cursor: pointer; transition: all 0.3s; }
+        .stat-box:hover { transform: translateY(-2px); }
+        .stat-box h3 { font-size: 22px; margin-bottom: 3px; }
+        .stat-box p { font-size: 11px; opacity: 0.9; }
         .stat-total { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .stat-occupied { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
         .stat-available { background: linear-gradient(135deg, #27ae60 0%, #229954 100%); }
         .stat-empty { background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%); }
-        .stat-private { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
-        .stat-buried { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); }
+        .stat-families { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
+        .stat-alive { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); }
+        .stat-deceased { background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); }
         
-        .search-box { margin-bottom: 15px; }
-        .search-box input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px; }
+        .search-box { margin-bottom: 10px; }
+        .search-box input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; }
         .search-box input:focus { outline: none; border-color: #667eea; }
         
-        .filters { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-        .filters select { flex: 1; min-width: 120px; padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 13px; }
+        .filters { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+        .filters select { flex: 1; min-width: 100px; padding: 7px; border: 2px solid #ddd; border-radius: 6px; font-size: 12px; }
         
-        .section-block { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-right: 4px solid #667eea; }
-        .section-block h3 { color: #2c3e50; margin-bottom: 10px; font-size: 16px; }
+        /* شجرة العائلة */
+        .tree-family { background: #fff8e7; padding: 12px; border-radius: 8px; margin-bottom: 12px; border-right: 4px solid #f39c12; }
+        .tree-family h3 { color: #856404; margin-bottom: 8px; font-size: 15px; }
+        .tree-grandparents { background: #e8f5e9; padding: 8px; border-radius: 6px; margin-bottom: 8px; border-right: 3px solid #27ae60; }
+        .tree-grandparents h4 { color: #2e7d32; font-size: 12px; margin-bottom: 5px; }
+        .tree-couple { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; align-items: center; }
+        .tree-person { background: white; padding: 6px 10px; border-radius: 6px; border: 2px solid #667eea; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+        .tree-person:hover { background: #667eea; color: white; }
+        .tree-person.deceased { border-color: #2c3e50; background: #f0f0f0; }
+        .tree-person.head { background: #667eea; color: white; }
+        .tree-children { background: #f8f9fa; padding: 8px; border-radius: 6px; margin-top: 8px; }
+        .tree-children h4 { font-size: 12px; color: #667eea; margin-bottom: 5px; }
+        .tree-children-list { display: flex; flex-wrap: wrap; gap: 5px; }
+        .child-card { background: white; padding: 4px 8px; border-radius: 4px; border-right: 2px solid #3498db; font-size: 11px; cursor: pointer; }
+        .child-card:hover { background: #3498db; color: white; }
+        .child-card.deceased { border-right-color: #2c3e50; background: #f0f0f0; }
+        .connector { text-align: center; color: #667eea; font-size: 16px; margin: 3px 0; }
         
-        .grave-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
-        .grave-card { background: white; border: 2px solid #ddd; border-radius: 8px; padding: 10px; cursor: pointer; transition: all 0.2s; text-align: center; }
-        .grave-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        /* القبور */
+        .grave-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; }
+        .grave-card { background: white; border: 2px solid #ddd; border-radius: 6px; padding: 8px; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .grave-card:hover { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
         .grave-card.occupied { border-color: #e74c3c; background: #fdf2f2; }
         .grave-card.available { border-color: #27ae60; background: #f2fdf2; }
         .grave-card.empty { border-color: #95a5a6; background: #f9f9f9; border-style: dashed; }
         .grave-card.private { border-color: #f39c12; }
-        .grave-card .grave-id { font-weight: bold; font-size: 14px; color: #2c3e50; }
-        .grave-card .grave-status { font-size: 11px; margin-top: 5px; }
-        .grave-card .grave-type { font-size: 10px; color: #7f8c8d; }
+        .grave-number { font-weight: bold; font-size: 14px; color: #2c3e50; }
+        .grave-status { font-size: 10px; margin-top: 3px; }
+        .grave-type { font-size: 9px; color: #7f8c8d; }
+        .grave-name { font-size: 10px; color: #2c3e50; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        .burial-list { display: grid; gap: 10px; }
-        .burial-card { background: white; border-right: 4px solid #2c3e50; padding: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .burial-card h4 { color: #2c3e50; margin-bottom: 5px; }
-        .burial-card p { color: #7f8c8d; font-size: 12px; margin: 2px 0; }
+        /* العائلات */
+        .family-card { background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 8px; border-right: 4px solid #667eea; cursor: pointer; }
+        .family-card:hover { background: #e9ecef; }
+        .family-card h4 { color: #2c3e50; font-size: 14px; margin-bottom: 3px; }
+        .family-card p { color: #7f8c8d; font-size: 11px; margin: 2px 0; }
         
-        .family-section { background: #fff8e7; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-right: 4px solid #f39c12; }
-        .family-section h3 { color: #856404; margin-bottom: 10px; }
-        .family-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
-        .family-card { background: white; padding: 10px; border-radius: 6px; cursor: pointer; }
-        .family-card h4 { color: #2c3e50; font-size: 14px; }
-        .family-card p { font-size: 11px; color: #7f8c8d; }
+        .section-block { background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px; border-right: 4px solid #667eea; }
+        .section-block h3 { color: #2c3e50; margin-bottom: 8px; font-size: 14px; }
         
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; margin: 3px; }
+        .btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; margin: 2px; }
         .btn-primary { background: #667eea; color: white; }
         .btn-success { background: #27ae60; color: white; }
         .btn-warning { background: #f39c12; color: white; }
         .btn-danger { background: #e74c3c; color: white; }
         .btn-info { background: #3498db; color: white; }
-        .btn-small { padding: 5px 10px; font-size: 12px; }
+        .btn-small { padding: 4px 8px; font-size: 11px; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 10px; }
         .modal.active { display: flex; }
-        .modal-content { background: white; padding: 20px; border-radius: 12px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; }
+        .modal-content { background: white; padding: 15px; border-radius: 10px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .close-btn { background: none; border: none; font-size: 22px; cursor: pointer; }
         
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .form-group { margin-bottom: 8px; }
+        .form-group label { display: block; margin-bottom: 3px; font-weight: bold; font-size: 12px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 6px; border: 2px solid #ddd; border-radius: 5px; font-size: 13px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
-        .legend { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; font-size: 12px; }
-        .legend-item { display: flex; align-items: center; gap: 5px; }
-        .legend-color { width: 20px; height: 20px; border-radius: 3px; }
+        .legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; font-size: 11px; }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+        .legend-color { width: 15px; height: 15px; border-radius: 3px; }
         
-        .status-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-        .status-occupied { background: #e74c3c; color: white; }
-        .status-available { background: #27ae60; color: white; }
-        .status-empty { background: #95a5a6; color: white; }
-        .type-private { background: #f39c12; color: white; }
-        .type-public { background: #3498db; color: white; }
+        .badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin: 1px; }
+        .badge-active { background: #d4edda; color: #155724; }
+        .badge-deceased { background: #343a40; color: #fff; }
+        .badge-young { background: #d1ecf1; color: #0c5460; }
         
-        .cemetery-info { background: #e3f2fd; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
-        .cemetery-info h3 { color: #1976d2; margin-bottom: 10px; }
-        .cemetery-info p { margin: 5px 0; font-size: 13px; }
+        .results-count { background: #e3f2fd; padding: 6px; border-radius: 5px; margin-bottom: 10px; text-align: center; font-size: 12px; color: #1976d2; }
         
-        .location-badge { display: inline-block; padding: 2px 6px; background: #667eea; color: white; border-radius: 3px; font-size: 10px; margin: 2px; }
+        .export-buttons { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+        .export-buttons button { flex: 1; min-width: 100px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>🏛️ مقبرة النازحين</h1>
-        <p>قرية زعورة - نظام إدارة المقبرة والمدفونين</p>
+        <h1>🏛️ قرية زعورة</h1>
+        <p>شجرة العائلة والمقبرة - نظام متكامل</p>
     </div>
     
     <div class="tabs">
-        <button class="tab active" onclick="switchTab('overview')">📊 نظرة عامة</button>
-        <button class="tab" onclick="switchTab('graves')">️ القبور</button>
-        <button class="tab" onclick="switchTab('burials')">📋 المدفونين</button>
+        <button class="tab active" onclick="switchTab('tree')">🌳 شجرة العائلة</button>
+        <button class="tab" onclick="switchTab('cemetery')">⚰️ المقبرة</button>
         <button class="tab" onclick="switchTab('families')">👪 العائلات</button>
-        <button class="tab" onclick="switchTab('locations')">📍 المواقع</button>
+        <button class="tab" onclick="switchTab('stats')">📊 إحصائيات</button>
     </div>
     
-    <!-- نظرة عامة -->
-    <div id="overview" class="tab-content active">
-        <div class="cemetery-info">
-            <h3>📍 معلومات المقبرة</h3>
-            <p><strong>الاسم:</strong> مقبرة النازحين</p>
-            <p><strong>الموقع:</strong> دمشق، الأحداث</p>
-            <p><strong>تاريخ الافتتاح:</strong> 1/1/1995</p>
-            <p><strong>المساحة:</strong> 5000 م²</p>
-            <p><strong>الحالة القانونية:</strong> وقفية</p>
-            <p><strong>المسؤول:</strong> عيسى محمد محمود</p>
-            <p><strong>الهاتف:</strong> 912345678</p>
+    <!-- شجرة العائلة -->
+    <div id="tree" class="tab-content active">
+        <div class="search-box">
+            <input type="text" id="treeSearch" placeholder="🔍 ابحث عن عائلة أو شخص..." oninput="searchTree()">
         </div>
-        
-        <div class="stats">
-            <div class="stat-box stat-total"><h3 id="statTotal">0</h3><p>إجمالي القبور</p></div>
-            <div class="stat-box stat-occupied"><h3 id="statOccupied">0</h3><p>مشغول</p></div>
-            <div class="stat-box stat-available"><h3 id="statAvailable">0</h3><p>متاح</p></div>
-            <div class="stat-box stat-empty"><h3 id="statEmpty">0</h3><p>فارغ</p></div>
-            <div class="stat-box stat-private"><h3 id="statPrivate">0</h3><p>قبور خاصة</p></div>
-            <div class="stat-box stat-buried"><h3 id="statBuried">0</h3><p>إجمالي المدفونين</p></div>
+        <div class="filters">
+            <select id="filterTreeSector" onchange="filterTree()">
+                <option value="">كل القطاعات</option>
+                <option value="الجبل">الجبل</option>
+                <option value="الحارة1">الحارة 1</option>
+                <option value="الحارة2">الحارة 2</option>
+                <option value="الوادي">الوادي</option>
+                <option value="المنصورة">المنصورة</option>
+                <option value="دمر">دمر</option>
+            </select>
+            <select id="filterTreeFamily" onchange="filterTree()">
+                <option value="">كل العائلات</option>
+            </select>
         </div>
-        
-        <div class="section-block">
-            <h3>📊 توزيع حسب الموقع</h3>
-            <div id="locationStats"></div>
+        <div class="export-buttons">
+            <button class="btn btn-success" onclick="openAddPersonModal()">+ إضافة فرد</button>
+            <button class="btn btn-warning" onclick="openAddGrandparentModal()">👴 إضافة جد</button>
+            <button class="btn btn-info" onclick="exportTreeExcel()">📊 Excel</button>
         </div>
-        
-        <div class="section-block">
-            <h3>👪 توزيع حسب العائلة</h3>
-            <div id="familyStats"></div>
-        </div>
+        <div class="results-count" id="treeResults"></div>
+        <div id="treeContainer"></div>
     </div>
     
-    <!-- القبور -->
-    <div id="graves" class="tab-content">
+    <!-- المقبرة -->
+    <div id="cemetery" class="tab-content">
         <div class="legend">
             <div class="legend-item"><div class="legend-color" style="background:#e74c3c;"></div>مشغول</div>
             <div class="legend-item"><div class="legend-color" style="background:#27ae60;"></div>متاح</div>
             <div class="legend-item"><div class="legend-color" style="background:#95a5a6;border:2px dashed #7f8c8d;"></div>فارغ</div>
             <div class="legend-item"><div class="legend-color" style="background:#f39c12;"></div>خاص</div>
-            <div class="legend-item"><div class="legend-color" style="background:#3498db;"></div>عام</div>
         </div>
         
         <div class="search-box">
-            <input type="text" id="graveSearch" placeholder="🔍 ابحث برقم القبر، اسم المدفون، العائلة..." oninput="searchGraves()">
+            <input type="text" id="graveSearch" placeholder="🔍 ابحث برقم القبر أو اسم المدفون..." oninput="searchGraves()">
         </div>
         
         <div class="filters">
-            <select id="filterLocation" onchange="filterGraves()">
+            <select id="filterGraveLocation" onchange="filterGraves()">
                 <option value="">كل المواقع</option>
                 <option value="صف أول (شمال تحت)">صف أول (شمال تحت)</option>
                 <option value="صف ثاني فوق">صف ثاني فوق</option>
@@ -176,43 +182,30 @@
                 <option value="صف رابع فوق">صف رابع فوق</option>
                 <option value="صف خامس فوق">صف خامس فوق</option>
             </select>
-            <select id="filterType" onchange="filterGraves()">
+            <select id="filterGraveType" onchange="filterGraves()">
                 <option value="">كل الأنواع</option>
                 <option value="خاص">خاص</option>
                 <option value="عام">عام</option>
+                <option value="غير محدد">غير محدد</option>
             </select>
-            <select id="filterStatus" onchange="filterGraves()">
+            <select id="filterGraveStatus" onchange="filterGraves()">
                 <option value="">كل الحالات</option>
                 <option value="مشغول">مشغول</option>
                 <option value="متاح">متاح</option>
                 <option value="فارغ">فارغ</option>
             </select>
-            <select id="filterFamily" onchange="filterGraves()">
+            <select id="filterGraveFamily" onchange="filterGraves()">
                 <option value="">كل العائلات</option>
             </select>
         </div>
         
-        <button class="btn btn-success" onclick="openAddGraveModal()">+ إضافة قبر</button>
-        <button class="btn btn-info" onclick="exportGravesToExcel()">📊 تصدير Excel</button>
-        
-        <div id="gravesContainer" style="margin-top: 15px;"></div>
-    </div>
-    
-    <!-- المدفونين -->
-    <div id="burials" class="tab-content">
-        <div class="search-box">
-            <input type="text" id="burialSearch" placeholder="🔍 ابحث باسم المتوفى..." oninput="searchBurials()">
+        <div class="export-buttons">
+            <button class="btn btn-success" onclick="openAddGraveModal()">+ إضافة قبر</button>
+            <button class="btn btn-info" onclick="exportGravesExcel()">📊 Excel</button>
         </div>
         
-        <div class="filters">
-            <select id="filterYear" onchange="filterBurials()">
-                <option value="">كل السنوات</option>
-            </select>
-        </div>
-        
-        <button class="btn btn-success" onclick="openAddBurialModal()">+ إضافة مدفون</button>
-        
-        <div id="burialsContainer" class="burial-list" style="margin-top: 15px;"></div>
+        <div class="results-count" id="graveResults"></div>
+        <div id="graveContainer"></div>
     </div>
     
     <!-- العائلات -->
@@ -220,12 +213,105 @@
         <div class="search-box">
             <input type="text" id="familySearch" placeholder="🔍 ابحث عن عائلة..." oninput="searchFamilies()">
         </div>
-        <div id="familiesContainer" style="margin-top: 15px;"></div>
+        <div class="filters">
+            <select id="filterFamilySector" onchange="filterFamilies()">
+                <option value="">كل القطاعات</option>
+                <option value="الجبل">الجبل</option>
+                <option value="الحارة1">الحارة 1</option>
+                <option value="الحارة2">الحارة 2</option>
+                <option value="الوادي">الوادي</option>
+                <option value="المنصورة">المنصورة</option>
+                <option value="دمر">دمر</option>
+            </select>
+        </div>
+        <button class="btn btn-success" onclick="openAddFamilyModal()" style="margin-bottom:10px;">+ إضافة عائلة</button>
+        <div id="familiesContainer"></div>
     </div>
     
-    <!-- المواقع -->
-    <div id="locations" class="tab-content">
-        <div id="locationsContainer" style="margin-top: 15px;"></div>
+    <!-- الإحصائيات -->
+    <div id="stats" class="tab-content">
+        <div class="stats">
+            <div class="stat-box stat-families"><h3 id="statFamilies">0</h3><p>العائلات</p></div>
+            <div class="stat-box stat-total"><h3 id="statPeople">0</h3><p>إجمالي الأفراد</p></div>
+            <div class="stat-box stat-alive"><h3 id="statAlive">0</h3><p>الأحياء</p></div>
+            <div class="stat-box stat-deceased"><h3 id="statDeceased">0</h3><p>المتوفين</p></div>
+            <div class="stat-box stat-occupied"><h3 id="statGraves">0</h3><p>القبور</p></div>
+            <div class="stat-box stat-available"><h3 id="statAvailable">0</h3><p>قبور متاحة</p></div>
+            <div class="stat-box stat-empty"><h3 id="statEmpty">0</h3><p>قبور فارغة</p></div>
+        </div>
+        <div id="statsDetails"></div>
+    </div>
+</div>
+
+<!-- نافذة تفاصيل الشخص -->
+<div id="personModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="personModalTitle">تفاصيل الشخص</h3>
+            <button class="close-btn" onclick="closeModal('personModal')">×</button>
+        </div>
+        <div id="personDetails"></div>
+        <div style="margin-top:10px;">
+            <button class="btn btn-warning" onclick="editPerson()">✏️ تعديل</button>
+            <button class="btn btn-danger" onclick="deletePerson()">🗑️ حذف</button>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة إضافة/تعديل فرد -->
+<div id="addPersonModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="addPersonTitle">إضافة فرد</h3>
+            <button class="close-btn" onclick="closeModal('addPersonModal')">×</button>
+        </div>
+        <form onsubmit="savePerson(event)">
+            <input type="hidden" id="personEditId">
+            <div class="form-row">
+                <div class="form-group"><label>رقم الفرد *</label><input type="text" id="pCode" required placeholder="F001"></div>
+                <div class="form-group"><label>كود الأسرة *</label><input type="text" id="pFamily" required placeholder="A001"></div>
+            </div>
+            <div class="form-group"><label>الاسم الثلاثي *</label><input type="text" id="pName" required></div>
+            <div class="form-row">
+                <div class="form-group"><label>صلة القرابة</label><select id="pRelation"><option>رب أسرة</option><option>زوجة</option><option>ابن</option><option>بنت</option><option>جد</option><option>جدة</option></select></div>
+                <div class="form-group"><label>الجنس</label><select id="pGender"><option>ذكر</option><option>أنثى</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>القطاع</label><select id="pSector"><option>الجبل</option><option>الحارة1</option><option>الحارة2</option><option>الوادي</option><option>المنصورة</option><option>دمر</option></select></div>
+                <div class="form-group"><label>تاريخ الميلاد</label><input type="date" id="pBirth"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>الحالة</label><select id="pStatus"><option>حي</option><option>متوفى</option></select></div>
+                <div class="form-group"><label>تاريخ الوفاة</label><input type="date" id="pDeath"></div>
+            </div>
+            <div class="form-group"><label>الجوال</label><input type="tel" id="pPhone"></div>
+            <div class="form-group"><label>ملاحظات</label><textarea id="pNotes" rows="2"></textarea></div>
+            <button type="submit" class="btn btn-success" style="width:100%;">حفظ</button>
+        </form>
+    </div>
+</div>
+
+<!-- نافذة إضافة جد -->
+<div id="addGrandparentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>إضافة جد / جدة</h3>
+            <button class="close-btn" onclick="closeModal('addGrandparentModal')">×</button>
+        </div>
+        <form onsubmit="saveGrandparent(event)">
+            <div class="form-group"><label>الأسرة *</label><select id="gpFamily" required></select></div>
+            <div class="form-group"><label>اسم الجد/الجدة *</label><input type="text" id="gpName" required></div>
+            <div class="form-row">
+                <div class="form-group"><label>الجيل</label><select id="gpGeneration"><option>الجد الأول</option><option>الجد الثاني</option><option>الجد الثالث</option></select></div>
+                <div class="form-group"><label>الجنس</label><select id="gpGender"><option>ذكر</option><option>أنثى</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>تاريخ الميلاد</label><input type="date" id="gpBirth"></div>
+                <div class="form-group"><label>تاريخ الوفاة</label><input type="date" id="gpDeath"></div>
+            </div>
+            <div class="form-group"><label>ملاحظات</label><textarea id="gpNotes" rows="2"></textarea></div>
+            <button type="submit" class="btn btn-success" style="width:100%;">حفظ</button>
+        </form>
     </div>
 </div>
 
@@ -237,9 +323,9 @@
             <button class="close-btn" onclick="closeModal('graveModal')">×</button>
         </div>
         <div id="graveDetails"></div>
-        <div style="margin-top: 15px;">
-            <button class="btn btn-warning" onclick="editCurrentGrave()">️ تعديل</button>
-            <button class="btn btn-danger" onclick="deleteCurrentGrave()">️ حذف</button>
+        <div style="margin-top:10px;">
+            <button class="btn btn-warning" onclick="editGrave()">✏️ تعديل</button>
+            <button class="btn btn-danger" onclick="deleteGrave()">🗑️ حذف</button>
         </div>
     </div>
 </div>
@@ -248,194 +334,430 @@
 <div id="addGraveModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 id="addGraveModalTitle">إضافة قبر</h3>
+            <h3 id="addGraveTitle">إضافة قبر</h3>
             <button class="close-btn" onclick="closeModal('addGraveModal')">×</button>
         </div>
         <form onsubmit="saveGrave(event)">
             <input type="hidden" id="graveEditId">
             <div class="form-row">
-                <div class="form-group"><label>رقم القبر *</label><input type="text" id="graveNumber" required placeholder="Z-001"></div>
-                <div class="form-group"><label>الموقع الداخلي *</label><input type="text" id="graveLocation" required placeholder="صف أول (شمال تحت)"></div>
+                <div class="form-group"><label>رقم القبر *</label><input type="text" id="gNumber" required placeholder="Z-001"></div>
+                <div class="form-group"><label>الموقع</label><input type="text" id="gLocation" placeholder="صف أول (شمال تحت)"></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>نوع القبر</label><select id="graveType"><option value="عام">عام</option><option value="خاص">خاص</option></select></div>
-                <div class="form-group"><label>الحالة الحالية</label><select id="graveStatus"><option value="فارغ">فارغ</option><option value="متاح">متاح</option><option value="مشغول">مشغول</option></select></div>
+                <div class="form-group"><label>النوع</label><select id="gType"><option value="غير محدد">غير محدد</option><option value="عام">عام</option><option value="خاص">خاص</option></select></div>
+                <div class="form-group"><label>الحالة</label><select id="gStatus"><option value="فارغ">فارغ</option><option value="متاح">متاح</option><option value="مشغول">مشغول</option></select></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>اسم العائلة</label><input type="text" id="graveFamily" placeholder="آل الخطيب"></div>
-                <div class="form-group"><label>المالك</label><input type="text" id="graveOwner" placeholder="اسم المالك"></div>
+                <div class="form-group"><label>العائلة</label><input type="text" id="gFamily" placeholder="آل الخطيب"></div>
+                <div class="form-group"><label>المالك</label><input type="text" id="gOwner"></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>آخر مدفون</label><input type="text" id="graveLastBuried" placeholder="اسم آخر مدفون"></div>
-                <div class="form-group"><label>آخر تاريخ دفن</label><input type="date" id="graveLastDate"></div>
+                <div class="form-group"><label>آخر مدفون</label><input type="text" id="gLastBuried"></div>
+                <div class="form-group"><label>تاريخ الدفن</label><input type="date" id="gLastDate"></div>
             </div>
-            <div class="form-row">
-                <div class="form-group"><label>جواز الاستخدام (تاريخ الانتهاء)</label><input type="date" id="graveExpiry"></div>
-                <div class="form-group"><label>اسم الضيعة</label><input type="text" id="graveVillage" value="زعورة"></div>
-            </div>
-            <div class="form-group"><label>ملاحظات</label><textarea id="graveNotes" rows="2"></textarea></div>
+            <div class="form-group"><label>ملاحظات</label><textarea id="gNotes" rows="2"></textarea></div>
             <button type="submit" class="btn btn-success" style="width:100%;">حفظ</button>
         </form>
     </div>
 </div>
 
-<!-- نافذة إضافة مدفون -->
-<div id="addBurialModal" class="modal">
+<!-- نافذة إضافة عائلة -->
+<div id="addFamilyModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>إضافة مدفون</h3>
-            <button class="close-btn" onclick="closeModal('addBurialModal')">×</button>
+            <h3>إضافة عائلة</h3>
+            <button class="close-btn" onclick="closeModal('addFamilyModal')">×</button>
         </div>
-        <form onsubmit="saveBurial(event)">
+        <form onsubmit="saveFamily(event)">
             <div class="form-row">
-                <div class="form-group"><label>رقم القبر *</label><select id="burialGrave" required></select></div>
-                <div class="form-group"><label>اسم المتوفى الكامل *</label><input type="text" id="burialName" required></div>
+                <div class="form-group"><label>كود الأسرة *</label><input type="text" id="fCode" required placeholder="A001"></div>
+                <div class="form-group"><label>اسم العائلة *</label><input type="text" id="fName" required placeholder="عساف"></div>
             </div>
-            <div class="form-row">
-                <div class="form-group"><label>تاريخ الوفاة</label><input type="date" id="burialDeath"></div>
-                <div class="form-group"><label>تاريخ الدفن</label><input type="date" id="burialDate"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>عمر المتوفى</label><input type="number" id="burialAge"></div>
-                <div class="form-group"><label>العام</label><input type="number" id="burialYear"></div>
-            </div>
-            <div class="form-group"><label>مصدر المعلومة</label><input type="text" id="burialSource" placeholder="الشاهدة"></div>
-            <div class="form-group"><label>ملاحظات</label><textarea id="burialNotes" rows="2"></textarea></div>
+            <div class="form-group"><label>القطاع</label><select id="fSector"><option>الجبل</option><option>الحارة1</option><option>الحارة2</option><option>الوادي</option><option>المنصورة</option><option>دمر</option></select></div>
+            <div class="form-group"><label>ملاحظات</label><textarea id="fNotes" rows="2"></textarea></div>
             <button type="submit" class="btn btn-success" style="width:100%;">حفظ</button>
         </form>
     </div>
 </div>
 
 <script>
-// ========== البيانات الحقيقية ==========
-const gravesData = [
-    {id:'Z-001',location:'صف أول (شمال تحت)',type:'عام',lastBuried:'',lastDate:'',expiry:'',status:'فارغ',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-004',location:'صف أول (شمال تحت)',type:'عام',lastBuried:'أيمن حمدان حسن',lastDate:'2002-01-01',expiry:'2012-01-01',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-006',location:'صف أول (شمال تحت)',type:'عام',lastBuried:'كاترين محمد الخطيب',lastDate:'2006-01-01',expiry:'2016-01-01',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-007',location:'صف أول (شمال تحت)',type:'عام',lastBuried:'حسن أحمد رضوان',lastDate:'2005-02-01',expiry:'2015-02-01',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-008',location:'صف أول (شمال تحت)',type:'خاص',lastBuried:'سعيد الجوهري',lastDate:'2000-02-01',expiry:'2010-02-01',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'سعيد الجوهري',notes:''},
-    {id:'Z-009',location:'صف أول (شمال تحت)',type:'خاص',lastBuried:'علي شعبان الخطيب',lastDate:'1991-02-01',expiry:'2001-02-01',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'علي شعبان الخطيب',notes:''},
-    {id:'Z-010',location:'صف أول (شمال تحت)',type:'عام',lastBuried:'فضة حسن رضوان',lastDate:'2023-01-01',expiry:'2033-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-011',location:'صف أول (شمال تحت)',type:'عام',lastBuried:'نوفة الدرويش',lastDate:'2020-01-01',expiry:'2030-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-014',location:'صف أول (شمال تحت)',type:'خاص',lastBuried:'حورية الخطيب (أم علي)',lastDate:'2024-01-01',expiry:'2034-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'حورية الخطيب (أم علي)',notes:''},
-    {id:'Z-015',location:'صف أول (شمال تحت)',type:'خاص',lastBuried:'سعيد الخطيب (أبو علي)',lastDate:'2012-01-01',expiry:'2022-01-01',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'سعيد الخطيب (أبو علي)',notes:''},
-    {id:'Z-017',location:'صف أول (شمال تحت)',type:'خاص',lastBuried:'محمد الخطيب(أبو نضال)',lastDate:'2024-01-01',expiry:'2034-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'محمد الخطيب(أبو نضال)',notes:''},
-    {id:'Z-030',location:'صف النسوان',type:'عام',lastBuried:'شما محمد الخطيب (ام عيسى)',lastDate:'2011-01-01',expiry:'2021-01-01',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-031',location:'صف النسوان',type:'عام',lastBuried:'ميرا يعقوب عساف',lastDate:'2025-01-01',expiry:'2035-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-036',location:'صف النسوان',type:'عام',lastBuried:'غصون الخطيب (ام بسام)',lastDate:'2017-01-01',expiry:'2027-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-037',location:'صف النسوان',type:'عام',lastBuried:'بدرا (ام سهيل)',lastDate:'2020-01-01',expiry:'2030-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-038',location:'صف النسوان',type:'عام',lastBuried:'فتاة الخطيب (ام يوسف)',lastDate:'2021-01-01',expiry:'2031-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-039',location:'صف النسوان',type:'عام',lastBuried:'حسنة الدرويش (ام سعيد)',lastDate:'2022-01-01',expiry:'2032-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-040',location:'صف النسوان',type:'عام',lastBuried:'نوال جلو (ام وحيد)',lastDate:'2023-01-01',expiry:'2033-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-041',location:'صف النسوان',type:'عام',lastBuried:'ميساء الشعار (ام وليم)',lastDate:'2023-01-01',expiry:'2033-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-042',location:'صف النسوان',type:'عام',lastBuried:'فندية الخطيب ام وهيب',lastDate:'2025-01-01',expiry:'2035-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-055',location:'صف النسوان',type:'خاص',lastBuried:'فطوم الحمصي',lastDate:'1986-01-01',expiry:'1996-01-01',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'فطوم الحمصي',notes:''},
-    {id:'Z-056',location:'صف النسوان',type:'خاص',lastBuried:'يوسف احمد عساف أبو محمد',lastDate:'1983-01-01',expiry:'1993-01-01',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'يوسف احمد عساف أبو محمد',notes:''},
-    {id:'Z-057',location:'صف ثاني فوق',type:'خاص',lastBuried:'خضر عساف أبو احمد',lastDate:'2015-01-01',expiry:'2025-01-01',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'خضر عساف أبو احمد',notes:''},
-    {id:'Z-059',location:'صف ثاني فوق',type:'خاص',lastBuried:'الشيخ محمد عساف أبو مالك',lastDate:'2012-01-01',expiry:'2022-01-01',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'الشيخ محمد عساف أبو مالك',notes:''},
-    {id:'Z-060',location:'صف ثاني فوق',type:'خاص',lastBuried:'الشيخ شعبان الخطيب أبو لؤي',lastDate:'2010-01-01',expiry:'2020-01-01',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'الشيخ شعبان الخطيب أبو لؤي',notes:''},
-    {id:'Z-072',location:'صف ثاني فوق',type:'عام',lastBuried:'كامل يوسف الجبر أبو يوسف',lastDate:'2020-01-01',expiry:'2030-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'كامل يوسف الجبر أبو يوسف',notes:''},
-    {id:'Z-074',location:'صف ثاني فوق',type:'خاص',lastBuried:'الشيخ احمد خضر احمد أبو فراس',lastDate:'2021-04-19',expiry:'2031-04-19',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:'القبر مرخم بالكامل - مدفون فيه واحد'},
-    {id:'Z-076',location:'صف ثاني فوق',type:'خاص',lastBuried:'إبراهيم خضر احمد أبو هيثم',lastDate:'2019-01-01',expiry:'2029-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'إبراهيم خضر احمد أبو هيثم',notes:''},
-    {id:'Z-077',location:'صف ثاني فوق',type:'خاص',lastBuried:'عطا خضر احمد',lastDate:'2021-01-01',expiry:'2031-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'عطا خضر احمد',notes:''},
-    {id:'Z-078',location:'صف ثاني فوق',type:'خاص',lastBuried:'عبد الله خضر احمد',lastDate:'2024-01-01',expiry:'2034-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'عبد الله خضر احمد',notes:''},
-    {id:'Z-081',location:'صف ثاني فوق',type:'عام',lastBuried:'هشام محمد الخطيب',lastDate:'2025-10-19',expiry:'2035-10-19',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-094',location:'صف ثالث فوق',type:'عام',lastBuried:'إبراهيم الابراهيم (درعا)',lastDate:'2023-01-01',expiry:'2033-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-106',location:'صف رابع فوق',type:'خاص',lastBuried:'شما احمد الخطيب ام عبد الله',lastDate:'2021-01-01',expiry:'2031-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'أبو حسن لؤي',notes:''},
-    {id:'Z-107',location:'صف رابع فوق',type:'خاص',lastBuried:'سلمان علي عساف',lastDate:'2014-03-06',expiry:'2024-03-06',status:'متاح',village:'زعورة',family:'آل الخطيب',owner:'سلمان علي عساف',notes:''},
-    {id:'Z-128',location:'صف رابع فوق',type:'عام',lastBuried:'اصف خضر عساف',lastDate:'2026-01-01',expiry:'2036-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-129',location:'صف رابع فوق',type:'عام',lastBuried:'احمد شعبان الخطيب',lastDate:'2024-01-01',expiry:'2034-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-130',location:'صف رابع فوق',type:'عام',lastBuried:'علي هيثم السليمان',lastDate:'2023-01-01',expiry:'2033-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-131',location:'صف رابع فوق',type:'عام',lastBuried:'محمد السليمان الخطيب أبو هيثم',lastDate:'2022-01-01',expiry:'2032-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-132',location:'صف رابع فوق',type:'عام',lastBuried:'حسن سليمان الخطيب أبو وهيب',lastDate:'2020-01-01',expiry:'2030-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-133',location:'صف رابع فوق',type:'عام',lastBuried:'توفيق الخطيب أبو اكرم',lastDate:'2018-01-01',expiry:'2028-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-134',location:'صف رابع فوق',type:'عام',lastBuried:'فراس عساف',lastDate:'2022-01-01',expiry:'2032-01-01',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-142',location:'صف النسوان',type:'عام',lastBuried:'مفيدة حسين الخطيب(ام أكرم)',lastDate:'2026-07-05',expiry:'2036-07-05',status:'مشغول',village:'زعورة',family:'آل الخطيب',owner:'',notes:''},
-    {id:'Z-143',location:'صف النسوان',type:'عام',lastBuried:'فتاة حربا زوجة عفيف الزلق',lastDate:'2026-06-20',expiry:'2036-06-20',status:'مشغول',village:'زعورة',family:'آل الزلق',owner:'',notes:''},
-    {id:'Z-180',location:'',type:'خاص',lastBuried:'نزيه ابو عيسى',lastDate:'2026-06-15',expiry:'2036-06-15',status:'مشغول',village:'زعورة',family:'آل ابو عيسى',owner:'',notes:''},
-    {id:'Z-196',location:'',type:'',lastBuried:'عبد يوسف الجوهري',lastDate:'2026-03-31',expiry:'2036-03-31',status:'مشغول',village:'زعورة',family:'آل الجوهري',owner:'',notes:''},
-    {id:'Z-286',location:'',type:'خاص',lastBuried:'نمرة دياب ام بسام منصور',lastDate:'2025-03-01',expiry:'2035-03-01',status:'مشغول',village:'زعورة',family:'آل منصور',owner:'',notes:''},
-    {id:'Z-287',location:'',type:'خاص',lastBuried:'عبد الفايز منصور',lastDate:'2026-02-19',expiry:'2036-02-19',status:'مشغول',village:'زعورة',family:'آل منصور',owner:'',notes:''},
-    {id:'Z-339',location:'',type:'خاص',lastBuried:'لطيف قنص',lastDate:'2025-01-02',expiry:'2035-01-02',status:'مشغول',village:'زعورة',family:'آل قنص',owner:'',notes:''},
-    {id:'Z-365',location:'',type:'خاص',lastBuried:'ابنة ابي فهد محمد',lastDate:'2025-12-15',expiry:'2035-12-15',status:'مشغول',village:'زعورة',family:'آل عيسى',owner:'',notes:''}
+// ========== البيانات ==========
+let persons = [
+    {id:'A001-F001',family:'A001',name:'علي عساف عساف',relation:'رب أسرة',gender:'ذكر',sector:'الجبل',birth:'1948-01-01',status:'حي',phone:'951743028',notes:''},
+    {id:'A001-F002',family:'A001',name:'حمدة مصطفى محمد',relation:'زوجة',gender:'أنثى',sector:'الجبل',birth:'1955-01-01',status:'حي',phone:'',notes:''},
+    {id:'A003-F001',family:'A003',name:'باسم علي عساف',relation:'رب أسرة',gender:'ذكر',sector:'الجبل',birth:'1973-11-01',status:'حي',phone:'+963991699459',notes:''},
+    {id:'A004-F001',family:'A004',name:'عساف علي عساف',relation:'رب أسرة',gender:'ذكر',sector:'الجبل',birth:'1974-01-01',status:'حي',phone:'939134655',notes:''},
+    {id:'A005-F001',family:'A005',name:'بسام علي عساف',relation:'رب أسرة',gender:'ذكر',sector:'الجبل',birth:'1980-10-14',status:'حي',phone:'988012043',notes:''},
+    {id:'A005-F002',family:'A005',name:'عبير احمد احمد',relation:'زوجة',gender:'أنثى',sector:'الجبل',birth:'1986-10-12',status:'حي',phone:'',notes:''},
+    {id:'A005-F003',family:'A005',name:'علي بسام عساف',relation:'ابن',gender:'ذكر',sector:'الجبل',birth:'2007-06-11',status:'حي',phone:'',notes:''},
+    {id:'A005-F004',family:'A005',name:'احمد بسام عساف',relation:'ابن',gender:'ذكر',sector:'الجبل',birth:'2010-07-26',status:'حي',phone:'',notes:''},
+    {id:'A020-F001',family:'A020',name:'سلمان علي عساف',relation:'رب أسرة',gender:'ذكر',sector:'الجبل',birth:'1988-01-01',status:'متوفى',phone:'',notes:''},
+    {id:'A020-F002',family:'A020',name:'حمزة سلمان عساف',relation:'ابن',gender:'ذكر',sector:'الجبل',birth:'2014-01-08',status:'حي',phone:'',notes:'يتيم'},
+    {id:'A022-F001',family:'A022',name:'شعبان علي الخطيب',relation:'رب أسرة',gender:'ذكر',sector:'الحارة1',birth:'1965-08-02',status:'حي',phone:'+963933144846',notes:''},
+    {id:'A022-F002',family:'A022',name:'نوفة مصطفى محمد',relation:'زوجة',gender:'أنثى',sector:'الحارة1',birth:'1966-10-01',status:'حي',phone:'',notes:''},
+    {id:'A022-F003',family:'A022',name:'علا شعبان الخطيب',relation:'بنت',gender:'أنثى',sector:'الحارة1',birth:'1991-02-08',status:'حي',phone:'',notes:''},
+    {id:'A025-F001',family:'A025',name:'علي شعبان الخطيب',relation:'رب أسرة',gender:'ذكر',sector:'الحارة1',birth:'1988-08-19',status:'حي',phone:'945102428',notes:''},
+    {id:'A025-F002',family:'A025',name:'يارا وهيب الخطيب',relation:'زوجة',gender:'أنثى',sector:'الحارة1',birth:'1992-11-02',status:'حي',phone:'',notes:''},
+    {id:'A025-F003',family:'A025',name:'تاليا علي الخطيب',relation:'بنت',gender:'أنثى',sector:'الحارة1',birth:'2018-04-17',status:'حي',phone:'',notes:''},
+    {id:'A025-F004',family:'A025',name:'ليليا علي الخطيب',relation:'بنت',gender:'أنثى',sector:'الحارة1',birth:'2019-08-19',status:'حي',phone:'',notes:''},
+    {id:'A025-F005',family:'A025',name:'حسن علي الخطيب',relation:'ابن',gender:'ذكر',sector:'الحارة1',birth:'2023-10-20',status:'حي',phone:'',notes:''},
+    {id:'A030-F001',family:'A030',name:'يوسف شعبان الخطيب',relation:'رب أسرة',gender:'ذكر',sector:'الحارة2',birth:'1969-03-31',status:'حي',phone:'+963991441683',notes:''},
+    {id:'A030-F002',family:'A030',name:'غادة حسن عيسى',relation:'زوجة',gender:'أنثى',sector:'الحارة2',birth:'1972-01-13',status:'حي',phone:'',notes:''},
+    {id:'A030-F003',family:'A030',name:'إلياس يوسف الخطيب',relation:'ابن',gender:'ذكر',sector:'الحارة2',birth:'2001-04-20',status:'حي',phone:'+963991441683',notes:''},
+    {id:'A089-F001',family:'A089',name:'حسان احمد عساف',relation:'رب أسرة',gender:'ذكر',sector:'الحارة1',birth:'1976-10-12',status:'متوفى',phone:'',notes:''},
+    {id:'A089-F002',family:'A089',name:'سهى حمدان عساف',relation:'زوجة',gender:'أنثى',sector:'الحارة1',birth:'1980-06-28',status:'حي',phone:'0934844071',notes:''},
+    {id:'A089-F003',family:'A089',name:'مايا حسان عساف',relation:'بنت',gender:'أنثى',sector:'الحارة1',birth:'2005-01-01',status:'حي',phone:'',notes:'ايتام'},
+    {id:'A089-F004',family:'A089',name:'دانا حسان عساف',relation:'بنت',gender:'أنثى',sector:'الحارة1',birth:'2008-07-31',status:'حي',phone:'',notes:'ايتام'},
+    {id:'A089-F005',family:'A089',name:'كندة حسان عساف',relation:'بنت',gender:'أنثى',sector:'الحارة1',birth:'2010-09-01',status:'حي',phone:'',notes:'ايتام'},
+    {id:'A149-F001',family:'A149',name:'لطيف قنص',relation:'رب أسرة',gender:'ذكر',sector:'الجبل',birth:'1945-01-01',status:'متوفى',phone:'',notes:''},
+    {id:'A137-F001',family:'A137',name:'علي محمد رضوان',relation:'رب أسرة',gender:'ذكر',sector:'الحارة1',birth:'1978-01-01',status:'متوفى',phone:'',notes:''},
+    {id:'A137-F002',family:'A137',name:'غادة محمد أسعد',relation:'زوجة',gender:'أنثى',sector:'الحارة1',birth:'1980-01-01',status:'حي',phone:'0931859745',notes:''},
+    {id:'A137-F003',family:'A137',name:'سلافة علي رضوان',relation:'بنت',gender:'أنثى',sector:'الحارة1',birth:'2008-01-01',status:'حي',phone:'',notes:'ايتام'},
+    {id:'A137-F004',family:'A137',name:'سيلين علي رضوان',relation:'بنت',gender:'أنثى',sector:'الحارة1',birth:'2011-01-01',status:'حي',phone:'',notes:'ايتام'},
+    {id:'A137-F005',family:'A137',name:'حنين علي رضوان',relation:'بنت',gender:'أنثى',sector:'الحارة1',birth:'2013-01-01',status:'حي',phone:'',notes:'ايتام'},
+    {id:'A137-F006',family:'A137',name:'جودي علي رضوان',relation:'بنت',gender:'أنثى',sector:'الحارة1',birth:'2014-01-01',status:'حي',phone:'',notes:'ايتام'}
 ];
 
-const burialsData = [
-    {id:'BUR-0001',graveId:'Z-004',name:'أيمن حمدان حسن',deathDate:'2002-01-01',burialDate:'2002-01-01',age:'',source:'الشاهدة',year:2002,notes:''},
-    {id:'BUR-0002',graveId:'Z-006',name:'هبة شعبان عساف',deathDate:'1990-01-01',burialDate:'1990-01-01',age:'',source:'الشاهدة',year:1990,notes:''},
-    {id:'BUR-0003',graveId:'Z-006',name:'كاترين محمد الخطيب',deathDate:'2006-01-01',burialDate:'2006-01-01',age:'',source:'الشاهدة',year:2006,notes:''},
-    {id:'BUR-0004',graveId:'Z-007',name:'حسن أحمد رضوان',deathDate:'2005-01-01',burialDate:'2005-02-01',age:'',source:'الشاهدة',year:2005,notes:''},
-    {id:'BUR-0005',graveId:'Z-008',name:'سعيد الجوهري',deathDate:'2000-01-01',burialDate:'2000-02-01',age:'',source:'الشاهدة',year:2000,notes:''},
-    {id:'BUR-0006',graveId:'Z-009',name:'علي شعبان الخطيب',deathDate:'1991-01-01',burialDate:'1991-02-01',age:'',source:'الشاهدة',year:1991,notes:''},
-    {id:'BUR-0008',graveId:'Z-010',name:'فضة حسن رضوان',deathDate:'2023-01-01',burialDate:'2023-01-01',age:'',source:'الشاهدة',year:2023,notes:''},
-    {id:'BUR-0011',graveId:'Z-011',name:'نوفة الدرويش',deathDate:'2020-01-01',burialDate:'2020-01-01',age:'',source:'الشاهدة',year:2020,notes:''},
-    {id:'BUR-0013',graveId:'Z-012',name:'فوزية الدرويش',deathDate:'2010-01-01',burialDate:'2010-01-01',age:'',source:'الشاهدة',year:2010,notes:''},
-    {id:'BUR-0014',graveId:'Z-013',name:'أندريه محمد الخطيب',deathDate:'2007-01-01',burialDate:'2007-01-01',age:'',source:'الشاهدة',year:2007,notes:''},
-    {id:'BUR-0015',graveId:'Z-014',name:'حورية الخطيب (أم علي)',deathDate:'2024-01-01',burialDate:'2024-01-01',age:'',source:'الشاهدة',year:2024,notes:''},
-    {id:'BUR-0016',graveId:'Z-015',name:'سعيد الخطيب (أبو علي)',deathDate:'2012-01-01',burialDate:'2012-01-01',age:'',source:'الشاهدة',year:2012,notes:''},
-    {id:'BUR-0018',graveId:'Z-016',name:'نوفة الخطيب',deathDate:'2015-01-01',burialDate:'2015-01-01',age:'',source:'الشاهدة',year:2015,notes:''},
-    {id:'BUR-0019',graveId:'Z-017',name:'محمد الخطيب(أبو نضال)',deathDate:'2024-01-01',burialDate:'2024-01-01',age:'',source:'الشاهدة',year:2024,notes:''},
-    {id:'BUR-0021',graveId:'Z-018',name:'سليمان الخطيب',deathDate:'1995-01-01',burialDate:'1995-01-01',age:'',source:'الشاهدة',year:1995,notes:''},
-    {id:'BUR-0022',graveId:'Z-019',name:'حمدان العساف',deathDate:'2000-01-01',burialDate:'2000-01-01',age:'',source:'الشاهدة',year:2000,notes:''},
-    {id:'BUR-0023',graveId:'Z-020',name:'علي سعيد الخطيب',deathDate:'1986-01-01',burialDate:'1986-01-01',age:'',source:'الشاهدة',year:1986,notes:''},
-    {id:'BUR-0025',graveId:'Z-021',name:'محمود علي الخطيب',deathDate:'1983-01-01',burialDate:'1983-01-01',age:'',source:'الشاهدة',year:1983,notes:''},
-    {id:'BUR-0026',graveId:'Z-022',name:'محمد محمود',deathDate:'2013-01-01',burialDate:'2013-01-01',age:'',source:'الشاهدة',year:2013,notes:''},
-    {id:'BUR-0027',graveId:'Z-023',name:'كامل محمود الخطيب',deathDate:'1999-01-01',burialDate:'1999-01-01',age:'',source:'الشاهدة',year:1999,notes:''},
-    {id:'BUR-0028',graveId:'Z-024',name:'الشيخ يوسف معروف',deathDate:'1994-01-01',burialDate:'1994-01-01',age:'',source:'الشاهدة',year:1994,notes:''},
-    {id:'BUR-0029',graveId:'Z-030',name:'شما محمد الخطيب (ام عيسى)',deathDate:'2011-01-01',burialDate:'2011-01-01',age:'',source:'الشاهدة',year:2011,notes:''},
-    {id:'BUR-0031',graveId:'Z-031',name:'ميرا يعقوب عساف',deathDate:'2025-01-01',burialDate:'2025-01-01',age:'',source:'الشاهدة',year:2025,notes:''},
-    {id:'BUR-0032',graveId:'Z-032',name:'صفا الخطيب (ام ايمن)',deathDate:'2011-01-01',burialDate:'2011-01-01',age:'',source:'الشاهدة',year:2011,notes:''},
-    {id:'BUR-0033',graveId:'Z-033',name:'حورية بلال (ام لؤي)',deathDate:'2012-01-01',burialDate:'2012-01-01',age:'',source:'الشاهدة',year:2012,notes:''},
-    {id:'BUR-0034',graveId:'Z-034',name:'مها محمد المحمد (ام يعرب)',deathDate:'2013-01-01',burialDate:'2013-01-01',age:'',source:'الشاهدة',year:2013,notes:''},
-    {id:'BUR-0035',graveId:'Z-035',name:'فاطمة ( زوجة انيس أبو سومر)',deathDate:'2010-01-01',burialDate:'2010-01-01',age:'',source:'الشاهدة',year:2010,notes:''},
-    {id:'BUR-0036',graveId:'Z-036',name:'غصون الخطيب (ام بسام)',deathDate:'2017-01-01',burialDate:'2017-01-01',age:'',source:'الشاهدة',year:2017,notes:''},
-    {id:'BUR-0037',graveId:'Z-037',name:'بدرا (ام سهيل)',deathDate:'2020-01-01',burialDate:'2020-01-01',age:'',source:'الشاهدة',year:2020,notes:''},
-    {id:'BUR-0038',graveId:'Z-038',name:'فتاة الخطيب (ام يوسف)',deathDate:'2021-01-01',burialDate:'2021-01-01',age:'',source:'الشاهدة',year:2021,notes:''},
-    {id:'BUR-0039',graveId:'Z-039',name:'حسنة الدرويش (ام سعيد)',deathDate:'2022-01-01',burialDate:'2022-01-01',age:'',source:'الشاهدة',year:2022,notes:''},
-    {id:'BUR-0040',graveId:'Z-040',name:'نوال جلو (ام وحيد)',deathDate:'2023-01-01',burialDate:'2023-01-01',age:'',source:'الشاهدة',year:2023,notes:''},
-    {id:'BUR-0041',graveId:'Z-041',name:'ميساء الشعار (ام وليم)',deathDate:'2023-01-01',burialDate:'2023-01-01',age:'',source:'الشاهدة',year:2023,notes:''},
-    {id:'BUR-0042',graveId:'Z-042',name:'فندية الخطيب ام وهيب',deathDate:'2025-01-01',burialDate:'2025-01-01',age:'',source:'الشاهدة',year:2025,notes:''},
-    {id:'BUR-0044',graveId:'Z-055',name:'فطوم الحمصي',deathDate:'1986-01-01',burialDate:'1986-01-01',age:'',source:'الشاهدة',year:1986,notes:''},
-    {id:'BUR-0045',graveId:'Z-056',name:'يوسف احمد عساف أبو محمد',deathDate:'1983-01-01',burialDate:'1983-01-01',age:'',source:'الشاهدة',year:1983,notes:''},
-    {id:'BUR-0046',graveId:'Z-057',name:'خضر عساف أبو احمد',deathDate:'2015-01-01',burialDate:'2015-01-01',age:'',source:'الشاهدة',year:2015,notes:''},
-    {id:'BUR-0047',graveId:'Z-059',name:'الشيخ محمد عساف أبو مالك',deathDate:'2012-01-01',burialDate:'2012-01-01',age:'',source:'الشاهدة',year:2012,notes:''},
-    {id:'BUR-0048',graveId:'Z-060',name:'الشيخ شعبان الخطيب أبو لؤي',deathDate:'2010-01-01',burialDate:'2010-01-01',age:'',source:'الشاهدة',year:2010,notes:''},
-    {id:'BUR-0049',graveId:'Z-061',name:'موسى احمد رضوان',deathDate:'2012-01-01',burialDate:'2012-01-01',age:'',source:'الشاهدة',year:2012,notes:''},
-    {id:'BUR-0051',graveId:'Z-063',name:'الطفل سلمان خضر احمد',deathDate:'2013-01-01',burialDate:'2013-01-01',age:'',source:'الشاهدة',year:2013,notes:''},
-    {id:'BUR-0052',graveId:'Z-064',name:'احمد حسن رضوان',deathDate:'2014-01-01',burialDate:'2014-01-01',age:'',source:'الشاهدة',year:2014,notes:''},
-    {id:'BUR-0053',graveId:'Z-072',name:'كامل يوسف الجبر أبو يوسف',deathDate:'2020-01-01',burialDate:'2020-01-01',age:'',source:'الشاهدة',year:2020,notes:''},
-    {id:'BUR-0054',graveId:'Z-074',name:'الشيخ احمد خضر احمد أبو فراس',deathDate:'2021-04-19',burialDate:'2021-04-19',age:'',source:'الشاهدة',year:2021,notes:''},
-    {id:'BUR-0055',graveId:'Z-076',name:'إبراهيم خضر احمد أبو هيثم',deathDate:'2019-01-01',burialDate:'2019-01-01',age:'',source:'الشاهدة',year:2019,notes:''},
-    {id:'BUR-0056',graveId:'Z-077',name:'عطا خضر احمد',deathDate:'2021-01-01',burialDate:'2021-01-01',age:'',source:'الشاهدة',year:2021,notes:''},
-    {id:'BUR-0057',graveId:'Z-078',name:'عبد الله خضر احمد',deathDate:'2024-01-01',burialDate:'2024-01-01',age:'',source:'الشاهدة',year:2024,notes:''},
-    {id:'BUR-0058',graveId:'Z-080',name:'قصي حسن الخطيب',deathDate:'2014-01-01',burialDate:'2014-01-01',age:'',source:'الشاهدة',year:2014,notes:''},
-    {id:'BUR-0060',graveId:'Z-081',name:'هشام محمد الخطيب',deathDate:'2025-10-19',burialDate:'2025-10-19',age:'',source:'الشاهدة',year:2025,notes:''},
-    {id:'BUR-0061',graveId:'Z-082',name:'لؤي الخطيب أبو يعرب',deathDate:'2015-01-01',burialDate:'2015-01-01',age:'',source:'الشاهدة',year:2015,notes:''},
-    {id:'BUR-0062',graveId:'Z-083',name:'بسام فارس الخطيب',deathDate:'2016-01-01',burialDate:'2016-01-01',age:'',source:'الشاهدة',year:2016,notes:''},
-    {id:'BUR-0064',graveId:'Z-092',name:'حسين محمد الخطيب أبو سعيد',deathDate:'2011-01-01',burialDate:'2011-01-01',age:'',source:'الشاهدة',year:2011,notes:''},
-    {id:'BUR-0065',graveId:'Z-093',name:'حسن الخطيب أبو سهيل',deathDate:'2008-01-01',burialDate:'2008-01-01',age:'',source:'الشاهدة',year:2008,notes:''},
-    {id:'BUR-0067',graveId:'Z-094',name:'إبراهيم الابراهيم (درعا)',deathDate:'2023-01-01',burialDate:'2023-01-01',age:'',source:'الشاهدة',year:2023,notes:''},
-    {id:'BUR-0068',graveId:'Z-096',name:'غالية الموسى ام احمد',deathDate:'2014-01-01',burialDate:'2014-01-01',age:'',source:'الشاهدة',year:2014,notes:''},
-    {id:'BUR-0069',graveId:'Z-099',name:'حمدان السليمان أبو عيسى',deathDate:'2013-01-01',burialDate:'2013-01-01',age:'',source:'الشاهدة',year:2013,notes:''},
-    {id:'BUR-0070',graveId:'Z-103',name:'مازن مخلوف',deathDate:'2012-01-01',burialDate:'2012-01-01',age:'',source:'الشاهدة',year:2012,notes:''},
-    {id:'BUR-0071',graveId:'Z-106',name:'شما احمد الخطيب ام عبد الله',deathDate:'2021-01-01',burialDate:'2021-01-01',age:'',source:'الشاهدة',year:2021,notes:''},
-    {id:'BUR-0072',graveId:'Z-107',name:'سلمان علي عساف',deathDate:'2014-03-06',burialDate:'2014-03-06',age:'',source:'الشاهدة',year:2014,notes:''},
-    {id:'BUR-0073',graveId:'Z-128',name:'اصف خضر عساف',deathDate:'2026-01-01',burialDate:'2026-01-01',age:'',source:'الشاهدة',year:2026,notes:''},
-    {id:'BUR-0074',graveId:'Z-129',name:'احمد شعبان الخطيب',deathDate:'2024-01-01',burialDate:'2024-01-01',age:'',source:'الشاهدة',year:2024,notes:''},
-    {id:'BUR-0075',graveId:'Z-130',name:'علي هيثم السليمان',deathDate:'2023-01-01',burialDate:'2023-01-01',age:'',source:'الشاهدة',year:2023,notes:''},
-    {id:'BUR-0076',graveId:'Z-131',name:'محمد السليمان الخطيب أبو هيثم',deathDate:'2022-01-01',burialDate:'2022-01-01',age:'',source:'الشاهدة',year:2022,notes:''},
-    {id:'BUR-0077',graveId:'Z-132',name:'حسن سليمان الخطيب أبو وهيب',deathDate:'2020-01-01',burialDate:'2020-01-01',age:'',source:'الشاهدة',year:2020,notes:''},
-    {id:'BUR-0078',graveId:'Z-133',name:'توفيق الخطيب أبو اكرم',deathDate:'2018-01-01',burialDate:'2018-01-01',age:'',source:'الشاهدة',year:2018,notes:''},
-    {id:'BUR-0079',graveId:'Z-134',name:'فراس عساف',deathDate:'2022-01-01',burialDate:'2022-01-01',age:'',source:'الشاهدة',year:2022,notes:''},
-    {id:'BUR-0084',graveId:'Z-142',name:'مفيدة حسين الخطيب(ام أكرم)',deathDate:'2026-07-05',burialDate:'2026-07-05',age:'',source:'الشاهدة',year:2026,notes:''},
-    {id:'BUR-0085',graveId:'Z-143',name:'فتاة حربا زوجة عفيف الزلق',deathDate:'2026-06-20',burialDate:'2026-06-20',age:'',source:'الشاهدة',year:2026,notes:''},
-    {id:'BUR-0086',graveId:'Z-339',name:'لطيف قنص',deathDate:'2025-01-01',burialDate:'2025-01-02',age:'',source:'الشاهدة',year:2025,notes:''},
-    {id:'BUR-0087',graveId:'Z-286',name:'نمرة دياب ام بسام منصور',deathDate:'2025-03-01',burialDate:'2025-03-01',age:'',source:'الشاهدة',year:2025,notes:''},
-    {id:'BUR-0088',graveId:'Z-365',name:'ابنة ابي فهد محمد',deathDate:'2025-12-15',burialDate:'2025-12-15',age:'',source:'الشاهدة',year:2025,notes:''},
-    {id:'BUR-0089',graveId:'Z-287',name:'عبد الفايز منصور',deathDate:'2026-02-19',burialDate:'2026-02-19',age:'',source:'الشاهدة',year:2026,notes:''},
-    {id:'BUR-0090',graveId:'Z-196',name:'عبد يوسف الجوهري',deathDate:'2026-03-31',burialDate:'2026-03-31',age:'',source:'الشاهدة',year:2026,notes:''},
-    {id:'BUR-0091',graveId:'Z-180',name:'نزيه ابو عيسى',deathDate:'2026-06-15',burialDate:'2026-06-15',age:'',source:'الشاهدة',year:2026,notes:''}
+let grandparents = [
+    {id:'GP001',family:'A001',name:'محمد عساف',generation:'الجد الأول',gender:'ذكر',birth:'1920-01-01',death:'1990-01-01',notes:'جد عائلة عساف'},
+    {id:'GP002',family:'A003',name:'علي عساف الكبير',generation:'الجد الأول',gender:'ذكر',birth:'1940-01-01',death:'2010-01-01',notes:''}
 ];
+
+let graves = [
+    {id:'Z-001',number:'Z-001',location:'صف أول (شمال تحت)',type:'غير محدد',status:'فارغ',family:'آل الخطيب',owner:'',lastBuried:'',lastDate:'',notes:''},
+    {id:'Z-004',number:'Z-004',location:'صف أول (شمال تحت)',type:'عام',status:'متاح',family:'آل الخطيب',owner:'',lastBuried:'أيمن حمدان حسن',lastDate:'2002-01-01',notes:''},
+    {id:'Z-006',number:'Z-006',location:'صف أول (شمال تحت)',type:'عام',status:'متاح',family:'آل الخطيب',owner:'',lastBuried:'كاترين محمد الخطيب',lastDate:'2006-01-01',notes:''},
+    {id:'Z-008',number:'Z-008',location:'صف أول (شمال تحت)',type:'خاص',status:'متاح',family:'آل الخطيب',owner:'سعيد الجوهري',lastBuried:'سعيد الجوهري',lastDate:'2000-02-01',notes:''},
+    {id:'Z-010',number:'Z-010',location:'صف أول (شمال تحت)',type:'عام',status:'مشغول',family:'آل الخطيب',owner:'',lastBuried:'فضة حسن رضوان',lastDate:'2023-01-01',notes:''},
+    {id:'Z-014',number:'Z-014',location:'صف أول (شمال تحت)',type:'خاص',status:'مشغول',family:'آل الخطيب',owner:'حورية الخطيب',lastBuried:'حورية الخطيب (أم علي)',lastDate:'2024-01-01',notes:''},
+    {id:'Z-030',number:'Z-030',location:'صف النسوان',type:'عام',status:'متاح',family:'آل الخطيب',owner:'',lastBuried:'شما محمد الخطيب',lastDate:'2011-01-01',notes:''},
+    {id:'Z-031',number:'Z-031',location:'صف النسوان',type:'عام',status:'مشغول',family:'آل الخطيب',owner:'',lastBuried:'ميرا يعقوب عساف',lastDate:'2025-01-01',notes:''},
+    {id:'Z-050',number:'Z-050',location:'صف النسوان',type:'عام',status:'فارغ',family:'آل الخطيب',owner:'',lastBuried:'',lastDate:'',notes:''},
+    {id:'Z-074',number:'Z-074',location:'صف ثاني فوق',type:'خاص',status:'مشغول',family:'آل الخطيب',owner:'',lastBuried:'الشيخ احمد خضر احمد',lastDate:'2021-04-19',notes:'القبر مرخم بالكامل'},
+    {id:'Z-100',number:'Z-100',location:'صف ثالث فوق',type:'عام',status:'فارغ',family:'آل الخطيب',owner:'',lastBuried:'',lastDate:'',notes:''},
+    {id:'Z-150',number:'Z-150',location:'',type:'غير محدد',status:'فارغ',family:'آل الزلق',owner:'',lastBuried:'',lastDate:'',notes:''},
+    {id:'Z-200',number:'Z-200',location:'',type:'غير محدد',status:'فارغ',family:'آل الجوهري',owner:'',lastBuried:'',lastDate:'',notes:''},
+    {id:'Z-250',number:'Z-250',location:'',type:'غير محدد',status:'فارغ',family:'آل خلوف',owner:'',lastBuried:'',lastDate:'',notes:''},
+    {id:'Z-300',number:'Z-300',location:'',type:'غير محدد',status:'فارغ',family:'آل بدر',owner:'',lastBuried:'',lastDate:'',notes:''},
+    {id:'Z-350',number:'Z-350',location:'',type:'غير محدد',status:'فارغ',family:'آل الزعوري',owner:'',lastBuried:'',lastDate:'',notes:''},
+    {id:'Z-400',number:'Z-400',location:'',type:'غير محدد',status:'فارغ',family:'آل قاسم',owner:'',lastBuried:'',lastDate:'',notes:''}
+];
+
+let families = [
+    {code:'A001',name:'عساف',sector:'الجبل',notes:''},
+    {code:'A003',name:'عساف',sector:'الجبل',notes:''},
+    {code:'A004',name:'عساف',sector:'الجبل',notes:''},
+    {code:'A005',name:'عساف',sector:'الجبل',notes:''},
+    {code:'A020',name:'عساف',sector:'الجبل',notes:''},
+    {code:'A022',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A025',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A030',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A035',name:'سليمان',sector:'الحارة2',notes:''},
+    {code:'A040',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A045',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A048',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A049',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A051',name:'احمد',sector:'الحارة2',notes:''},
+    {code:'A057',name:'احمد',sector:'الحارة2',notes:''},
+    {code:'A063',name:'احمد',sector:'الحارة2',notes:''},
+    {code:'A069',name:'احمد',sector:'الحارة2',notes:''},
+    {code:'A072',name:'اجمد',sector:'الحارة2',notes:''},
+    {code:'A075',name:'احمد',sector:'الحارة2',notes:''},
+    {code:'A079',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A083',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A089',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A094',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A099',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A103',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A106',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A112',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A118',name:'الطحان',sector:'الحارة1',notes:''},
+    {code:'A123',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A129',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A134',name:'رضوان',sector:'الحارة1',notes:''},
+    {code:'A137',name:'رضوان',sector:'الحارة1',notes:''},
+    {code:'A143',name:'رضوان',sector:'الحارة1',notes:''},
+    {code:'A149',name:'قنص',sector:'الجبل',notes:''},
+    {code:'A150',name:'رضوان',sector:'الحارة1',notes:''},
+    {code:'A156',name:'رضوان',sector:'الحارة1',notes:''},
+    {code:'A159',name:'رضوان',sector:'الحارة1',notes:''},
+    {code:'A163',name:'رضوان',sector:'الحارة1',notes:''},
+    {code:'A168',name:'رضوان',sector:'الحارة1',notes:''},
+    {code:'A172',name:'رضوان',sector:'الحارة1',notes:''},
+    {code:'A176',name:'مرعي',sector:'الحارة2',notes:''},
+    {code:'A177',name:'مرعي',sector:'الحارة2',notes:''},
+    {code:'A178',name:'مرعي',sector:'الحارة2',notes:''},
+    {code:'A179',name:'مرعي',sector:'الحارة2',notes:''},
+    {code:'A180',name:'مرعي',sector:'الحارة2',notes:''},
+    {code:'A183',name:'مرعي',sector:'الحارة2',notes:''},
+    {code:'A184',name:'مرعي',sector:'الحارة2',notes:''},
+    {code:'A185',name:'مرعي',sector:'الحارة2',notes:''},
+    {code:'A186',name:'مرعي',sector:'الحارة2',notes:''},
+    {code:'A187',name:'مرعي',sector:'الحارة2',notes:''},
+    {code:'A188',name:'مرعي',sector:'الحارة2',notes:''},
+    {code:'A189',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A191',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A195',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A196',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A199',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A203',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A205',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A206',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A208',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A209',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A210',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A211',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A212',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A214',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A215',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A216',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A217',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A220',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A221',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A222',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A223',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A224',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A225',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A226',name:'خلوف',sector:'الحارة2',notes:''},
+    {code:'A227',name:'خلوف',sector:'الحارة2',notes:''},
+    {code:'A228',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A232',name:'خلوف',sector:'الحارة2',notes:''},
+    {code:'A233',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A234',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A236',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A237',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A239',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A242',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A243',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A245',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A246',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A247',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A248',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A249',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A250',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A251',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A252',name:'محمود',sector:'الحارة2',notes:''},
+    {code:'A255',name:'محمود',sector:'الحارة2',notes:''},
+    {code:'A258',name:'محمود',sector:'الحارة2',notes:''},
+    {code:'A259',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A262',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A264',name:'احمد',sector:'الحارة2',notes:''},
+    {code:'A265',name:'احمد',sector:'الحارة2',notes:''},
+    {code:'A266',name:'احمد',sector:'الحارة2',notes:''},
+    {code:'A267',name:'احمد',sector:'الحارة2',notes:''},
+    {code:'A268',name:'احمد',sector:'الحارة2',notes:''},
+    {code:'A269',name:'أبو عيسى',sector:'الحارة2',notes:''},
+    {code:'A271',name:'أبو عيسى',sector:'الحارة2',notes:''},
+    {code:'A272',name:'أبو عيسى',sector:'الحارة2',notes:''},
+    {code:'A273',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A275',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A277',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A278',name:'احمد',sector:'الحارة1',notes:''},
+    {code:'A279',name:'احمد',sector:'الحارة1',notes:''},
+    {code:'A280',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A281',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A282',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A283',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A284',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A285',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A286',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A288',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A290',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A291',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A293',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A294',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A296',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A297',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A298',name:'حسن',sector:'الحارة1',notes:''},
+    {code:'A301',name:'حسن',sector:'الحارة1',notes:''},
+    {code:'A304',name:'حسن',sector:'الحارة1',notes:''},
+    {code:'A305',name:'حسن',sector:'الحارة1',notes:''},
+    {code:'A306',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A307',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A308',name:'الزعوري',sector:'الحارة1',notes:''},
+    {code:'A309',name:'شاهين',sector:'الحارة1',notes:''},
+    {code:'A310',name:'محمود',sector:'الحارة1',notes:''},
+    {code:'A311',name:'احمد',sector:'الوادي',notes:''},
+    {code:'A312',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A313',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A314',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A315',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A316',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A317',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A318',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A319',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A321',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A324',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A326',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A327',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A328',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A329',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A330',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A331',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A332',name:'الجوهري',sector:'الوادي',notes:''},
+    {code:'A333',name:'حمدان',sector:'الوادي',notes:''},
+    {code:'A334',name:'حمدان',sector:'الوادي',notes:''},
+    {code:'A335',name:'حمدان',sector:'الوادي',notes:''},
+    {code:'A336',name:'حمدان',sector:'الوادي',notes:''},
+    {code:'A337',name:'حمدان',sector:'الوادي',notes:''},
+    {code:'A338',name:'حمدان',sector:'الوادي',notes:''},
+    {code:'A339',name:'حمدان',sector:'الوادي',notes:''},
+    {code:'A340',name:'حمدان',sector:'الوادي',notes:''},
+    {code:'A341',name:'حمدان',sector:'الوادي',notes:''},
+    {code:'A343',name:'أبو عيسى',sector:'الوادي',notes:''},
+    {code:'A344',name:'أبو عيسى',sector:'الوادي',notes:''},
+    {code:'A346',name:'أبو عيسى',sector:'الوادي',notes:''},
+    {code:'A347',name:'أبو عيسى',sector:'الوادي',notes:''},
+    {code:'A348',name:'أبو عيسى',sector:'الوادي',notes:''},
+    {code:'A349',name:'أبو عيسى',sector:'الوادي',notes:''},
+    {code:'A350',name:'جريعة',sector:'الوادي',notes:''},
+    {code:'A352',name:'سليمان',sector:'الحارة2',notes:''},
+    {code:'A353',name:'سليمان',sector:'الحارة2',notes:''},
+    {code:'A354',name:'سليمان',sector:'الحارة2',notes:''},
+    {code:'A356',name:'دويل',sector:'المنصورة',notes:''},
+    {code:'A357',name:'دويل',sector:'المنصورة',notes:''},
+    {code:'A358',name:'دويل',sector:'المنصورة',notes:''},
+    {code:'A359',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A360',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A361',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A362',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A363',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A364',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A365',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A366',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A367',name:'الحسن',sector:'الحارة2',notes:''},
+    {code:'A368',name:'الحسن',sector:'الحارة2',notes:''},
+    {code:'A369',name:'الحسن',sector:'الحارة2',notes:''},
+    {code:'A370',name:'قنص',sector:'المنصورة',notes:''},
+    {code:'A372',name:'الطحان',sector:'الحارة1',notes:''},
+    {code:'A373',name:'الزلق',sector:'المنصورة',notes:''},
+    {code:'A374',name:'الزلق',sector:'المنصورة',notes:''},
+    {code:'A375',name:'احمد',sector:'المنصورة',notes:''},
+    {code:'A377',name:'الزلق',sector:'المنصورة',notes:''},
+    {code:'A378',name:'الزلق',sector:'المنصورة',notes:''},
+    {code:'A379',name:'الزلق',sector:'المنصورة',notes:''},
+    {code:'A380',name:'الزلق',sector:'المنصورة',notes:''},
+    {code:'A381',name:'الزلق',sector:'المنصورة',notes:''},
+    {code:'A382',name:'الزلق',sector:'المنصورة',notes:''},
+    {code:'A383',name:'منصور',sector:'المنصورة',notes:''},
+    {code:'A384',name:'منصور',sector:'المنصورة',notes:''},
+    {code:'A387',name:'منصور',sector:'المنصورة',notes:''},
+    {code:'A388',name:'منصور',sector:'المنصورة',notes:''},
+    {code:'A391',name:'أبو خازم',sector:'المنصورة',notes:''},
+    {code:'A392',name:'أبو خازم',sector:'الحارة2',notes:''},
+    {code:'A393',name:'احمد',sector:'الجبل',notes:''},
+    {code:'A394',name:'السلمان',sector:'الجبل',notes:''},
+    {code:'A396',name:'أبو عيسى',sector:'الجبل',notes:''},
+    {code:'A397',name:'أبو عيسى',sector:'الجبل',notes:''},
+    {code:'A398',name:'أبو عيسى',sector:'الجبل',notes:''},
+    {code:'A399',name:'قاسم',sector:'الجبل',notes:''},
+    {code:'A400',name:'قاسم',sector:'الجبل',notes:''},
+    {code:'A401',name:'قاسم',sector:'الجبل',notes:''},
+    {code:'A402',name:'قاسم',sector:'الجبل',notes:''},
+    {code:'A403',name:'قاسم',sector:'الجبل',notes:''},
+    {code:'A404',name:'قاسم',sector:'الجبل',notes:''},
+    {code:'A405',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A406',name:'منصور',sector:'الجبل',notes:''},
+    {code:'A407',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A408',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A409',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A410',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A411',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A412',name:'قنص',sector:'الجبل',notes:''},
+    {code:'A413',name:'قنص',sector:'الجبل',notes:''},
+    {code:'A414',name:'الناصر',sector:'الجبل',notes:''},
+    {code:'A415',name:'الناصر',sector:'الجبل',notes:''},
+    {code:'A416',name:'الناصر',sector:'الجبل',notes:''},
+    {code:'A417',name:'البدر',sector:'الجبل',notes:''},
+    {code:'A418',name:'البدر',sector:'الجبل',notes:''},
+    {code:'A419',name:'البدر',sector:'الجبل',notes:''},
+    {code:'A420',name:'بدر',sector:'الوادي',notes:''},
+    {code:'A421',name:'بدر',sector:'الوادي',notes:''},
+    {code:'A422',name:'بدر',sector:'الوادي',notes:''},
+    {code:'A423',name:'بدر',sector:'الوادي',notes:''},
+    {code:'A424',name:'صالح',sector:'الجبل',notes:''},
+    {code:'A426',name:'محمد',sector:'الجبل',notes:''},
+    {code:'A427',name:'الشريف',sector:'الجبل',notes:''},
+    {code:'A428',name:'مرعي',sector:'الجبل',notes:''},
+    {code:'A429',name:'الصالح',sector:'الجبل',notes:''},
+    {code:'A431',name:'احمد',sector:'دمر',notes:''},
+    {code:'A433',name:'الخطيب',sector:'دمر',notes:''},
+    {code:'A434',name:'سليمان',sector:'الحارة2',notes:''},
+    {code:'A435',name:'عبود',sector:'الحارة2',notes:''},
+    {code:'A436',name:'الأحمد',sector:'الحارة2',notes:''},
+    {code:'A437',name:'احمد',sector:'الحارة2',notes:''},
+    {code:'A438',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A439',name:'احمد',sector:'الحارة1',notes:''},
+    {code:'A442',name:'أم شعبان',sector:'الحارة1',notes:''},
+    {code:'A444',name:'الخطيب',sector:'الحارة2',notes:''},
+    {code:'A445',name:'احمد',sector:'الوادي',notes:''},
+    {code:'A446',name:'أبو مرعي',sector:'الوادي',notes:''},
+    {code:'A447',name:'أبو عيسى',sector:'الوادي',notes:''},
+    {code:'A449',name:'كهموز',sector:'الوادي',notes:''},
+    {code:'A450',name:'دويل',sector:'المنصورة',notes:''},
+    {code:'A451',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A452',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A453',name:'الزلق',sector:'المنصورة',notes:''},
+    {code:'A455',name:'الزلق',sector:'المنصورة',notes:''},
+    {code:'A457',name:'النجار',sector:'المنصورة',notes:''},
+    {code:'A458',name:'النجار',sector:'المنصورة',notes:''},
+    {code:'A459',name:'النجار',sector:'المنصورة',notes:''},
+    {code:'A460',name:'النجار',sector:'المنصورة',notes:''},
+    {code:'A461',name:'النجار',sector:'المنصورة',notes:''},
+    {code:'A462',name:'أبو خازم',sector:'المنصورة',notes:''},
+    {code:'A463',name:'أبو خازم',sector:'المنصورة',notes:''},
+    {code:'A464',name:'قاسم',sector:'الحارة2',notes:''},
+    {code:'A465',name:'خلوف',sector:'الجبل',notes:''},
+    {code:'A466',name:'خلوف',sector:'الجبل',notes:''},
+    {code:'A467',name:'خلوف',sector:'الجبل',notes:''},
+    {code:'A468',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A469',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A470',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A471',name:'خلوف',sector:'المنصورة',notes:''},
+    {code:'A472',name:'خلوف',sector:'الجبل',notes:''},
+    {code:'A473',name:'خلوف',sector:'الجبل',notes:''},
+    {code:'A474',name:'خلوف',sector:'الجبل',notes:''},
+    {code:'A475',name:'حمد',sector:'الجبل',notes:''},
+    {code:'A476',name:'حمد',sector:'الجبل',notes:''},
+    {code:'A477',name:'قاسم',sector:'الجبل',notes:''},
+    {code:'A478',name:'قاسم',sector:'الجبل',notes:''},
+    {code:'A479',name:'قاسم',sector:'الجبل',notes:''},
+    {code:'A480',name:'الخطيب',sector:'الحارة1',notes:''},
+    {code:'A481',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A482',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A483',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A484',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A485',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A486',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A487',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A488',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A489',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A490',name:'حسن',sector:'الجبل',notes:''},
+    {code:'A491',name:'قنص',sector:'الجبل',notes:''},
+    {code:'A492',name:'البدر',sector:'الجبل',notes:''},
+    {code:'A493',name:'الحمصي',sector:'الجبل',notes:''},
+    {code:'A494',name:'الحمصي',sector:'الجبل',notes:''},
+    {code:'A495',name:'الحمصي',sector:'الجبل',notes:''},
+    {code:'A496',name:'الزعوري',sector:'الجبل',notes:''},
+    {code:'A498',name:'علي',sector:'الجبل',notes:''},
+    {code:'A499',name:'علي',sector:'الجبل',notes:''},
+    {code:'A500',name:'علي',sector:'الجبل',notes:''},
+    {code:'A501',name:'رضوان',sector:'الجبل',notes:''},
+    {code:'A503',name:'مرشد',sector:'الجبل',notes:''},
+    {code:'A504',name:'مرعي',sector:'دمر',notes:''},
+    {code:'A505',name:'الخطيب',sector:'دمر',notes:''},
+    {code:'A506',name:'الخطيب',sector:'دمر',notes:''},
+    {code:'A556',name:'حمدان',sector:'الوادي',notes:''},
+    {code:'A557',name:'حمدان',sector:'الوادي',notes:''},
+    {code:'A626',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A627',name:'عساف',sector:'الحارة1',notes:''},
+    {code:'A628',name:'قاسم',sector:'الجبل',notes:''},
+    {code:'A660',name:'دويل',sector:'المنصورة',notes:''},
+    {code:'A661',name:'دويل',sector:'المنصورة',notes:''}
+];
+
+let currentGraveId = null;
+let currentPersonId = null;
 
 // ========== التبويبات ==========
 function switchTab(tabName) {
@@ -444,89 +766,281 @@ function switchTab(tabName) {
     event.target.classList.add('active');
     document.getElementById(tabName).classList.add('active');
     
-    if (tabName === 'overview') updateOverview();
-    if (tabName === 'graves') displayGraves();
-    if (tabName === 'burials') displayBurials();
+    if (tabName === 'tree') displayTree();
+    if (tabName === 'cemetery') displayGraves();
     if (tabName === 'families') displayFamilies();
-    if (tabName === 'locations') displayLocations();
+    if (tabName === 'stats') updateStats();
 }
 
-// ========== نظرة عامة ==========
-function updateOverview() {
-    document.getElementById('statTotal').textContent = gravesData.length;
-    document.getElementById('statOccupied').textContent = gravesData.filter(g => g.status === 'مشغول').length;
-    document.getElementById('statAvailable').textContent = gravesData.filter(g => g.status === 'متاح').length;
-    document.getElementById('statEmpty').textContent = gravesData.filter(g => g.status === 'فارغ').length;
-    document.getElementById('statPrivate').textContent = gravesData.filter(g => g.type === 'خاص').length;
-    document.getElementById('statBuried').textContent = burialsData.length;
+// ========== شجرة العائلة ==========
+function displayTree() {
+    const container = document.getElementById('treeContainer');
+    const search = document.getElementById('treeSearch').value.toLowerCase();
+    const sector = document.getElementById('filterTreeSector').value;
+    const familyFilter = document.getElementById('filterTreeFamily').value;
     
-    // إحصائيات المواقع
-    const locations = {};
-    gravesData.forEach(g => {
-        const loc = g.location || 'غير محدد';
-        if (!locations[loc]) locations[loc] = {total: 0, occupied: 0, available: 0, empty: 0};
-        locations[loc].total++;
-        if (g.status === 'مشغول') locations[loc].occupied++;
-        else if (g.status === 'متاح') locations[loc].available++;
-        else locations[loc].empty++;
+    // تجميع حسب الأسرة
+    const byFamily = {};
+    persons.forEach(p => {
+        if (search && !p.name.toLowerCase().includes(search) && !p.id.toLowerCase().includes(search)) return;
+        if (sector && p.sector !== sector) return;
+        if (familyFilter && p.family !== familyFilter) return;
+        
+        if (!byFamily[p.family]) byFamily[p.family] = [];
+        byFamily[p.family].push(p);
     });
     
-    let locHtml = '';
-    for (const [loc, data] of Object.entries(locations)) {
-        locHtml += `<div style="margin:10px 0;padding:10px;background:white;border-radius:6px;">
-            <strong>${loc}</strong>: ${data.total} قبر | 
-            <span style="color:#e74c3c;">${data.occupied} مشغول</span> | 
-            <span style="color:#27ae60;">${data.available} متاح</span> | 
-            <span style="color:#95a5a6;">${data.empty} فارغ</span>
-        </div>`;
-    }
-    document.getElementById('locationStats').innerHTML = locHtml;
+    let html = '';
+    const familyCodes = Object.keys(byFamily).sort();
     
-    // إحصائيات العائلات
-    const families = {};
-    gravesData.forEach(g => {
-        const fam = g.family || 'غير محدد';
-        if (!families[fam]) families[fam] = {total: 0, private: 0, public: 0};
-        families[fam].total++;
-        if (g.type === 'خاص') families[fam].private++;
-        else families[fam].public++;
+    familyCodes.forEach(familyCode => {
+        const family = families.find(f => f.code === familyCode);
+        const familyName = family ? family.name : familyCode;
+        const members = byFamily[familyCode];
+        
+        // الأجداد
+        const gps = grandparents.filter(gp => gp.family === familyCode);
+        
+        // رب الأسرة
+        const head = members.find(m => m.relation === 'رب أسرة');
+        const wife = members.find(m => m.relation === 'زوجة');
+        const children = members.filter(m => m.relation === 'ابن' || m.relation === 'بنت');
+        
+        html += `<div class="tree-family">`;
+        html += `<h3>👪 عائلة ${familyName} (${familyCode}) - ${members.length} فرد</h3>`;
+        
+        // الأجداد
+        if (gps.length > 0) {
+            html += `<div class="tree-grandparents">`;
+            html += `<h4>👴 الأجداد</h4>`;
+            gps.forEach(gp => {
+                const isDeceased = gp.death ? true : false;
+                html += `<div class="tree-person ${isDeceased ? 'deceased' : ''}" onclick="viewGrandparent('${gp.id}')" style="margin:3px;">
+                    ${isDeceased ? '⚰️' : '👴'} ${gp.name} - ${gp.generation}
+                </div>`;
+            });
+            html += `</div>`;
+        }
+        
+        // الزوجان
+        if (head || wife) {
+            html += `<div class="tree-couple">`;
+            if (head) {
+                const isDeceased = head.status === 'متوفى';
+                html += `<div class="tree-person head ${isDeceased ? 'deceased' : ''}" onclick="viewPerson('${head.id}')">
+                    👨 ${head.name} ${isDeceased ? '⚰️' : ''}
+                </div>`;
+            }
+            if (wife) {
+                const isDeceased = wife.status === 'متوفى';
+                html += `<div class="connector"></div>`;
+                html += `<div class="tree-person ${isDeceased ? 'deceased' : ''}" onclick="viewPerson('${wife.id}')">
+                    👩 ${wife.name} ${isDeceased ? '⚰️' : ''}
+                </div>`;
+            }
+            html += `</div>`;
+        }
+        
+        // الأبناء
+        if (children.length > 0) {
+            html += `<div class="tree-children">`;
+            html += `<h4>👶 الأبناء (${children.length})</h4>`;
+            html += `<div class="tree-children-list">`;
+            children.forEach(c => {
+                const isDeceased = c.status === 'متوفى';
+                const icon = c.gender === 'ذكر' ? '👦' : '👧';
+                html += `<div class="child-card ${isDeceased ? 'deceased' : ''}" onclick="viewPerson('${c.id}')">
+                    ${icon} ${c.name} ${isDeceased ? '⚰️' : ''}
+                </div>`;
+            });
+            html += `</div></div>`;
+        }
+        
+        html += `</div>`;
     });
     
-    let famHtml = '<div class="family-grid">';
-    for (const [fam, data] of Object.entries(families)) {
-        famHtml += `<div class="family-card" onclick="filterByFamily('${fam}')">
-            <h4>${fam}</h4>
-            <p>${data.total} قبر | ${data.private} خاص | ${data.public} عام</p>
-        </div>`;
+    container.innerHTML = html || '<p style="text-align:center;color:#999;">لا توجد نتائج</p>';
+    document.getElementById('treeResults').textContent = `عرض ${familyCodes.length} عائلة`;
+}
+
+function searchTree() { displayTree(); }
+function filterTree() { displayTree(); }
+
+function viewPerson(personId) {
+    const p = persons.find(x => x.id === personId);
+    if (!p) return;
+    currentPersonId = personId;
+    
+    const family = families.find(f => f.code === p.family);
+    const age = p.birth ? calculateAge(p.birth, p.status === 'متوفى' ? null : null) : '-';
+    
+    document.getElementById('personModalTitle').textContent = 'تفاصيل الشخص';
+    document.getElementById('personDetails').innerHTML = `
+        <div style="background:#f8f9fa;padding:15px;border-radius:8px;">
+            <h3 style="color:#2c3e50;margin-bottom:10px;">👤 ${p.name}</h3>
+            <p><strong>الكود:</strong> ${p.id}</p>
+            <p><strong>العائلة:</strong> ${family ? family.name : p.family} (${p.family})</p>
+            <p><strong>صلة القرابة:</strong> ${p.relation}</p>
+            <p><strong>الجنس:</strong> ${p.gender}</p>
+            <p><strong>القطاع:</strong> ${p.sector}</p>
+            <p><strong>تاريخ الميلاد:</strong> ${p.birth || '-'}</p>
+            <p><strong>العمر:</strong> ${age} سنة</p>
+            <p><strong>الحالة:</strong> <span class="badge ${p.status === 'حي' ? 'badge-active' : 'badge-deceased'}">${p.status}</span></p>
+            <p><strong>الجوال:</strong> ${p.phone || '-'}</p>
+            ${p.notes ? `<p><strong>ملاحظات:</strong> ${p.notes}</p>` : ''}
+        </div>
+    `;
+    document.getElementById('personModal').classList.add('active');
+}
+
+function viewGrandparent(gpId) {
+    const gp = grandparents.find(x => x.id === gpId);
+    if (!gp) return;
+    
+    const family = families.find(f => f.code === gp.family);
+    
+    document.getElementById('personModalTitle').textContent = 'تفاصيل الجد/الجدة';
+    document.getElementById('personDetails').innerHTML = `
+        <div style="background:#e8f5e9;padding:15px;border-radius:8px;">
+            <h3 style="color:#2e7d32;margin-bottom:10px;"> ${gp.name}</h3>
+            <p><strong>الجيل:</strong> ${gp.generation}</p>
+            <p><strong>العائلة:</strong> ${family ? family.name : gp.family}</p>
+            <p><strong>الجنس:</strong> ${gp.gender}</p>
+            <p><strong>تاريخ الميلاد:</strong> ${gp.birth || '-'}</p>
+            <p><strong>تاريخ الوفاة:</strong> ${gp.death || '-'}</p>
+            ${gp.notes ? `<p><strong>ملاحظات:</strong> ${gp.notes}</p>` : ''}
+        </div>
+    `;
+    document.getElementById('personModal').classList.add('active');
+}
+
+function calculateAge(birth, death) {
+    const birthDate = new Date(birth);
+    const endDate = death ? new Date(death) : new Date();
+    let age = endDate.getFullYear() - birthDate.getFullYear();
+    const m = endDate.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && endDate.getDate() < birthDate.getDate())) age--;
+    return age;
+}
+
+function openAddPersonModal() {
+    document.getElementById('addPersonTitle').textContent = 'إضافة فرد';
+    document.getElementById('personEditId').value = '';
+    document.getElementById('pCode').value = '';
+    document.getElementById('pFamily').value = '';
+    document.getElementById('pName').value = '';
+    document.getElementById('pRelation').value = 'رب أسرة';
+    document.getElementById('pGender').value = 'ذكر';
+    document.getElementById('pSector').value = 'الجبل';
+    document.getElementById('pBirth').value = '';
+    document.getElementById('pStatus').value = 'حي';
+    document.getElementById('pDeath').value = '';
+    document.getElementById('pPhone').value = '';
+    document.getElementById('pNotes').value = '';
+    document.getElementById('addPersonModal').classList.add('active');
+}
+
+function openAddGrandparentModal() {
+    const select = document.getElementById('gpFamily');
+    select.innerHTML = families.map(f => `<option value="${f.code}">${f.code} - ${f.name}</option>`).join('');
+    document.getElementById('gpName').value = '';
+    document.getElementById('gpGeneration').value = 'الجد الأول';
+    document.getElementById('gpGender').value = 'ذكر';
+    document.getElementById('gpBirth').value = '';
+    document.getElementById('gpDeath').value = '';
+    document.getElementById('gpNotes').value = '';
+    document.getElementById('addGrandparentModal').classList.add('active');
+}
+
+function savePerson(e) {
+    e.preventDefault();
+    const editId = document.getElementById('personEditId').value;
+    const personData = {
+        id: document.getElementById('pFamily').value + '-' + document.getElementById('pCode').value,
+        family: document.getElementById('pFamily').value,
+        name: document.getElementById('pName').value,
+        relation: document.getElementById('pRelation').value,
+        gender: document.getElementById('pGender').value,
+        sector: document.getElementById('pSector').value,
+        birth: document.getElementById('pBirth').value,
+        status: document.getElementById('pStatus').value,
+        phone: document.getElementById('pPhone').value,
+        notes: document.getElementById('pNotes').value
+    };
+    
+    if (editId) {
+        const index = persons.findIndex(p => p.id === editId);
+        if (index !== -1) persons[index] = personData;
+        alert('✅ تم التعديل');
+    } else {
+        persons.push(personData);
+        alert('✅ تم الإضافة');
     }
-    famHtml += '</div>';
-    document.getElementById('familyStats').innerHTML = famHtml;
+    
+    closeModal('addPersonModal');
+    displayTree();
 }
 
-function filterByFamily(family) {
-    switchTab('graves');
-    document.querySelectorAll('.tab')[1].classList.add('active');
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.getElementById('graves').classList.add('active');
-    document.getElementById('filterFamily').value = family;
-    filterGraves();
+function saveGrandparent(e) {
+    e.preventDefault();
+    grandparents.push({
+        id: 'GP' + String(grandparents.length + 1).padStart(3, '0'),
+        family: document.getElementById('gpFamily').value,
+        name: document.getElementById('gpName').value,
+        generation: document.getElementById('gpGeneration').value,
+        gender: document.getElementById('gpGender').value,
+        birth: document.getElementById('gpBirth').value,
+        death: document.getElementById('gpDeath').value,
+        notes: document.getElementById('gpNotes').value
+    });
+    alert('✅ تم إضافة الجد');
+    closeModal('addGrandparentModal');
+    displayTree();
 }
 
-// ========== القبور ==========
+function editPerson() {
+    const p = persons.find(x => x.id === currentPersonId);
+    if (!p) return;
+    
+    document.getElementById('addPersonTitle').textContent = 'تعديل فرد';
+    document.getElementById('personEditId').value = p.id;
+    document.getElementById('pCode').value = p.id.split('-')[1];
+    document.getElementById('pFamily').value = p.family;
+    document.getElementById('pName').value = p.name;
+    document.getElementById('pRelation').value = p.relation;
+    document.getElementById('pGender').value = p.gender;
+    document.getElementById('pSector').value = p.sector;
+    document.getElementById('pBirth').value = p.birth || '';
+    document.getElementById('pStatus').value = p.status;
+    document.getElementById('pPhone').value = p.phone || '';
+    document.getElementById('pNotes').value = p.notes || '';
+    
+    closeModal('personModal');
+    document.getElementById('addPersonModal').classList.add('active');
+}
+
+function deletePerson() {
+    if (!confirm('هل أنت متأكد من الحذف؟')) return;
+    persons = persons.filter(p => p.id !== currentPersonId);
+    alert('✅ تم الحذف');
+    closeModal('personModal');
+    displayTree();
+}
+
+// ========== المقبرة ==========
 function displayGraves() {
-    const container = document.getElementById('gravesContainer');
+    const container = document.getElementById('graveContainer');
     const search = document.getElementById('graveSearch').value.toLowerCase();
-    const location = document.getElementById('filterLocation').value;
-    const type = document.getElementById('filterType').value;
-    const status = document.getElementById('filterStatus').value;
-    const family = document.getElementById('filterFamily').value;
+    const location = document.getElementById('filterGraveLocation').value;
+    const type = document.getElementById('filterGraveType').value;
+    const status = document.getElementById('filterGraveStatus').value;
+    const family = document.getElementById('filterGraveFamily').value;
     
-    let filtered = gravesData.filter(g => {
+    let filtered = graves.filter(g => {
         if (search) {
-            const match = g.id.toLowerCase().includes(search) || 
+            const match = g.number.toLowerCase().includes(search) || 
                          (g.lastBuried && g.lastBuried.toLowerCase().includes(search)) ||
-                         (g.family && g.family.toLowerCase().includes(search)) ||
-                         (g.owner && g.owner.toLowerCase().includes(search));
+                         (g.family && g.family.toLowerCase().includes(search));
             if (!match) return false;
         }
         if (location && g.location !== location) return false;
@@ -545,21 +1059,22 @@ function displayGraves() {
     });
     
     let html = '';
-    for (const [loc, graves] of Object.entries(byLocation)) {
-        html += `<div class="section-block">
-            <h3>📍 ${loc} (${graves.length} قبر)</h3>
-            <div class="grave-grid">`;
+    for (const [loc, gravesList] of Object.entries(byLocation)) {
+        html += `<div class="section-block">`;
+        html += `<h3>📍 ${loc} (${gravesList.length} قبر)</h3>`;
+        html += `<div class="grave-grid">`;
         
-        graves.forEach(g => {
+        gravesList.forEach(g => {
             const statusClass = g.status === 'مشغول' ? 'occupied' : g.status === 'متاح' ? 'available' : 'empty';
             const typeClass = g.type === 'خاص' ? 'private' : '';
             const statusText = g.status === 'مشغول' ? '🔒 مشغول' : g.status === 'متاح' ? '✅ متاح' : '⚪ فارغ';
+            const typeText = g.type === 'غير محدد' ? '❓' : (g.type === 'خاص' ? '🏷️ خاص' : '🌐 عام');
             
             html += `<div class="grave-card ${statusClass} ${typeClass}" onclick="viewGrave('${g.id}')">
-                <div class="grave-id">${g.id}</div>
-                <div class="grave-type">${g.type || '-'}</div>
+                <div class="grave-number">${g.number}</div>
+                <div class="grave-type">${typeText}</div>
                 <div class="grave-status">${statusText}</div>
-                ${g.lastBuried ? `<div style="font-size:10px;margin-top:5px;color:#2c3e50;">${g.lastBuried}</div>` : ''}
+                ${g.lastBuried ? `<div class="grave-name">${g.lastBuried}</div>` : ''}
             </div>`;
         });
         
@@ -567,305 +1082,238 @@ function displayGraves() {
     }
     
     container.innerHTML = html || '<p style="text-align:center;color:#999;">لا توجد نتائج</p>';
+    document.getElementById('graveResults').textContent = `عرض ${filtered.length} قبر`;
 }
 
 function searchGraves() { displayGraves(); }
 function filterGraves() { displayGraves(); }
 
 function viewGrave(graveId) {
-    const g = gravesData.find(x => x.id === graveId);
+    const g = graves.find(x => x.id === graveId);
     if (!g) return;
+    currentGraveId = graveId;
     
-    const burials = burialsData.filter(b => b.graveId === graveId);
-    
-    let html = `
-        <div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:15px;">
-            <h4 style="color:#2c3e50;margin-bottom:10px;">⚰️ القبر: ${g.id}</h4>
+    document.getElementById('graveModalTitle').textContent = 'تفاصيل القبر ' + g.number;
+    document.getElementById('graveDetails').innerHTML = `
+        <div style="background:#f8f9fa;padding:15px;border-radius:8px;">
+            <h3 style="color:#2c3e50;margin-bottom:10px;">⚰️ القبر: ${g.number}</h3>
             <p><strong>الموقع:</strong> ${g.location || 'غير محدد'}</p>
-            <p><strong>النوع:</strong> <span class="status-badge ${g.type === 'خاص' ? 'type-private' : 'type-public'}">${g.type || '-'}</span></p>
-            <p><strong>الحالة:</strong> <span class="status-badge status-${g.status === 'مشغول' ? 'occupied' : g.status === 'متاح' ? 'available' : 'empty'}">${g.status}</span></p>
+            <p><strong>النوع:</strong> ${g.type === 'غير محدد' ? '❓ غير محدد' : (g.type === 'خاص' ? '🏷️ خاص' : '🌐 عام')}</p>
+            <p><strong>الحالة:</strong> ${g.status === 'مشغول' ? ' مشغول' : g.status === 'متاح' ? '✅ متاح' : '⚪ فارغ'}</p>
             <p><strong>العائلة:</strong> ${g.family || '-'}</p>
             <p><strong>المالك:</strong> ${g.owner || '-'}</p>
             <p><strong>آخر مدفون:</strong> ${g.lastBuried || '-'}</p>
-            <p><strong>آخر تاريخ دفن:</strong> ${g.lastDate || '-'}</p>
-            <p><strong>جواز الاستخدام حتى:</strong> ${g.expiry || '-'}</p>
-            <p><strong>الضيعة:</strong> ${g.village || '-'}</p>
+            <p><strong>تاريخ الدفن:</strong> ${g.lastDate || '-'}</p>
             ${g.notes ? `<p><strong>ملاحظات:</strong> ${g.notes}</p>` : ''}
         </div>
     `;
-    
-    if (burials.length > 0) {
-        html += `<h4 style="color:#2c3e50;margin-bottom:10px;">📋 المدفونين في هذا القبر (${burials.length})</h4>`;
-        burials.forEach(b => {
-            html += `<div style="background:white;padding:10px;border-radius:6px;margin-bottom:8px;border-right:3px solid #2c3e50;">
-                <strong>${b.name}</strong>
-                <p style="font-size:12px;color:#7f8c8d;margin:5px 0;">
-                    الوفاة: ${b.deathDate || '-'} | الدفن: ${b.burialDate || '-'} | العام: ${b.year || '-'}
-                </p>
-                ${b.notes ? `<p style="font-size:11px;color:#666;">📝 ${b.notes}</p>` : ''}
-            </div>`;
-        });
-    }
-    
-    document.getElementById('graveDetails').innerHTML = html;
     document.getElementById('graveModal').classList.add('active');
 }
 
-let currentGraveId = null;
-
-function editCurrentGrave() {
-    const g = gravesData.find(x => x.id === currentGraveId);
-    if (!g) return;
-    
-    document.getElementById('addGraveModalTitle').textContent = 'تعديل قبر';
-    document.getElementById('graveEditId').value = g.id;
-    document.getElementById('graveNumber').value = g.id;
-    document.getElementById('graveLocation').value = g.location || '';
-    document.getElementById('graveType').value = g.type || 'عام';
-    document.getElementById('graveStatus').value = g.status || 'فارغ';
-    document.getElementById('graveFamily').value = g.family || '';
-    document.getElementById('graveOwner').value = g.owner || '';
-    document.getElementById('graveLastBuried').value = g.lastBuried || '';
-    document.getElementById('graveLastDate').value = g.lastDate || '';
-    document.getElementById('graveExpiry').value = g.expiry || '';
-    document.getElementById('graveVillage').value = g.village || 'زعورة';
-    document.getElementById('graveNotes').value = g.notes || '';
-    
-    closeModal('graveModal');
-    document.getElementById('addGraveModal').classList.add('active');
-}
-
-function deleteCurrentGrave() {
-    if (!confirm('هل أنت متأكد من حذف هذا القبر؟')) return;
-    const index = gravesData.findIndex(g => g.id === currentGraveId);
-    if (index !== -1) {
-        gravesData.splice(index, 1);
-        alert('✅ تم الحذف');
-        closeModal('graveModal');
-        displayGraves();
-        updateOverview();
-    }
-}
-
 function openAddGraveModal() {
-    document.getElementById('addGraveModalTitle').textContent = 'إضافة قبر';
+    document.getElementById('addGraveTitle').textContent = 'إضافة قبر';
     document.getElementById('graveEditId').value = '';
-    document.getElementById('graveNumber').value = '';
-    document.getElementById('graveLocation').value = '';
-    document.getElementById('graveType').value = 'عام';
-    document.getElementById('graveStatus').value = 'فارغ';
-    document.getElementById('graveFamily').value = '';
-    document.getElementById('graveOwner').value = '';
-    document.getElementById('graveLastBuried').value = '';
-    document.getElementById('graveLastDate').value = '';
-    document.getElementById('graveExpiry').value = '';
-    document.getElementById('graveVillage').value = 'زعورة';
-    document.getElementById('graveNotes').value = '';
+    document.getElementById('gNumber').value = '';
+    document.getElementById('gLocation').value = '';
+    document.getElementById('gType').value = 'غير محدد';
+    document.getElementById('gStatus').value = 'فارغ';
+    document.getElementById('gFamily').value = '';
+    document.getElementById('gOwner').value = '';
+    document.getElementById('gLastBuried').value = '';
+    document.getElementById('gLastDate').value = '';
+    document.getElementById('gNotes').value = '';
     document.getElementById('addGraveModal').classList.add('active');
 }
 
 function saveGrave(e) {
     e.preventDefault();
     const editId = document.getElementById('graveEditId').value;
-    
     const graveData = {
-        id: document.getElementById('graveNumber').value,
-        location: document.getElementById('graveLocation').value,
-        type: document.getElementById('graveType').value,
-        status: document.getElementById('graveStatus').value,
-        family: document.getElementById('graveFamily').value,
-        owner: document.getElementById('graveOwner').value,
-        lastBuried: document.getElementById('graveLastBuried').value,
-        lastDate: document.getElementById('graveLastDate').value,
-        expiry: document.getElementById('graveExpiry').value,
-        village: document.getElementById('graveVillage').value,
-        notes: document.getElementById('graveNotes').value
+        id: document.getElementById('gNumber').value,
+        number: document.getElementById('gNumber').value,
+        location: document.getElementById('gLocation').value,
+        type: document.getElementById('gType').value,
+        status: document.getElementById('gStatus').value,
+        family: document.getElementById('gFamily').value,
+        owner: document.getElementById('gOwner').value,
+        lastBuried: document.getElementById('gLastBuried').value,
+        lastDate: document.getElementById('gLastDate').value,
+        notes: document.getElementById('gNotes').value
     };
     
     if (editId) {
-        const index = gravesData.findIndex(g => g.id === editId);
-        if (index !== -1) {
-            gravesData[index] = {...gravesData[index], ...graveData};
-            alert('✅ تم التعديل');
-        }
+        const index = graves.findIndex(g => g.id === editId);
+        if (index !== -1) graves[index] = graveData;
+        alert('✅ تم التعديل');
     } else {
-        gravesData.push(graveData);
+        graves.push(graveData);
         alert('✅ تم الإضافة');
     }
     
     closeModal('addGraveModal');
     displayGraves();
-    updateOverview();
 }
 
-// ========== المدفونين ==========
-function displayBurials() {
-    const container = document.getElementById('burialsContainer');
-    const search = document.getElementById('burialSearch').value.toLowerCase();
-    const year = document.getElementById('filterYear').value;
+function editGrave() {
+    const g = graves.find(x => x.id === currentGraveId);
+    if (!g) return;
     
-    let filtered = burialsData.filter(b => {
-        if (search && !b.name.toLowerCase().includes(search)) return false;
-        if (year && b.year !== parseInt(year)) return false;
-        return true;
-    });
+    document.getElementById('addGraveTitle').textContent = 'تعديل قبر';
+    document.getElementById('graveEditId').value = g.id;
+    document.getElementById('gNumber').value = g.number;
+    document.getElementById('gLocation').value = g.location || '';
+    document.getElementById('gType').value = g.type;
+    document.getElementById('gStatus').value = g.status;
+    document.getElementById('gFamily').value = g.family || '';
+    document.getElementById('gOwner').value = g.owner || '';
+    document.getElementById('gLastBuried').value = g.lastBuried || '';
+    document.getElementById('gLastDate').value = g.lastDate || '';
+    document.getElementById('gNotes').value = g.notes || '';
     
-    let html = '';
-    filtered.forEach(b => {
-        const grave = gravesData.find(g => g.id === b.graveId);
-        html += `<div class="burial-card">
-            <h4>👤 ${b.name}</h4>
-            <p>⚰️ القبر: ${b.graveId} ${grave ? `- ${grave.location || ''}` : ''}</p>
-            <p>📅 الوفاة: ${b.deathDate || '-'} | الدفن: ${b.burialDate || '-'}</p>
-            <p>📊 العام: ${b.year || '-'} | المصدر: ${b.source || '-'}</p>
-            ${b.age ? `<p>🎂 العمر: ${b.age} سنة</p>` : ''}
-            ${b.notes ? `<p>📝 ${b.notes}</p>` : ''}
-        </div>`;
-    });
-    
-    container.innerHTML = html || '<p style="text-align:center;color:#999;">لا توجد نتائج</p>';
+    closeModal('graveModal');
+    document.getElementById('addGraveModal').classList.add('active');
 }
 
-function searchBurials() { displayBurials(); }
-function filterBurials() { displayBurials(); }
-
-function openAddBurialModal() {
-    const select = document.getElementById('burialGrave');
-    select.innerHTML = gravesData.map(g => `<option value="${g.id}">${g.id} - ${g.location || ''}</option>`).join('');
-    document.getElementById('burialName').value = '';
-    document.getElementById('burialDeath').value = '';
-    document.getElementById('burialDate').value = '';
-    document.getElementById('burialAge').value = '';
-    document.getElementById('burialYear').value = new Date().getFullYear();
-    document.getElementById('burialSource').value = '';
-    document.getElementById('burialNotes').value = '';
-    document.getElementById('addBurialModal').classList.add('active');
-}
-
-function saveBurial(e) {
-    e.preventDefault();
-    burialsData.push({
-        id: 'BUR-' + String(burialsData.length + 1).padStart(4, '0'),
-        graveId: document.getElementById('burialGrave').value,
-        name: document.getElementById('burialName').value,
-        deathDate: document.getElementById('burialDeath').value,
-        burialDate: document.getElementById('burialDate').value,
-        age: document.getElementById('burialAge').value,
-        source: document.getElementById('burialSource').value,
-        year: parseInt(document.getElementById('burialYear').value),
-        notes: document.getElementById('burialNotes').value
-    });
-    alert('✅ تم الإضافة');
-    closeModal('addBurialModal');
-    displayBurials();
-    updateOverview();
+function deleteGrave() {
+    if (!confirm('هل أنت متأكد من الحذف؟')) return;
+    graves = graves.filter(g => g.id !== currentGraveId);
+    alert('✅ تم الحذف');
+    closeModal('graveModal');
+    displayGraves();
 }
 
 // ========== العائلات ==========
 function displayFamilies() {
     const container = document.getElementById('familiesContainer');
     const search = document.getElementById('familySearch').value.toLowerCase();
+    const sector = document.getElementById('filterFamilySector').value;
     
-    const families = {};
-    gravesData.forEach(g => {
-        const fam = g.family || 'غير محدد';
-        if (search && !fam.toLowerCase().includes(search)) return;
-        if (!families[fam]) families[fam] = {graves: [], burials: 0};
-        families[fam].graves.push(g);
-    });
-    
-    burialsData.forEach(b => {
-        const grave = gravesData.find(g => g.id === b.graveId);
-        if (grave && grave.family) {
-            if (families[grave.family]) families[grave.family].burials++;
-        }
+    let filtered = families.filter(f => {
+        if (search && !f.name.toLowerCase().includes(search) && !f.code.toLowerCase().includes(search)) return false;
+        if (sector && f.sector !== sector) return false;
+        return true;
     });
     
     let html = '';
-    for (const [fam, data] of Object.entries(families)) {
-        html += `<div class="family-section">
-            <h3>👪 ${fam}</h3>
-            <p style="margin-bottom:10px;">${data.graves.length} قبر | ${data.burials} مدفون</p>
-            <div class="grave-grid">`;
+    filtered.forEach(f => {
+        const memberCount = persons.filter(p => p.family === f.code).length;
+        const aliveCount = persons.filter(p => p.family === f.code && p.status === 'حي').length;
+        const deceasedCount = persons.filter(p => p.family === f.code && p.status === 'متوفى').length;
+        const graveCount = graves.filter(g => g.family && g.family.includes(f.name)).length;
         
-        data.graves.forEach(g => {
-            const statusClass = g.status === 'مشغول' ? 'occupied' : g.status === 'متاح' ? 'available' : 'empty';
-            html += `<div class="grave-card ${statusClass}" onclick="viewGrave('${g.id}')">
-                <div class="grave-id">${g.id}</div>
-                <div class="grave-status">${g.status}</div>
-            </div>`;
-        });
-        
-        html += `</div></div>`;
-    }
+        html += `<div class="family-card" onclick="viewFamily('${f.code}')">
+            <h4>👪 ${f.name} (${f.code})</h4>
+            <p> ${f.sector} | 👥 ${memberCount} فرد | ✅ ${aliveCount} حي | ⚰️ ${deceasedCount} متوفي</p>
+            <p>️ ${graveCount} قبر مرتبط</p>
+            ${f.notes ? `<p>📝 ${f.notes}</p>` : ''}
+        </div>`;
+    });
     
     container.innerHTML = html || '<p style="text-align:center;color:#999;">لا توجد نتائج</p>';
 }
 
 function searchFamilies() { displayFamilies(); }
+function filterFamilies() { displayFamilies(); }
 
-// ========== المواقع ==========
-function displayLocations() {
-    const container = document.getElementById('locationsContainer');
+function viewFamily(familyCode) {
+    const f = families.find(x => x.code === familyCode);
+    if (!f) return;
     
-    const locations = {};
-    gravesData.forEach(g => {
-        const loc = g.location || 'غير محدد';
-        if (!locations[loc]) locations[loc] = [];
-        locations[loc].push(g);
+    const members = persons.filter(p => p.family === familyCode);
+    const graves_list = graves.filter(g => g.family && g.family.includes(f.name));
+    
+    alert(`عائلة ${f.name} (${f.code})\n\n📍 القطاع: ${f.sector}\n👥 الأفراد: ${members.length}\n✅ أحياء: ${members.filter(m => m.status === 'حي').length}\n⚰️ متوفين: ${members.filter(m => m.status === 'متوفى').length}\n⚰️ قبور: ${graves_list.length}\n\n${f.notes ? 'ملاحظات: ' + f.notes : ''}`);
+}
+
+function openAddFamilyModal() {
+    document.getElementById('fCode').value = '';
+    document.getElementById('fName').value = '';
+    document.getElementById('fSector').value = 'الجبل';
+    document.getElementById('fNotes').value = '';
+    document.getElementById('addFamilyModal').classList.add('active');
+}
+
+function saveFamily(e) {
+    e.preventDefault();
+    families.push({
+        code: document.getElementById('fCode').value,
+        name: document.getElementById('fName').value,
+        sector: document.getElementById('fSector').value,
+        notes: document.getElementById('fNotes').value
+    });
+    alert('✅ تم إضافة العائلة');
+    closeModal('addFamilyModal');
+    displayFamilies();
+}
+
+// ========== الإحصائيات ==========
+function updateStats() {
+    document.getElementById('statFamilies').textContent = families.length;
+    document.getElementById('statPeople').textContent = persons.length;
+    document.getElementById('statAlive').textContent = persons.filter(p => p.status === 'حي').length;
+    document.getElementById('statDeceased').textContent = persons.filter(p => p.status === 'متوفى').length;
+    document.getElementById('statGraves').textContent = graves.length;
+    document.getElementById('statAvailable').textContent = graves.filter(g => g.status === 'متاح').length;
+    document.getElementById('statEmpty').textContent = graves.filter(g => g.status === 'فارغ').length;
+    
+    // تفاصيل حسب القطاع
+    const sectors = {};
+    persons.forEach(p => {
+        if (!sectors[p.sector]) sectors[p.sector] = {total: 0, alive: 0, deceased: 0};
+        sectors[p.sector].total++;
+        if (p.status === 'حي') sectors[p.sector].alive++;
+        else sectors[p.sector].deceased++;
     });
     
-    let html = '';
-    for (const [loc, graves] of Object.entries(locations)) {
-        const occupied = graves.filter(g => g.status === 'مشغول').length;
-        const available = graves.filter(g => g.status === 'متاح').length;
-        const empty = graves.filter(g => g.status === 'فارغ').length;
-        
-        html += `<div class="section-block">
-            <h3>📍 ${loc}</h3>
-            <p style="margin-bottom:10px;">إجمالي: ${graves.length} | مشغول: ${occupied} | متاح: ${available} | فارغ: ${empty}</p>
-            <div class="grave-grid">`;
-        
-        graves.forEach(g => {
-            const statusClass = g.status === 'مشغول' ? 'occupied' : g.status === 'متاح' ? 'available' : 'empty';
-            html += `<div class="grave-card ${statusClass}" onclick="viewGrave('${g.id}')">
-                <div class="grave-id">${g.id}</div>
-                <div class="grave-status">${g.status}</div>
-                ${g.lastBuried ? `<div style="font-size:9px;">${g.lastBuried}</div>` : ''}
-            </div>`;
-        });
-        
-        html += `</div></div>`;
+    let html = '<h3 style="margin-bottom:15px;">📊 تفاصيل حسب القطاع</h3>';
+    for (const [sector, data] of Object.entries(sectors)) {
+        html += `<div class="section-block"><h3>${sector}</h3><p>إجمالي: ${data.total} | أحياء: ${data.alive} | متوفين: ${data.deceased}</p></div>`;
     }
-    
-    container.innerHTML = html;
+    document.getElementById('statsDetails').innerHTML = html;
 }
 
 // ========== تصدير Excel ==========
-function exportGravesToExcel() {
-    const data = gravesData.map(g => {
-        const burials = burialsData.filter(b => b.graveId === g.id);
+function exportTreeExcel() {
+    const data = persons.map(p => {
+        const family = families.find(f => f.code === p.family);
         return {
-            'رقم القبر': g.id,
-            'الموقع': g.location,
-            'النوع': g.type,
-            'الحالة': g.status,
-            'العائلة': g.family,
-            'المالك': g.owner,
-            'آخر مدفون': g.lastBuried,
-            'آخر تاريخ دفن': g.lastDate,
-            'جواز الاستخدام': g.expiry,
-            'الضيعة': g.village,
-            'عدد المدفونين': burials.length,
-            'أسماء المدفونين': burials.map(b => b.name).join(' | '),
-            'ملاحظات': g.notes
+            'الكود': p.id,
+            'الأسرة': p.family,
+            'الاسم': p.name,
+            'صلة القرابة': p.relation,
+            'الجنس': p.gender,
+            'القطاع': p.sector,
+            'تاريخ الميلاد': p.birth,
+            'الحالة': p.status,
+            'الجوال': p.phone,
+            'ملاحظات': p.notes
         };
     });
     
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'الأفراد');
+    XLSX.writeFile(wb, `زعورة_شجرة_العائلة_${new Date().toISOString().split('T')[0]}.xlsx`);
+    alert('✅ تم التصدير');
+}
+
+function exportGravesExcel() {
+    const data = graves.map(g => ({
+        'رقم القبر': g.number,
+        'الموقع': g.location,
+        'النوع': g.type,
+        'الحالة': g.status,
+        'العائلة': g.family,
+        'المالك': g.owner,
+        'آخر مدفون': g.lastBuried,
+        'تاريخ الدفن': g.lastDate,
+        'ملاحظات': g.notes
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'القبور');
-    XLSX.writeFile(wb, `مقبرة_النازحين_زعورة_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.writeFile(wb, `زعورة_المقبرة_${new Date().toISOString().split('T')[0]}.xlsx`);
     alert('✅ تم التصدير');
 }
 
@@ -874,19 +1322,22 @@ function closeModal(id) {
 }
 
 // تهيئة
-updateOverview();
+function init() {
+    // ملء قائمة العائلات في الفلاتر
+    const familySelects = ['filterTreeFamily', 'filterGraveFamily'];
+    familySelects.forEach(id => {
+        const select = document.getElementById(id);
+        if (select) {
+            const uniqueFamilies = [...new Set(graves.map(g => g.family).filter(f => f))];
+            select.innerHTML = '<option value="">كل العائلات</option>' + 
+                uniqueFamilies.map(f => `<option value="${f}">${f}</option>`).join('');
+        }
+    });
+    
+    displayTree();
+}
 
-// ملء قائمة العائلات في الفلتر
-const familySelect = document.getElementById('filterFamily');
-const families = [...new Set(gravesData.map(g => g.family).filter(f => f))];
-familySelect.innerHTML = '<option value="">كل العائلات</option>' + 
-    families.map(f => `<option value="${f}">${f}</option>`).join('');
-
-// ملء قائمة السنوات
-const yearSelect = document.getElementById('filterYear');
-const years = [...new Set(burialsData.map(b => b.year).filter(y => y))].sort();
-yearSelect.innerHTML = '<option value="">كل السنوات</option>' + 
-    years.map(y => `<option value="${y}">${y}</option>`).join('');
+init();
 </script>
 
 </body>
