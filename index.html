@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام القرية - شجرة العائلة والمقبرة</title>
+    <title>نظام قرية عساف - شجرة العائلة والمقبرة</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -11,14 +11,15 @@
         .container { max-width: 1100px; margin: 0 auto; background: #fff; color: #333; padding: 20px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
         h1 { text-align: center; color: #2c3e50; margin-bottom: 5px; font-size: 22px; }
         .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 20px; font-size: 13px; }
+        .village-name { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+        .village-name h2 { font-size: 24px; margin-bottom: 5px; }
+        .village-name p { font-size: 14px; opacity: 0.9; }
         
-        /* التبويبات */
-        .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 3px solid #e0e0e0; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 3px solid #e0e0e0; flex-wrap: wrap; }
         .tab { padding: 12px 20px; cursor: pointer; border: none; background: none; font-size: 14px; font-weight: bold; color: #7f8c8d; border-bottom: 3px solid transparent; margin-bottom: -3px; }
         .tab.active { color: #2c3e50; border-bottom-color: #667eea; }
         .tab:hover { background: #f5f5f5; }
         
-        /* الإحصائيات */
         .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
         .stat-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; text-align: center; }
         .stat-box h3 { font-size: 28px; margin-bottom: 5px; }
@@ -27,23 +28,20 @@
         .stat-box.family { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
         .stat-box.alive { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); }
         
-        /* البحث */
         .search-box { margin-bottom: 15px; }
         .search-box input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 15px; }
         .search-box input:focus { outline: none; border-color: #667eea; }
         
-        /* الفلاتر */
         .filters { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .filters select { flex: 1; min-width: 120px; padding: 8px; border: 2px solid #ddd; border-radius: 6px; font-size: 13px; }
         
-        /* بطاقات */
         .card { background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-right: 4px solid #667eea; }
         .card h4 { color: #2c3e50; margin-bottom: 5px; font-size: 15px; }
         .card p { color: #7f8c8d; font-size: 12px; margin: 2px 0; }
         .card.grave-card { border-right-color: #2c3e50; background: #f0f0f0; }
         .card.family-card { border-right-color: #f39c12; background: #fff8e7; }
+        .card-actions { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
         
-        /* شجرة العائلة */
         .tree-container { overflow-x: auto; padding: 20px; background: #f8f9fa; border-radius: 10px; min-height: 400px; }
         .tree-node { display: inline-block; text-align: center; margin: 10px; padding: 10px; background: white; border: 2px solid #667eea; border-radius: 8px; min-width: 100px; cursor: pointer; }
         .tree-node:hover { background: #667eea; color: white; }
@@ -52,14 +50,13 @@
         .tree-children { display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
         .tree-connector { width: 2px; height: 20px; background: #667eea; margin: 0 auto; }
         
-        /* خريطة المقبرة */
         .cemetery-map { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 5px; padding: 15px; background: #e8f5e9; border-radius: 10px; min-height: 300px; }
         .grave-slot { background: #fff; border: 2px solid #2c3e50; border-radius: 5px; padding: 8px; text-align: center; cursor: pointer; font-size: 11px; }
         .grave-slot.occupied { background: #2c3e50; color: white; }
         .grave-slot.empty { background: #c8e6c9; border-style: dashed; }
+        .grave-slot.private { border-color: #f39c12; }
         .grave-slot:hover { transform: scale(1.05); }
         
-        /* الأزرار */
         .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; margin: 3px; }
         .btn-primary { background: #667eea; color: white; }
         .btn-success { background: #27ae60; color: white; }
@@ -67,7 +64,6 @@
         .btn-danger { background: #e74c3c; color: white; }
         .btn-small { padding: 5px 10px; font-size: 12px; }
         
-        /* النوافذ */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
         .modal.active { display: flex; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; color: #333; }
@@ -85,58 +81,78 @@
         .legend { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; font-size: 12px; }
         .legend-item { display: flex; align-items: center; gap: 5px; }
         .legend-color { width: 20px; height: 20px; border-radius: 3px; }
+        
+        .grave-status { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; margin: 2px; }
+        .status-occupied { background: #e74c3c; color: white; }
+        .status-available { background: #27ae60; color: white; }
+        .status-empty { background: #95a5a6; color: white; }
+        .type-private { background: #f39c12; color: white; }
+        .type-public { background: #3498db; color: white; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🏛️ نظام القرية</h1>
-    <p class="subtitle">شجرة العائلة والمقبرة</p>
+    <div class="village-name">
+        <h2>🏛️ قرية عساف</h2>
+        <p>نظام شجرة العائلة والمقبرة</p>
+    </div>
     
-    <!-- التبويبات -->
     <div class="tabs">
         <button class="tab active" onclick="switchTab('tree')">👨‍‍👧‍👦 شجرة العائلة</button>
         <button class="tab" onclick="switchTab('cemetery')">️ المقبرة</button>
         <button class="tab" onclick="switchTab('families')">👪 العائلات</button>
-        <button class="tab" onclick="switchTab('stats')">📊 إحصائيات</button>
+        <button class="tab" onclick="switchTab('stats')"> إحصائيات</button>
     </div>
     
     <!-- تبويب شجرة العائلة -->
     <div id="tree" class="tab-content active">
         <div class="search-box">
-            <input type="text" id="treeSearch" placeholder="🔍 ابحث عن شخص أو عائلة..." oninput="searchTree()">
+            <input type="text" id="treeSearch" placeholder="🔍 ابحث عن شخص..." oninput="searchTree()">
         </div>
         <div class="filters">
             <select id="filterFamily" onchange="filterTree()">
                 <option value="">كل العائلات</option>
             </select>
-            <select id="filterGeneration" onchange="filterTree()">
-                <option value="">كل الأجيال</option>
-                <option value="1">الجيل الأول (الأجداد)</option>
-                <option value="2">الجيل الثاني (الآباء)</option>
-                <option value="3">الجيل الثالث (الأبناء)</option>
-                <option value="4">الجيل الرابع</option>
+            <select id="filterStatus" onchange="filterTree()">
+                <option value="">الكل (أحياء ومتوفين)</option>
+                <option value="alive">الأحياء فقط</option>
+                <option value="deceased">المتوفين فقط</option>
             </select>
         </div>
         <button class="btn btn-success" onclick="openAddPersonModal()">+ إضافة فرد</button>
         <button class="btn btn-primary" onclick="showFamilyTree()">🌳 عرض شجرة عائلة</button>
+        <button class="btn btn-warning" onclick="exportToExcel()">📊 تصدير Excel</button>
         <div id="treeView" class="tree-container" style="margin-top: 15px;">
-            <p style="text-align:center;color:#999;">اختر عائلة لعرض شجرتها</p>
+            <p style="text-align:center;color:#999;">اضغط "عرض شجرة عائلة" لاختيار عائلة</p>
         </div>
     </div>
     
     <!-- تبويب المقبرة -->
     <div id="cemetery" class="tab-content">
         <div class="legend">
-            <div class="legend-item"><div class="legend-color" style="background:#2c3e50;"></div>قبر مشغول</div>
-            <div class="legend-item"><div class="legend-color" style="background:#c8e6c9;border:2px dashed #2c3e50;"></div>قبر فارغ</div>
+            <div class="legend-item"><div class="legend-color" style="background:#2c3e50;"></div>مشغول</div>
+            <div class="legend-item"><div class="legend-color" style="background:#c8e6c9;border:2px dashed #2c3e50;"></div>فارغ</div>
+            <div class="legend-item"><div class="legend-color" style="background:#f39c12;"></div>خاص</div>
+            <div class="legend-item"><div class="legend-color" style="background:#3498db;"></div>عام</div>
         </div>
         <div class="filters">
             <select id="filterSection" onchange="filterCemetery()">
                 <option value="">كل الأقسام</option>
-                <option value="A">القسم A - الشمالي</option>
-                <option value="B">القسم B - الجنوبي</option>
-                <option value="C">القسم C - الشرقي</option>
+                <option value="A">القسم A</option>
+                <option value="B">القسم B</option>
+                <option value="C">القسم C</option>
+            </select>
+            <select id="filterGraveType" onchange="filterCemetery()">
+                <option value="">كل الأنواع</option>
+                <option value="private">خاص</option>
+                <option value="public">عام</option>
+            </select>
+            <select id="filterGraveStatus" onchange="filterCemetery()">
+                <option value="">كل الحالات</option>
+                <option value="occupied">مشغول</option>
+                <option value="available">متاح</option>
+                <option value="empty">فارغ</option>
             </select>
         </div>
         <button class="btn btn-success" onclick="openAddGraveModal()">+ إضافة قبر</button>
@@ -169,7 +185,7 @@
     </div>
 </div>
 
-<!-- نافذة إضافة فرد -->
+<!-- نافذة إضافة/تعديل فرد -->
 <div id="personModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -179,16 +195,20 @@
         <form id="personForm" onsubmit="savePerson(event)">
             <input type="hidden" id="personId">
             <div class="form-row">
-                <div class="form-group"><label>العائلة *</label><select id="personFamily" required></select></div>
-                <div class="form-group"><label>الاسم الكامل *</label><input type="text" id="personName" required></div>
+                <div class="form-group"><label>العائلة</label><select id="personFamily"></select></div>
+                <div class="form-group"><label>الاسم الكامل</label><input type="text" id="personName"></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>الجنس</label><select id="personGender"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select></div>
+                <div class="form-group"><label>الجنس</label><select id="personGender"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option><option value="">غير محدد</option></select></div>
                 <div class="form-group"><label>تاريخ الميلاد</label><input type="date" id="personBirth"></div>
             </div>
             <div class="form-row">
                 <div class="form-group"><label>تاريخ الوفاة</label><input type="date" id="personDeath"></div>
                 <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="personPhone"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>مكان السكن الحالي</label><input type="text" id="personResidence" placeholder="داخل/خارج القرية"></div>
+                <div class="form-group"><label>المهنة</label><input type="text" id="personJob"></div>
             </div>
             <div class="form-row">
                 <div class="form-group"><label>الأب</label><select id="personFather"><option value="">-</option></select></div>
@@ -200,16 +220,17 @@
     </div>
 </div>
 
-<!-- نافذة إضافة عائلة -->
+<!-- نافذة إضافة/تعديل عائلة -->
 <div id="familyModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>إضافة عائلة</h3>
+            <h3 id="familyModalTitle">إضافة عائلة</h3>
             <button class="close-btn" onclick="closeModal('familyModal')">×</button>
         </div>
         <form onsubmit="saveFamily(event)">
+            <input type="hidden" id="familyId">
             <div class="form-group"><label>اسم العائلة *</label><input type="text" id="familyName" required></div>
-            <div class="form-group"><label>القطاع</label><select id="familySector"><option>الجبل</option><option>الحارة 1</option><option>الحارة 2</option><option>الوادي</option><option>المنصورة</option><option>دمر</option></select></div>
+            <div class="form-group"><label>القطاع</label><select id="familySector"><option value="">غير محدد</option><option>الجبل</option><option>الحارة 1</option><option>الحارة 2</option><option>الوادي</option><option>المنصورة</option><option>دمر</option></select></div>
             <div class="form-group"><label>سنة التأسيس</label><input type="number" id="familyYear" placeholder="1900"></div>
             <div class="form-group"><label>ملاحظات</label><textarea id="familyNotes" rows="2"></textarea></div>
             <button type="submit" class="btn btn-success" style="width:100%;">حفظ</button>
@@ -217,23 +238,32 @@
     </div>
 </div>
 
-<!-- نافذة إضافة قبر -->
+<!-- نافذة إضافة/تعديل قبر -->
 <div id="graveModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>إضافة قبر</h3>
+            <h3 id="graveModalTitle">إضافة قبر</h3>
             <button class="close-btn" onclick="closeModal('graveModal')">×</button>
         </div>
         <form onsubmit="saveGrave(event)">
-            <div class="form-group"><label>المتوفي *</label><select id="gravePerson" required></select></div>
+            <input type="hidden" id="graveId">
+            <div class="form-group"><label>المتوفين (يمكن اختيار أكثر من واحد)</label>
+                <select id="gravePersons" multiple size="5" style="height:auto;"></select>
+                <small style="color:#666;">اضغط Ctrl لاختيار متعدد</small>
+            </div>
             <div class="form-row">
                 <div class="form-group"><label>القسم *</label><select id="graveSection" required><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></div>
                 <div class="form-group"><label>الصف *</label><input type="number" id="graveRow" required></div>
             </div>
             <div class="form-row">
                 <div class="form-group"><label>رقم القبر *</label><input type="number" id="graveNumber" required></div>
-                <div class="form-group"><label>تاريخ الدفن</label><input type="date" id="graveDate"></div>
+                <div class="form-group"><label>تاريخ الدفن الأول</label><input type="date" id="graveDate"></div>
             </div>
+            <div class="form-row">
+                <div class="form-group"><label>نوع القبر</label><select id="graveType"><option value="public">عام</option><option value="private">خاص</option></select></div>
+                <div class="form-group"><label>حالة القبر</label><select id="graveStatus"><option value="occupied">مشغول</option><option value="available">متاح</option><option value="empty">فارغ</option></select></div>
+            </div>
+            <div class="form-group"><label>مدة الدفن (بالسنوات)</label><input type="number" id="graveDuration" placeholder="مثال: 10"></div>
             <div class="form-group"><label>ملاحظات</label><textarea id="graveNotes" rows="2"></textarea></div>
             <button type="submit" class="btn btn-success" style="width:100%;">حفظ</button>
         </form>
@@ -241,23 +271,23 @@
 </div>
 
 <script>
-// ========== البيانات التجريبية ==========
+// ========== البيانات ==========
 let families = [
-    {id: 'F001', name: 'عساف', sector: 'الجبل', year: 1900},
-    {id: 'F002', name: 'الخطيب', sector: 'الحارة 2', year: 1920},
-    {id: 'F003', name: 'سليمان', sector: 'الحارة 1', year: 1910}
+    {id: 'F001', name: 'عساف', sector: 'الجبل', year: 1900, notes: ''},
+    {id: 'F002', name: 'الخطيب', sector: 'الحارة 2', year: 1920, notes: ''},
+    {id: 'F003', name: 'سليمان', sector: 'الحارة 1', year: 1910, notes: ''}
 ];
 
 let persons = [
-    {id: 'P001', familyId: 'F001', name: 'علي عساف', gender: 'ذكر', birth: '1948-01-01', death: '', father: '', mother: '', phone: '951743028'},
-    {id: 'P002', familyId: 'F001', name: 'حمدة', gender: 'أنثى', birth: '1955-01-01', death: '', father: '', mother: '', phone: ''},
-    {id: 'P003', familyId: 'F001', name: 'باسم عساف', gender: 'ذكر', birth: '1973-11-01', death: '', father: 'P001', mother: 'P002', phone: ''},
-    {id: 'P004', familyId: 'F001', name: 'عساف علي', gender: 'ذكر', birth: '1974-01-01', death: '2020-05-10', father: 'P001', mother: 'P002', phone: ''},
-    {id: 'P005', familyId: 'F002', name: 'شعبان الخطيب', gender: 'ذكر', birth: '1969-03-31', death: '', father: '', mother: '', phone: ''}
+    {id: 'P001', familyId: 'F001', name: 'علي عساف', gender: 'ذكر', birth: '1948-01-01', death: '', father: '', mother: '', phone: '951743028', residence: 'داخل القرية', job: 'مزارع', notes: 'رب الأسرة'},
+    {id: 'P002', familyId: 'F001', name: 'حمدة', gender: 'أنثى', birth: '1955-01-01', death: '', father: '', mother: '', phone: '', residence: 'داخل القرية', job: '', notes: ''},
+    {id: 'P003', familyId: 'F001', name: 'باسم عساف', gender: 'ذكر', birth: '1973-11-01', death: '', father: 'P001', mother: 'P002', phone: '', residence: 'خارج القرية - دمشق', job: 'مهندس', notes: ''},
+    {id: 'P004', familyId: 'F001', name: 'عساف علي', gender: 'ذكر', birth: '1974-01-01', death: '2020-05-10', father: 'P001', mother: 'P002', phone: '', residence: '', job: '', notes: ''},
+    {id: 'P005', familyId: 'F002', name: 'شعبان الخطيب', gender: 'ذكر', birth: '1969-03-31', death: '', father: '', mother: '', phone: '', residence: 'داخل القرية', job: '', notes: ''}
 ];
 
 let graves = [
-    {id: 'G001', personId: 'P004', section: 'A', row: 3, number: 15, date: '2020-05-10'}
+    {id: 'G001', personIds: ['P004'], section: 'A', row: 3, number: 15, date: '2020-05-10', type: 'private', status: 'occupied', duration: 10, notes: 'قبر عائلي'}
 ];
 
 // ========== التبويبات ==========
@@ -283,26 +313,21 @@ function showFamilyTree() {
     const familyMembers = persons.filter(p => p.familyId === familyId);
     const container = document.getElementById('treeView');
     
-    let html = `<h3 style="text-align:center;margin-bottom:20px;"> شجرة عائلة ${family.name}</h3>`;
+    let html = `<h3 style="text-align:center;margin-bottom:20px;">🌳 شجرة عائلة ${family.name}</h3>`;
     
-    // الأجداد (من ليس لهم أب في البيانات)
     const grandparents = familyMembers.filter(p => !p.father && !p.mother);
-    const parents = familyMembers.filter(p => p.father && !persons.find(c => c.father === p.id));
-    const children = familyMembers.filter(p => p.father && persons.find(c => c.father === p.id));
     
     grandparents.forEach(gp => {
         html += `<div style="text-align:center;margin-bottom:20px;">`;
         html += renderPersonNode(gp);
         html += `<div class="tree-connector"></div>`;
         
-        // أبناء هذا الجد
         const gpChildren = familyMembers.filter(p => p.father === gp.id || p.mother === gp.id);
         if (gpChildren.length > 0) {
             html += `<div class="tree-children">`;
             gpChildren.forEach(child => {
                 html += renderPersonNode(child);
                 
-                // أحفاد
                 const grandchildren = familyMembers.filter(p => p.father === child.id);
                 if (grandchildren.length > 0) {
                     html += `<div class="tree-children" style="margin-top:10px;">`;
@@ -325,9 +350,10 @@ function renderPersonNode(person) {
     const age = person.birth ? calculateAge(person.birth, person.death) : '?';
     return `
         <div class="tree-node ${isDeceased ? 'deceased' : ''}" onclick="viewPerson('${person.id}')">
-            <div style="font-size:20px;">${isDeceased ? '⚰️' : (person.gender === 'ذكر' ? '👨' : '👩')}</div>
+            <div style="font-size:20px;">${isDeceased ? '⚰️' : (person.gender === 'ذكر' ? '👨' : '')}</div>
             <div style="font-weight:bold;font-size:12px;">${person.name}</div>
             <div style="font-size:10px;">${age} سنة</div>
+            ${person.residence ? `<div style="font-size:9px;">📍 ${person.residence}</div>` : ''}
             ${isDeceased ? `<div style="font-size:10px;">توفي ${person.death}</div>` : ''}
         </div>
     `;
@@ -357,9 +383,14 @@ function searchTree() {
     let html = '<h3>نتائج البحث:</h3>';
     results.forEach(p => {
         const family = families.find(f => f.id === p.familyId);
-        html += `<div class="card" onclick="viewPerson('${p.id}')" style="cursor:pointer;">
+        html += `<div class="card" style="cursor:pointer;" onclick="viewPerson('${p.id}')">
             <h4>${p.name}</h4>
             <p>عائلة ${family ? family.name : '-'} | ${p.gender} | ${calculateAge(p.birth, p.death)} سنة</p>
+            ${p.residence ? `<p>📍 ${p.residence}</p>` : ''}
+            <div class="card-actions">
+                <button class="btn btn-warning btn-small" onclick="event.stopPropagation();editPerson('${p.id}')">✏️ تعديل</button>
+                <button class="btn btn-danger btn-small" onclick="event.stopPropagation();deletePerson('${p.id}')">🗑️ حذف</button>
+            </div>
         </div>`;
     });
     container.innerHTML = html;
@@ -373,26 +404,65 @@ function viewPerson(personId) {
     const father = persons.find(x => x.id === p.father);
     const mother = persons.find(x => x.id === p.mother);
     const children = persons.filter(x => x.father === p.id || x.mother === p.id);
-    const grave = graves.find(g => g.personId === p.id);
+    const grave = graves.find(g => g.personIds.includes(p.id));
     
     alert(`
 👤 ${p.name}
 👪 عائلة: ${family ? family.name : '-'}
 ${p.gender} | العمر: ${calculateAge(p.birth, p.death)} سنة
-📅 ميلاد: ${p.birth || '-'}
-${p.death ? '⚰️ وفاة: ' + p.death : '✅ على قيد الحياة'}
-👨 الأب: ${father ? father.name : '-'}
- الأم: ${mother ? mother.name : '-'}
-👶 الأبناء: ${children.length > 0 ? children.map(c => c.name).join(', ') : '-'}
-${grave ? `⚰️ القبر: قسم ${grave.section} - صف ${grave.row} - رقم ${grave.number}` : ''}
- ${p.phone || '-'}
+ ميلاد: ${p.birth || 'غير محدد'}
+${p.death ? '️ وفاة: ' + p.death : '✅ على قيد الحياة'}
+📍 السكن: ${p.residence || 'غير محدد'}
+💼 المهنة: ${p.job || 'غير محدد'}
+👨 الأب: ${father ? father.name : 'غير محدد'}
+ الأم: ${mother ? mother.name : 'غير محدد'}
+👶 الأبناء: ${children.length > 0 ? children.map(c => c.name).join(', ') : 'لا يوجد'}
+${grave ? `⚰️ القبر: قسم ${grave.section} - صف ${grave.row} - رقم ${grave.number}\n   النوع: ${grave.type === 'private' ? 'خاص' : 'عام'}\n   المدة: ${grave.duration || 'غير محدد'} سنة` : '⚰️ لا يوجد قبر مسجل'}
+📱 ${p.phone || 'غير محدد'}
+📝 ${p.notes || 'لا ملاحظات'}
     `.trim());
+}
+
+function editPerson(personId) {
+    const p = persons.find(x => x.id === personId);
+    if (!p) return;
+    
+    document.getElementById('personModalTitle').textContent = 'تعديل فرد';
+    document.getElementById('personId').value = p.id;
+    document.getElementById('personName').value = p.name;
+    document.getElementById('personGender').value = p.gender;
+    document.getElementById('personBirth').value = p.birth;
+    document.getElementById('personDeath').value = p.death;
+    document.getElementById('personPhone').value = p.phone;
+    document.getElementById('personResidence').value = p.residence || '';
+    document.getElementById('personJob').value = p.job || '';
+    document.getElementById('personNotes').value = p.notes || '';
+    
+    const familySelect = document.getElementById('personFamily');
+    familySelect.innerHTML = families.map(f => `<option value="${f.id}" ${f.id === p.familyId ? 'selected' : ''}>${f.name}</option>`).join('');
+    
+    const parentSelects = ['personFather', 'personMother'];
+    parentSelects.forEach(id => {
+        document.getElementById(id).innerHTML = '<option value="">-</option>' + 
+            persons.filter(x => x.id !== p.id).map(x => `<option value="${x.id}" ${x.id === p[id.replace('person', '').toLowerCase()] ? 'selected' : ''}>${x.name}</option>`).join('');
+    });
+    
+    document.getElementById('personModal').classList.add('active');
+}
+
+function deletePerson(personId) {
+    if (!confirm('هل أنت متأكد من حذف هذا الشخص؟')) return;
+    persons = persons.filter(p => p.id !== personId);
+    alert('✅ تم الحذف');
+    updateStats();
 }
 
 // ========== المقبرة ==========
 function showCemeteryMap() {
     const container = document.getElementById('cemeteryMap');
     const section = document.getElementById('filterSection').value;
+    const type = document.getElementById('filterGraveType').value;
+    const status = document.getElementById('filterGraveStatus').value;
     
     let html = '';
     const sections = ['A', 'B', 'C'];
@@ -407,13 +477,20 @@ function showCemeteryMap() {
         for (let r = 1; r <= rows; r++) {
             for (let c = 1; c <= cols; c++) {
                 const grave = graves.find(g => g.section === sec && g.row === r && g.number === c);
-                const person = grave ? persons.find(p => p.id === grave.personId) : null;
                 
-                if (grave && person) {
-                    html += `<div class="grave-slot occupied" onclick="viewGrave('${grave.id}')" title="${person.name}">
+                if (grave) {
+                    if (type && grave.type !== type) continue;
+                    if (status && grave.status !== status) continue;
+                    
+                    const personNames = grave.personIds.map(id => {
+                        const p = persons.find(x => x.id === id);
+                        return p ? p.name : 'غير معروف';
+                    }).join(', ');
+                    
+                    html += `<div class="grave-slot occupied ${grave.type === 'private' ? 'private' : ''}" onclick="viewGrave('${grave.id}')" title="${personNames}">
                         <div>⚰️</div>
-                        <div>${person.name.split(' ')[0]}</div>
                         <div>${r}-${c}</div>
+                        <div style="font-size:9px;">${grave.type === 'private' ? 'خاص' : 'عام'}</div>
                     </div>`;
                 } else {
                     html += `<div class="grave-slot empty" onclick="openAddGraveModalAt('${sec}',${r},${c})" title="قبر فارغ">
@@ -430,8 +507,13 @@ function showCemeteryMap() {
 function viewGrave(graveId) {
     const g = graves.find(x => x.id === graveId);
     if (!g) return;
-    const p = persons.find(x => x.id === g.personId);
-    alert(`⚰️ القبر: ${g.id}\n👤 ${p ? p.name : '-'}\n📍 القسم ${g.section} - صف ${g.row} - رقم ${g.number}\n📅 ${g.date || '-'}`);
+    
+    const personNames = g.personIds.map(id => {
+        const p = persons.find(x => x.id === id);
+        return p ? p.name : 'غير معروف';
+    }).join('\n');
+    
+    alert(`️ القبر: ${g.id}\n المتوفين:\n${personNames}\n📍 القسم ${g.section} - صف ${g.row} - رقم ${g.number}\n📅 تاريخ الدفن: ${g.date || 'غير محدد'}\n🏷️ النوع: ${g.type === 'private' ? 'خاص' : 'عام'}\n📊 الحالة: ${g.status === 'occupied' ? 'مشغول' : g.status === 'available' ? 'متاح' : 'فارغ'}\n⏱️ المدة: ${g.duration || 'غير محدد'} سنة\n📝 ${g.notes || 'لا ملاحظات'}`);
 }
 
 function openAddGraveModalAt(section, row, number) {
@@ -439,6 +521,35 @@ function openAddGraveModalAt(section, row, number) {
     document.getElementById('graveSection').value = section;
     document.getElementById('graveRow').value = row;
     document.getElementById('graveNumber').value = number;
+}
+
+function editGrave(graveId) {
+    const g = graves.find(x => x.id === graveId);
+    if (!g) return;
+    
+    document.getElementById('graveModalTitle').textContent = 'تعديل قبر';
+    document.getElementById('graveId').value = g.id;
+    document.getElementById('graveSection').value = g.section;
+    document.getElementById('graveRow').value = g.row;
+    document.getElementById('graveNumber').value = g.number;
+    document.getElementById('graveDate').value = g.date || '';
+    document.getElementById('graveType').value = g.type;
+    document.getElementById('graveStatus').value = g.status;
+    document.getElementById('graveDuration').value = g.duration || '';
+    document.getElementById('graveNotes').value = g.notes || '';
+    
+    const personSelect = document.getElementById('gravePersons');
+    const deceased = persons.filter(p => p.death);
+    personSelect.innerHTML = deceased.map(p => `<option value="${p.id}" ${g.personIds.includes(p.id) ? 'selected' : ''}>${p.name}</option>`).join('');
+    
+    document.getElementById('graveModal').classList.add('active');
+}
+
+function deleteGrave(graveId) {
+    if (!confirm('هل أنت متأكد من حذف هذا القبر؟')) return;
+    graves = graves.filter(g => g.id !== graveId);
+    alert('✅ تم الحذف');
+    showCemeteryMap();
 }
 
 // ========== العائلات ==========
@@ -451,10 +562,15 @@ function displayFamilies() {
         const deceasedCount = persons.filter(p => p.familyId === f.id && p.death).length;
         
         html += `<div class="card family-card">
-            <h4> عائلة ${f.name}</h4>
-            <p>📍 ${f.sector} | 📅 تأسست ${f.year || '-'}</p>
+            <h4>👪 عائلة ${f.name}</h4>
+            <p>📍 ${f.sector || 'غير محدد'} | 📅 تأسست ${f.year || 'غير محدد'}</p>
             <p>👥 ${memberCount} فرد | ⚰️ ${deceasedCount} متوفي | ✅ ${memberCount - deceasedCount} أحياء</p>
-            <button class="btn btn-primary btn-small" onclick="showFamilyTreeById('${f.id}')">🌳 عرض الشجرة</button>
+            ${f.notes ? `<p>📝 ${f.notes}</p>` : ''}
+            <div class="card-actions">
+                <button class="btn btn-primary btn-small" onclick="showFamilyTreeById('${f.id}')">🌳 الشجرة</button>
+                <button class="btn btn-warning btn-small" onclick="editFamily('${f.id}')">✏️ تعديل</button>
+                <button class="btn btn-danger btn-small" onclick="deleteFamily('${f.id}')">🗑️ حذف</button>
+            </div>
         </div>`;
     });
     
@@ -466,16 +582,7 @@ function showFamilyTreeById(familyId) {
     document.querySelectorAll('.tab')[0].classList.add('active');
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.getElementById('tree').classList.add('active');
-    
-    const family = families.find(f => f.id === familyId);
-    const familyMembers = persons.filter(p => p.familyId === familyId);
-    const container = document.getElementById('treeView');
-    
-    let html = `<h3 style="text-align:center;">🌳 شجرة عائلة ${family.name}</h3>`;
-    familyMembers.forEach(p => {
-        html += renderPersonNode(p);
-    });
-    container.innerHTML = html;
+    showFamilyTree();
 }
 
 function searchFamilies() {
@@ -486,9 +593,33 @@ function searchFamilies() {
     let html = '';
     filtered.forEach(f => {
         const count = persons.filter(p => p.familyId === f.id).length;
-        html += `<div class="card family-card"><h4>👪 ${f.name}</h4><p>${f.sector} | ${count} فرد</p></div>`;
+        html += `<div class="card family-card"><h4>👪 ${f.name}</h4><p>${f.sector || '-'} | ${count} فرد</p>
+            <div class="card-actions">
+                <button class="btn btn-warning btn-small" onclick="editFamily('${f.id}')">✏️ تعديل</button>
+            </div>
+        </div>`;
     });
     container.innerHTML = html;
+}
+
+function editFamily(familyId) {
+    const f = families.find(x => x.id === familyId);
+    if (!f) return;
+    
+    document.getElementById('familyModalTitle').textContent = 'تعديل عائلة';
+    document.getElementById('familyId').value = f.id;
+    document.getElementById('familyName').value = f.name;
+    document.getElementById('familySector').value = f.sector || '';
+    document.getElementById('familyYear').value = f.year || '';
+    document.getElementById('familyNotes').value = f.notes || '';
+    document.getElementById('familyModal').classList.add('active');
+}
+
+function deleteFamily(familyId) {
+    if (!confirm('هل أنت متأكد من حذف هذه العائلة؟')) return;
+    families = families.filter(f => f.id !== familyId);
+    alert('✅ تم الحذف');
+    displayFamilies();
 }
 
 // ========== الإحصائيات ==========
@@ -503,7 +634,6 @@ function updateStats() {
     document.getElementById('statDeceased').textContent = deceased;
     document.getElementById('statGraves').textContent = graves.length;
     
-    // متوسط العمر
     let totalAge = 0, count = 0;
     persons.forEach(p => {
         if (p.birth) {
@@ -513,7 +643,6 @@ function updateStats() {
     });
     document.getElementById('statAvgAge').textContent = count > 0 ? Math.round(totalAge / count) : 0;
     
-    // إحصائيات تفصيلية
     const detailed = document.getElementById('detailedStats');
     let html = '<h3 style="margin-bottom:15px;">📊 تفاصيل حسب القطاع</h3>';
     
@@ -535,14 +664,13 @@ function updateStats() {
 
 // ========== النماذج ==========
 function openAddPersonModal() {
+    document.getElementById('personModalTitle').textContent = 'إضافة فرد';
     document.getElementById('personForm').reset();
     document.getElementById('personId').value = '';
     
-    // ملء قائمة العائلات
     const familySelect = document.getElementById('personFamily');
-    familySelect.innerHTML = families.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+    familySelect.innerHTML = '<option value="">اختر عائلة...</option>' + families.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
     
-    // ملء قائمة الآباء والأمهات
     const parentSelects = ['personFather', 'personMother'];
     parentSelects.forEach(id => {
         document.getElementById(id).innerHTML = '<option value="">-</option>' + 
@@ -553,15 +681,31 @@ function openAddPersonModal() {
 }
 
 function openAddFamilyModal() {
+    document.getElementById('familyModalTitle').textContent = 'إضافة عائلة';
+    document.getElementById('familyId').value = '';
     document.getElementById('familyName').value = '';
+    document.getElementById('familySector').value = '';
+    document.getElementById('familyYear').value = '';
+    document.getElementById('familyNotes').value = '';
     document.getElementById('familyModal').classList.add('active');
 }
 
 function openAddGraveModal() {
-    const personSelect = document.getElementById('gravePerson');
+    document.getElementById('graveModalTitle').textContent = 'إضافة قبر';
+    document.getElementById('graveId').value = '';
+    document.getElementById('graveSection').value = 'A';
+    document.getElementById('graveRow').value = '';
+    document.getElementById('graveNumber').value = '';
+    document.getElementById('graveDate').value = '';
+    document.getElementById('graveType').value = 'public';
+    document.getElementById('graveStatus').value = 'empty';
+    document.getElementById('graveDuration').value = '';
+    document.getElementById('graveNotes').value = '';
+    
+    const personSelect = document.getElementById('gravePersons');
     const deceased = persons.filter(p => p.death);
-    personSelect.innerHTML = '<option value="">اختر...</option>' + 
-        deceased.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+    personSelect.innerHTML = deceased.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+    
     document.getElementById('graveModal').classList.add('active');
 }
 
@@ -571,8 +715,9 @@ function closeModal(id) {
 
 function savePerson(e) {
     e.preventDefault();
-    const newPerson = {
-        id: 'P' + String(persons.length + 1).padStart(3, '0'),
+    const personId = document.getElementById('personId').value;
+    
+    const personData = {
         familyId: document.getElementById('personFamily').value,
         name: document.getElementById('personName').value,
         gender: document.getElementById('personGender').value,
@@ -580,40 +725,113 @@ function savePerson(e) {
         death: document.getElementById('personDeath').value,
         father: document.getElementById('personFather').value,
         mother: document.getElementById('personMother').value,
-        phone: document.getElementById('personPhone').value
+        phone: document.getElementById('personPhone').value,
+        residence: document.getElementById('personResidence').value,
+        job: document.getElementById('personJob').value,
+        notes: document.getElementById('personNotes').value
     };
-    persons.push(newPerson);
-    alert('✅ تم إضافة الفرد');
+    
+    if (personId) {
+        const index = persons.findIndex(p => p.id === personId);
+        if (index !== -1) {
+            persons[index] = {...persons[index], ...personData};
+            alert('✅ تم التعديل');
+        }
+    } else {
+        personData.id = 'P' + String(persons.length + 1).padStart(3, '0');
+        persons.push(personData);
+        alert('✅ تم الإضافة');
+    }
+    
     closeModal('personModal');
     updateStats();
 }
 
 function saveFamily(e) {
     e.preventDefault();
-    families.push({
-        id: 'F' + String(families.length + 1).padStart(3, '0'),
+    const familyId = document.getElementById('familyId').value;
+    
+    const familyData = {
         name: document.getElementById('familyName').value,
         sector: document.getElementById('familySector').value,
-        year: document.getElementById('familyYear').value
-    });
-    alert('✅ تم إضافة العائلة');
+        year: document.getElementById('familyYear').value,
+        notes: document.getElementById('familyNotes').value
+    };
+    
+    if (familyId) {
+        const index = families.findIndex(f => f.id === familyId);
+        if (index !== -1) {
+            families[index] = {...families[index], ...familyData};
+            alert('✅ تم التعديل');
+        }
+    } else {
+        familyData.id = 'F' + String(families.length + 1).padStart(3, '0');
+        families.push(familyData);
+        alert('✅ تم الإضافة');
+    }
+    
     closeModal('familyModal');
     displayFamilies();
 }
 
 function saveGrave(e) {
     e.preventDefault();
-    graves.push({
-        id: 'G' + String(graves.length + 1).padStart(3, '0'),
-        personId: document.getElementById('gravePerson').value,
+    const graveId = document.getElementById('graveId').value;
+    
+    const selectedPersons = Array.from(document.getElementById('gravePersons').selectedOptions).map(o => o.value);
+    
+    const graveData = {
+        personIds: selectedPersons,
         section: document.getElementById('graveSection').value,
         row: parseInt(document.getElementById('graveRow').value),
         number: parseInt(document.getElementById('graveNumber').value),
-        date: document.getElementById('graveDate').value
-    });
-    alert('✅ تم إضافة القبر');
+        date: document.getElementById('graveDate').value,
+        type: document.getElementById('graveType').value,
+        status: document.getElementById('graveStatus').value,
+        duration: parseInt(document.getElementById('graveDuration').value) || null,
+        notes: document.getElementById('graveNotes').value
+    };
+    
+    if (graveId) {
+        const index = graves.findIndex(g => g.id === graveId);
+        if (index !== -1) {
+            graves[index] = {...graves[index], ...graveData};
+            alert('✅ تم التعديل');
+        }
+    } else {
+        graveData.id = 'G' + String(graves.length + 1).padStart(3, '0');
+        graves.push(graveData);
+        alert('✅ تم الإضافة');
+    }
+    
     closeModal('graveModal');
     showCemeteryMap();
+}
+
+function exportToExcel() {
+    const data = persons.map(p => {
+        const family = families.find(f => f.id === p.familyId);
+        const grave = graves.find(g => g.personIds.includes(p.id));
+        return {
+            'الاسم': p.name,
+            'العائلة': family ? family.name : '',
+            'الجنس': p.gender,
+            'تاريخ الميلاد': p.birth,
+            'تاريخ الوفاة': p.death,
+            'العمر': p.birth ? calculateAge(p.birth, p.death) : '',
+            'السكن': p.residence,
+            'المهنة': p.job,
+            'الهاتف': p.phone,
+            'القبر': grave ? `${grave.section}-${grave.row}-${grave.number}` : '',
+            'ملاحظات': p.notes
+        };
+    });
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'الأفراد');
+    XLSX.writeFile(wb, `قرية_عساف_${new Date().toISOString().split('T')[0]}.xlsx`);
+    alert('✅ تم التصدير');
 }
 
 // تهيئة
