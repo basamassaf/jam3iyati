@@ -22,28 +22,31 @@
         .btn-warning { background: #f39c12; }
         .btn-danger { background: #e74c3c; }
         .btn-info { background: #3498db; }
-        .btn-small { width: auto; padding: 5px 10px; font-size: 12px; margin: 2px; display: inline-block; border-radius: 4px; border: none; color: white; cursor: pointer; }
+        .btn-small { width: auto; padding: 5px 10px; font-size: 12px; margin: 2px; display: inline-block; }
         .error { background: #fee; color: #c33; padding: 8px; border-radius: 6px; margin-bottom: 10px; display: none; text-align: center; font-size: 13px; }
+        .success { background: #efe; color: #3a3; padding: 8px; border-radius: 6px; margin-bottom: 10px; display: none; text-align: center; font-size: 13px; }
+        .loading { text-align: center; color: #667eea; margin: 15px 0; font-size: 14px; }
         
+        /* بطاقة العضو */
         .member-card { 
             background: #f8f9fa; 
             padding: 8px 10px; 
             border-radius: 6px; 
             margin-bottom: 6px; 
-            border-right: 4px solid #667eea;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
+            border-right: 3px solid #667eea;
             transition: all 0.2s;
         }
         .member-card:hover { background: #e9ecef; }
-        .member-card .info { flex: 1; min-width: 0; }
-        .member-card .name { font-weight: bold; font-size: 13px; color: #2c3e50; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .member-card .details { font-size: 11px; color: #7f8c8d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-        .member-card .actions { display: flex; gap: 4px; flex-shrink: 0; align-items: center; }
+        .member-card .color-bar { width: 3px; height: 35px; border-radius: 2px; flex-shrink: 0; display: inline-block; vertical-align: middle; margin-left: 8px; }
+        .member-card .info { display: inline-block; vertical-align: middle; flex: 1; }
+        .member-card .name { font-weight: bold; font-size: 14px; color: #2c3e50; }
+        .member-card .details { font-size: 11px; color: #7f8c8d; margin-top: 2px; }
+        .member-card .actions { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
         
-        .badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; }
+        .badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; margin: 1px; }
+        .badge-active { background: #d4edda; color: #155724; }
+        .badge-young { background: #d1ecf1; color: #0c5460; }
+        .badge-senior { background: #fff3cd; color: #856404; }
         .badge-head { background: #667eea; color: white; }
         
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -53,25 +56,36 @@
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .close-modal { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
         
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 6px; margin-bottom: 12px; }
-        .stat-box { background: #e3f2fd; padding: 8px 5px; border-radius: 6px; text-align: center; cursor: pointer; }
-        .stat-box h4 { font-size: 16px; color: #1976d2; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; margin-bottom: 12px; }
+        .stat-box { background: #e3f2fd; padding: 10px 8px; border-radius: 6px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .stat-box:hover { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.15); }
+        .stat-box.active-filter { background: #667eea; color: white; }
+        .stat-box.active-filter h4, .stat-box.active-filter p { color: white; }
+        .stat-box h4 { font-size: 20px; color: #1976d2; }
         .stat-box p { font-size: 10px; color: #666; }
         
         .filter-row { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
         .filter-row select, .filter-row input { flex: 1; min-width: 100px; padding: 7px; font-size: 13px; }
         
-        .whatsapp-btn { background: #25D366; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .whatsapp-btn { background: #25D366; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; }
         .export-buttons { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-        .export-buttons button { flex: 1; min-width: 90px; }
+        .export-buttons button { flex: 1; min-width: 100px; }
         
-        .sector-selector { background: #f8f9fa; padding: 8px; border-radius: 6px; margin-bottom: 10px; border: 1px solid #667eea; }
-        .sector-selector h4 { font-size: 12px; color: #667eea; margin-bottom: 6px; }
-        .sector-buttons { display: flex; flex-wrap: wrap; gap: 4px; }
-        .sector-buttons button { flex: 1; min-width: 70px; padding: 5px; font-size: 11px; }
-        .sector-buttons button.active { background: #667eea; color: white; }
+        .family-group { background: #fff3cd; padding: 8px; border-radius: 6px; margin-bottom: 8px; border-right: 3px solid #f39c12; }
+        .family-group h4 { color: #856404; margin-bottom: 6px; font-size: 13px; }
+        .family-member { background: white; padding: 6px; border-radius: 4px; margin-bottom: 4px; border-right: 2px solid #667eea; font-size: 12px; }
+        
+        .view-toggle { display: flex; gap: 5px; margin-bottom: 10px; }
+        .view-toggle button { flex: 1; padding: 7px; font-size: 13px; }
+        .view-toggle button.active { background: #667eea; }
         
         .results-count { background: #e3f2fd; padding: 6px; border-radius: 4px; margin-bottom: 10px; text-align: center; font-size: 12px; color: #1976d2; }
+        
+        .sector-selector { background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 2px solid #667eea; }
+        .sector-selector h4 { font-size: 13px; color: #667eea; margin-bottom: 8px; }
+        .sector-buttons { display: flex; flex-wrap: wrap; gap: 5px; }
+        .sector-buttons button { flex: 1; min-width: 80px; padding: 6px; font-size: 12px; }
+        .sector-buttons button.active { background: #667eea; }
         
         #loginScreen, #dashboard, #membersSection { display: none; }
         #loginScreen.active, #dashboard.active, #membersSection.active { display: block; }
@@ -80,7 +94,6 @@
 <body>
 
 <div class="container">
-    <!-- شاشة تسجيل الدخول -->
     <div id="loginScreen" class="active">
         <h1>️ نظام إدارة الجمعية</h1>
         <p class="subtitle">تسجيل دخول المستخدمين</p>
@@ -96,7 +109,6 @@
         <button class="btn" onclick="doLogin()">تسجيل الدخول</button>
     </div>
 
-    <!-- لوحة التحكم -->
     <div id="dashboard">
         <h1>مرحباً، <span id="userName"></span></h1>
         <p class="subtitle" id="userRole">👑 مدير عام</p>
@@ -104,7 +116,6 @@
         <button class="btn btn-secondary" onclick="doLogout()" style="margin-top: 10px;">تسجيل الخروج</button>
     </div>
 
-    <!-- قسم الأعضاء -->
     <div id="membersSection">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
             <h2>👥 الأعضاء</h2>
@@ -117,10 +128,13 @@
             <div class="stat-box" onclick="quickFilter('young')"><h4 id="youngCount">0</h4><p>شباب</p></div>
             <div class="stat-box" onclick="quickFilter('senior')"><h4 id="seniorCount">0</h4><p>كبار</p></div>
             <div class="stat-box" onclick="quickFilter('sub_both')"><h4 id="bothCount">0</h4><p>مزدوج</p></div>
+            <div class="stat-box" onclick="quickFilter('sub_assoc')"><h4 id="assocCount">0</h4><p>جمعية</p></div>
+            <div class="stat-box" onclick="quickFilter('sub_death')"><h4 id="deathCount">0</h4><p>وفاة</p></div>
+            <div class="stat-box" onclick="quickFilter('new_members')"><h4 id="newCount">0</h4><p>جدد</p></div>
         </div>
 
-        <div class="sector-selector" id="sectorSelector">
-            <h4>🎯 اختر القطاع للعرض:</h4>
+        <div class="sector-selector">
+            <h4>🎯 اختر القطاع:</h4>
             <div class="sector-buttons">
                 <button class="btn btn-small" onclick="selectSector('all')" id="sector-all">الكل</button>
                 <button class="btn btn-small" onclick="selectSector('الحارة 1')" id="sector-الحارة 1">الحارة 1</button>
@@ -150,13 +164,35 @@
                 <option value="both">مزدوج</option>
                 <option value="association">جمعية فقط</option>
                 <option value="death">وفاة فقط</option>
+                <option value="none">غير مشترك</option>
+            </select>
+        </div>
+        
+        <div class="filter-row">
+            <select id="filterRelation" onchange="applyFilters()">
+                <option value="">كل الصلات</option>
+                <option value="رب أسرة">رب أسرة</option>
+                <option value="زوجة">زوجة</option>
+                <option value="ابن">ابن</option>
+                <option value="بنت">بنت</option>
+            </select>
+            <select id="filterType" onchange="applyFilters()">
+                <option value="">كل الأنواع</option>
+                <option value="young">شاب (&lt;30)</option>
+                <option value="senior">كبير (&gt;60)</option>
+                <option value="normal">عادي</option>
             </select>
         </div>
 
+        <div class="view-toggle">
+            <button class="btn btn-small active" id="viewIndividual" onclick="setView('individual')">👤 أفراد</button>
+            <button class="btn btn-small" id="viewFamily" onclick="setView('family')">👨‍👩‍‍ أسر</button>
+        </div>
+
         <div class="export-buttons">
-            <button class="btn btn-success btn-small" onclick="openAddMemberModal()">+ إضافة عضو</button>
-            <button class="btn btn-info btn-small" onclick="exportToExcel()">تصدير Excel</button>
-            <button class="btn btn-warning btn-small" onclick="resetFilters()">إعادة ضبط</button>
+            <button class="btn btn-success btn-small" onclick="openAddMemberModal()">+ إضافة</button>
+            <button class="btn btn-info btn-small" onclick="exportToExcel()">📊 Excel</button>
+            <button class="btn btn-warning btn-small" onclick="resetFilters()">🔄 إعادة</button>
         </div>
         
         <div class="results-count" id="resultsCount">جاري التحميل...</div>
@@ -164,7 +200,6 @@
     </div>
 </div>
 
-<!-- النافذة المنبثقة للإضافة والتعديل -->
 <div id="memberModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -188,6 +223,7 @@
                         <option value="normal">عادي</option>
                         <option value="young">شاب (&lt;30)</option>
                         <option value="senior">كبير (&gt;60)</option>
+                        <option value="disabled">معاق</option>
                     </select>
                 </div>
                 <div class="input-group"><label>صلة القرابة</label>
@@ -211,15 +247,12 @@
             </div>
             <div class="form-row">
                 <div class="input-group"><label>رقم الجوال</label><input type="tel" id="memberPhone"></div>
-                <div class="input-group"><label>حالة العضو</label>
-                    <select id="memberStatus">
-                        <option value="active">نشط</option>
-                        <option value="exempt">معفي</option>
-                        <option value="suspended">متوقف</option>
-                        <option value="withdrawn">منسحب</option>
-                        <option value="deceased">متوفي</option>
-                    </select>
-                </div>
+                <div class="input-group"><label>البريد</label><input type="email" id="memberEmail"></div>
+            </div>
+            <div class="input-group"><label>العنوان</label><textarea id="memberAddress" rows="2"></textarea></div>
+            <div class="form-row">
+                <div class="input-group"><label>المهنة</label><input type="text" id="memberJob"></div>
+                <div class="input-group"><label>تاريخ الانضمام</label><input type="date" id="joinDate"></div>
             </div>
             <div class="input-group"><label>نوع الاشتراك:</label>
                 <div style="display:flex;gap:15px;margin:8px 0;">
@@ -227,7 +260,22 @@
                     <label><input type="checkbox" id="subDeath"> وفاة</label>
                 </div>
             </div>
-            <button type="submit" class="btn btn-success">حفظ البيانات</button>
+            <div class="form-row">
+                <div class="input-group"><label>تاريخ اشتراك الجمعية</label><input type="date" id="associationDate"></div>
+                <div class="input-group"><label>تاريخ اشتراك الوفاة</label><input type="date" id="deathDate"></div>
+            </div>
+            <div class="input-group"><label>حالة العضو:</label>
+                <select id="memberStatus">
+                    <option value="active">نشط</option>
+                    <option value="exempt">معفي</option>
+                    <option value="suspended">متوقف</option>
+                    <option value="withdrawn">منسحب</option>
+                    <option value="deceased">متوفي</option>
+                </select>
+            </div>
+            <div class="input-group"><label>ملاحظات:</label><textarea id="memberNotes" rows="2"></textarea></div>
+            <button type="submit" class="btn btn-success">حفظ</button>
+            <button type="button" class="btn btn-secondary" onclick="closeMemberModal()">إلغاء</button>
         </form>
     </div>
 </div>
@@ -253,6 +301,7 @@ const db = firebase.firestore();
 let currentUser = null;
 let allMembers = [];
 let filteredMembers = [];
+let currentView = 'individual';
 let currentSector = 'all';
 let userRole = 'admin';
 
@@ -277,7 +326,9 @@ async function loadUserRole() {
                 userRole === 'admin' ? '👑 مدير عام' : `👔 معتمد - ${currentSector}`;
             updateSectorButtons();
         }
-    } catch (e) { console.error(e); }
+    } catch (error) {
+        console.error('Error loading role:', error);
+    }
 }
 
 function showLogin() {
@@ -305,9 +356,15 @@ function doLogin() {
     const password = document.getElementById('password').value;
     const errorMsg = document.getElementById('errorMsg');
     
+    if (!email || !password) {
+        errorMsg.textContent = '⚠️ أدخل البريد وكلمة المرور';
+        errorMsg.style.display = 'block';
+        return;
+    }
+    
     auth.signInWithEmailAndPassword(email, password)
         .catch(error => {
-            errorMsg.textContent = 'خطأ: ' + error.message;
+            errorMsg.textContent = '❌ خطأ: ' + error.message;
             errorMsg.style.display = 'block';
         });
 }
@@ -316,45 +373,142 @@ function doLogout() { auth.signOut(); }
 
 async function loadMembers() {
     const container = document.getElementById('membersList');
-    document.getElementById('resultsCount').textContent = 'جاري التحميل...';
+    const resultsCount = document.getElementById('resultsCount');
+    resultsCount.textContent = '⏳ جاري التحميل...';
+    container.innerHTML = '<div class="loading">جاري تحميل الأعضاء...</div>';
     
     try {
-        let query = db.collection('members');
-        if (userRole !== 'admin' && currentSector !== 'all') {
-            query = query.where('sector', '==', currentSector);
-        }
-        
-        const snapshot = await query.get();
+        const snapshot = await db.collection('members').get();
         allMembers = [];
         snapshot.forEach(doc => {
             allMembers.push({ id: doc.id, ...doc.data() });
         });
         
+        allMembers.sort((a, b) => {
+            const codeA = (a.familyCode || '') + (a.memberCode || '');
+            const codeB = (b.familyCode || '') + (b.memberCode || '');
+            return codeA.localeCompare(codeB);
+        });
+        
         applyFilters();
     } catch (error) {
+        console.error('Error:', error);
         container.innerHTML = '<p style="text-align:center;color:#e74c3c;">خطأ: ' + error.message + '</p>';
     }
 }
 
+function selectSector(sector) {
+    currentSector = sector;
+    updateSectorButtons();
+    applyFilters();
+}
+
+function updateSectorButtons() {
+    const sectors = ['all', 'الحارة 1', 'الحارة 2', 'الوادي', 'المنصورة', 'الجبل', 'دمر'];
+    sectors.forEach(s => {
+        const btn = document.getElementById(`sector-${s}`);
+        if (btn) {
+            btn.classList.toggle('active', s === currentSector);
+        }
+    });
+}
+
+function calculateAge() {
+    const birthDate = document.getElementById('birthDate').value;
+    if (!birthDate) return;
+    
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+    }
+    
+    document.getElementById('memberAge').value = age;
+    
+    if (age < 30) document.getElementById('memberType').value = 'young';
+    else if (age > 60) document.getElementById('memberType').value = 'senior';
+    else document.getElementById('memberType').value = 'normal';
+}
+
+// ✅ البحث الفوري - بدون تأخير
+function doSearch() {
+    applyFilters();
+}
+
+function quickFilter(type) {
+    document.getElementById('filterStatus').value = '';
+    document.getElementById('filterSubscription').value = '';
+    document.getElementById('filterRelation').value = '';
+    document.getElementById('filterType').value = '';
+    document.getElementById('searchInput').value = '';
+    
+    if (type === 'active') document.getElementById('filterStatus').value = 'active';
+    else if (type === 'young') document.getElementById('filterType').value = 'young';
+    else if (type === 'senior') document.getElementById('filterType').value = 'senior';
+    else if (type === 'sub_both') document.getElementById('filterSubscription').value = 'both';
+    else if (type === 'sub_assoc') document.getElementById('filterSubscription').value = 'association';
+    else if (type === 'sub_death') document.getElementById('filterSubscription').value = 'death';
+    else if (type === 'new_members') {
+        filteredMembers = allMembers.filter(m => {
+            if (currentSector !== 'all' && m.sector !== currentSector) return false;
+            if (m.joinDate) {
+                const joinYear = new Date(m.joinDate).getFullYear();
+                return joinYear >= 2024;
+            }
+            return false;
+        });
+        updateStats();
+        displayMembers();
+        return;
+    }
+    
+    applyFilters();
+}
+
+// ✅ تطبيق الفلاتر - البحث يعمل بالحرف
 function applyFilters() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
     const status = document.getElementById('filterStatus').value;
     const subscription = document.getElementById('filterSubscription').value;
+    const relation = document.getElementById('filterRelation').value;
+    const type = document.getElementById('filterType').value;
     
     filteredMembers = allMembers.filter(m => {
+        // فلتر القطاع
         if (currentSector !== 'all' && m.sector !== currentSector) return false;
         
-        if (searchTerm) {
+        // ✅ البحث الفوري بالحرف
+        if (searchTerm && searchTerm.length > 0) {
             const name = (m.name || '').toLowerCase();
             const code = `${m.familyCode}-${m.memberCode}`.toLowerCase();
             const phone = (m.phone || '').toLowerCase();
-            if (!name.includes(searchTerm) && !code.includes(searchTerm) && !phone.includes(searchTerm)) return false;
+            const sector = (m.sector || '').toLowerCase();
+            
+            const foundInName = name.includes(searchTerm);
+            const foundInCode = code.includes(searchTerm);
+            const foundInPhone = phone.includes(searchTerm);
+            const foundInSector = sector.includes(searchTerm);
+            
+            if (!foundInName && !foundInCode && !foundInPhone && !foundInSector) {
+                return false;
+            }
         }
         
         if (status && m.status !== status) return false;
-        if (subscription === 'both' && !(m.hasAssociation && m.hasDeath)) return false;
-        if (subscription === 'association' && !(m.hasAssociation && !m.hasDeath)) return false;
-        if (subscription === 'death' && !(!m.hasAssociation && m.hasDeath)) return false;
+        if (relation && m.relation !== relation) return false;
+        if (type && m.memberType !== type) return false;
+        
+        if (subscription) {
+            const hasAssoc = m.hasAssociation || false;
+            const hasDeath = m.hasDeath || false;
+            if (subscription === 'both' && !(hasAssoc && hasDeath)) return false;
+            if (subscription === 'association' && !(hasAssoc && !hasDeath)) return false;
+            if (subscription === 'death' && !(hasDeath && !hasAssoc)) return false;
+            if (subscription === 'none' && (hasAssoc || hasDeath)) return false;
+        }
         
         return true;
     });
@@ -363,32 +517,110 @@ function applyFilters() {
     displayMembers();
 }
 
+function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterStatus').value = '';
+    document.getElementById('filterSubscription').value = '';
+    document.getElementById('filterRelation').value = '';
+    document.getElementById('filterType').value = '';
+    currentSector = 'all';
+    updateSectorButtons();
+    applyFilters();
+}
+
+function updateStats() {
+    const today = new Date();
+    let youngCount = 0, seniorCount = 0, activeCount = 0;
+    let bothCount = 0, assocCount = 0, deathCount = 0, newCount = 0;
+    
+    filteredMembers.forEach(m => {
+        if (m.status === 'active') activeCount++;
+        
+        if (m.birthDate) {
+            const birth = new Date(m.birthDate);
+            const age = today.getFullYear() - birth.getFullYear();
+            if (age < 30) youngCount++;
+            else if (age > 60) seniorCount++;
+        } else if (m.memberType === 'young') youngCount++;
+        else if (m.memberType === 'senior') seniorCount++;
+        
+        const hasAssoc = m.hasAssociation || false;
+        const hasDeath = m.hasDeath || false;
+        if (hasAssoc && hasDeath) bothCount++;
+        else if (hasAssoc) assocCount++;
+        else if (hasDeath) deathCount++;
+        
+        if (m.joinDate) {
+            const joinYear = new Date(m.joinDate).getFullYear();
+            if (joinYear >= 2024) newCount++;
+        }
+    });
+    
+    document.getElementById('totalCount').textContent = filteredMembers.length;
+    document.getElementById('activeCount').textContent = activeCount;
+    document.getElementById('youngCount').textContent = youngCount;
+    document.getElementById('seniorCount').textContent = seniorCount;
+    document.getElementById('bothCount').textContent = bothCount;
+    document.getElementById('assocCount').textContent = assocCount;
+    document.getElementById('deathCount').textContent = deathCount;
+    document.getElementById('newCount').textContent = newCount;
+}
+
+function setView(view) {
+    currentView = view;
+    document.getElementById('viewIndividual').classList.toggle('active', view === 'individual');
+    document.getElementById('viewFamily').classList.toggle('active', view === 'family');
+    displayMembers();
+}
+
 function displayMembers() {
     const container = document.getElementById('membersList');
-    document.getElementById('resultsCount').textContent = `عرض ${filteredMembers.length} من أصل ${allMembers.length} عضو`;
+    const resultsCount = document.getElementById('resultsCount');
+    
+    resultsCount.textContent = `عرض ${filteredMembers.length} من ${allMembers.length} عضو`;
     
     if (filteredMembers.length === 0) {
-        container.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">لا توجد نتائج</p>';
+        container.innerHTML = '<p style="text-align:center;color:#999;padding:30px;">لا توجد نتائج</p>';
         return;
     }
     
+    if (currentView === 'family') {
+        displayFamilyView(container);
+    } else {
+        displayIndividualView(container);
+    }
+}
+
+function displayIndividualView(container) {
     let html = '';
     filteredMembers.forEach(m => {
         const fullCode = `${m.familyCode}-${m.memberCode}`;
-        const statusColors = {'active':'#27ae60','exempt':'#f39c12','suspended':'#e67e22','withdrawn':'#95a5a6','deceased':'#34495e'};
+        
+        const statusColors = {
+            'active': '#27ae60', 'exempt': '#f39c12', 'suspended': '#e67e22',
+            'withdrawn': '#95a5a6', 'deceased': '#34495e'
+        };
         const statusColor = statusColors[m.status] || '#667eea';
-        const subIcon = (m.hasAssociation && m.hasDeath) ? '🔵🔴' : (m.hasAssociation ? '🔵' : (m.hasDeath ? '🔴' : '⚪'));
+        const statusText = {'active':'نشط','exempt':'معفي','suspended':'متوقف','withdrawn':'منسحب','deceased':'متوفي'}[m.status] || m.status;
+        
+        const subIcon = (m.hasAssociation && m.hasDeath) ? '🔵🔴' : 
+                       (m.hasAssociation ? '🔵' : (m.hasDeath ? '🔴' : '⚪'));
+        
+        const headBadge = m.relation === 'رب أسرة' ? '<span class="badge badge-head">رب</span>' : '';
         
         html += `
             <div class="member-card">
-                <div class="info" onclick="viewMember('${m.id}')">
-                    <div class="name">${m.name} ${m.relation === 'رب أسرة' ? '<span class="badge badge-head">رب</span>' : ''}</div>
-                    <div class="details">${fullCode} • ${m.sector||'-'} • ${subIcon}</div>
+                <div class="color-bar" style="background:${statusColor};"></div>
+                <div class="info">
+                    <div class="name">${m.name} ${headBadge}</div>
+                    <div class="details">${fullCode} • ${m.sector||'-'} • ${subIcon} • ${m.memberAge||'-'}سنة</div>
                 </div>
                 <div class="actions">
-                    <button class="btn-small btn-warning" onclick="editMember('${m.id}')">✏️</button>
-                    <button class="btn-small btn-danger" onclick="deleteMember('${m.id}')">🗑️</button>
+                    <span class="badge" style="background:${statusColor};color:white;">${statusText}</span>
                     ${m.phone ? `<button class="whatsapp-btn" onclick="sendWhatsApp('${m.phone}','${m.name}')">📱</button>` : ''}
+                    <button class="btn btn-info btn-small" onclick="viewMember('${m.id}')">👁️</button>
+                    <button class="btn btn-warning btn-small" onclick="editMember('${m.id}')">✏️</button>
+                    <button class="btn btn-danger btn-small" onclick="deleteMember('${m.id}')">️</button>
                 </div>
             </div>
         `;
@@ -396,117 +628,202 @@ function displayMembers() {
     container.innerHTML = html;
 }
 
-function updateStats() {
-    let active = 0, young = 0, senior = 0, both = 0;
+function displayFamilyView(container) {
+    const families = {};
     filteredMembers.forEach(m => {
-        if (m.status === 'active') active++;
-        if (m.memberType === 'young' || m.memberAge < 30) young++;
-        if (m.memberType === 'senior' || m.memberAge > 60) senior++;
-        if (m.hasAssociation && m.hasDeath) both++;
+        if (!families[m.familyCode]) families[m.familyCode] = [];
+        families[m.familyCode].push(m);
     });
-    document.getElementById('totalCount').textContent = filteredMembers.length;
-    document.getElementById('activeCount').textContent = active;
-    document.getElementById('youngCount').textContent = young;
-    document.getElementById('seniorCount').textContent = senior;
-    document.getElementById('bothCount').textContent = both;
-}
-
-function editMember(id) {
-    const m = allMembers.find(x => x.id === id);
-    if (!m) return;
-    document.getElementById('modalTitle').textContent = 'تعديل بيانات عضو';
-    document.getElementById('memberId').value = id;
-    document.getElementById('familyCode').value = m.familyCode || '';
-    document.getElementById('memberCode').value = m.memberCode || '';
-    document.getElementById('memberName').value = m.name || '';
-    document.getElementById('birthDate').value = m.birthDate || '';
-    document.getElementById('memberAge').value = m.memberAge || '';
-    document.getElementById('relation').value = m.relation || 'رب أسرة';
-    document.getElementById('memberSector').value = m.sector || 'الحارة 1';
-    document.getElementById('memberPhone').value = m.phone || '';
-    document.getElementById('subAssociation').checked = m.hasAssociation || false;
-    document.getElementById('subDeath').checked = m.hasDeath || false;
-    document.getElementById('memberStatus').value = m.status || 'active';
-    document.getElementById('memberModal').classList.add('active');
-}
-
-function deleteMember(id) {
-    if (confirm('هل أنت متأكد من حذف هذا العضو؟')) {
-        db.collection('members').doc(id).delete().then(() => {
-            alert('تم الحذف بنجاح');
-            loadMembers();
+    
+    let html = '';
+    Object.keys(families).sort().forEach(familyCode => {
+        const members = families[familyCode];
+        const head = members.find(m => m.relation === 'رب أسرة');
+        const familyName = head ? head.name : familyCode;
+        
+        html += `<div class="family-group">`;
+        html += `<h4>‍👩‍👧‍👦 ${familyCode} - ${familyName} (${members.length})</h4>`;
+        
+        members.forEach(m => {
+            const fullCode = `${m.familyCode}-${m.memberCode}`;
+            const subText = (m.hasAssociation && m.hasDeath) ? 'مزدوج' : 
+                           (m.hasAssociation ? 'جمعية' : (m.hasDeath ? 'وفاة' : '-'));
+            const headBadge = m.relation === 'رب أسرة' ? '<span class="badge badge-head">رب</span>' : '';
+            
+            html += `
+                <div class="family-member">
+                    <strong>${m.name}</strong> ${headBadge}
+                    <span class="badge badge-active">${m.status === 'active' ? 'نشط' : m.status}</span>
+                    <small>${fullCode} | ${subText} | 📱 ${m.phone || '-'}</small>
+                    <div style="margin-top:4px;">
+                        <button class="btn btn-info btn-small" onclick="viewMember('${m.id}')">️</button>
+                        <button class="btn btn-warning btn-small" onclick="editMember('${m.id}')">✏️</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteMember('${m.id}')">🗑️</button>
+                    </div>
+                </div>
+            `;
         });
-    }
+        
+        html += `</div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+function exportToExcel() {
+    const data = filteredMembers.map(m => ({
+        'كود الأسرة': m.familyCode,
+        'كود الفرد': m.memberCode,
+        'الاسم': m.name,
+        'صلة القرابة': m.relation,
+        'القطاع': m.sector,
+        'الهاتف': m.phone,
+        'تاريخ الميلاد': m.birthDate,
+        'العمر': m.memberAge,
+        'نوع العضو': m.memberType,
+        'تاريخ الانضمام': m.joinDate,
+        'مشترك جمعية': m.hasAssociation ? 'نعم' : 'لا',
+        'مشترك وفاة': m.hasDeath ? 'نعم' : 'لا',
+        'حالة_العضو': {'active':'نشط','exempt':'معفي','suspended':'متوقف','withdrawn':'منسحب','deceased':'متوفي'}[m.status] || m.status,
+        'ملاحظات': m.notes
+    }));
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'الأعضاء');
+    XLSX.writeFile(wb, `أعضاء_${new Date().toISOString().split('T')[0]}.xlsx`);
+    alert(`✅ تم تصدير ${data.length} عضو`);
+}
+
+function sendWhatsApp(phone, name) {
+    const message = `مرحباً ${name}،\n\nهذه رسالة من نظام إدارة الجمعية.`;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
 }
 
 function openAddMemberModal() {
     document.getElementById('modalTitle').textContent = 'إضافة عضو جديد';
     document.getElementById('memberForm').reset();
     document.getElementById('memberId').value = '';
+    document.getElementById('joinDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('memberSector').value = currentSector !== 'all' ? currentSector : 'الحارة 1';
     document.getElementById('memberModal').classList.add('active');
 }
 
-function closeMemberModal() { document.getElementById('memberModal').classList.remove('active'); }
+function closeMemberModal() {
+    document.getElementById('memberModal').classList.remove('active');
+}
 
-function saveMember(e) {
-    e.preventDefault();
-    const id = document.getElementById('memberId').value;
-    const data = {
+function saveMember(event) {
+    event.preventDefault();
+    
+    const memberId = document.getElementById('memberId').value;
+    const memberData = {
         familyCode: document.getElementById('familyCode').value,
         memberCode: document.getElementById('memberCode').value,
         name: document.getElementById('memberName').value,
         birthDate: document.getElementById('birthDate').value,
         memberAge: parseInt(document.getElementById('memberAge').value) || 0,
+        memberType: document.getElementById('memberType').value,
         relation: document.getElementById('relation').value,
         sector: document.getElementById('memberSector').value,
         phone: document.getElementById('memberPhone').value,
+        email: document.getElementById('memberEmail').value,
+        address: document.getElementById('memberAddress').value,
+        job: document.getElementById('memberJob').value,
+        joinDate: document.getElementById('joinDate').value,
         hasAssociation: document.getElementById('subAssociation').checked,
         hasDeath: document.getElementById('subDeath').checked,
+        associationDate: document.getElementById('associationDate').value,
+        deathDate: document.getElementById('deathDate').value,
         status: document.getElementById('memberStatus').value,
+        notes: document.getElementById('memberNotes').value,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
     
-    const action = id ? db.collection('members').doc(id).update(data) : db.collection('members').add(data);
-    action.then(() => {
-        alert('تم الحفظ بنجاح');
+    const savePromise = memberId 
+        ? db.collection('members').doc(memberId).update(memberData)
+        : db.collection('members').add({...memberData, createdAt: firebase.firestore.FieldValue.serverTimestamp()});
+    
+    savePromise.then(() => {
+        alert('✅ تم الحفظ بنجاح');
         closeMemberModal();
         loadMembers();
+    }).catch(error => {
+        alert('❌ خطأ: ' + error.message);
     });
 }
 
-function doSearch() { applyFilters(); }
-function selectSector(s) { currentSector = s; updateSectorButtons(); applyFilters(); }
-function updateSectorButtons() {
-    ['all', 'الحارة 1', 'الحارة 2', 'الوادي', 'المنصورة', 'الجبل', 'دمر'].forEach(s => {
-        const btn = document.getElementById(`sector-${s}`);
-        if (btn) btn.classList.toggle('active', s === currentSector);
+function viewMember(memberId) {
+    const m = allMembers.find(x => x.id === memberId);
+    if (!m) return;
+    
+    const fullCode = `${m.familyCode}-${m.memberCode}`;
+    const subText = (m.hasAssociation && m.hasDeath) ? 'مزدوج' : 
+                   (m.hasAssociation ? 'جمعية' : (m.hasDeath ? 'وفاة' : 'غير مشترك'));
+    
+    alert(`
+👤 ${m.name}
+🔑 ${fullCode}
+🏢 ${m.sector || '-'} | 👥 ${m.relation || '-'}
+🎂 ${m.birthDate || '-'} (${m.memberAge || '-'} سنة)
+📱 ${m.phone || '-'}
+📧 ${m.email || '-'}
+📋 الاشتراك: ${subText}
+📅 الانضمام: ${m.joinDate || '-'}
+📊 الحالة: ${m.status}
+📝 ${m.notes || 'لا ملاحظات'}
+    `.trim());
+}
+
+function editMember(memberId) {
+    const m = allMembers.find(x => x.id === memberId);
+    if (!m) return;
+    
+    document.getElementById('modalTitle').textContent = 'تعديل عضو';
+    document.getElementById('memberId').value = memberId;
+    document.getElementById('familyCode').value = m.familyCode || '';
+    document.getElementById('memberCode').value = m.memberCode || '';
+    document.getElementById('memberName').value = m.name || '';
+    document.getElementById('birthDate').value = m.birthDate || '';
+    document.getElementById('memberAge').value = m.memberAge || '';
+    document.getElementById('memberType').value = m.memberType || 'normal';
+    document.getElementById('relation').value = m.relation || 'رب أسرة';
+    document.getElementById('memberSector').value = m.sector || 'الحارة 1';
+    document.getElementById('memberPhone').value = m.phone || '';
+    document.getElementById('memberEmail').value = m.email || '';
+    document.getElementById('memberAddress').value = m.address || '';
+    document.getElementById('memberJob').value = m.job || '';
+    document.getElementById('joinDate').value = m.joinDate || '';
+    document.getElementById('subAssociation').checked = m.hasAssociation || false;
+    document.getElementById('subDeath').checked = m.hasDeath || false;
+    document.getElementById('associationDate').value = m.associationDate || '';
+    document.getElementById('deathDate').value = m.deathDate || '';
+    document.getElementById('memberStatus').value = m.status || 'active';
+    document.getElementById('memberNotes').value = m.notes || '';
+    document.getElementById('memberModal').classList.add('active');
+}
+
+function deleteMember(memberId) {
+    if (!confirm('هل أنت متأكد من حذف هذا العضو؟')) return;
+    
+    db.collection('members').doc(memberId).delete()
+        .then(() => {
+            allMembers = allMembers.filter(m => m.id !== memberId);
+            applyFilters();
+            alert('✅ تم الحذف');
+        })
+        .catch(error => {
+            alert('❌ خطأ: ' + error.message);
+        });
+}
+
+document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('active');
     });
-}
-function calculateAge() {
-    const b = new Date(document.getElementById('birthDate').value);
-    if (!isNaN(b)) document.getElementById('memberAge').value = new Date().getFullYear() - b.getFullYear();
-}
-function resetFilters() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('filterStatus').value = '';
-    document.getElementById('filterSubscription').value = '';
-    currentSector = 'all';
-    updateSectorButtons();
-    applyFilters();
-}
-function viewMember(id) {
-    const m = allMembers.find(x => x.id === id);
-    if (m) alert(`👤 ${m.name}\n🔑 ${m.familyCode}-${m.memberCode}\n🏢 القطاع: ${m.sector}\n📱 الهاتف: ${m.phone||'-'}`);
-}
-function sendWhatsApp(phone, name) {
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent('مرحباً ' + name)}`, '_blank');
-}
-function exportToExcel() {
-    const ws = XLSX.utils.json_to_sheet(filteredMembers);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "الأعضاء");
-    XLSX.writeFile(wb, "members.xlsx");
-}
+});
 </script>
+
 </body>
 </html>
