@@ -138,8 +138,11 @@
   <section id="familyTab" class="tab-content">
     <div class="card">
       <div class="filters">
-        <input id="familySearch" placeholder="ابحث باسم الفرد أو كود الأسرة" oninput="drawFamilyTree()">
-        <button onclick="drawFamilyTree()">تحديث الشجرة</button>
+        <!-- تم التغيير هنا إلى قائمة منسدلة بدلاً من الكتابة -->
+        <select id="familySelect" onchange="drawFamilyTreeFromSelect()" style="min-width: 300px;">
+          <option value="">-- اختر فرداً لعرض شجرته --</option>
+        </select>
+        <button onclick="drawFamilyTreeFromSelect()">عرض الشجرة</button>
       </div>
       <div id="familyTree"></div>
     </div>
@@ -156,7 +159,7 @@
 
 <script>
 "use strict";
-const STORAGE_KEY = "zaoura_manager_v3";
+const STORAGE_KEY = "zaoura_manager_final";
 let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { people: [], cemeteries: [], graves: [], burials: [] };
 
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); renderAll(); }
@@ -169,14 +172,16 @@ function normalizeHeader(value) {
 
 function cleanName(value) { return String(value ?? "").trim().replace(/\s+/g, " ").replace(/[أإآ]/g, "ا").replace(/ة/g, "ه"); }
 
-function val(obj, ...names) {
-  if (!obj) return "";
-  const normalized = {};
-  for (const key of Object.keys(obj)) normalized[normalizeHeader(key)] = obj[key];
-  for (const name of names) {
-    const key = normalizeHeader(name);
-    if (normalized[key] !== undefined && normalized[key] !== null && String(normalized[key]).trim() !== "") {
-      return normalized[key];
+// دالة استخراج القيم بدقة بناءً على رؤوس الأعمدة التي زودتني بها
+function getVal(row, ...possibleNames) {
+  if (!row) return "";
+  for (const name of possibleNames) {
+    const normalizedTarget = normalizeHeader(name);
+    for (const key of Object.keys(row)) {
+      if (normalizeHeader(key) === normalizedTarget) {
+        const val = String(row[key]).trim();
+        if (val) return val;
+      }
     }
   }
   return "";
@@ -239,12 +244,18 @@ document.querySelectorAll(".tab").forEach(button => {
     document.querySelectorAll(".tab-content").forEach(x => x.classList.remove("active"));
     button.classList.add("active");
     document.getElementById(button.dataset.tab).classList.add("active");
-    if (button.dataset.tab === "familyTab") drawFamilyTree();
+    if (button.dataset.tab === "familyTab") {
+      populateFamilyDropdown();
+      drawFamilyTreeFromSelect();
+    }
   });
 });
 
 // --- Rendering ---
-function renderAll() { renderPeople(); renderCemeteries(); renderGraves(); renderBurials(); drawFamilyTree(); }
+function renderAll() { 
+  renderPeople(); renderCemeteries(); renderGraves(); renderBurials(); 
+  populateFamilyDropdown();
+}
 
 function renderPeople() {
   const search = document.getElementById("peopleSearch").value;
@@ -279,46 +290,60 @@ function renderBurials() {
   document.getElementById("burialsTable").innerHTML = list.length ? `<div class="table-wrap"><table><thead><tr><th>المتوفى</th><th>رقم القبر</th><th>تاريخ الوفاة</th><th>تاريخ الدفن</th><th>المصدر</th><th>إجراء</th></tr></thead><tbody>${list.map(b => `<tr><td>${esc(b.personName)}</td><td>${esc(b.graveNumber)}</td><td>${esc(b.deathDate || "-")}</td><td>${esc(b.burialDate)}</td><td>${esc(b.source)}</td><td>${actionButtons("burial", b.id)}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">لا توجد بيانات</div>`;
 }
 
-// --- Family Tree ---
-function drawFamilyTree() {
-  const search = document.getElementById("familySearch").value;
-  const container = document.getElementById("familyTree");
-  if (!search) { container.innerHTML = `<div class="notice">اكتب اسم الفرد أو كود الأسرة للبحث وعرض الشجرة</div>`; return; }
-  
-  const matchesPeople = data.people.filter(p => matches(`${p.name} ${p.familyCode}`, search));
-  if (!matchesPeople.length) { container.innerHTML = `<div class="empty">لا توجد نتائج</div>`; return; }
-
-  let html = "";
-  matchesPeople.forEach(p => {
-    const father = data.people.find(x => x.id === p.father);
-    const mother = data.people.find(x => x.id === p.mother);
-    const children = data.people.filter(x => x.father === p.id || x.mother === p.id);
-    
-    const node = (person, sel = false) => person ? `<div class="person-node ${person.gender === 'أنثى' ? 'female' : 'male'} ${sel ? 'selected' : ''}" onclick="editItem('person', ${person.id})">
-      <div style="font-size:20px">${person.gender === 'أنثى' ? '👩' : '👨'}</div>
-      <strong>${esc(person.name)}</strong><br>
-      <small>${esc(person.relation || '')} | ${calculateAge(person.birth, person.death)} سنة<br>${badge(person.status)}</small>
-    </div>` : "";
-
-    html += `<div class="card family-tree">`;
-    if (father || mother) html += `<div class="children" style="border:none; padding:0; margin:0">${node(father)} ${node(mother)}</div>`;
-    html += node(p, true);
-    if (children.length) {
-      html += `<div class="children">`;
-      const groups = {};
-      children.forEach(c => (groups[c.mother || "غير محدد"] = groups[c.mother || "غير محدد"] || []).push(c));
-      Object.entries(groups).forEach(([momId, kids]) => {
-        const mom = momId !== "غير محدد" ? data.people.find(x => x.id == momId) : null;
-        html += `<div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px dashed #cbd5e1">`;
-        if (mom) html += `<div style="font-size:12px; color:#64748b; margin-bottom:8px; text-align:center">من الزوجة: ${esc(mom.name)}</div>`;
-        html += `<div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center">`;
-        kids.forEach(k => { html += node(k); });
-        html += `</div></div>`;
-      });
-      html += `</div>`;
-    }
-    html += `</div>`;
+// --- Family Tree Dropdown & Rendering ---
+function populateFamilyDropdown() {
+  const select = document.getElementById("familySelect");
+  const currentVal = select.value;
+  select.innerHTML = '<option value="">-- اختر فرداً لعرض شجرته --</option>';
+  data.people.forEach(p => {
+    const option = document.createElement("option");
+    option.value = p.id;
+    option.textContent = `${p.name} (${p.familyCode || 'بدون كود'})`;
+    select.appendChild(option);
   });
+  select.value = currentVal;
+}
+
+function drawFamilyTreeFromSelect() {
+  const selectedId = document.getElementById("familySelect").value;
+  const container = document.getElementById("familyTree");
+  
+  if (!selectedId) { 
+    container.innerHTML = `<div class="notice">الرجاء اختيار فرد من القائمة أعلاه لعرض شجرته</div>`; 
+    return; 
+  }
+  
+  const p = data.people.find(x => String(x.id) === String(selectedId));
+  if (!p) { container.innerHTML = `<div class="empty">لم يتم العثور على الفرد</div>`; return; }
+
+  const father = data.people.find(x => x.id === p.father);
+  const mother = data.people.find(x => x.id === p.mother);
+  const children = data.people.filter(x => String(x.father) === String(p.id) || String(x.mother) === String(p.id));
+  
+  const node = (person, sel = false) => person ? `<div class="person-node ${person.gender === 'أنثى' ? 'female' : 'male'} ${sel ? 'selected' : ''}" onclick="editItem('person', ${person.id})">
+    <div style="font-size:20px">${person.gender === 'أنثى' ? '👩' : '👨'}</div>
+    <strong>${esc(person.name)}</strong><br>
+    <small>${esc(person.relation || '')} | ${calculateAge(person.birth, person.death)} سنة<br>${badge(person.status)}</small>
+  </div>` : "";
+
+  let html = `<div class="card family-tree">`;
+  if (father || mother) html += `<div class="children" style="border:none; padding:0; margin:0">${node(father)} ${node(mother)}</div>`;
+  html += node(p, true);
+  if (children.length) {
+    html += `<div class="children">`;
+    const groups = {};
+    children.forEach(c => (groups[c.mother || "غير محدد"] = groups[c.mother || "غير محدد"] || []).push(c));
+    Object.entries(groups).forEach(([momId, kids]) => {
+      const mom = momId !== "غير محدد" ? data.people.find(x => String(x.id) === String(momId)) : null;
+      html += `<div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px dashed #cbd5e1">`;
+      if (mom) html += `<div style="font-size:12px; color:#64748b; margin-bottom:8px; text-align:center">من الزوجة: ${esc(mom.name)}</div>`;
+      html += `<div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center">`;
+      kids.forEach(k => { html += node(k); });
+      html += `</div></div>`;
+    });
+    html += `</div>`;
+  }
+  html += `</div>`;
   container.innerHTML = html;
 }
 
@@ -480,7 +505,7 @@ function deleteItem(type, id) {
   save();
 }
 
-// --- Excel Import (محدث ليتطابق تماماً مع بياناتك) ---
+// --- Excel Import (مخصص بدقة لجداولك) ---
 document.getElementById("excelFile").addEventListener("change", function(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -488,101 +513,81 @@ document.getElementById("excelFile").addEventListener("change", function(e) {
   const reader = new FileReader();
   reader.onload = function(event) {
     try {
-      // cellDates: true يضمن قراءة تواريخ Excel بشكل صحيح
       const workbook = XLSX.read(event.target.result, { type: "array", cellDates: true });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
       
-      let importedBurials = 0, importedPeople = 0, importedGraves = 0, skipped = 0;
+      let importedPeople = 0, importedGraves = 0, skipped = 0;
 
       rows.forEach(row => {
-        const graveNumber = val(row, "رقم_القبر", "رقم القبر", "graveNumber");
-        const personName = val(row, "اسم_المتوفى_كامل", "اسم المتوفى", "الاسم", "personName");
-        const familyCode = val(row, "كود_الأسرة", "كود الأسرة", "familyCode");
+        // 1. محاولة استخراج بيانات الأفراد بناءً على الأعمدة الدقيقة التي زودتني بها
+        const familyCode = getVal(row, "كود الأسرة", "كود_الأسرة");
+        const memberCode = getVal(row, "رقم الفرد", "رقم_الفرد");
+        const personName = getVal(row, "الاسم الثلاثي", "الاسم");
         
-        // 1. استيراد سجلات الدفن (بناءً على نموذجك)
-        if (graveNumber && personName) {
-          const deathDate = normalizeExcelDate(val(row, "تاريخ_الوفاة", "deathDate"));
-          const burialDate = normalizeExcelDate(val(row, "تاريخ_الدفن", "burialDate"));
+        if (familyCode && personName) {
+          const birth = normalizeExcelDate(getVal(row, "تاريخ الميلاد", "تاريخ_الميلاد"));
           
-          // البحث عن القبر، وإذا لم يوجد ننشئه تلقائياً
-          let grave = data.graves.find(g => g.number === graveNumber);
-          if (!grave) {
-            grave = {
-              id: nextId(data.graves),
-              number: graveNumber,
-              cemeteryId: data.cemeteries[0]?.id || 1,
-              location: val(row, "اسم_المقبرة", "الموقع"),
-              type: "عام",
-              family: "",
-              owner: "",
-              status: "مشغول",
-              years: 10,
-              lastBuried: personName,
-              lastBurialDate: burialDate,
-              availableDate: burialDate ? dateAdd(burialDate, 10) : "",
-              notes: val(row, "ملاحظات")
-            };
-            data.graves.push(grave);
-            importedGraves++;
-          } else {
-            // تحديث القبر الموجود
-            grave.status = "مشغول";
-            grave.lastBuried = personName;
-            grave.lastBurialDate = burialDate;
-            grave.availableDate = burialDate ? dateAdd(burialDate, grave.years || 10) : "";
+          // منع التكرار
+          if (data.people.some(p => cleanName(p.name) === cleanName(personName) && p.birth === birth)) { 
+            skipped++; return; 
           }
-
-          // إنشاء سجل الدفن
-          data.burials.push({
-            id: nextId(data.burials),
-            graveId: grave.id,
-            graveNumber: graveNumber,
-            cemeteryName: val(row, "اسم_المقبرة", "cemeteryName"),
-            personName: personName,
-            personId: null,
-            deathDate: deathDate,
-            burialDate: burialDate,
-            age: val(row, "عمر_المتوفى", "age"),
-            source: val(row, "مصدر_المعلومة", "source"),
-            year: val(row, "العام", "year"),
-            notes: val(row, "ملاحظات", "notes")
-          });
-          importedBurials++;
-        }
-        
-        // 2. استيراد الأفراد (إذا كان الملف يحتوي على كود أسرة واسم)
-        else if (familyCode && personName) {
-          const birth = normalizeExcelDate(val(row, "تاريخ_الميلاد", "الميلاد", "birth"));
-          if (data.people.some(p => cleanName(p.name) === cleanName(personName) && p.birth === birth)) { skipped++; return; }
           
-          const fatherName = cleanName(val(row, "الأب", "اسم_الأب", "father"));
-          const motherName = cleanName(val(row, "الأم", "اسم_الأم", "mother"));
+          const fatherName = cleanName(getVal(row, "الأب", "اسم_الأب"));
+          const motherName = cleanName(getVal(row, "الأم", "اسم_الأم"));
           const fatherObj = data.people.find(p => cleanName(p.name) === fatherName);
           const motherObj = data.people.find(p => cleanName(p.name) === motherName);
 
           data.people.push({
             id: nextId(data.people),
             name: personName,
-            gender: val(row, "الجنس", "gender") || "ذكر",
+            gender: getVal(row, "الجنس") || "ذكر",
             birth: birth,
-            death: normalizeExcelDate(val(row, "تاريخ_الوفاة", "الوفاة", "death")),
+            death: normalizeExcelDate(getVal(row, "تاريخ الوفاة", "تاريخ_الوفاة")),
             familyCode: familyCode,
-            memberCode: val(row, "رقم_الفرد", "memberCode"),
-            sector: val(row, "القطاع", "sector"),
-            status: val(row, "الحالة", "حالة_العضو", "status") || "حي",
-            relation: val(row, "صلة_القرابة", "صلة القرابة", "relation"),
+            memberCode: memberCode,
+            sector: getVal(row, "القطاع"),
+            status: getVal(row, "الحالة", "حالة_العضو") || "حي",
+            relation: getVal(row, "صلة القرابة", "صلة_القرابة"),
             father: fatherObj ? fatherObj.id : null,
             mother: motherObj ? motherObj.id : null,
-            phone: val(row, "الهاتف", "الجوال", "phone"),
-            notes: val(row, "ملاحظات", "notes")
+            phone: getVal(row, "الجوال", "الهاتف"),
+            notes: getVal(row, "ملاحظات")
           });
           importedPeople++;
+        }
+        
+        // 2. محاولة استخراج بيانات القبور بناءً على الأعمدة الدقيقة
+        const graveNumber = getVal(row, "رقم_القبر", "رقم القبر");
+        if (graveNumber && !familyCode) { // التأكد من أنه ليس صف أفراد
+          if (data.graves.some(g => g.number === graveNumber)) { skipped++; return; }
+          
+          const lastBurialDate = normalizeExcelDate(getVal(row, "آخر_تاريخ_دفن", "آخر تاريخ دفن"));
+          // إزالة الرموز التعبيرية من حالة القبر (مثل ⚪ فارغ -> فارغ)
+          const rawStatus = getVal(row, "حالة_القبر", "الحالة_الحالية");
+          const cleanStatus = rawStatus.replace(/[^\u0600-\u06FF\s]/g, '').trim() || "فارغ";
+
+          data.graves.push({
+            id: nextId(data.graves),
+            number: graveNumber,
+            cemeteryId: data.cemeteries[0]?.id || 1,
+            location: getVal(row, "الموقع_الداخلي", "الموقع الداخلي"),
+            type: getVal(row, "نوع_القبر", "نوع القبر") || "عام",
+            family: getVal(row, "اسم_العائلة", "اسم العائلة"),
+            owner: getVal(row, "المالك"),
+            status: cleanStatus,
+            years: 10,
+            lastBuried: getVal(row, "آخر_مدفون", "آخر مدفون"),
+            lastBurialDate: lastBurialDate,
+            availableDate: lastBurialDate ? dateAdd(lastBurialDate, 10) : "",
+            notes: getVal(row, "ملاحظات_موثقة", "ملاحظات موثقة")
+          });
+          importedGraves++;
         }
       });
 
       save();
-      alert(`✅ تم الاستيراد بنجاح!\n📜 سجلات دفن: ${importedBurials}\n👥 أفراد: ${importedPeople}\n⚰️ قبور جديدة: ${importedGraves}\n⚠️ تم تخطي: ${skipped} (مكرر أو ناقص)`);
+      alert(`✅ تم الاستيراد بنجاح!\n👥 أفراد: ${importedPeople}\n⚰️ قبور: ${importedGraves}\n⚠️ تم تخطي: ${skipped} (مكرر أو ناقص)`);
       e.target.value = ""; 
     } catch (err) {
       console.error(err);
