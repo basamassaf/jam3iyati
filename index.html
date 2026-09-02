@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>نظام الأفراد والمدافن وشجرة العائلة</title>
+<!-- مكتبة Excel -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
@@ -56,7 +57,7 @@ tr:hover td { background: #f8fafc; }
 <body>
 
 <header>
-  <h1>🏛️ نظام إدارة الأفراد والمدافن وشجرة العائلة</h1>
+  <h1>🏛️ نظام إدارة الأفراد والمدافن</h1>
   <div>قرية زعورة - نظام متكامل ومحلي</div>
 </header>
 
@@ -105,7 +106,7 @@ tr:hover td { background: #f8fafc; }
       <div><label>تاريخ الميلاد</label><input type="date" id="personBirth"></div>
       <div><label>القطاع</label><select id="personSector"><option value="">اختر القطاع</option><option>الجبل</option><option>الحارة1</option><option>الحارة2</option><option>الوادي</option><option>المنصورة</option><option>دمر</option></select></div>
       <div><label>حالة العضو</label><select id="personStatus"><option value="حي">حي</option><option value="متوفى">متوفى</option><option value="معفي">معفي</option><option value="منسحب">منسحب</option></select></div>
-      <div><label>الأب</label><select id="personFather"><option value="">غير محدد</option></select></div9>
+      <div><label>الأب</label><select id="personFather"><option value="">غير محدد</option></select></div>
       <div><label>الأم</label><select id="personMother"><option value="">غير محدد</option></select></div>
     </div>
     <label>ملاحظات</label>
@@ -194,10 +195,11 @@ tr:hover td { background: #f8fafc; }
   <div class="card">
     <h2>📥 استيراد الأفراد من Excel</h2>
     <div class="info">
-      <b>تعليمات هامة:</b><br>
-      1. يجب أن يكون الصف الأول في ملف Excel يحتوي على عناوين الأعمدة.<br>
-      2. الأسماء المقبولة للأعمدة: <b>الاسم الثلاثي</b> (أو الاسم)، <b>كود الأسرة</b>، <b>رقم الفرد</b>، <b>الجنس</b>، <b>تاريخ الميلاد</b>، <b>القطاع</b>، <b>حالة_العضو</b> (أو الحالة)، <b>ملاحظات</b>.<br>
-      3. تأكد من فتح الصفحة مع اتصال بالإنترنت لتعمل مكتبة Excel.
+      <b>تعليمات هامة جداً لنجاح الاستيراد:</b><br>
+      1. يجب أن يكون الصف الأول في ملف Excel يحتوي على عناوين الأعمدة بالضبط كما يلي:<br>
+      <b>الاسم</b> | <b>الجنس</b> | <b>تاريخ الميلاد</b> | <b>كود الأسرة</b> | <b>رقم الفرد</b> | <b>القطاع</b> | <b>الحالة</b> | <b>ملاحظات</b><br>
+      2. تأكد من حفظ الملف بصيغة <b>.xlsx</b><br>
+      3. تأكد من وجود اتصال بالإنترنت لتعمل مكتبة المعالجة.
     </div>
     <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="margin: 15px 0;">
     <br>
@@ -224,11 +226,11 @@ function newId() {
   return Date.now() + Math.floor(Math.random() * 100000);
 }
 
-function openPage(pageId, button) {
+function openPage(pageId, btn) {
   document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
   document.getElementById(pageId).classList.add("active");
-  document.querySelectorAll("nav button").forEach(btn => btn.classList.remove("active"));
-  button.classList.add("active");
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
   renderAll();
 }
 
@@ -240,7 +242,7 @@ function getCemeteryName(cemeteryId) { const c = getCemetery(cemeteryId); return
 // ================= الأفراد =================
 function savePerson() {
   const name = document.getElementById("personName").value.trim();
-  if (!name) { alert("اكتب اسم الفرد"); return; }
+  if (!name) { alert("⚠️ الرجاء كتابة اسم الفرد"); return; }
 
   const personData = {
     name: name,
@@ -352,7 +354,7 @@ function renderPeople() {
 // ================= المدافن =================
 function addCemetery() {
   const name = document.getElementById("cemeteryName").value.trim();
-  if (!name) { alert("اكتب اسم المدفن"); return; }
+  if (!name) { alert("⚠️ اكتب اسم المدفن"); return; }
   data.cemeteries.push({ id: newId(), name: name });
   document.getElementById("cemeteryName").value = "";
   saveData();
@@ -378,7 +380,7 @@ function renderCemeteries() {
 function saveGrave() {
   const number = document.getElementById("graveNumber").value.trim();
   const cemeteryId = document.getElementById("graveCemetery").value;
-  if (!number || !cemeteryId) { alert("أدخل رقم القبر واختر المدفن"); return; }
+  if (!number || !cemeteryId) { alert("⚠️ أدخل رقم القبر واختر المدفن"); return; }
 
   const graveData = {
     number: number,
@@ -395,7 +397,6 @@ function saveGrave() {
     const index = data.graves.findIndex(g => g.id == editId);
     if (index !== -1) {
       graveData.id = editId;
-      // الحفاظ على availableDate إذا كان مشغولاً
       graveData.availableDate = data.graves[index].availableDate;
       data.graves[index] = graveData;
     }
@@ -479,11 +480,11 @@ function addBurial() {
   const personId = document.getElementById("burialPerson").value;
   const graveId = document.getElementById("burialGrave").value;
   const burialDate = document.getElementById("burialDate").value;
-  if (!personId || !graveId || !burialDate) { alert("أكمل جميع بيانات الدفن"); return; }
+  if (!personId || !graveId || !burialDate) { alert("⚠️ أكمل جميع بيانات الدفن"); return; }
 
   const grave = data.graves.find(g => g.id == graveId);
   if (!grave) { alert("القبر غير موجود"); return; }
-  if (grave.status === "مشغول") { alert("هذا القبر مشغول حالياً"); return; }
+  if (grave.status === "مشغول") { alert("⚠️ هذا القبر مشغول حالياً"); return; }
 
   const date = new Date(burialDate);
   date.setFullYear(date.getFullYear() + grave.years);
@@ -493,12 +494,8 @@ function addBurial() {
   grave.status = "مشغول";
   grave.availableDate = availableDate;
   
-  // تحديث حالة الشخص إلى متوفى تلقائياً
   const person = getPerson(personId);
-  if(person) {
-      person.status = "متوفى";
-      person.birth = person.birth || ""; 
-  }
+  if(person) person.status = "متوفى";
 
   saveData();
   alert("✅ تم حفظ سجل الدفن وتحديث حالة القبر والفرد");
@@ -585,8 +582,6 @@ function renderFamilyTree() {
 // ================= أدوات عامة =================
 function deleteRecord(type, recordId) {
   if (!confirm("⚠️ هل أنت متأكد من حذف هذا السجل نهائياً؟")) return;
-  
-  // إذا كان حذف قبر، يجب تحرير سجلات الدفن المرتبطة به (اختياري، هنا سنحذف السجل فقط)
   data[type] = data[type].filter(item => item.id != recordId);
   saveData();
 }
@@ -616,19 +611,19 @@ function downloadBackup() {
   const file = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(file);
-  link.download = `نسخة_احتياطية_زعورة_${new Date().toISOString().slice(0,10)}.json`;
+  link.download = `نسخة_احتياطية_${new Date().toISOString().slice(0,10)}.json`;
   link.click();
 }
 
 function restoreBackup() {
   const file = document.getElementById("backupFile").files[0];
-  if (!file) { alert("اختر ملف النسخة الاحتياطية أولاً"); return; }
+  if (!file) { alert("⚠️ اختر ملف النسخة الاحتياطية أولاً"); return; }
   const reader = new FileReader();
   reader.onload = function(event) {
     try {
       const restored = JSON.parse(event.target.result);
       if (!restored.people || !restored.cemeteries || !restored.graves || !restored.burials) {
-        alert("ملف النسخة الاحتياطية تالف أو غير صحيح");
+        alert("❌ ملف النسخة الاحتياطية تالف أو غير صحيح");
         return;
       }
       data = restored;
@@ -640,17 +635,23 @@ function restoreBackup() {
 }
 
 function deleteAllData() {
-  if (!confirm("⚠️ تحذير: سيتم حذف جميع البيانات نهائياً ولا يمكن استرجاعها إلا عبر النسخة الاحتياطية. هل أنت متأكد؟")) return;
+  if (!confirm("⚠️ تحذير: سيتم حذف جميع البيانات نهائياً. هل أنت متأكد؟")) return;
   data = { people: [], cemeteries: [], graves: [], burials: [] };
   saveData();
   alert("تم حذف جميع البيانات");
 }
 
-// ================= استيراد Excel المطور =================
+// ================= استيراد Excel المطور والآمن =================
 function importExcel() {
   const file = document.getElementById("excelFile").files[0];
-  if (!file) { alert("الرجاء اختيار ملف Excel أولاً"); return; }
-  if (typeof XLSX === "undefined") { alert("لم يتم تحميل مكتبة Excel. تأكد من وجود اتصال بالإنترنت."); return; }
+  if (!file) { alert("⚠️ الرجاء اختيار ملف Excel أولاً"); return; }
+  
+  if (typeof XLSX === "undefined") { 
+    alert("❌ لم يتم تحميل مكتبة Excel. تأكد من وجود اتصال بالإنترنت."); 
+    return; 
+  }
+
+  alert("جاري معالجة الملف، يرجى الانتظار...");
 
   const reader = new FileReader();
   reader.onload = function(event) {
@@ -659,29 +660,32 @@ function importExcel() {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-      if (!rows.length) { alert("الملف فارغ أو لا يحتوي على بيانات"); return; }
+      if (!rows || rows.length === 0) { 
+        alert("⚠️ الملف فارغ أو لا يحتوي على بيانات"); 
+        return; 
+      }
 
       let addedCount = 0;
       let skippedCount = 0;
 
       rows.forEach(row => {
-        // البحث المرن عن اسم العمود
-        const name = String(row["الاسم الثلاثي"] || row["الاسم"] || row["name"] || "").trim();
+        // البحث المرن عن اسم العمود بأسماء متعددة محتملة
+        const name = String(row["الاسم"] || row["الاسم الثلاثي"] || row["name"] || "").trim();
         if (!name) { skippedCount++; return; }
 
         const fatherName = String(row["الأب"] || row["اسم الأب"] || "").trim();
         const motherName = String(row["الأم"] || row["اسم الأم"] || "").trim();
         
-        // البحث عن الأب والأم بالاسم لربطهم تلقائياً إذا كانوا موجودين
         const father = fatherName ? data.people.find(p => p.name.trim() === fatherName) : null;
         const mother = motherName ? data.people.find(p => p.name.trim() === motherName) : null;
 
-        // منع التكرار
         const birth = String(row["تاريخ الميلاد"] || row["الميلاد"] || "").trim();
+        
+        // منع التكرار
         const exists = data.people.find(p => p.name === name && p.birth === birth);
         if (exists) { skippedCount++; return; }
 
-        let status = String(row["حالة_العضو"] || row["الحالة"] || row["status"] || "حي").trim();
+        let status = String(row["الحالة"] || row["حالة_العضو"] || row["status"] || "حي").trim();
         if(status !== "حي" && status !== "متوفى" && status !== "معفي" && status !== "منسحب") status = "حي";
 
         data.people.push({
@@ -702,13 +706,13 @@ function importExcel() {
 
       saveData();
       let msg = `✅ تم استيراد ${addedCount} فرد بنجاح.`;
-      if (skippedCount > 0) msg += `\n⚠️ تم تخطي ${skippedCount} صف (فارغة أو مكررة).`;
+      if (skippedCount > 0) msg += `\n⚠️ تم تخطي ${skippedCount} صف (إما فارغة، مكررة، أو تفتقد لاسم).`;
       alert(msg);
       document.getElementById("excelFile").value = "";
 
     } catch (error) {
       console.error(error);
-      alert("❌ حدث خطأ أثناء قراءة الملف. تأكد من أنه ملف Excel صالح.");
+      alert("❌ حدث خطأ أثناء قراءة الملف. تأكد من أنه ملف Excel صالح (.xlsx)");
     }
   };
   reader.readAsArrayBuffer(file);
@@ -726,6 +730,6 @@ function renderAll() {
 
 // تشغيل عند البدء
 renderAll();
-</9>
+</script>
 </body>
 </html>
