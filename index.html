@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>نظام إدارة قرية زعورة v3.0</title>
+<title>نظام إدارة قرية زعورة v4.0</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -25,6 +25,7 @@
   --danger: #ef4444;
   --warning: #f59e0b;
   --info: #3b82f6;
+  --gray: #94a3b8;
 }
 [data-theme="dark"] {
   --bg: #0f172a;
@@ -41,29 +42,31 @@ body {
   transition: 0.3s;
   direction: rtl;
   font-size: 14px;
+  line-height: 1.6;
 }
 header {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: #fff;
-  padding: 16px 24px;
+  padding: 12px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   position: sticky;
   top: 0;
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
-header h1 { font-size: 22px; display: flex; align-items: center; gap: 10px; }
+header h1 { font-size: 20px; display: flex; align-items: center; gap: 8px; }
+header .header-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 nav {
   display: flex;
-  gap: 4px;
+  gap: 2px;
   background: var(--card);
-  padding: 8px 12px;
+  padding: 6px 10px;
   position: sticky;
-  top: 66px;
+  top: 60px;
   z-index: 999;
   border-bottom: 2px solid var(--border);
   overflow-x: auto;
@@ -73,17 +76,18 @@ nav {
 nav button {
   border: 0;
   background: transparent;
-  padding: 8px 16px;
-  border-radius: 10px;
+  padding: 6px 12px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px;
   transition: 0.3s;
   white-space: nowrap;
   color: var(--text);
+  position: relative;
 }
 nav button:hover { background: var(--bg); transform: translateY(-2px); }
-nav button.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(15,118,110,0.3); }
+nav button.active { background: var(--primary); color: #fff; }
 nav button .badge {
   position: absolute;
   top: -4px;
@@ -91,44 +95,44 @@ nav button .badge {
   background: var(--danger);
   color: #fff;
   border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 10px;
-  min-width: 18px;
+  padding: 1px 5px;
+  font-size: 9px;
+  min-width: 16px;
 }
-main { max-width: 1600px; margin: auto; padding: 16px; }
+main { max-width: 1600px; margin: auto; padding: 10px; }
 .page { display: none; animation: fade 0.3s; }
 .page.active { display: block; }
-@keyframes fade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 16px;
+  padding: 14px;
+  margin-bottom: 12px;
   box-shadow: var(--shadow);
   transition: 0.3s;
 }
-.card:hover { box-shadow: 0 8px 30px rgba(15,118,110,0.2); }
+.card:hover { box-shadow: 0 8px 30px rgba(15,118,110,0.15); }
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
-.card-header h2 { font-size: 18px; display: flex; align-items: center; gap: 8px; color: var(--primary-dark); }
+.card-header h2 { font-size: 16px; display: flex; align-items: center; gap: 6px; color: var(--primary-dark); }
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
 }
 .stat-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px;
+  padding: 12px;
   text-align: center;
   transition: 0.3s;
   cursor: pointer;
@@ -140,13 +144,13 @@ main { max-width: 1600px; margin: auto; padding: 16px; }
   position: absolute;
   top: 0;
   right: 0;
-  width: 4px;
+  width: 3px;
   height: 100%;
   background: var(--primary);
 }
-.stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
-.stat-card .value { font-size: 28px; font-weight: bold; color: var(--primary); }
-.stat-card .label { font-size: 12px; opacity: 0.7; }
+.stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.stat-card .value { font-size: 22px; font-weight: bold; color: var(--primary); }
+.stat-card .label { font-size: 11px; opacity: 0.7; }
 .stat-card.green .value { color: var(--success); }
 .stat-card.red .value { color: var(--danger); }
 .stat-card.orange .value { color: var(--warning); }
@@ -155,41 +159,41 @@ main { max-width: 1600px; margin: auto; padding: 16px; }
 .stat-card.red::before { background: var(--danger); }
 .stat-card.orange::before { background: var(--warning); }
 .stat-card.blue::before { background: var(--info); }
-.grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+.grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
 @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
 }
-.form-group { display: flex; flex-direction: column; gap: 4px; }
-.form-group label { font-weight: 600; font-size: 12px; opacity: 0.8; }
+.form-group { display: flex; flex-direction: column; gap: 3px; }
+.form-group label { font-weight: 600; font-size: 11px; opacity: 0.8; }
 input, select, textarea {
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 2px solid var(--border);
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--bg);
   color: var(--text);
-  font-size: 14px;
+  font-size: 13px;
   transition: 0.3s;
   font-family: inherit;
 }
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(15,118,110,0.2);
+  box-shadow: 0 0 0 3px rgba(15,118,110,0.15);
 }
 .btn {
-  padding: 8px 16px;
+  padding: 6px 14px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px;
   transition: 0.3s;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 .btn:hover { transform: translateY(-2px); filter: brightness(0.95); }
 .btn:active { transform: scale(0.97); }
@@ -198,38 +202,40 @@ input:focus, select:focus, textarea:focus {
 .btn-danger { background: var(--danger); color: #fff; }
 .btn-warning { background: var(--warning); color: #fff; }
 .btn-light { background: var(--bg); color: var(--text); }
-.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn-sm { padding: 3px 8px; font-size: 10px; }
 .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
 .badge {
   display: inline-block;
-  padding: 2px 12px;
-  border-radius: 20px;
-  font-size: 11px;
+  padding: 1px 10px;
+  border-radius: 16px;
+  font-size: 10px;
   font-weight: 600;
+  white-space: nowrap;
 }
 .badge-success { background: #d1fae5; color: #065f46; }
 .badge-danger { background: #fee2e2; color: #991b1b; }
 .badge-warning { background: #fef3c7; color: #92400e; }
 .badge-info { background: #dbeafe; color: #1e40af; }
 .badge-secondary { background: #e2e8f0; color: #475569; }
-.table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
-table { width: 100%; border-collapse: collapse; min-width: 600px; }
-th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: right; }
-th { background: var(--bg); font-weight: 600; position: sticky; top: 0; }
-tr:hover td { background: rgba(15,118,110,0.05); }
+.table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; min-width: 500px; font-size: 12px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: right; vertical-align: middle; }
+th { background: var(--bg); font-weight: 600; position: sticky; top: 0; white-space: nowrap; }
+td { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+tr:hover td { background: rgba(15,118,110,0.04); }
 dialog {
   border: 0;
   border-radius: var(--radius);
-  width: min(700px, 95vw);
+  width: min(650px, 95vw);
   max-height: 90vh;
   padding: 0;
   background: var(--card);
   color: var(--text);
   box-shadow: 0 20px 60px rgba(0,0,0,0.4);
 }
-dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+dialog::backdrop { background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
 .modal-header {
-  padding: 16px 20px;
+  padding: 12px 16px;
   background: var(--primary);
   color: #fff;
   border-radius: var(--radius) var(--radius) 0 0;
@@ -237,43 +243,44 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
   justify-content: space-between;
   align-items: center;
 }
-.modal-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
-.modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; }
+.modal-body { padding: 16px; max-height: 70vh; overflow-y: auto; }
+.modal-footer { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap; }
 #toast-container {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 16px;
+  right: 16px;
   z-index: 99999;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 .toast {
-  padding: 14px 24px;
+  padding: 10px 20px;
   border-radius: var(--radius);
   color: #fff;
   font-weight: 600;
+  font-size: 13px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.2);
   animation: slideIn 0.3s ease;
-  max-width: 400px;
+  max-width: 380px;
 }
 .toast-success { background: var(--success); }
 .toast-error { background: var(--danger); }
 .toast-warning { background: var(--warning); }
-@keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slideIn { from { transform: translateX(80px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 #loading-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(3px);
   z-index: 99998;
   justify-content: center;
   align-items: center;
 }
 .spinner {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border: 4px solid #fff;
   border-top-color: var(--primary);
   border-radius: 50%;
@@ -282,148 +289,60 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ===== FAMILY TREE ===== */
-.tree-container {
-  min-height: 400px;
-  padding: 20px;
-  background: var(--bg);
-  border-radius: var(--radius);
-  overflow: auto;
-  position: relative;
-}
-.tree-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-.tree-level {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  position: relative;
-  padding: 8px;
-}
-.tree-level::before {
-  content: '';
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  width: 2px;
-  height: 16px;
-  background: var(--border);
-}
-.tree-node {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-}
+.tree-container { min-height: 300px; padding: 12px; background: var(--bg); border-radius: var(--radius); overflow: auto; }
+.tree-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.tree-level { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; padding: 4px 0; position: relative; }
+.tree-level-title { text-align: center; font-size: 11px; color: var(--gray); margin-bottom: 2px; }
+.tree-node { display: flex; flex-direction: column; align-items: center; }
 .tree-node .node-card {
   background: var(--card);
   border: 2px solid var(--primary);
-  border-radius: var(--radius);
-  padding: 12px 20px;
+  border-radius: 10px;
+  padding: 8px 14px;
   cursor: pointer;
   transition: 0.3s;
-  min-width: 120px;
+  min-width: 100px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  position: relative;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  font-size: 12px;
 }
-.tree-node .node-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(15,118,110,0.2);
-}
+.tree-node .node-card:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 6px 20px rgba(15,118,110,0.15); }
 .tree-node .node-card.female { border-color: #ec4899; background: #fdf2f8; }
 .tree-node .node-card.male { border-color: #3b82f6; background: #eff6ff; }
-.tree-node .node-card.selected { border-color: var(--warning); background: #fef9c3; box-shadow: 0 0 0 4px #fde68a; }
-.tree-node .node-card .icon { font-size: 28px; }
-.tree-node .node-card .name { font-weight: bold; font-size: 14px; margin-top: 4px; }
-.tree-node .node-card .info { font-size: 11px; opacity: 0.7; }
-.tree-connector {
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-  padding: 4px 0;
-}
-.tree-connector .line {
-  width: 2px;
-  height: 20px;
-  background: var(--border);
-}
-.tree-children {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  padding: 8px;
-  position: relative;
-}
-.tree-children::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 2px;
-  height: 16px;
-  background: var(--border);
-}
-.tree-spouse {
-  border: 1px dashed var(--border);
-  border-radius: var(--radius);
-  padding: 8px 12px;
-  margin-top: 4px;
-  background: var(--bg);
-  font-size: 11px;
-  opacity: 0.8;
-}
+.tree-node .node-card.selected { border-color: var(--warning); background: #fef9c3; box-shadow: 0 0 0 3px #fde68a; }
+.tree-node .node-card .icon { font-size: 22px; }
+.tree-node .node-card .name { font-weight: bold; font-size: 13px; }
+.tree-node .node-card .info { font-size: 10px; opacity: 0.6; }
+.tree-connector { display: flex; justify-content: center; gap: 2px; padding: 2px 0; }
+.tree-connector .line { width: 2px; height: 16px; background: var(--border); }
+.tree-children { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 4px 0; position: relative; }
 
 /* ===== 3D GRAVES ===== */
 .grave-3d-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  padding: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  padding: 8px;
 }
 .grave-3d {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 16px;
+  padding: 12px;
   text-align: center;
   box-shadow: var(--shadow);
   transition: 0.3s;
   cursor: pointer;
   border: 2px solid var(--border);
-  position: relative;
-  transform: perspective(600px) rotateX(5deg);
+  transform: perspective(400px) rotateX(3deg);
 }
 .grave-3d:hover {
-  transform: perspective(600px) rotateX(0deg) translateY(-8px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  transform: perspective(400px) rotateX(0deg) translateY(-6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   border-color: var(--primary);
 }
-.grave-3d .grave-icon {
-  font-size: 48px;
-  display: block;
-  margin-bottom: 8px;
-}
-.grave-3d .grave-number {
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--primary);
-}
-.grave-3d .grave-owner {
-  font-size: 13px;
-  opacity: 0.8;
-}
-.grave-3d .grave-status {
-  display: inline-block;
-  padding: 2px 12px;
-  border-radius: 12px;
-  font-size: 11px;
-  margin-top: 6px;
-}
+.grave-3d .grave-icon { font-size: 36px; display: block; }
+.grave-3d .grave-number { font-size: 18px; font-weight: bold; color: var(--primary); }
+.grave-3d .grave-owner { font-size: 12px; opacity: 0.7; }
 .grave-3d.occupied { border-color: var(--danger); }
 .grave-3d.occupied .grave-icon { color: var(--danger); }
 .grave-3d.available { border-color: var(--success); }
@@ -431,52 +350,49 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
 .grave-3d.reuse { border-color: var(--warning); }
 .grave-3d.reuse .grave-icon { color: var(--warning); }
 
-/* ===== MAP ===== */
-#graveMap { height: 500px; border-radius: var(--radius); z-index: 1; }
-
 /* ===== CEMETERY MAP ===== */
 .cemetery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 8px;
-  padding: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 6px;
+  padding: 10px;
   background: var(--bg);
   border-radius: var(--radius);
 }
 .cemetery-plot {
   background: var(--card);
   border: 2px solid var(--border);
-  border-radius: 8px;
-  padding: 8px;
+  border-radius: 6px;
+  padding: 6px;
   text-align: center;
   cursor: pointer;
   transition: 0.3s;
-  min-height: 70px;
+  min-height: 60px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 11px;
+  font-size: 10px;
 }
-.cemetery-plot:hover {
-  transform: scale(1.05);
-  box-shadow: var(--shadow);
-  border-color: var(--primary);
-}
+.cemetery-plot:hover { transform: scale(1.05); box-shadow: var(--shadow); border-color: var(--primary); }
 .cemetery-plot.occupied { border-color: var(--danger); background: #fee2e2; }
 .cemetery-plot.available { border-color: var(--success); background: #d1fae5; }
 .cemetery-plot.reuse { border-color: var(--warning); background: #fef3c7; }
-.cemetery-plot .number { font-weight: bold; font-size: 14px; }
-.cemetery-plot .name { font-size: 10px; opacity: 0.8; }
+.cemetery-plot .number { font-weight: bold; font-size: 13px; }
+.cemetery-plot .name { font-size: 9px; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60px; }
+
+/* ===== MAP ===== */
+#graveMap { height: 400px; border-radius: var(--radius); z-index: 1; }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  header h1 { font-size: 18px; }
-  nav button { font-size: 11px; padding: 6px 10px; }
+@media (max-width: 600px) {
+  header h1 { font-size: 16px; }
+  nav button { font-size: 10px; padding: 4px 8px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .form-grid { grid-template-columns: 1fr; }
   .grave-3d-container { grid-template-columns: repeat(2, 1fr); }
-  .cemetery-grid { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); }
+  .cemetery-grid { grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); }
+  th, td { font-size: 11px; padding: 4px 6px; }
 }
 </style>
 </head>
@@ -490,9 +406,9 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
 
 <!-- Header -->
 <header>
-  <h1>🏘️ نظام إدارة قرية زعورة <span style="font-size:14px;opacity:0.7;">v3.0</span></h1>
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-    <span id="userDisplay">👤 المدير</span>
+  <h1>🏘️ زعورة <span style="font-size:12px;opacity:0.7;">v4.0</span></h1>
+  <div class="header-actions">
+    <span id="userDisplay" style="font-size:12px;">👤 المدير</span>
     <button class="btn btn-light btn-sm" onclick="toggleTheme()">🌙</button>
     <button class="btn btn-danger btn-sm" onclick="logout()">🚪</button>
   </div>
@@ -500,16 +416,16 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
 
 <!-- Navigation -->
 <nav>
-  <button data-page="dashboard" class="active">📊 لوحة التحكم</button>
+  <button data-page="dashboard" class="active">📊 الرئيسية</button>
   <button data-page="people">👥 الأفراد</button>
   <button data-page="family">🌳 الشجرة</button>
-  <button data-page="graves">⚰️ القبور <span class="badge badge-info" id="graveCount">0</span></button>
+  <button data-page="graves">⚰️ القبور <span class="badge" id="graveCount">0</span></button>
   <button data-page="burials">📜 الدفن</button>
   <button data-page="map">🗺️ الخريطة</button>
-  <button data-page="cemetery">🏛️ مخطط المقبرة</button>
+  <button data-page="cemetery">🏛️ المخطط</button>
   <button data-page="reports">📄 التقارير</button>
   <button data-page="import">📥 استيراد</button>
-  <button data-page="trash">🗑️ سلة <span class="badge badge-danger" id="trashCount">0</span></button>
+  <button data-page="trash">🗑️ <span class="badge" id="trashCount">0</span></button>
 </nav>
 
 <!-- Main -->
@@ -519,10 +435,10 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
 <section id="dashboard" class="page active">
   <div class="stats-grid" id="dashboardStats"></div>
   <div class="grid-2">
-    <div class="card"><div class="card-header"><h2>📈 إحصائيات القطاعات</h2></div><canvas id="sectorChart" height="250"></canvas></div>
-    <div class="card"><div class="card-header"><h2>⚰️ حالة القبور</h2></div><canvas id="graveChart" height="250"></canvas></div>
+    <div class="card"><div class="card-header"><h2>📈 القطاعات</h2></div><canvas id="sectorChart" height="200"></canvas></div>
+    <div class="card"><div class="card-header"><h2>⚰️ القبور</h2></div><canvas id="graveChart" height="200"></canvas></div>
   </div>
-  <div class="card"><div class="card-header"><h2>📋 آخر النشاطات</h2></div><div id="recentActivities"></div></div>
+  <div class="card"><div class="card-header"><h2>📋 النشاطات</h2></div><div id="recentActivities"></div></div>
 </section>
 
 <!-- People -->
@@ -530,36 +446,32 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
   <div class="stats-grid" id="peopleStats"></div>
   <div class="card">
     <div class="card-header">
-      <h2>🔍 فلترة متقدمة</h2>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-        <input id="peopleSearch" placeholder="🔍 بحث..." style="min-width:150px;" oninput="debounceRenderPeople()">
-        <select id="peopleSectorFilter" onchange="renderPeople()"><option value="">كل القطاعات</option></select>
-        <select id="peopleStatusFilter" onchange="renderPeople()"><option value="">كل الحالات</option></select>
-        <select id="peopleGenderFilter" onchange="renderPeople()"><option value="">كل الجنسين</option><option>ذكر</option><option>أنثى</option></select>
-        <select id="peopleRelationFilter" onchange="renderPeople()"><option value="">كل الصلات</option><option>رب أسرة</option><option>زوجة</option><option>ابن</option><option>بنت</option></select>
-        <input id="peopleAgeFrom" type="number" placeholder="العمر من" style="width:80px;" onchange="renderPeople()">
-        <input id="peopleAgeTo" type="number" placeholder="إلى" style="width:80px;" onchange="renderPeople()">
-        <button class="btn btn-light btn-sm" onclick="clearPeopleFilters()">🗑️ مسح</button>
+      <h2>🔍 فلترة</h2>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+        <input id="peopleSearch" placeholder="🔍 بحث..." style="min-width:120px;font-size:12px;" oninput="debounceRenderPeople()">
+        <select id="peopleSectorFilter" style="font-size:12px;" onchange="renderPeople()"><option value="">القطاع</option></select>
+        <select id="peopleStatusFilter" style="font-size:12px;" onchange="renderPeople()"><option value="">الحالة</option></select>
+        <button class="btn btn-light btn-sm" onclick="clearPeopleFilters()">مسح</button>
       </div>
     </div>
-    <button class="btn btn-success" onclick="openPersonModal()">➕ إضافة فرد</button>
+    <button class="btn btn-success" onclick="openPersonModal()">➕ إضافة</button>
   </div>
-  <div class="card"><div class="table-wrap"><table><thead><tr>
-    <th>الاسم</th><th>الجنس</th><th>العمر</th><th>القطاع</th><th>الحالة</th><th>الصلة</th><th>الهاتف</th><th>إجراءات</th>
-  </tr></thead><tbody id="peopleBody"></tbody></table></div></div>
+  <div class="card"><div class="table-wrap"><table>
+    <thead><tr><th>الاسم</th><th>الجنس</th><th>العمر</th><th>القطاع</th><th>الحالة</th><th>الصلة</th><th>الهاتف</th><th>إجراءات</th></tr></thead>
+    <tbody id="peopleBody"></tbody>
+  </table></div></div>
 </section>
 
 <!-- Family Tree -->
 <section id="family" class="page">
   <div class="card">
     <div class="card-header">
-      <h2>🌳 شجرة العائلة - عرض متقدم</h2>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <input id="familySearch" list="familyDatalist" placeholder="🔍 ابحث عن فرد..." style="min-width:200px;" oninput="renderFamilyTree()">
+      <h2>🌳 شجرة العائلة</h2>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        <input id="familySearch" list="familyDatalist" placeholder="🔍 ابحث..." style="min-width:150px;font-size:12px;" oninput="renderFamilyTree()">
         <datalist id="familyDatalist"></datalist>
-        <button class="btn btn-primary btn-sm" onclick="renderFamilyTree()">🔍 عرض</button>
-        <button class="btn btn-light btn-sm" onclick="document.getElementById('familySearch').value='';renderFamilyTree()">🗑️ مسح</button>
-        <button class="btn btn-outline btn-sm" onclick="expandAll()">📖 عرض الكل</button>
+        <button class="btn btn-primary btn-sm" onclick="renderFamilyTree()">عرض</button>
+        <button class="btn btn-light btn-sm" onclick="document.getElementById('familySearch').value='';renderFamilyTree()">مسح</button>
       </div>
     </div>
     <div id="familyTreeContainer" class="tree-container"></div>
@@ -571,23 +483,23 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
   <div class="stats-grid" id="graveStats"></div>
   <div class="card">
     <div class="card-header">
-      <h2>🔍 فلترة القبور</h2>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-        <input id="graveSearch" placeholder="🔍 بحث..." style="min-width:150px;" oninput="debounceRenderGraves()">
-        <select id="graveTypeFilter" onchange="renderGraves()"><option value="">كل الأنواع</option></select>
-        <select id="graveStatusFilter" onchange="renderGraves()"><option value="">كل الحالات</option></select>
-        <select id="graveLocationFilter" onchange="renderGraves()"><option value="">كل المواقع</option></select>
-        <button class="btn btn-light btn-sm" onclick="clearGraveFilters()">🗑️ مسح</button>
+      <h2>🔍 فلترة</h2>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+        <input id="graveSearch" placeholder="🔍 بحث..." style="min-width:120px;font-size:12px;" oninput="debounceRenderGraves()">
+        <select id="graveTypeFilter" style="font-size:12px;" onchange="renderGraves()"><option value="">النوع</option></select>
+        <select id="graveStatusFilter" style="font-size:12px;" onchange="renderGraves()"><option value="">الحالة</option></select>
+        <button class="btn btn-light btn-sm" onclick="clearGraveFilters()">مسح</button>
+        <button class="btn btn-primary btn-sm" onclick="toggleGraveView()">🔄 عرض</button>
       </div>
     </div>
-    <button class="btn btn-success" onclick="openGraveModal()">➕ إضافة قبر</button>
-    <button class="btn btn-primary" onclick="toggleGraveView()">🔄 تبديل العرض</button>
+    <button class="btn btn-success" onclick="openGraveModal()">➕ إضافة</button>
   </div>
   <div id="graveViewContainer">
     <div class="card" id="graveTableView">
-      <div class="table-wrap"><table><thead><tr>
-        <th>الرقم</th><th>الموقع</th><th>النوع</th><th>المالك</th><th>الحالة</th><th>الإتاحة</th><th>إجراءات</th>
-      </tr></thead><tbody id="graveBody"></tbody></table></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>الرقم</th><th>الموقع</th><th>النوع</th><th>المالك</th><th>الحالة</th><th>الإتاحة</th><th>إجراءات</th></tr></thead>
+        <tbody id="graveBody"></tbody>
+      </table></div>
     </div>
     <div class="card" id="grave3DView" style="display:none;">
       <div class="grave-3d-container" id="grave3DBody"></div>
@@ -601,29 +513,29 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
   <div class="card">
     <div class="card-header">
       <h2>📜 سجلات الدفن</h2>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <input id="burialSearch" placeholder="🔍 بحث..." oninput="debounceRenderBurials()">
-        <select id="burialYearFilter" onchange="renderBurials()"><option value="">كل السنوات</option></select>
-        <select id="burialSourceFilter" onchange="renderBurials()"><option value="">كل المصادر</option><option>الشاهدة</option><option>سجل رسمي</option><option>رواية أهلية</option></select>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        <input id="burialSearch" placeholder="🔍 بحث..." style="min-width:120px;font-size:12px;" oninput="debounceRenderBurials()">
+        <select id="burialYearFilter" style="font-size:12px;" onchange="renderBurials()"><option value="">السنة</option></select>
       </div>
     </div>
-    <button class="btn btn-success" onclick="openBurialModal()">📜 تسجيل دفن</button>
+    <button class="btn btn-success" onclick="openBurialModal()">📜 تسجيل</button>
   </div>
-  <div class="card"><div class="table-wrap"><table><thead><tr>
-    <th>المتوفى</th><th>القبر</th><th>الوفاة</th><th>الدفن</th><th>العمر</th><th>المصدر</th><th>إجراء</th>
-  </tr></thead><tbody id="burialBody"></tbody></table></div></div>
+  <div class="card"><div class="table-wrap"><table>
+    <thead><tr><th>المتوفى</th><th>القبر</th><th>الوفاة</th><th>الدفن</th><th>العمر</th><th>المصدر</th><th>إجراء</th></tr></thead>
+    <tbody id="burialBody"></tbody>
+  </table></div></div>
 </section>
 
 <!-- Map -->
 <section id="map" class="page">
-  <div class="card"><div class="card-header"><h2>🗺️ خريطة القبور التفاعلية</h2></div><div id="graveMap"></div></div>
+  <div class="card"><div class="card-header"><h2>🗺️ خريطة القبور</h2></div><div id="graveMap"></div></div>
 </section>
 
-<!-- Cemetery Map -->
+<!-- Cemetery -->
 <section id="cemetery" class="page">
   <div class="card">
     <div class="card-header"><h2>🏛️ مخطط المقبرة</h2>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
         <button class="btn btn-primary btn-sm" onclick="renderCemeteryMap('grid')">📐 شبكي</button>
         <button class="btn btn-primary btn-sm" onclick="renderCemeteryMap('list')">📋 قائمة</button>
       </div>
@@ -635,15 +547,15 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
 <!-- Reports -->
 <section id="reports" class="page">
   <div class="card">
-    <div class="card-header"><h2>📄 التقارير المتقدمة</h2></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
-      <button class="btn btn-primary" onclick="generateReport('people')">👥 الأفراد</button>
-      <button class="btn btn-primary" onclick="generateReport('graves')">⚰️ القبور</button>
-      <button class="btn btn-primary" onclick="generateReport('burials')">📜 الدفن</button>
-      <button class="btn btn-success" onclick="generateReport('sector')">📊 القطاعات</button>
-      <button class="btn btn-warning" onclick="generateReport('statistics')">📈 إحصائي شامل</button>
-      <button class="btn btn-info" onclick="generateReport('family')">🌳 العائلات</button>
-      <button class="btn btn-danger" onclick="generateReport('deceased')">⚰️ المتوفون</button>
+    <div class="card-header"><h2>📄 التقارير</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;">
+      <button class="btn btn-primary btn-sm" onclick="generateReport('people')">👥 الأفراد</button>
+      <button class="btn btn-primary btn-sm" onclick="generateReport('graves')">⚰️ القبور</button>
+      <button class="btn btn-primary btn-sm" onclick="generateReport('burials')">📜 الدفن</button>
+      <button class="btn btn-success btn-sm" onclick="generateReport('sector')">📊 القطاعات</button>
+      <button class="btn btn-warning btn-sm" onclick="generateReport('statistics')">📈 إحصائي</button>
+      <button class="btn btn-info btn-sm" onclick="generateReport('family')">🌳 العائلات</button>
+      <button class="btn btn-danger btn-sm" onclick="generateReport('deceased')">⚰️ المتوفون</button>
     </div>
   </div>
   <div id="reportOutput"></div>
@@ -653,30 +565,30 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
 <section id="import" class="page">
   <div class="card">
     <div class="card-header"><h2>📥 استيراد البيانات</h2></div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;">
-      <div class="card" style="border:2px dashed var(--border);text-align:center;padding:20px;">
-        <h3>⚰️ قبور</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+      <div class="card" style="border:2px dashed var(--border);text-align:center;padding:12px;">
+        <h4>⚰️ قبور</h4>
         <input type="file" id="importGraves" accept=".xlsx,.xls,.csv" style="display:none" onchange="importGravesFile(this)">
-        <button class="btn btn-success" onclick="document.getElementById('importGraves').click()">📤 اختر ملف</button>
+        <button class="btn btn-success btn-sm" onclick="document.getElementById('importGraves').click()">📤 اختر</button>
         <div id="resultGraves"></div>
       </div>
-      <div class="card" style="border:2px dashed var(--border);text-align:center;padding:20px;">
-        <h3>👥 أفراد</h3>
+      <div class="card" style="border:2px dashed var(--border);text-align:center;padding:12px;">
+        <h4>👥 أفراد</h4>
         <input type="file" id="importPeople" accept=".xlsx,.xls,.csv" style="display:none" onchange="importPeopleFile(this)">
-        <button class="btn btn-success" onclick="document.getElementById('importPeople').click()">📤 اختر ملف</button>
+        <button class="btn btn-success btn-sm" onclick="document.getElementById('importPeople').click()">📤 اختر</button>
         <div id="resultPeople"></div>
       </div>
-      <div class="card" style="border:2px dashed var(--border);text-align:center;padding:20px;">
-        <h3>📜 دفن</h3>
+      <div class="card" style="border:2px dashed var(--border);text-align:center;padding:12px;">
+        <h4>📜 دفن</h4>
         <input type="file" id="importBurials" accept=".xlsx,.xls,.csv" style="display:none" onchange="importBurialsFile(this)">
-        <button class="btn btn-success" onclick="document.getElementById('importBurials').click()">📤 اختر ملف</button>
+        <button class="btn btn-success btn-sm" onclick="document.getElementById('importBurials').click()">📤 اختر</button>
         <div id="resultBurials"></div>
       </div>
-      <div class="card" style="border:2px solid var(--warning);text-align:center;padding:20px;">
-        <h3>🔄 نسخة سابقة</h3>
-        <p style="font-size:12px;opacity:0.7;">يدعم V1, V2, V3</p>
+      <div class="card" style="border:2px solid var(--warning);text-align:center;padding:12px;">
+        <h4>🔄 نسخة سابقة</h4>
+        <p style="font-size:10px;opacity:0.6;">يدعم جميع الإصدارات</p>
         <input type="file" id="importBackup" accept=".json" style="display:none" onchange="importBackupFile(this)">
-        <button class="btn btn-warning" onclick="document.getElementById('importBackup').click()">📤 استعادة</button>
+        <button class="btn btn-warning btn-sm" onclick="document.getElementById('importBackup').click()">📤 استعادة</button>
         <div id="resultBackup"></div>
       </div>
     </div>
@@ -687,7 +599,7 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
 <section id="trash" class="page">
   <div class="card">
     <div class="card-header"><h2>🗑️ سلة المحذوفات</h2>
-      <button class="btn btn-danger btn-sm" onclick="emptyTrash()">🗑️ إفراغ السلة</button>
+      <button class="btn btn-danger btn-sm" onclick="emptyTrash()">🗑️ إفراغ</button>
     </div>
     <div id="trashContent"></div>
   </div>
@@ -702,14 +614,14 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
     <form id="personForm" onsubmit="savePerson(event)">
       <input type="hidden" id="personId">
       <div class="form-grid">
-        <div class="form-group"><label>الاسم الثلاثي *</label><input id="pName" required></div>
+        <div class="form-group"><label>الاسم *</label><input id="pName" required></div>
         <div class="form-group"><label>الجنس</label><select id="pGender"><option>ذكر</option><option>أنثى</option></select></div>
-        <div class="form-group"><label>تاريخ الميلاد</label><input id="pBirth" type="date"></div>
-        <div class="form-group"><label>تاريخ الوفاة</label><input id="pDeath" type="date"></div>
+        <div class="form-group"><label>الميلاد</label><input id="pBirth" type="date"></div>
+        <div class="form-group"><label>الوفاة</label><input id="pDeath" type="date"></div>
         <div class="form-group"><label>كود الأسرة</label><input id="pFamily"></div>
         <div class="form-group"><label>القطاع</label><select id="pSector"><option value="">--</option></select></div>
         <div class="form-group"><label>الحالة</label><select id="pStatus"><option>حي</option><option>متوفى</option><option>معفي</option><option>منسحب</option></select></div>
-        <div class="form-group"><label>صلة القرابة</label><select id="pRelation"><option value="">--</option><option>رب أسرة</option><option>زوجة</option><option>ابن</option><option>بنت</option></select></div>
+        <div class="form-group"><label>الصلة</label><select id="pRelation"><option value="">--</option><option>رب أسرة</option><option>زوجة</option><option>ابن</option><option>بنت</option></select></div>
         <div class="form-group"><label>الأب</label><input id="pFatherInput" list="fatherDatalist" placeholder="ابحث..." onchange="linkFather()"><datalist id="fatherDatalist"></datalist><input type="hidden" id="pFather"></div>
         <div class="form-group"><label>الأم</label><input id="pMotherInput" list="motherDatalist" placeholder="ابحث..." onchange="linkMother()"><datalist id="motherDatalist"></datalist><input type="hidden" id="pMother"></div>
         <div class="form-group"><label>الهاتف</label><input id="pPhone"></div>
@@ -726,14 +638,14 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
     <form id="graveForm" onsubmit="saveGrave(event)">
       <input type="hidden" id="graveId">
       <div class="form-grid">
-        <div class="form-group"><label>رقم القبر *</label><input id="gNumber" required></div>
-        <div class="form-group"><label>الموقع</label><input id="gLocation" placeholder="الإحداثيات أو الصف"></div>
+        <div class="form-group"><label>الرقم *</label><input id="gNumber" required></div>
+        <div class="form-group"><label>الموقع</label><input id="gLocation"></div>
         <div class="form-group"><label>النوع</label><select id="gType"><option>عام</option><option>خاص</option></select></div>
         <div class="form-group"><label>المالك</label><input id="gOwner"></div>
         <div class="form-group"><label>الحالة</label><select id="gStatus"><option>فارغ</option><option>متاح</option><option>مشغول</option></select></div>
-        <div class="form-group"><label>سنوات إعادة الاستخدام</label><input id="gYears" type="number" value="10"></div>
+        <div class="form-group"><label>سنوات الإعادة</label><input id="gYears" type="number" value="10"></div>
         <div class="form-group"><label>آخر مدفون</label><input id="gLast"></div>
-        <div class="form-group"><label>تاريخ آخر دفن</label><input id="gDate" type="date"></div>
+        <div class="form-group"><label>آخر دفن</label><input id="gDate" type="date"></div>
         <div class="form-group"><label>تاريخ الإتاحة</label><input id="gAvailable" type="date"></div>
         <div class="form-group" style="grid-column:1/-1"><label>ملاحظات</label><textarea id="gNotes" rows="2"></textarea></div>
       </div>
@@ -749,11 +661,11 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
       <div class="form-grid">
         <div class="form-group"><label>القبر *</label><select id="bGrave" required></select></div>
         <div class="form-group"><label>الفرد</label><input id="bPersonInput" list="peopleDatalist" placeholder="ابحث..." onchange="linkBurialPerson()"><datalist id="peopleDatalist"></datalist><input type="hidden" id="bPersonId"></div>
-        <div class="form-group"><label>اسم المتوفى *</label><input id="bName" required></div>
-        <div class="form-group"><label>تاريخ الوفاة</label><input id="bDeath" type="date"></div>
-        <div class="form-group"><label>تاريخ الدفن *</label><input id="bDate" type="date" required></div>
+        <div class="form-group"><label>المتوفى *</label><input id="bName" required></div>
+        <div class="form-group"><label>الوفاة</label><input id="bDeath" type="date"></div>
+        <div class="form-group"><label>الدفن *</label><input id="bDate" type="date" required></div>
         <div class="form-group"><label>العمر</label><input id="bAge" type="number"></div>
-        <div class="form-group"><label>سنوات إعادة الاستخدام</label><input id="bYears" type="number" value="10"></div>
+        <div class="form-group"><label>سنوات الإعادة</label><input id="bYears" type="number" value="10"></div>
         <div class="form-group"><label>المصدر</label><select id="bSource"><option>الشاهدة</option><option>سجل رسمي</option><option>رواية أهلية</option></select></div>
         <div class="form-group" style="grid-column:1/-1"><label>ملاحظات</label><textarea id="bNotes" rows="2"></textarea></div>
       </div>
@@ -768,8 +680,8 @@ dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
 // ============================================================
 // ===== CONFIG =====
 // ============================================================
-const SECRET_KEY = 'zaoura-v3-secret';
-const STORAGE_KEY = 'zaoura_v3_data';
+const SECRET_KEY = 'zaoura-v4-secret';
+const STORAGE_KEY = 'zaoura_v4_data';
 
 let state = {
   data: { people: [], graves: [], burials: [], deleted: [], logs: [] },
@@ -813,7 +725,7 @@ function resetData() {
 // ============================================================
 function nextId(list) { return list.length ? Math.max(...list.map(x => Number(x.id) || 0)) + 1 : 1; }
 function esc(v) { return String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
-function norm(v) { return String(v ?? '').trim().toLowerCase().replace(/[\s_\-ـ]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه'); }
+function norm(v) { return String(v ?? '').trim().toLowerCase().replace(/[\s_\-ـ]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/[ًٌٍَُِّْ]/g,''); }
 function cleanName(v) { return String(v ?? '').trim().replace(/\s+/g, ' '); }
 function toDate(v) {
   if (!v) return '';
@@ -850,6 +762,21 @@ function graveStatus(g) {
   return g.status || 'فارغ';
 }
 function matches(text, query) { if (!query) return true; return norm(text).includes(norm(query)); }
+
+// ===== Fingerprint للكشف عن التكرار =====
+function getFingerprint(item, type) {
+  if (type === 'person') {
+    return norm(`${item.name}|${item.birth}|${item.familyCode}`).replace(/[^a-z0-9]/g,'');
+  }
+  if (type === 'grave') {
+    return norm(`${item.number}|${item.location}`).replace(/[^a-z0-9]/g,'');
+  }
+  if (type === 'burial') {
+    return norm(`${item.personName}|${item.graveNumber}|${item.burialDate}`).replace(/[^a-z0-9]/g,'');
+  }
+  return '';
+}
+
 function badge(s) {
   const map = {
     'حي': 'success', 'فارغ': 'success', 'متاح': 'info',
@@ -885,17 +812,13 @@ function showLoading(show) {
 }
 
 // ============================================================
-// ===== THEME =====
+// ===== THEME & NAV =====
 // ============================================================
 function toggleTheme() {
   state.theme = state.theme === 'light' ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', state.theme);
   localStorage.setItem('theme', state.theme);
 }
-
-// ============================================================
-// ===== NAVIGATION =====
-// ============================================================
 document.querySelectorAll('nav button').forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
@@ -909,10 +832,6 @@ document.querySelectorAll('nav button').forEach(btn => {
     renderAll();
   };
 });
-
-// ============================================================
-// ===== MODAL =====
-// ============================================================
 function openModal(id) { document.getElementById(id).showModal(); }
 function closeModal(id) { document.getElementById(id).close(); }
 
@@ -926,7 +845,6 @@ function renderAll() {
   renderBurials();
   updateCounts();
 }
-
 function updateCounts() {
   document.getElementById('graveCount').textContent = state.data.graves.length || 0;
   document.getElementById('trashCount').textContent = state.data.deleted.length || 0;
@@ -949,13 +867,13 @@ function renderDashboard() {
     ${statCard('⚰️ متوفون', deceased, 'red')}
   `;
   
-  const recent = state.data.logs.slice(-10).reverse();
+  const recent = state.data.logs.slice(-8).reverse();
   document.getElementById('recentActivities').innerHTML = recent.length ?
-    recent.map(log => `<div style="display:flex;justify-content:space-between;padding:6px 12px;background:var(--bg);border-radius:8px;font-size:12px;margin:2px 0;">
+    recent.map(log => `<div style="display:flex;justify-content:space-between;padding:4px 10px;background:var(--bg);border-radius:6px;font-size:11px;margin:2px 0;">
       <span>${log.action} - ${log.target} #${log.id}</span>
       <span style="opacity:0.5">${new Date(log.time).toLocaleString()}</span>
     </div>`).join('') :
-    '<div class="text-muted">لا توجد نشاطات</div>';
+    '<div style="opacity:0.5;font-size:12px;">لا توجد نشاطات</div>';
   
   renderCharts();
 }
@@ -974,7 +892,7 @@ function renderCharts() {
         labels: Object.keys(sectors),
         datasets: [{ label: 'الأفراد', data: Object.values(sectors), backgroundColor: '#0f766e', borderRadius: 4 }]
       },
-      options: { responsive: true, plugins: { legend: { display: false } } }
+      options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
     });
   }
   
@@ -988,30 +906,22 @@ function renderCharts() {
         labels: Object.keys(statuses),
         datasets: [{ data: Object.values(statuses), backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#3b82f6'] }]
       },
-      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+      options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
     });
   }
 }
 
-// ===== People =====
+// ===== PEOPLE =====
 function renderPeople() {
   const q = document.getElementById('peopleSearch').value;
   const sector = document.getElementById('peopleSectorFilter').value;
   const status = document.getElementById('peopleStatusFilter').value;
-  const gender = document.getElementById('peopleGenderFilter').value;
-  const relation = document.getElementById('peopleRelationFilter').value;
-  const ageFrom = parseInt(document.getElementById('peopleAgeFrom').value) || 0;
-  const ageTo = parseInt(document.getElementById('peopleAgeTo').value) || 999;
   
-  let list = state.data.people.filter(p => {
-    const age = parseInt(calcAge(p.birth, p.death)) || 0;
-    return matches(`${p.name} ${p.familyCode} ${p.sector} ${p.phone}`, q) &&
-      (!sector || p.sector === sector) &&
-      (!status || p.status === status) &&
-      (!gender || p.gender === gender) &&
-      (!relation || p.relation === relation) &&
-      age >= ageFrom && age <= ageTo;
-  });
+  let list = state.data.people.filter(p =>
+    matches(`${p.name} ${p.familyCode} ${p.sector} ${p.phone}`, q) &&
+    (!sector || p.sector === sector) &&
+    (!status || p.status === status)
+  );
   
   document.getElementById('peopleStats').innerHTML = `
     ${statCard('الإجمالي', list.length, '')}
@@ -1022,7 +932,7 @@ function renderPeople() {
   
   document.getElementById('peopleBody').innerHTML = list.length ? list.map(p => `
     <tr>
-      <td><b>${esc(p.name)}</b></td>
+      <td title="${esc(p.name)}"><b>${esc(p.name)}</b></td>
       <td>${esc(p.gender)}</td>
       <td>${calcAge(p.birth, p.death)}</td>
       <td>${esc(p.sector || '-')}</td>
@@ -1031,28 +941,25 @@ function renderPeople() {
       <td>${esc(p.phone || '-')}</td>
       <td>${actions('person', p.id)}</td>
     </tr>
-  `).join('') : '<tr><td colspan="8" class="text-center text-muted">لا توجد بيانات</td></tr>';
+  `).join('') : '<tr><td colspan="8" style="text-align:center;opacity:0.5;padding:20px;">لا توجد بيانات</td></tr>';
   
-  // Update filters
   const sectors = [...new Set(state.data.people.map(p => p.sector).filter(Boolean))];
   const sel = document.getElementById('peopleSectorFilter');
   const cur = sel.value;
   sel.innerHTML = '<option value="">كل القطاعات</option>' + sectors.map(s => `<option ${s === cur ? 'selected' : ''}>${esc(s)}</option>`).join('');
 }
 
-// ===== Graves =====
+// ===== GRAVES =====
 function renderGraves() {
   const q = document.getElementById('graveSearch').value;
   const type = document.getElementById('graveTypeFilter').value;
   const status = document.getElementById('graveStatusFilter').value;
-  const location = document.getElementById('graveLocationFilter').value;
   
   let list = state.data.graves.filter(g => {
     const cur = graveStatus(g);
     return matches(`${g.number} ${g.family} ${g.owner} ${g.lastBuried} ${g.location}`, q) &&
       (!type || g.type === type) &&
-      (!status || cur === status) &&
-      (!location || g.location === location);
+      (!status || cur === status);
   });
   
   const occupied = state.data.graves.filter(g => graveStatus(g) === 'مشغول').length;
@@ -1066,20 +973,18 @@ function renderGraves() {
     ${statCard('🟨 قابل للإعادة', reuse, 'orange')}
   `;
   
-  // Table view
   document.getElementById('graveBody').innerHTML = list.length ? list.map(g => `
     <tr>
-      <td><b>${esc(g.number)}</b></td>
-      <td>${esc(g.location || '-')}</td>
+      <td title="${esc(g.number)}"><b>${esc(g.number)}</b></td>
+      <td title="${esc(g.location)}">${esc(g.location || '-')}</td>
       <td>${badge(g.type)}</td>
-      <td>${esc(g.owner || '-')}</td>
+      <td title="${esc(g.owner)}">${esc(g.owner || '-')}</td>
       <td>${badge(graveStatus(g))}</td>
       <td>${esc(g.availableDate || '-')}</td>
       <td>${actions('grave', g.id)}</td>
     </tr>
-  `).join('') : '<tr><td colspan="7" class="text-center text-muted">لا توجد بيانات</td></tr>';
+  `).join('') : '<tr><td colspan="7" style="text-align:center;opacity:0.5;padding:20px;">لا توجد قبور</td></tr>';
   
-  // 3D view
   document.getElementById('grave3DBody').innerHTML = list.length ? list.map(g => {
     const statusClass = graveStatus(g) === 'مشغول' ? 'occupied' : graveStatus(g) === 'متاح' || graveStatus(g) === 'فارغ' ? 'available' : 'reuse';
     const icon = graveStatus(g) === 'مشغول' ? '🪦' : graveStatus(g) === 'متاح' || graveStatus(g) === 'فارغ' ? '🕊️' : '🔄';
@@ -1087,21 +992,14 @@ function renderGraves() {
       <span class="grave-icon">${icon}</span>
       <div class="grave-number">${esc(g.number)}</div>
       <div class="grave-owner">${esc(g.owner || 'غير مخصص')}</div>
-      <div class="grave-status ${statusClass}">${graveStatus(g)}</div>
-      ${g.lastBuried ? `<div style="font-size:10px;opacity:0.6;margin-top:4px;">مدفون: ${esc(g.lastBuried)}</div>` : ''}
+      ${g.lastBuried ? `<div style="font-size:9px;opacity:0.6;">${esc(g.lastBuried)}</div>` : ''}
     </div>`;
-  }).join('') : '<div class="text-center text-muted" style="grid-column:1/-1;">لا توجد قبور</div>';
+  }).join('') : '<div style="grid-column:1/-1;text-align:center;opacity:0.5;padding:20px;">لا توجد قبور</div>';
   
-  // Update filters
   const types = [...new Set(state.data.graves.map(g => g.type).filter(Boolean))];
   const selType = document.getElementById('graveTypeFilter');
   const curType = selType.value;
   selType.innerHTML = '<option value="">كل الأنواع</option>' + types.map(t => `<option ${t === curType ? 'selected' : ''}>${esc(t)}</option>`).join('');
-  
-  const locations = [...new Set(state.data.graves.map(g => g.location).filter(Boolean))];
-  const selLoc = document.getElementById('graveLocationFilter');
-  const curLoc = selLoc.value;
-  selLoc.innerHTML = '<option value="">كل المواقع</option>' + locations.map(l => `<option ${l === curLoc ? 'selected' : ''}>${esc(l)}</option>`).join('');
 }
 
 function toggleGraveView() {
@@ -1110,16 +1008,14 @@ function toggleGraveView() {
   document.getElementById('grave3DView').style.display = state.graveView === '3d' ? 'block' : 'none';
 }
 
-// ===== Burials =====
+// ===== BURIALS =====
 function renderBurials() {
   const q = document.getElementById('burialSearch').value;
   const year = document.getElementById('burialYearFilter').value;
-  const source = document.getElementById('burialSourceFilter').value;
   
   let list = state.data.burials.filter(b =>
     matches(`${b.personName} ${b.graveNumber}`, q) &&
-    (!year || String(b.year) === year) &&
-    (!source || b.source === source)
+    (!year || String(b.year) === year)
   );
   
   document.getElementById('burialStats').innerHTML = `
@@ -1130,7 +1026,7 @@ function renderBurials() {
   
   document.getElementById('burialBody').innerHTML = list.length ? list.map(b => `
     <tr>
-      <td><b>${esc(b.personName)}</b></td>
+      <td title="${esc(b.personName)}"><b>${esc(b.personName)}</b></td>
       <td>${esc(b.graveNumber)}</td>
       <td>${esc(b.deathDate || '-')}</td>
       <td>${esc(b.burialDate)}</td>
@@ -1138,7 +1034,7 @@ function renderBurials() {
       <td>${esc(b.source || '-')}</td>
       <td>${actions('burial', b.id)}</td>
     </tr>
-  `).join('') : '<tr><td colspan="7" class="text-center text-muted">لا توجد بيانات</td></tr>';
+  `).join('') : '<tr><td colspan="7" style="text-align:center;opacity:0.5;padding:20px;">لا توجد سجلات</td></tr>';
   
   const years = [...new Set(state.data.burials.map(b => b.year).filter(Boolean))].sort();
   const sel = document.getElementById('burialYearFilter');
@@ -1146,11 +1042,11 @@ function renderBurials() {
   sel.innerHTML = '<option value="">كل السنوات</option>' + years.map(y => `<option ${String(y) === cur ? 'selected' : ''}>${y}</option>`).join('');
 }
 
-// ===== Trash =====
+// ===== TRASH =====
 function renderTrash() {
   const items = state.data.deleted || [];
   if (!items.length) {
-    document.getElementById('trashContent').innerHTML = '<div class="text-center text-muted">🗑️ السلة فارغة</div>';
+    document.getElementById('trashContent').innerHTML = '<div style="text-align:center;opacity:0.5;padding:20px;">🗑️ السلة فارغة</div>';
     return;
   }
   document.getElementById('trashContent').innerHTML = `
@@ -1174,124 +1070,152 @@ function renderTrash() {
 }
 
 // ============================================================
-// ===== FAMILY TREE - محسّن بالكامل =====
+// ===== FAMILY TREE - محسّن تماماً =====
 // ============================================================
 function renderFamilyTree() {
   const input = document.getElementById('familySearch').value.trim();
   const container = document.getElementById('familyTreeContainer');
-  if (!input) { container.innerHTML = '<div class="text-center text-muted">🔍 ابحث عن فرد لعرض شجرة عائلته</div>'; return; }
+  if (!input) { container.innerHTML = '<div style="text-align:center;opacity:0.5;padding:30px;">🔍 ابحث عن فرد</div>'; return; }
   
   const found = state.data.people.find(p => cleanName(p.name) === cleanName(input)) || state.data.people.find(p => matches(p.name, input));
-  if (!found) { container.innerHTML = `<div class="text-center text-muted">❌ لم يتم العثور على: ${esc(input)}</div>`; return; }
+  if (!found) { container.innerHTML = `<div style="text-align:center;opacity:0.5;padding:30px;">❌ لم يتم العثور على: ${esc(input)}</div>`; return; }
   
   const p = found;
+  
+  // بناء شجرة العائلة باستخدام BFS
+  function buildTree(person, depth = 0, maxDepth = 4) {
+    if (depth > maxDepth) return null;
+    const node = { ...person, children: [], spouse: null };
+    
+    // الأبناء
+    const children = state.data.people.filter(x => 
+      String(x.father) === String(person.id) || String(x.mother) === String(person.id)
+    );
+    children.forEach(c => {
+      const childNode = buildTree(c, depth + 1, maxDepth);
+      if (childNode) node.children.push(childNode);
+    });
+    
+    // الزوج/ة
+    const spouse = state.data.people.find(x => 
+      x.gender !== person.gender && 
+      (x.familyCode === person.familyCode || x.relation === 'زوجة' || x.relation === 'زوج')
+    );
+    if (spouse) node.spouse = spouse;
+    
+    return node;
+  }
+  
+  const tree = buildTree(p);
+  if (!tree) { container.innerHTML = '<div style="text-align:center;opacity:0.5;padding:30px;">لا توجد بيانات كافية</div>'; return; }
+  
+  // عرض الشجرة بشكل هرمي
+  function renderTreeLevel(node, level = 0) {
+    if (!node) return '';
+    const icon = node.gender === 'أنثى' ? '👩' : '👨';
+    const cls = node.gender === 'أنثى' ? 'female' : 'male';
+    const sel = node.id === p.id ? 'selected' : '';
+    
+    let html = `<div class="tree-level">`;
+    // الفرد
+    html += `<div class="tree-node">
+      <div class="node-card ${cls} ${sel}" onclick="editItem('person',${node.id})">
+        <div class="icon">${icon}</div>
+        <div class="name">${esc(node.name)}</div>
+        <div class="info">${esc(node.relation || '')} • ${calcAge(node.birth, node.death)}</div>
+        <div>${badge(node.status)}</div>
+      </div>
+    </div>`;
+    
+    // الزوج/ة
+    if (node.spouse) {
+      const spouseIcon = node.spouse.gender === 'أنثى' ? '👩' : '👨';
+      const spouseCls = node.spouse.gender === 'أنثى' ? 'female' : 'male';
+      html += `<div class="tree-node">
+        <div class="node-card ${spouseCls}" onclick="editItem('person',${node.spouse.id})">
+          <div class="icon">${spouseIcon}</div>
+          <div class="name">${esc(node.spouse.name)}</div>
+          <div class="info">💑 زوج/ة</div>
+          <div>${badge(node.spouse.status)}</div>
+        </div>
+      </div>`;
+    }
+    html += `</div>`;
+    
+    // الأبناء
+    if (node.children && node.children.length) {
+      html += `<div class="tree-connector"><div class="line"></div></div>`;
+      html += `<div class="tree-children">`;
+      node.children.forEach(child => {
+        html += renderTreeLevel(child, level + 1);
+      });
+      html += `</div>`;
+    }
+    
+    return html;
+  }
+  
+  // الأجداد (الجيل الأول)
+  let html = `<div class="tree-wrapper">`;
+  
+  // الآباء
   const father = state.data.people.find(x => x.id === p.father);
   const mother = state.data.people.find(x => x.id === p.mother);
-  
-  // الأطفال (الأبناء والبنات)
-  const children = state.data.people.filter(x => String(x.father) === String(p.id) || String(x.mother) === String(p.id));
+  if (father || mother) {
+    html += `<div class="tree-level-title">👨‍👩‍👧 الأبوان</div>`;
+    html += `<div class="tree-level">`;
+    if (father) {
+      const icon = father.gender === 'أنثى' ? '👩' : '👨';
+      const cls = father.gender === 'أنثى' ? 'female' : 'male';
+      html += `<div class="tree-node">
+        <div class="node-card ${cls}" onclick="editItem('person',${father.id})">
+          <div class="icon">${icon}</div>
+          <div class="name">${esc(father.name)}</div>
+          <div class="info">أب</div>
+          <div>${badge(father.status)}</div>
+        </div>
+      </div>`;
+    }
+    if (mother) {
+      const icon = mother.gender === 'أنثى' ? '👩' : '👨';
+      const cls = mother.gender === 'أنثى' ? 'female' : 'male';
+      html += `<div class="tree-node">
+        <div class="node-card ${cls}" onclick="editItem('person',${mother.id})">
+          <div class="icon">${icon}</div>
+          <div class="name">${esc(mother.name)}</div>
+          <div class="info">أم</div>
+          <div>${badge(mother.status)}</div>
+        </div>
+      </div>`;
+    }
+    html += `</div>`;
+    html += `<div class="tree-connector"><div class="line"></div></div>`;
+  }
   
   // الأخوة
   const siblings = state.data.people.filter(x => 
     (x.father === p.father || x.mother === p.mother) && x.id !== p.id
   );
   
-  // الأجداد (آباء الأب والأم)
-  const grandfather = father ? state.data.people.find(x => x.id === father.father) : null;
-  const grandmother = father ? state.data.people.find(x => x.id === father.mother) : null;
-  const maternalGrandfather = mother ? state.data.people.find(x => x.id === mother.father) : null;
-  const maternalGrandmother = mother ? state.data.people.find(x => x.id === mother.mother) : null;
+  // الفرد + الزوج/ة
+  html += `<div class="tree-level-title">👤 الفرد</div>`;
+  html += renderTreeLevel(tree);
   
-  // الأحفاد (أبناء الأبناء)
-  const grandchildren = [];
-  children.forEach(child => {
-    const grandkids = state.data.people.filter(x => String(x.father) === String(child.id) || String(x.mother) === String(child.id));
-    grandkids.forEach(gk => grandchildren.push({ parent: child, child: gk }));
-  });
-  
-  const personNode = (per, sel = false, extra = '') => {
-    if (!per) return '';
-    const icon = per.gender === 'أنثى' ? '👩' : '👨';
-    const cls = per.gender === 'أنثى' ? 'female' : 'male';
-    return `<div class="tree-node"><div class="node-card ${cls} ${sel ? 'selected' : ''}" onclick="editItem('person',${per.id})">
-      <div class="icon">${icon}</div>
-      <div class="name">${esc(per.name)}</div>
-      <div class="info">${esc(per.relation || '')} • ${calcAge(per.birth, per.death)} سنة</div>
-      <div>${badge(per.status)}</div>
-      ${extra}
-    </div></div>`;
-  };
-  
-  let html = `<div class="tree-wrapper">`;
-  
-  // ===== 1. الأجداد (الجيل الأول) =====
-  if (grandfather || grandmother || maternalGrandfather || maternalGrandmother) {
-    html += `<div style="text-align:center;font-size:12px;color:var(--text);opacity:0.5;margin-bottom:4px;">👴👵 الأجداد</div>`;
-    html += `<div class="tree-level">`;
-    if (grandfather) html += personNode(grandfather);
-    if (grandmother) html += personNode(grandmother);
-    if (maternalGrandfather) html += personNode(maternalGrandfather);
-    if (maternalGrandmother) html += personNode(maternalGrandmother);
-    html += `</div>`;
-    html += `<div class="tree-connector"><div class="line"></div></div>`;
-  }
-  
-  // ===== 2. الأب والأم (الجيل الثاني) =====
-  if (father || mother) {
-    html += `<div style="text-align:center;font-size:12px;color:var(--text);opacity:0.5;margin-bottom:4px;">👨‍👩‍👧 الأبوان</div>`;
-    html += `<div class="tree-level">`;
-    if (father) {
-      const spouse = state.data.people.find(x => x.id === father.id && x.gender === 'أنثى') || mother;
-      html += personNode(father, false, spouse ? `<div class="tree-spouse">💑 ${esc(spouse.name)}</div>` : '');
-    }
-    if (mother && !father) html += personNode(mother);
-    html += `</div>`;
-    html += `<div class="tree-connector"><div class="line"></div></div>`;
-  }
-  
-  // ===== 3. الفرد المحدد + الزوج/ة (الجيل الثالث) =====
-  html += `<div style="text-align:center;font-size:12px;color:var(--text);opacity:0.5;margin-bottom:4px;">👤 الفرد</div>`;
-  html += `<div class="tree-level">`;
-  html += personNode(p, true);
-  // عرض الزوج/ة إذا وجد
-  const spouse = state.data.people.find(x => 
-    (x.gender !== p.gender) && 
-    (x.familyCode === p.familyCode || x.relation === 'زوجة' || x.relation === 'زوج')
-  );
-  if (spouse) {
-    html += personNode(spouse, false, '<div class="tree-spouse">💑 زوج/ة</div>');
-  }
-  html += `</div>`;
-  
-  // ===== 4. الأخوة (الجيل الثالث) =====
+  // الأخوة
   if (siblings.length) {
-    html += `<div style="text-align:center;font-size:12px;color:var(--text);opacity:0.5;margin-top:8px;">👫 الأخوة</div>`;
+    html += `<div class="tree-level-title" style="margin-top:8px;">👫 الأخوة</div>`;
     html += `<div class="tree-level">`;
-    siblings.forEach(s => html += personNode(s));
-    html += `</div>`;
-  }
-  
-  // ===== 5. الأبناء (الجيل الرابع) =====
-  if (children.length) {
-    html += `<div style="text-align:center;font-size:12px;color:var(--text);opacity:0.5;margin-top:8px;">👨‍👩‍👧‍👦 الأبناء</div>`;
-    html += `<div class="tree-level">`;
-    children.forEach(c => {
-      // عرض زوج/ة الابن/البنت
-      const childSpouse = state.data.people.find(x => 
-        x.gender !== c.gender && 
-        (x.familyCode === c.familyCode || x.relation === 'زوجة' || x.relation === 'زوج')
-      );
-      html += personNode(c, false, childSpouse ? `<div class="tree-spouse">💑 ${esc(childSpouse.name)}</div>` : '');
-    });
-    html += `</div>`;
-  }
-  
-  // ===== 6. الأحفاد (الجيل الخامس) =====
-  if (grandchildren.length) {
-    html += `<div style="text-align:center;font-size:12px;color:var(--text);opacity:0.5;margin-top:8px;">👶 الأحفاد</div>`;
-    html += `<div class="tree-level">`;
-    grandchildren.forEach(g => {
-      html += personNode(g.child, false, `<div style="font-size:10px;opacity:0.6;">ابن ${esc(g.parent.name)}</div>`);
+    siblings.forEach(s => {
+      const icon = s.gender === 'أنثى' ? '👩' : '👨';
+      const cls = s.gender === 'أنثى' ? 'female' : 'male';
+      html += `<div class="tree-node">
+        <div class="node-card ${cls}" onclick="editItem('person',${s.id})">
+          <div class="icon">${icon}</div>
+          <div class="name">${esc(s.name)}</div>
+          <div class="info">${esc(s.relation || '')}</div>
+          <div>${badge(s.status)}</div>
+        </div>
+      </div>`;
     });
     html += `</div>`;
   }
@@ -1299,26 +1223,11 @@ function renderFamilyTree() {
   html += `</div>`;
   container.innerHTML = html;
   
-  // Populate datalist
   document.getElementById('familyDatalist').innerHTML = state.data.people.map(p => `<option value="${esc(p.name)}">`).join('');
 }
 
-function expandAll() {
-  // عرض شجرة كاملة للعائلة المختارة
-  const input = document.getElementById('familySearch').value.trim();
-  if (!input) {
-    // عرض أول شخص في القائمة
-    if (state.data.people.length) {
-      document.getElementById('familySearch').value = state.data.people[0].name;
-      renderFamilyTree();
-    }
-  } else {
-    renderFamilyTree();
-  }
-}
-
 // ============================================================
-// ===== MAP =====
+// ===== MAP & CEMETERY =====
 // ============================================================
 let mapInstance = null;
 
@@ -1338,32 +1247,23 @@ function initMap() {
       if (!isNaN(lat) && !isNaN(lng)) {
         const marker = L.marker([lat, lng]).addTo(mapInstance);
         const status = graveStatus(g);
-        const color = status === 'مشغول' ? 'red' : status === 'متاح' || status === 'فارغ' ? 'green' : 'orange';
         marker.bindPopup(`
           <b>⚰️ قبر ${esc(g.number)}</b><br>
           📍 ${esc(g.location || '')}<br>
           👤 ${esc(g.owner || 'غير مخصص')}<br>
           🏷️ ${badge(g.type)}<br>
-          📌 الحالة: <span style="color:${color};font-weight:bold;">${status}</span><br>
-          ${g.lastBuried ? `🪦 مدفون: ${esc(g.lastBuried)}` : ''}<br>
-          <button onclick="editItem('grave',${g.id})" class="btn btn-primary btn-sm">✏️ تعديل</button>
+          📌 الحالة: ${status}<br>
+          ${g.lastBuried ? `🪦 مدفون: ${esc(g.lastBuried)}` : ''}
         `);
-        // إضافة علامة مميزة حسب الحالة
-        if (status === 'مشغول') {
-          marker.setIcon(L.divIcon({ className: 'grave-marker occupied', html: '🪦', iconSize: [30, 30] }));
-        }
       }
     }
   });
 }
 
-// ============================================================
-// ===== CEMETERY MAP - مخطط المقبرة =====
-// ============================================================
 function renderCemeteryMap(view = 'grid') {
   const container = document.getElementById('cemeteryMapContainer');
   if (!state.data.graves.length) {
-    container.innerHTML = '<div class="text-center text-muted">لا توجد قبور لعرضها</div>';
+    container.innerHTML = '<div style="text-align:center;opacity:0.5;padding:30px;">لا توجد قبور</div>';
     return;
   }
   
@@ -1374,8 +1274,7 @@ function renderCemeteryMap(view = 'grid') {
       const cls = status === 'مشغول' ? 'occupied' : status === 'متاح' || status === 'فارغ' ? 'available' : 'reuse';
       return `<div class="cemetery-plot ${cls}" onclick="editItem('grave',${g.id})" title="قبر ${g.number}">
         <div class="number">${esc(g.number)}</div>
-        ${g.lastBuried ? `<div class="name">${esc(g.lastBuried)}</div>` : '<div class="name" style="opacity:0.5;">فارغ</div>'}
-        <div style="font-size:8px;opacity:0.5;">${status}</div>
+        ${g.lastBuried ? `<div class="name">${esc(g.lastBuried)}</div>` : '<div class="name" style="opacity:0.4;">فارغ</div>'}
       </div>`;
     }).join('');
   } else {
@@ -1401,7 +1300,7 @@ function renderCemeteryMap(view = 'grid') {
 // ============================================================
 function openPersonModal(id = null) {
   const p = id ? state.data.people.find(x => x.id === id) : {};
-  document.getElementById('personModalTitle').textContent = id ? '✏️ تعديل فرد' : '➕ إضافة فرد';
+  document.getElementById('personModalTitle').textContent = id ? '✏️ تعديل' : '➕ إضافة';
   document.getElementById('personId').value = p.id || '';
   document.getElementById('pName').value = p.name || '';
   document.getElementById('pGender').value = p.gender || 'ذكر';
@@ -1430,7 +1329,6 @@ function openPersonModal(id = null) {
     document.getElementById('pMotherInput').value = '';
     document.getElementById('pMother').value = '';
   }
-  // Update sector dropdown
   const sectors = [...new Set(state.data.people.map(p => p.sector).filter(Boolean))];
   const sel = document.getElementById('pSector');
   sel.innerHTML = '<option value="">--</option>' + sectors.map(s => `<option ${s === p.sector ? 'selected' : ''}>${esc(s)}</option>`).join('');
@@ -1485,13 +1383,13 @@ function savePerson(e) {
     closeModal('personModal');
     saveData();
     renderAll();
-  } catch(e) { showToast('❌ خطأ: ' + e.message, 'error'); }
+  } catch(e) { showToast('❌ ' + e.message, 'error'); }
   showLoading(false);
 }
 
 function openGraveModal(id = null) {
   const g = id ? state.data.graves.find(x => x.id === id) : {};
-  document.getElementById('graveModalTitle').textContent = id ? '✏️ تعديل قبر' : '➕ إضافة قبر';
+  document.getElementById('graveModalTitle').textContent = id ? '✏️ تعديل' : '➕ إضافة';
   document.getElementById('graveId').value = g.id || '';
   document.getElementById('gNumber').value = g.number || '';
   document.getElementById('gLocation').value = g.location || '';
@@ -1536,7 +1434,7 @@ function saveGrave(e) {
     closeModal('graveModal');
     saveData();
     renderAll();
-  } catch(e) { showToast('❌ خطأ: ' + e.message, 'error'); }
+  } catch(e) { showToast('❌ ' + e.message, 'error'); }
   showLoading(false);
 }
 
@@ -1597,7 +1495,7 @@ function saveBurial(e) {
     saveData();
     renderAll();
     showToast(`✅ تم التسجيل - الإتاحة: ${grave.availableDate}`, 'success');
-  } catch(e) { showToast('❌ خطأ: ' + e.message, 'error'); }
+  } catch(e) { showToast('❌ ' + e.message, 'error'); }
   showLoading(false);
 }
 
@@ -1630,7 +1528,7 @@ function deleteItem(type, id) {
     saveData();
     renderAll();
     showToast('🗑️ نقل إلى السلة', 'success');
-  } catch(e) { showToast('❌ خطأ: ' + e.message, 'error'); }
+  } catch(e) { showToast('❌ ' + e.message, 'error'); }
   showLoading(false);
 }
 
@@ -1677,7 +1575,7 @@ function logAction(action, target, id) {
 }
 
 // ============================================================
-// ===== IMPORT =====
+// ===== IMPORT - مع منع التضاعف =====
 // ============================================================
 function gv(row, ...names) {
   if (!row) return '';
@@ -1703,13 +1601,14 @@ function importPeopleFile(input) {
       const wb = XLSX.read(ev.target.result, { type: 'array', cellDates: true });
       const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
       let ok = 0, skip = 0;
+      const existingFingerprints = new Set(state.data.people.map(p => getFingerprint(p, 'person')));
+      
       rows.forEach(row => {
         const name = gv(row, 'الاسم الثلاثي', 'الاسم', 'name');
         const familyCode = gv(row, 'كود الأسرة', 'كود_الأسرة', 'familyCode');
         if (!name || !familyCode) { skip++; return; }
         const birth = toDate(gv(row, 'تاريخ الميلاد', 'تاريخ_الميلاد', 'birth'));
-        if (state.data.people.some(p => cleanName(p.name) === cleanName(name) && p.birth === birth)) { skip++; return; }
-        state.data.people.push({
+        const person = {
           id: nextId(state.data.people),
           name: name,
           gender: gv(row, 'الجنس') || 'ذكر',
@@ -1722,15 +1621,19 @@ function importPeopleFile(input) {
           father: null, mother: null,
           phone: gv(row, 'الجوال', 'الهاتف', 'phone'),
           notes: gv(row, 'ملاحظات')
-        });
+        };
+        const fp = getFingerprint(person, 'person');
+        if (existingFingerprints.has(fp)) { skip++; return; }
+        existingFingerprints.add(fp);
+        state.data.people.push(person);
         ok++;
       });
       logAction('import', 'people', ok);
       saveData();
       renderAll();
-      document.getElementById('resultPeople').innerHTML = `<div style="color:var(--success);padding:8px;">✅ تم استيراد ${ok} فرد، تخطي ${skip}</div>`;
-      showToast(`✅ تم استيراد ${ok} فرد`, 'success');
-    } catch(e) { showToast('❌ خطأ: ' + e.message, 'error'); }
+      document.getElementById('resultPeople').innerHTML = `<div style="color:var(--success);padding:6px;font-size:12px;">✅ تم استيراد ${ok} فرد، تخطي ${skip} مكرر</div>`;
+      showToast(`✅ استيراد ${ok} فرد`, 'success');
+    } catch(e) { showToast('❌ ' + e.message, 'error'); }
     showLoading(false);
   };
   reader.readAsArrayBuffer(file);
@@ -1746,12 +1649,13 @@ function importGravesFile(input) {
       const wb = XLSX.read(ev.target.result, { type: 'array', cellDates: true });
       const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
       let ok = 0, skip = 0;
+      const existingFingerprints = new Set(state.data.graves.map(g => getFingerprint(g, 'grave')));
+      
       rows.forEach(row => {
         const number = gv(row, 'رقم_القبر', 'رقم القبر', 'graveNumber');
         if (!number) { skip++; return; }
-        if (state.data.graves.some(g => g.number === number)) { skip++; return; }
         const lastBurialDate = toDate(gv(row, 'آخر_تاريخ_دفن', 'آخر تاريخ دفن', 'lastBurialDate'));
-        state.data.graves.push({
+        const grave = {
           id: nextId(state.data.graves),
           number: number,
           location: gv(row, 'الموقع_الداخلي', 'الموقع الداخلي', 'location'),
@@ -1763,15 +1667,19 @@ function importGravesFile(input) {
           lastBurialDate: lastBurialDate,
           availableDate: lastBurialDate ? dateAdd(lastBurialDate, 10) : '',
           notes: gv(row, 'ملاحظات_موثقة', 'ملاحظات موثقة', 'notes')
-        });
+        };
+        const fp = getFingerprint(grave, 'grave');
+        if (existingFingerprints.has(fp)) { skip++; return; }
+        existingFingerprints.add(fp);
+        state.data.graves.push(grave);
         ok++;
       });
       logAction('import', 'graves', ok);
       saveData();
       renderAll();
-      document.getElementById('resultGraves').innerHTML = `<div style="color:var(--success);padding:8px;">✅ تم استيراد ${ok} قبر، تخطي ${skip}</div>`;
-      showToast(`✅ تم استيراد ${ok} قبر`, 'success');
-    } catch(e) { showToast('❌ خطأ: ' + e.message, 'error'); }
+      document.getElementById('resultGraves').innerHTML = `<div style="color:var(--success);padding:6px;font-size:12px;">✅ تم استيراد ${ok} قبر، تخطي ${skip} مكرر</div>`;
+      showToast(`✅ استيراد ${ok} قبر`, 'success');
+    } catch(e) { showToast('❌ ' + e.message, 'error'); }
     showLoading(false);
   };
   reader.readAsArrayBuffer(file);
@@ -1787,12 +1695,34 @@ function importBurialsFile(input) {
       const wb = XLSX.read(ev.target.result, { type: 'array', cellDates: true });
       const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
       let ok = 0, skip = 0, updated = 0;
+      const existingFingerprints = new Set(state.data.burials.map(b => getFingerprint(b, 'burial')));
+      
       rows.forEach(row => {
         const graveNumber = gv(row, 'رقم_القبر', 'رقم القبر', 'graveNumber');
         const personName = gv(row, 'اسم_المتوفى_كامل', 'اسم المتوفى', 'personName');
         if (!graveNumber || !personName) { skip++; return; }
         const deathDate = toDate(gv(row, 'تاريخ_الوفاة', 'deathDate'));
         const burialDate = toDate(gv(row, 'تاريخ_الدفن', 'burialDate'));
+        if (!burialDate) { skip++; return; }
+        
+        const burial = {
+          id: nextId(state.data.burials),
+          graveId: null,
+          graveNumber: graveNumber,
+          personName: personName,
+          personId: null,
+          deathDate: deathDate,
+          burialDate: burialDate,
+          age: gv(row, 'عمر_المتوفى', 'age'),
+          source: gv(row, 'مصدر_المعلومة', 'source'),
+          notes: gv(row, 'ملاحظات', 'notes'),
+          year: burialDate ? new Date(burialDate).getFullYear() : null
+        };
+        const fp = getFingerprint(burial, 'burial');
+        if (existingFingerprints.has(fp)) { skip++; return; }
+        existingFingerprints.add(fp);
+        
+        // تحديث أو إضافة القبر
         let grave = state.data.graves.find(g => g.number === graveNumber);
         if (!grave) {
           grave = {
@@ -1805,7 +1735,7 @@ function importBurialsFile(input) {
             years: 10,
             lastBuried: personName,
             lastBurialDate: burialDate,
-            availableDate: burialDate ? dateAdd(burialDate, 10) : '',
+            availableDate: dateAdd(burialDate, 10),
             notes: ''
           };
           state.data.graves.push(grave);
@@ -1814,36 +1744,25 @@ function importBurialsFile(input) {
           grave.status = 'مشغول';
           grave.lastBuried = personName;
           grave.lastBurialDate = burialDate;
-          grave.availableDate = burialDate ? dateAdd(burialDate, grave.years || 10) : '';
+          grave.availableDate = dateAdd(burialDate, grave.years || 10);
           updated++;
         }
-        state.data.burials.push({
-          id: nextId(state.data.burials),
-          graveId: grave.id,
-          graveNumber: graveNumber,
-          personName: personName,
-          personId: null,
-          deathDate: deathDate,
-          burialDate: burialDate,
-          age: gv(row, 'عمر_المتوفى', 'age'),
-          source: gv(row, 'مصدر_المعلومة', 'source'),
-          notes: gv(row, 'ملاحظات', 'notes'),
-          year: burialDate ? new Date(burialDate).getFullYear() : null
-        });
+        burial.graveId = grave.id;
+        state.data.burials.push(burial);
         ok++;
       });
       logAction('import', 'burials', ok);
       saveData();
       renderAll();
-      document.getElementById('resultBurials').innerHTML = `<div style="color:var(--success);padding:8px;">✅ تم استيراد ${ok} سجل، تحديث ${updated} قبر، تخطي ${skip}</div>`;
-      showToast(`✅ تم استيراد ${ok} سجل`, 'success');
-    } catch(e) { showToast('❌ خطأ: ' + e.message, 'error'); }
+      document.getElementById('resultBurials').innerHTML = `<div style="color:var(--success);padding:6px;font-size:12px;">✅ تم استيراد ${ok} سجل، تحديث ${updated} قبر، تخطي ${skip} مكرر</div>`;
+      showToast(`✅ استيراد ${ok} سجل`, 'success');
+    } catch(e) { showToast('❌ ' + e.message, 'error'); }
     showLoading(false);
   };
   reader.readAsArrayBuffer(file);
 }
 
-// ===== Import Backup =====
+// ===== Import Backup - بدون تضاعف =====
 function importBackupFile(input) {
   const file = input.files[0];
   if (!file) return;
@@ -1858,31 +1777,55 @@ function importBackupFile(input) {
         throw new Error('ملف غير صالح');
       }
       
-      if (confirm('دمج أم استبدال؟ (OK = دمج | Cancel = استبدال)')) {
-        state.data.people = [...state.data.people, ...(imported.people || [])];
-        state.data.graves = [...state.data.graves, ...(imported.graves || [])];
-        state.data.burials = [...state.data.burials, ...(imported.burials || [])];
-        state.data.deleted = [...state.data.deleted, ...(imported.deleted || [])];
-        state.data.logs = [...state.data.logs, ...(imported.logs || [])];
-        showToast('✅ تم الدمج', 'success');
-      } else {
-        state.data = {
-          people: imported.people || [],
-          graves: imported.graves || [],
-          burials: imported.burials || [],
-          deleted: imported.deleted || [],
-          logs: imported.logs || []
-        };
-        showToast('✅ تم الاستبدال', 'success');
-      }
+      let merged = 0, skipped = 0;
       
-      logAction('import_backup', 'all', state.data.people.length);
+      // دمج الأفراد مع منع التكرار
+      const existingPeopleFp = new Set(state.data.people.map(p => getFingerprint(p, 'person')));
+      (imported.people || []).forEach(p => {
+        const fp = getFingerprint(p, 'person');
+        if (!existingPeopleFp.has(fp)) {
+          existingPeopleFp.add(fp);
+          state.data.people.push(p);
+          merged++;
+        } else {
+          skipped++;
+        }
+      });
+      
+      // دمج القبور مع منع التكرار
+      const existingGravesFp = new Set(state.data.graves.map(g => getFingerprint(g, 'grave')));
+      (imported.graves || []).forEach(g => {
+        const fp = getFingerprint(g, 'grave');
+        if (!existingGravesFp.has(fp)) {
+          existingGravesFp.add(fp);
+          state.data.graves.push(g);
+          merged++;
+        } else {
+          skipped++;
+        }
+      });
+      
+      // دمج سجلات الدفن
+      const existingBurialsFp = new Set(state.data.burials.map(b => getFingerprint(b, 'burial')));
+      (imported.burials || []).forEach(b => {
+        const fp = getFingerprint(b, 'burial');
+        if (!existingBurialsFp.has(fp)) {
+          existingBurialsFp.add(fp);
+          state.data.burials.push(b);
+          merged++;
+        } else {
+          skipped++;
+        }
+      });
+      
+      logAction('import_backup', 'all', merged);
       saveData();
       renderAll();
-      document.getElementById('resultBackup').innerHTML = `<div style="color:var(--success);padding:8px;">✅ تم استيراد ${state.data.people.length} فرد</div>`;
+      document.getElementById('resultBackup').innerHTML = `<div style="color:var(--success);padding:6px;font-size:12px;">✅ تم دمج ${merged} سجل، تخطي ${skipped} مكرر</div>`;
+      showToast(`✅ تم دمج ${merged} سجل`, 'success');
     } catch(e) {
       showToast('❌ ' + e.message, 'error');
-      document.getElementById('resultBackup').innerHTML = `<div style="color:var(--danger);padding:8px;">❌ ${e.message}</div>`;
+      document.getElementById('resultBackup').innerHTML = `<div style="color:var(--danger);padding:6px;font-size:12px;">❌ ${e.message}</div>`;
     }
     showLoading(false);
   };
@@ -1894,9 +1837,9 @@ function importBackupFile(input) {
 // ============================================================
 function generateReport(type) {
   let html = `<div class="card"><div class="card-header"><h2>📊 تقرير: ${type}</h2>
-    <div style="display:flex;gap:6px;">
-      <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ طباعة</button>
-      <button class="btn btn-success btn-sm" onclick="exportPDF()">📄 PDF</button>
+    <div style="display:flex;gap:4px;">
+      <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️</button>
+      <button class="btn btn-success btn-sm" onclick="exportPDF()">📄</button>
     </div>
   </div><div class="table-wrap"><table>`;
   
@@ -1906,9 +1849,9 @@ function generateReport(type) {
       html += `<tr><td>${esc(p.name)}</td><td>${esc(p.gender)}</td><td>${calcAge(p.birth, p.death)}</td><td>${esc(p.sector || '-')}</td><td>${badge(p.status)}</td><td>${esc(p.relation || '-')}</td></tr>`;
     });
   } else if (type === 'graves') {
-    html += `<thead><tr><th>الرقم</th><th>الموقع</th><th>النوع</th><th>المالك</th><th>الحالة</th><th>آخر مدفون</th></tr></thead><tbody>`;
+    html += `<thead><tr><th>الرقم</th><th>الموقع</th><th>النوع</th><th>المالك</th><th>الحالة</th></tr></thead><tbody>`;
     state.data.graves.forEach(g => {
-      html += `<tr><td>${esc(g.number)}</td><td>${esc(g.location || '-')}</td><td>${badge(g.type)}</td><td>${esc(g.owner || '-')}</td><td>${badge(graveStatus(g))}</td><td>${esc(g.lastBuried || '-')}</td></tr>`;
+      html += `<tr><td>${esc(g.number)}</td><td>${esc(g.location || '-')}</td><td>${badge(g.type)}</td><td>${esc(g.owner || '-')}</td><td>${badge(graveStatus(g))}</td></tr>`;
     });
   } else if (type === 'burials') {
     html += `<thead><tr><th>المتوفى</th><th>القبر</th><th>التاريخ</th><th>العمر</th><th>المصدر</th></tr></thead><tbody>`;
@@ -1918,8 +1861,8 @@ function generateReport(type) {
   } else if (type === 'sector') {
     const sectors = {};
     state.data.people.forEach(p => { if (p.sector) sectors[p.sector] = (sectors[p.sector] || 0) + 1; });
-    html += `<thead><tr><th>القطاع</th><th>عدد الأفراد</th><th>النسبة</th></tr></thead><tbody>`;
     const total = state.data.people.length || 1;
+    html += `<thead><tr><th>القطاع</th><th>العدد</th><th>النسبة</th></tr></thead><tbody>`;
     Object.entries(sectors).forEach(([s, c]) => {
       html += `<tr><td>${esc(s)}</td><td>${c}</td><td>${Math.round(c/total*100)}%</td></tr>`;
     });
@@ -1941,17 +1884,17 @@ function generateReport(type) {
         families[p.familyCode].push(p);
       }
     });
-    html += `<thead><tr><th>كود الأسرة</th><th>عدد الأفراد</th><th>الأعضاء</th></tr></thead><tbody>`;
+    html += `<thead><tr><th>كود الأسرة</th><th>العدد</th><th>الأعضاء</th></tr></thead><tbody>`;
     Object.entries(families).forEach(([code, members]) => {
       html += `<tr><td>${esc(code)}</td><td>${members.length}</td><td>${members.map(m => esc(m.name)).join('، ')}</td></tr>`;
     });
   } else if (type === 'deceased') {
     const deceased = state.data.people.filter(p => p.status === 'متوفى');
-    html += `<thead><tr><th>الاسم</th><th>تاريخ الوفاة</th><th>العمر عند الوفاة</th><th>القطاع</th></tr></thead><tbody>`;
+    html += `<thead><tr><th>الاسم</th><th>تاريخ الوفاة</th><th>العمر</th><th>القطاع</th></tr></thead><tbody>`;
     deceased.forEach(p => {
       html += `<tr><td>${esc(p.name)}</td><td>${esc(p.death || '-')}</td><td>${calcAge(p.birth, p.death)}</td><td>${esc(p.sector || '-')}</td></tr>`;
     });
-    if (!deceased.length) html += `<tr><td colspan="4" class="text-center text-muted">لا توجد وفيات مسجلة</td></tr>`;
+    if (!deceased.length) html += `<tr><td colspan="4" style="text-align:center;opacity:0.5;padding:20px;">لا توجد وفيات</td></tr>`;
   }
   
   html += `</tbody></table></div></div>`;
@@ -1959,10 +1902,8 @@ function generateReport(type) {
 }
 
 function exportPDF() {
-  showToast('📄 جاري تصدير PDF...', 'info');
-  setTimeout(() => {
-    showToast('✅ تم التصدير', 'success');
-  }, 1500);
+  showToast('📄 جاري التصدير...', 'info');
+  setTimeout(() => showToast('✅ تم التصدير', 'success'), 1500);
 }
 
 // ============================================================
@@ -1972,22 +1913,15 @@ function clearPeopleFilters() {
   document.getElementById('peopleSearch').value = '';
   document.getElementById('peopleSectorFilter').value = '';
   document.getElementById('peopleStatusFilter').value = '';
-  document.getElementById('peopleGenderFilter').value = '';
-  document.getElementById('peopleRelationFilter').value = '';
-  document.getElementById('peopleAgeFrom').value = '';
-  document.getElementById('peopleAgeTo').value = '';
   renderPeople();
 }
-
 function clearGraveFilters() {
   document.getElementById('graveSearch').value = '';
   document.getElementById('graveTypeFilter').value = '';
   document.getElementById('graveStatusFilter').value = '';
-  document.getElementById('graveLocationFilter').value = '';
   renderGraves();
 }
 
-// ===== Debounce =====
 const debounce = (fn, delay = 300) => {
   let timer;
   return (...args) => {
@@ -2000,7 +1934,7 @@ const debounceRenderGraves = debounce(renderGraves);
 const debounceRenderBurials = debounce(renderBurials);
 
 // ============================================================
-// ===== LOGOUT =====
+// ===== LOGOUT & INIT =====
 // ============================================================
 function logout() {
   if (confirm('تسجيل الخروج؟')) {
@@ -2010,19 +1944,14 @@ function logout() {
   }
 }
 
-// ============================================================
-// ===== INIT =====
-// ============================================================
 function init() {
-  // Theme
   const theme = localStorage.getItem('theme') || 'light';
   state.theme = theme;
   document.documentElement.setAttribute('data-theme', theme);
   
-  // Data
   loadData();
   
-  // Auto backup every 6 hours
+  // Auto backup
   setInterval(() => {
     if (state.data.people.length > 0) {
       try {
@@ -2032,7 +1961,7 @@ function init() {
     }
   }, 21600000);
   
-  // Check expiring graves daily
+  // Check expiring graves
   setInterval(() => {
     const soon = state.data.graves.filter(g => {
       if (!g.availableDate) return false;
@@ -2044,11 +1973,10 @@ function init() {
     }
   }, 86400000);
   
-  // Render
   renderAll();
   populateParentDatalists();
   
-  // Auto restore backup
+  // Auto restore
   const autoBackup = localStorage.getItem('zaoura_auto_backup');
   if (autoBackup && state.data.people.length === 0) {
     try {
@@ -2064,7 +1992,7 @@ function init() {
     } catch(e) {}
   }
   
-  showToast('🌟 مرحباً في زعورة v3.0', 'success');
+  showToast('🌟 مرحباً في زعورة v4.0', 'success');
 }
 
 document.addEventListener('DOMContentLoaded', init);
