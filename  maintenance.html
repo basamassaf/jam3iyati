@@ -1,0 +1,1993 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d5c46">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="مهام الصيانة">
+<title>مهام الصيانة - jam3iyati</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+<style>
+:root{
+  --emerald-900:#0d3d2e;
+  --emerald-800:#0d5c46;
+  --emerald-700:#127a5d;
+  --emerald-600:#1a9b76;
+  --emerald-500:#22b88d;
+  --emerald-100:#d4f4e8;
+  --emerald-50:#eefaf5;
+  --copper-700:#8b5a2b;
+  --copper-600:#b87333;
+  --copper-500:#d49249;
+  --copper-300:#e8b878;
+  --copper-100:#f5e6d3;
+  --danger:#c0392b;
+  --danger-light:#fdecea;
+  --warn:#d97706;
+  --warn-light:#fef3e2;
+  --ok:#15803d;
+  --ok-light:#dcfce7;
+  --gray-900:#0f172a;
+  --gray-700:#334155;
+  --gray-500:#64748b;
+  --gray-300:#cbd5e1;
+  --gray-200:#e2e8f0;
+  --gray-100:#f1f5f9;
+  --gray-50:#f8fafc;
+  --white:#fff;
+  --shadow-sm:0 1px 3px rgba(13,92,70,.08);
+  --shadow-md:0 4px 14px rgba(13,92,70,.12);
+  --shadow-lg:0 10px 30px rgba(13,92,70,.18);
+  --radius:14px;
+  --radius-sm:10px;
+  --radius-lg:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Segoe UI',Tahoma,'Arial',sans-serif;
+  background:linear-gradient(160deg,#f0f7f4 0%,#f8fafc 100%);
+  color:var(--gray-900);
+  min-height:100vh;
+  padding-bottom:90px;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============ الرأس ============ */
+.app-header{
+  background:linear-gradient(135deg,var(--emerald-800),var(--emerald-700));
+  color:#fff;
+  padding:18px 16px 22px;
+  border-radius:0 0 24px 24px;
+  box-shadow:var(--shadow-lg);
+  position:relative;
+  overflow:hidden;
+}
+.app-header::before{
+  content:'';
+  position:absolute;
+  top:-40%;left:-10%;
+  width:220px;height:220px;
+  background:radial-gradient(circle,rgba(212,146,73,.25),transparent 70%);
+  border-radius:50%;
+}
+.app-header::after{
+  content:'';
+  position:absolute;
+  bottom:-60%;right:-20%;
+  width:260px;height:260px;
+  background:radial-gradient(circle,rgba(34,184,141,.2),transparent 70%);
+  border-radius:50%;
+}
+.header-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  position:relative;
+  z-index:1;
+  margin-bottom:14px;
+}
+.header-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.header-icon{
+  font-size:26px;
+  background:rgba(255,255,255,.15);
+  width:42px;height:42px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter:blur(10px);
+}
+.header-title h1{
+  font-size:17px;
+  font-weight:700;
+  letter-spacing:.2px;
+}
+.header-title p{
+  font-size:11px;
+  opacity:.85;
+  margin-top:2px;
+}
+.header-date{
+  background:rgba(255,255,255,.15);
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:600;
+  backdrop-filter:blur(10px);
+  white-space:nowrap;
+}
+
+/* ============ إحصائيات ============ */
+.stats-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  position:relative;
+  z-index:1;
+}
+.stat{
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:12px;
+  padding:10px 6px;
+  text-align:center;
+  backdrop-filter:blur(10px);
+  transition:.2s;
+}
+.stat:active{transform:scale(.96)}
+.stat-num{
+  font-size:20px;
+  font-weight:800;
+  line-height:1;
+}
+.stat-lbl{
+  font-size:10px;
+  opacity:.9;
+  margin-top:4px;
+  font-weight:500;
+}
+.stat.high .stat-num{color:#ffb3a7}
+.stat.med .stat-num{color:#ffe08a}
+.stat.done .stat-num{color:#a7f3c9}
+
+/* ============ شريط البحث ============ */
+.search-wrap{
+  padding:14px 16px 8px;
+}
+.search-box{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:var(--white);
+  border-radius:14px;
+  padding:12px 14px;
+  box-shadow:var(--shadow-sm);
+  border:1px solid var(--gray-200);
+  transition:.2s;
+}
+.search-box:focus-within{
+  border-color:var(--emerald-600);
+  box-shadow:0 0 0 3px rgba(26,155,118,.1);
+}
+.search-box svg{
+  width:18px;height:18px;
+  color:var(--gray-500);
+  flex-shrink:0;
+}
+.search-box input{
+  flex:1;
+  border:none;
+  outline:none;
+  font-size:14px;
+  background:transparent;
+  font-family:inherit;
+}
+
+/* ============ الفلاتر ============ */
+.filters{
+  padding:0 16px 12px;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.filters::-webkit-scrollbar{display:none}
+.chip{
+  padding:7px 14px;
+  border-radius:20px;
+  border:1px solid var(--gray-200);
+  background:var(--white);
+  font-size:12px;
+  font-weight:600;
+  color:var(--gray-700);
+  cursor:pointer;
+  white-space:nowrap;
+  transition:.2s;
+  font-family:inherit;
+}
+.chip.active{
+  background:var(--emerald-700);
+  color:#fff;
+  border-color:var(--emerald-700);
+  box-shadow:0 4px 10px rgba(13,92,70,.25);
+}
+
+/* ============ قائمة المهام ============ */
+.tasks-list{
+  padding:0 16px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.task-card{
+  background:var(--white);
+  border-radius:var(--radius);
+  padding:14px;
+  box-shadow:var(--shadow-sm);
+  border-right:5px solid var(--gray-300);
+  position:relative;
+  transition:.25s;
+  animation:fadeUp .3s ease;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.task-card:active{transform:scale(.99)}
+.task-card.p-high{border-right-color:var(--danger);background:linear-gradient(90deg,var(--white) 60%,var(--danger-light) 100%)}
+.task-card.p-med{border-right-color:var(--warn);background:linear-gradient(90deg,var(--white) 60%,var(--warn-light) 100%)}
+.task-card.p-low{border-right-color:var(--ok);background:linear-gradient(90deg,var(--white) 60%,var(--ok-light) 100%)}
+.task-card.is-done{
+  opacity:.65;
+  border-right-color:var(--emerald-500);
+  background:var(--emerald-50);
+}
+.task-card.is-done .task-name{text-decoration:line-through;color:var(--gray-500)}
+
+.task-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  margin-bottom:8px;
+}
+.task-name{
+  font-size:15px;
+  font-weight:700;
+  color:var(--gray-900);
+  line-height:1.3;
+  flex:1;
+}
+.task-badges{
+  display:flex;
+  gap:4px;
+  flex-shrink:0;
+}
+.mini-badge{
+  font-size:10px;
+  font-weight:700;
+  padding:3px 8px;
+  border-radius:8px;
+  white-space:nowrap;
+}
+.mb-high{background:var(--danger);color:#fff}
+.mb-med{background:var(--warn);color:#fff}
+.mb-low{background:var(--ok);color:#fff}
+.mb-done{background:var(--emerald-600);color:#fff}
+
+.task-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 12px;
+  font-size:11.5px;
+  color:var(--gray-500);
+  margin-bottom:10px;
+}
+.task-meta span{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+.task-meta svg{width:12px;height:12px}
+
+.task-note{
+  background:var(--gray-50);
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:12px;
+  color:var(--gray-700);
+  margin-bottom:10px;
+  border-right:3px solid var(--copper-500);
+  line-height:1.5;
+}
+.task-parts{
+  background:var(--copper-100);
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:12px;
+  color:var(--copper-700);
+  margin-bottom:10px;
+  font-weight:600;
+}
+
+.task-actions{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.btn{
+  border:none;
+  border-radius:10px;
+  padding:8px 12px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  transition:.2s;
+  flex:1;
+  min-width:auto;
+}
+.btn:active{transform:scale(.96)}
+.btn svg{width:14px;height:14px}
+.btn-done{background:var(--ok);color:#fff}
+.btn-undo{background:var(--warn);color:#fff}
+.btn-note{background:var(--copper-600);color:#fff}
+.btn-print{background:var(--emerald-700);color:#fff}
+.btn-del{background:var(--gray-100);color:var(--danger);flex:0 0 auto;padding:8px 10px}
+
+.empty{
+  text-align:center;
+  padding:50px 20px;
+  color:var(--gray-500);
+}
+.empty-icon{font-size:50px;margin-bottom:12px;opacity:.4}
+.empty p{font-size:14px}
+
+/* ============ شريط سفلي ============ */
+.bottom-nav{
+  position:fixed;
+  bottom:0;left:0;right:0;
+  background:var(--white);
+  box-shadow:0 -4px 20px rgba(0,0,0,.08);
+  display:flex;
+  justify-content:space-around;
+  padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+  z-index:50;
+  border-top:1px solid var(--gray-200);
+}
+.nav-item{
+  flex:1;
+  text-align:center;
+  padding:6px 4px;
+  cursor:pointer;
+  border-radius:12px;
+  transition:.2s;
+  color:var(--gray-500);
+}
+.nav-item.active{color:var(--emerald-700);background:var(--emerald-50)}
+.nav-item svg{
+  width:22px;height:22px;
+  display:block;
+  margin:0 auto 3px;
+}
+.nav-item span{font-size:10.5px;font-weight:700}
+
+/* ============ زر عائم ============ */
+.fab{
+  position:fixed;
+  bottom:calc(80px + env(safe-area-inset-bottom));
+  left:50%;
+  transform:translateX(-50%);
+  width:58px;height:58px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--copper-600),var(--copper-500));
+  color:#fff;
+  border:none;
+  box-shadow:0 8px 24px rgba(184,115,51,.4);
+  cursor:pointer;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:60;
+  transition:.25s;
+}
+.fab.show{display:flex}
+.fab:active{transform:translateX(-50%) scale(.92)}
+.fab svg{width:28px;height:28px}
+
+/* ============ النوافذ المنبثقة ============ */
+.sheet-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.55);
+  backdrop-filter:blur(3px);
+  z-index:100;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  animation:fadeIn .2s;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.sheet-bg.open{display:flex}
+.sheet{
+  background:var(--white);
+  width:100%;
+  max-width:520px;
+  border-radius:24px 24px 0 0;
+  padding:20px 18px calc(20px + env(safe-area-inset-bottom));
+  max-height:92vh;
+  overflow-y:auto;
+  animation:slideUp .3s cubic-bezier(.16,1,.3,1);
+}
+@keyframes slideUp{
+  from{transform:translateY(100%)}
+  to{transform:translateY(0)}
+}
+.sheet-handle{
+  width:42px;height:5px;
+  background:var(--gray-300);
+  border-radius:3px;
+  margin:0 auto 16px;
+}
+.sheet-title{
+  font-size:17px;
+  font-weight:800;
+  color:var(--emerald-800);
+  margin-bottom:16px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.sheet-title svg{width:20px;height:20px}
+
+/* ============ حقول النموذج ============ */
+.field{margin-bottom:14px}
+.field label{
+  display:block;
+  font-size:12.5px;
+  font-weight:700;
+  color:var(--gray-700);
+  margin-bottom:6px;
+}
+.field label .req{color:var(--danger)}
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  padding:11px 13px;
+  border:1.5px solid var(--gray-200);
+  border-radius:11px;
+  font-size:14px;
+  font-family:inherit;
+  background:var(--white);
+  color:var(--gray-900);
+  transition:.2s;
+  outline:none;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  border-color:var(--emerald-600);
+  box-shadow:0 0 0 3px rgba(26,155,118,.1);
+}
+.field textarea{resize:vertical;min-height:70px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ============ الأزرار الكبيرة ============ */
+.btn-lg{
+  width:100%;
+  padding:14px;
+  border-radius:13px;
+  border:none;
+  font-size:15px;
+  font-weight:800;
+  cursor:pointer;
+  font-family:inherit;
+  transition:.2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.btn-lg:active{transform:scale(.98)}
+.btn-primary{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600));color:#fff;box-shadow:0 6px 16px rgba(13,92,70,.25)}
+.btn-copper{background:linear-gradient(135deg,var(--copper-700),var(--copper-500));color:#fff;box-shadow:0 6px 16px rgba(184,115,51,.25)}
+.btn-ghost{background:var(--gray-100);color:var(--gray-700)}
+
+/* ============ قائمة المواد ============ */
+.material-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:var(--gray-50);
+  border-radius:11px;
+  padding:10px;
+  margin-bottom:8px;
+  border:1px solid var(--gray-200);
+}
+.material-row .mat-name{
+  flex:1;
+  font-size:13px;
+  font-weight:600;
+  color:var(--gray-900);
+}
+.material-row .mat-unit{
+  font-size:11px;
+  color:var(--gray-500);
+  background:var(--white);
+  padding:3px 8px;
+  border-radius:6px;
+  border:1px solid var(--gray-200);
+}
+.material-row input.qty{
+  width:60px;
+  padding:7px;
+  text-align:center;
+  border:1.5px solid var(--gray-300);
+  border-radius:8px;
+  font-size:13px;
+  font-weight:700;
+  font-family:inherit;
+}
+.mat-del{
+  background:var(--danger-light);
+  color:var(--danger);
+  border:none;
+  width:30px;height:30px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:15px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ============ رسالة Toast ============ */
+.toast{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%) translateY(-100px);
+  background:var(--emerald-800);
+  color:#fff;
+  padding:12px 20px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:700;
+  z-index:200;
+  box-shadow:var(--shadow-lg);
+  transition:.35s cubic-bezier(.16,1,.3,1);
+  max-width:90%;
+  text-align:center;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600))}
+.toast.error{background:linear-gradient(135deg,#991b1b,var(--danger))}
+.toast.warn{background:linear-gradient(135deg,#92400e,var(--warn))}
+
+/* ============ صفحة المواد والإعدادات ============ */
+.page{
+  display:none;
+  padding:16px;
+  animation:fadeUp .3s;
+}
+.page.active{display:block}
+
+.section{
+  background:var(--white);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:var(--shadow-sm);
+  border:1px solid var(--gray-200);
+}
+.section-title{
+  font-size:14px;
+  font-weight:800;
+  color:var(--emerald-800);
+  margin-bottom:12px;
+  padding-bottom:10px;
+  border-bottom:2px solid var(--emerald-100);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.section-title button{
+  background:var(--copper-600);
+  color:#fff;
+  border:none;
+  padding:6px 12px;
+  border-radius:8px;
+  font-size:11.5px;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+}
+
+/* ============ صفحة الطباعة ============ */
+.print-page{
+  padding:20px;
+  background:var(--gray-100);
+  min-height:100vh;
+}
+.print-toolbar{
+  display:flex;
+  gap:8px;
+  margin-bottom:14px;
+  flex-wrap:wrap;
+}
+.print-toolbar .btn{flex:1;min-width:130px;padding:12px}
+
+.gov-paper{
+  background:#fff;
+  width:100%;
+  max-width:800px;
+  margin:0 auto;
+  padding:22mm 18mm 18mm;
+  box-shadow:0 4px 20px rgba(0,0,0,.12);
+  direction:rtl;
+  font-family:'Traditional Arabic','Sakkal Majalla','Amiri','Segoe UI',Tahoma,serif;
+  color:#000;
+  line-height:1.7;
+  position:relative;
+}
+
+.gov-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+  position:relative;
+  min-height:70px;
+}
+.gov-eagle{
+  position:absolute;
+  left:50%;
+  top:0;
+  transform:translateX(-50%);
+  width:64px;
+  height:auto;
+}
+.gov-header-right{
+  text-align:right;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.65;
+  margin-right:auto;
+  padding-right:8px;
+}
+.gov-header-left{
+  text-align:left;
+  font-size:13px;
+  font-weight:700;
+  padding-left:8px;
+  padding-top:8px;
+}
+
+.gov-date-line{
+  text-align:right;
+  font-size:13px;
+  font-weight:700;
+  margin:6px 0 20px;
+  padding-right:8px;
+}
+
+.gov-salutation{
+  text-align:center;
+  font-size:16px;
+  font-weight:800;
+  margin:8px 0 14px;
+}
+
+.gov-body{
+  font-size:14.5px;
+  font-weight:600;
+  text-align:justify;
+  margin-bottom:18px;
+  padding:0 6px;
+  line-height:1.9;
+}
+
+.gov-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-bottom:22px;
+  font-size:13px;
+}
+.gov-table th,
+.gov-table td{
+  border:1px solid #000;
+  padding:5px 8px;
+  text-align:center;
+  font-weight:700;
+  vertical-align:middle;
+}
+.gov-table th{
+  background:#f3f3f3;
+  font-weight:800;
+  font-size:12.5px;
+}
+.gov-table td.mat-name{
+  text-align:right;
+  padding-right:10px;
+}
+.gov-table td.mat-qty{
+  width:60px;
+  font-weight:800;
+}
+
+.gov-signatures{
+  display:flex;
+  justify-content:space-between;
+  margin-top:28px;
+  padding:0 20px;
+  font-size:13.5px;
+  font-weight:700;
+  text-align:center;
+  line-height:1.8;
+}
+.gov-sign-box{
+  flex:1;
+  max-width:45%;
+}
+.gov-sign-box .role{display:block;margin-bottom:2px}
+.gov-sign-box .name{font-weight:800;font-size:14px}
+
+.gov-divider{
+  border:none;
+  border-top:1.5px solid #000;
+  margin:22px 0 14px;
+}
+
+.gov-sub{
+  font-size:13.5px;
+  font-weight:800;
+  margin:14px 0 6px;
+}
+.gov-end{
+  text-align:center;
+  font-size:12px;
+  font-weight:700;
+  margin-top:35px;
+  color:#666;
+  border-top:1px dashed #999;
+  padding-top:10px;
+}
+
+/* ============ الطباعة ============ */
+@media print{
+  @page{size:A4;margin:15mm}
+  body{background:#fff;padding:0}
+  .no-print{display:none !important}
+  .print-page{background:#fff;padding:0;min-height:auto}
+  .gov-paper{
+    box-shadow:none;
+    padding:0;
+    max-width:100%;
+    width:100%;
+  }
+  .gov-eagle{width:56px}
+}
+
+/* ============ شاشات أصغر ============ */
+@media (max-width:400px){
+  .stat-num{font-size:17px}
+  .stat-lbl{font-size:9px}
+  .header-title h1{font-size:15px}
+  .gov-header-right, .gov-header-left{font-size:11px}
+  .gov-eagle{width:54px}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════ صفحة المهام الرئيسية ════════ -->
+<div id="pageHome" class="page active">
+
+  <header class="app-header">
+    <div class="header-top">
+      <div class="header-title">
+        <div class="header-icon">🔧</div>
+        <div>
+          <h1>مهام الصيانة</h1>
+          <p>نظام الميدان السريع</p>
+        </div>
+      </div>
+      <div class="header-date" id="headerDate"></div>
+    </div>
+    <div class="stats-row">
+      <div class="stat high">
+        <div class="stat-num" id="statHigh">0</div>
+        <div class="stat-lbl">🔴 عالية</div>
+      </div>
+      <div class="stat med">
+        <div class="stat-num" id="statMed">0</div>
+        <div class="stat-lbl">🟡 متوسطة</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-lbl">📋 الكل</div>
+      </div>
+      <div class="stat done">
+        <div class="stat-num" id="statDone">0</div>
+        <div class="stat-lbl">✅ منجزة</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="ابحث باسم المدرسة أو المنطقة...">
+    </div>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="chip active" data-filter="all">الكل</button>
+    <button class="chip" data-filter="pending">⏳ معلقة</button>
+    <button class="chip" data-filter="done">✅ منجزة</button>
+    <button class="chip" data-filter="high">🔴 عالية</button>
+    <button class="chip" data-filter="med">🟡 متوسطة</button>
+    <button class="chip" data-filter="low">🟢 منخفضة</button>
+  </div>
+
+  <div class="tasks-list" id="tasksList"></div>
+
+  <button class="fab show" onclick="openTaskSheet()" aria-label="إضافة مهمة">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+</div>
+
+<!-- ════════ صفحة المواد ════════ -->
+<div id="pageMaterials" class="page">
+  <div class="section">
+    <div class="section-title">
+      <span>📦 قائمة المواد الجاهزة</span>
+      <button onclick="openMaterialSheet()">+ إضافة مادة</button>
+    </div>
+    <div id="materialsList"></div>
+  </div>
+</div>
+
+<!-- ════════ صفحة الإعدادات ════════ -->
+<div id="pageSettings" class="page">
+  <div class="section">
+    <div class="section-title">🏛️ بيانات القالب الرسمي</div>
+    <div class="field">
+      <label>رأس الصفحة (السطر 1)</label>
+      <input type="text" id="setHeader1" value="مديرية التربية في محافظة دمشق">
+    </div>
+    <div class="field">
+      <label>رأس الصفحة (السطر 2)</label>
+      <input type="text" id="setHeader2" value="دائرة المعلوماتية">
+    </div>
+    <div class="field">
+      <label>رأس الصفحة (السطر 3)</label>
+      <input type="text" id="setHeader3" value="شعبة الصيانة (ورشة الكهرباء)">
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">✍️ التواقيع الثابتة</div>
+    <div class="field-row">
+      <div class="field">
+        <label>رئيس ورشة الكهرباء</label>
+        <input type="text" id="setSign1" value="بسام عساف">
+      </div>
+      <div class="field">
+        <label>رئيس شعبة الصيانة</label>
+        <input type="text" id="setSign2" value="فراس صالح">
+      </div>
+    </div>
+    <div class="field">
+      <label>رئيس دائرة المعلوماتية</label>
+      <input type="text" id="setSign3" value="علي العباس">
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">💾 النسخ الاحتياطي</div>
+    <button class="btn-lg btn-primary" style="margin-bottom:8px" onclick="exportJSON()">
+      📤 تصدير نسخة احتياطية (JSON)
+    </button>
+    <button class="btn-lg btn-copper" style="margin-bottom:8px" onclick="document.getElementById('importFile').click()">
+      📥 استيراد نسخة احتياطية
+    </button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+    <button class="btn-lg btn-ghost" onclick="exportCSV()">
+      📊 تصدير Excel (CSV)
+    </button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🗑️ منطقة الخطر</div>
+    <button class="btn-lg btn-ghost" style="color:var(--danger)" onclick="clearDone()">
+      حذف جميع المهام المنجزة
+    </button>
+  </div>
+</div>
+
+<!-- ════════ شريط التنقل السفلي ════════ -->
+<nav class="bottom-nav no-print">
+  <div class="nav-item active" data-page="pageHome" onclick="switchPage('pageHome')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+    <span>المهام</span>
+  </div>
+  <div class="nav-item" data-page="pageMaterials" onclick="switchPage('pageMaterials')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+    <span>المواد</span>
+  </div>
+  <div class="nav-item" data-page="pageSettings" onclick="switchPage('pageSettings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    <span>الإعدادات</span>
+  </div>
+</nav>
+
+<!-- ════════ نافذة إضافة/تعديل مهمة ════════ -->
+<div class="sheet-bg" id="taskSheetBg" onclick="if(event.target===this)closeSheet('taskSheetBg')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="taskSheetTitle">➕ مهمة جديدة</div>
+
+    <div class="field">
+      <label>اسم المدرسة / الموقع <span class="req">*</span></label>
+      <input type="text" id="fName" placeholder="مثال: مدرسة الشاهين">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>المبنى / القاعة</label>
+        <input type="text" id="fBuilding" placeholder="مثال: مبنى ح2 - قاعة الحاسوب">
+      </div>
+      <div class="field">
+        <label>رقم القاعة</label>
+        <input type="text" id="fRoom" placeholder="مثال: 1">
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>نوع المهمة</label>
+        <select id="fType">
+          <option>كشف عطل</option>
+          <option>إصلاح عطل</option>
+          <option>كشف وطباعة مواد</option>
+          <option>تمديد قاعة جديدة</option>
+          <option>نقل قاعة</option>
+          <option>صيانة دورية</option>
+          <option>تركيب أجهزة</option>
+          <option>استلام مواد</option>
+          <option>متابعة إدارية</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>الأولوية</label>
+        <select id="fPriority">
+          <option value="high">🔴 عالية</option>
+          <option value="med" selected>🟡 متوسطة</option>
+          <option value="low">🟢 منخفضة</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>المنطقة</label>
+        <select id="fArea">
+          <option>المزة - أبو زهير</option>
+          <option>برزة</option>
+          <option>الزاهرة</option>
+          <option>كفرسوسة</option>
+          <option>الميدان</option>
+          <option>ركن الدين</option>
+          <option>دمر</option>
+          <option>أخرى</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>المشرف / جهة الاتصال</label>
+        <input type="text" id="fContact" placeholder="اسم المشرف">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>ملاحظات / وصف العطل</label>
+      <textarea id="fNotes" placeholder="تفاصيل إضافية..."></textarea>
+    </div>
+
+    <button class="btn-lg btn-primary" onclick="saveTask()">
+      💾 حفظ المهمة
+    </button>
+    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('taskSheetBg')">
+      إلغاء
+    </button>
+  </div>
+</div>
+
+<!-- ════════ نافذة تفاصيل المهمة ════════ -->
+<div class="sheet-bg" id="detailSheetBg" onclick="if(event.target===this)closeSheet('detailSheetBg')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      <span id="detailTitle">تفاصيل المهمة</span>
+    </div>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- ════════ نافذة كشف المواد ════════ -->
+<div class="sheet-bg" id="matSheetBg" onclick="if(event.target===this)closeSheet('matSheetBg')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      <span>كشف المواد المطلوبة</span>
+    </div>
+
+    <div class="field">
+      <label>اختر مادة من القائمة</label>
+      <select id="matSelect" onchange="addMaterialToTask()">
+        <option value="">-- اختر مادة --</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>أو أضف مادة جديدة</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="matNewName" placeholder="اسم المادة" style="flex:1">
+        <input type="text" id="matNewUnit" placeholder="الوحدة" style="width:90px">
+        <button class="btn btn-done" style="flex:0 0 auto;padding:8px 12px" onclick="addNewMaterialInline()">+</button>
+      </div>
+    </div>
+
+    <div style="margin:16px 0 10px;font-size:13px;font-weight:800;color:var(--emerald-800)">
+      📋 المواد في هذه المهمة:
+    </div>
+    <div id="taskMaterialsList"></div>
+
+    <div class="field">
+      <label>اسم الفني (القائم بالكشف)</label>
+      <input type="text" id="fTechnician" placeholder="اسم الفني الذي قام بالكشف">
+    </div>
+
+    <button class="btn-lg btn-copper" style="margin-top:12px" onclick="saveTaskMaterials()">
+      💾 حفظ المواد
+    </button>
+    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('matSheetBg')">
+      إلغاء
+    </button>
+  </div>
+</div>
+
+<!-- ════════ نافذة إضافة/تعديل مادة في قائمة المواد ════════ -->
+<div class="sheet-bg" id="masterMatSheetBg" onclick="if(event.target===this)closeSheet('masterMatSheetBg')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="masterMatTitle">➕ إضافة مادة للقائمة</div>
+    <div class="field">
+      <label>اسم المادة <span class="req">*</span></label>
+      <input type="text" id="masterMatName" placeholder="مثال: منظم جهد">
+    </div>
+    <div class="field">
+      <label>الوحدة</label>
+      <input type="text" id="masterMatUnit" placeholder="مثال: عدد / متر / كيلو" value="عدد">
+    </div>
+    <button class="btn-lg btn-primary" onclick="saveMasterMaterial()">💾 حفظ</button>
+    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('masterMatSheetBg')">إلغاء</button>
+  </div>
+</div>
+
+<!-- ════════ رسالة Toast ════════ -->
+<div class="toast" id="toast"></div>
+
+<!-- ════════ صفحة الطباعة ════════ -->
+<div id="printPage" style="display:none;position:fixed;inset:0;background:#f1f5f9;z-index:500;overflow-y:auto">
+  <div class="print-toolbar no-print" style="position:sticky;top:0;background:#fff;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);z-index:10">
+    <button class="btn btn-ghost" style="flex:0 0 auto" onclick="closePrint()">← رجوع</button>
+    <button class="btn btn-primary" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+  </div>
+  <div class="print-page">
+    <div class="gov-paper" id="govPaper"></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+ /* ═══════════════════════════════════════════════════════
+   الجزء 2: المنطق الأساسي
+   المهام + المواد + الإعدادات + الحفظ
+   ═══════════════════════════════════════════════════════ */
+
+/* ═══ الحالة العامة ═══ */
+const STORAGE_KEYS = {
+  TASKS: 'mt_tasks_v1',
+  MATERIALS: 'mt_materials_v1',
+  SETTINGS: 'mt_settings_v1',
+  COUNTER: 'mt_counter_v1'
+};
+
+let state = {
+  tasks: [],
+  materials: [],
+  settings: {},
+  counter: 1,
+  currentFilter: 'all',
+  editingTaskId: null,
+  currentTaskId: null
+};
+
+/* ═══ المواد الافتراضية ═══ */
+const DEFAULT_MATERIALS = [
+  { id: 1, name: 'منظم جهد', unit: 'عدد' },
+  { id: 2, name: 'UPS', unit: 'عدد' },
+  { id: 3, name: 'بروجكتور', unit: 'عدد' },
+  { id: 4, name: 'قاعدة بروجكتور', unit: 'عدد' },
+  { id: 5, name: 'شاشة لمس', unit: 'عدد' },
+  { id: 6, name: 'شاشة عادية', unit: 'عدد' },
+  { id: 7, name: 'لوحة مفاتيح', unit: 'عدد' },
+  { id: 8, name: 'ماوس', unit: 'عدد' },
+  { id: 9, name: 'كابل شبكة RJ45', unit: 'عدد' },
+  { id: 10, name: 'كابل 4×4 ملم', unit: 'متر' },
+  { id: 11, name: 'كابل 2 ملم', unit: 'متر' },
+  { id: 12, name: 'شريط مفرد 2 ملم', unit: 'متر' },
+  { id: 13, name: 'شريط مفرد 4 ملم', unit: 'متر' },
+  { id: 14, name: 'شريط مفرد 2.5 ملم', unit: 'متر' },
+  { id: 15, name: 'مسطرة جدارية رباعية', unit: 'عدد' },
+  { id: 16, name: 'مسطرة جدارية متعددة', unit: 'عدد' },
+  { id: 17, name: 'شخاشيرو', unit: 'عدد' },
+  { id: 18, name: 'توال عازل كهرباء', unit: 'عدد' },
+  { id: 19, name: 'قاطع مفرد 16 أمبير', unit: 'عدد' },
+  { id: 20, name: 'قاطع مفرد 25 أمبير', unit: 'عدد' },
+  { id: 21, name: 'قاطع مفرد 32 أمبير', unit: 'عدد' },
+  { id: 22, name: 'قاطع ثلاثي 40 أمبير', unit: 'عدد' },
+  { id: 23, name: 'تابلو ظاهر 16 خط', unit: 'عدد' },
+  { id: 24, name: 'بريز مفرد ظاهر حراري', unit: 'عدد' },
+  { id: 25, name: 'علبة أناش 14 ملم', unit: 'عدد' },
+  { id: 26, name: 'مجاري بلاستيك 4 سم', unit: 'متر' },
+  { id: 27, name: 'مجاري بلاستيك 2 ملم', unit: 'عدد' },
+  { id: 28, name: 'براغي تلفون 6 ملم', unit: 'عدد' },
+  { id: 29, name: 'براغي سن صاج', unit: 'عدد' },
+  { id: 30, name: 'أسافين 6 ملم', unit: 'عدد' },
+  { id: 31, name: 'أسافين 8 ملم بلاستيك', unit: 'عدد' },
+  { id: 32, name: 'رنديلة صاج', unit: 'عدد' },
+  { id: 33, name: 'بار مفرد نحاس', unit: 'متر' },
+  { id: 34, name: 'أمبير 40', unit: 'عدد' },
+  { id: 35, name: 'كرت شبكة', unit: 'عدد' },
+  { id: 36, name: 'هارد ديسك', unit: 'عدد' },
+  { id: 37, name: 'رام', unit: 'عدد' },
+  { id: 38, name: 'Switch', unit: 'عدد' },
+  { id: 39, name: 'موصلات شبكة', unit: 'عدد' },
+  { id: 40, name: 'مواد أخرى', unit: 'عدد' }
+];
+
+/* ═══ الإعدادات الافتراضية ═══ */
+const DEFAULT_SETTINGS = {
+  header1: 'مديرية التربية في محافظة دمشق',
+  header2: 'دائرة المعلوماتية',
+  header3: 'شعبة الصيانة (ورشة الكهرباء)',
+  sign1: 'بسام عساف',
+  sign2: 'فراس صالح',
+  sign3: 'علي العباس'
+};
+
+/* ═══════════════════════════════════════════════════════
+   التحميل والحفظ
+   ═══════════════════════════════════════════════════════ */
+function loadState(){
+  try{
+    state.tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.TASKS) || '[]');
+    state.materials = JSON.parse(localStorage.getItem(STORAGE_KEYS.MATERIALS) || 'null') || DEFAULT_MATERIALS;
+    state.settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS) || 'null') || DEFAULT_SETTINGS;
+    state.counter = parseInt(localStorage.getItem(STORAGE_KEYS.COUNTER) || '1');
+  }catch(e){
+    console.error('خطأ تحميل:', e);
+    state.tasks = [];
+    state.materials = DEFAULT_MATERIALS;
+    state.settings = DEFAULT_SETTINGS;
+    state.counter = 1;
+  }
+}
+
+function saveTasks(){
+  localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(state.tasks));
+}
+function saveMaterials(){
+  localStorage.setItem(STORAGE_KEYS.MATERIALS, JSON.stringify(state.materials));
+}
+function saveSettings(){
+  localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(state.settings));
+}
+function saveCounter(){
+  localStorage.setItem(STORAGE_KEYS.COUNTER, String(state.counter));
+}
+
+/* ═══════════════════════════════════════════════════════
+   رسائل Toast
+   ═══════════════════════════════════════════════════════ */
+let toastTimer = null;
+function showToast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type || '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ═══════════════════════════════════════════════════════
+   التنقل بين الصفحات
+   ═══════════════════════════════════════════════════════ */
+function switchPage(pageId){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.nav-item[data-page="${pageId}"]`).classList.add('active');
+  if(pageId === 'pageMaterials') renderMaterials();
+  if(pageId === 'pageSettings') loadSettingsToForm();
+  window.scrollTo(0, 0);
+}
+
+/* ═══════════════════════════════════════════════════════
+   فتح/إغلاق النوافذ (Sheets)
+   ═══════════════════════════════════════════════════════ */
+function openSheet(id){
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSheet(id){
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ═══════════════════════════════════════════════════════
+   التاريخ في الرأس
+   ═══════════════════════════════════════════════════════ */
+function updateHeaderDate(){
+  const d = new Date();
+  const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  document.getElementById('headerDate').textContent = 
+    days[d.getDay()] + ' ' + d.toLocaleDateString('ar-SY');
+}
+
+function todayISO(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}/${m}/${day}`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   المهام: إضافة/تعديل
+   ═══════════════════════════════════════════════════════ */
+function openTaskSheet(taskId){
+  state.editingTaskId = taskId || null;
+  const title = document.getElementById('taskSheetTitle');
+  const fName = document.getElementById('fName');
+  const fBuilding = document.getElementById('fBuilding');
+  const fRoom = document.getElementById('fRoom');
+  const fType = document.getElementById('fType');
+  const fPriority = document.getElementById('fPriority');
+  const fArea = document.getElementById('fArea');
+  const fContact = document.getElementById('fContact');
+  const fNotes = document.getElementById('fNotes');
+  
+  if(taskId){
+    const t = state.tasks.find(x => x.id === taskId);
+    if(!t) return;
+    title.textContent = '✏️ تعديل المهمة';
+    fName.value = t.name || '';
+    fBuilding.value = t.building || '';
+    fRoom.value = t.room || '';
+    fType.value = t.type || 'كشف عطل';
+    fPriority.value = t.priority || 'med';
+    fArea.value = t.area || 'أخرى';
+    fContact.value = t.contact || '';
+    fNotes.value = t.notes || '';
+  }else{
+    title.textContent = '➕ مهمة جديدة';
+    fName.value = '';
+    fBuilding.value = '';
+    fRoom.value = '';
+    fType.value = 'كشف عطل';
+    fPriority.value = 'med';
+    fArea.value = 'المزة - أبو زهير';
+    fContact.value = '';
+    fNotes.value = '';
+  }
+  
+  openSheet('taskSheetBg');
+  setTimeout(() => fName.focus(), 350);
+}
+
+function saveTask(){
+  const name = document.getElementById('fName').value.trim();
+  if(!name){
+    showToast('الرجاء إدخال اسم المدرسة', 'error');
+    document.getElementById('fName').focus();
+    return;
+  }
+  
+  const data = {
+    name: name,
+    building: document.getElementById('fBuilding').value.trim(),
+    room: document.getElementById('fRoom').value.trim(),
+    type: document.getElementById('fType').value,
+    priority: document.getElementById('fPriority').value,
+    area: document.getElementById('fArea').value,
+    contact: document.getElementById('fContact').value.trim(),
+    notes: document.getElementById('fNotes').value.trim()
+  };
+  
+  if(state.editingTaskId){
+    const t = state.tasks.find(x => x.id === state.editingTaskId);
+    if(t){
+      Object.assign(t, data);
+      showToast('✅ تم تحديث المهمة', 'success');
+    }
+  }else{
+    const task = {
+      id: Date.now(),
+      number: state.counter++,
+      ...data,
+      materials: [],
+      technician: '',
+      status: 'pending',
+      createdAt: todayISO(),
+      doneAt: ''
+    };
+    state.tasks.unshift(task);
+    saveCounter();
+    showToast('✅ تمت إضافة المهمة', 'success');
+  }
+  
+  saveTasks();
+  closeSheet('taskSheetBg');
+  renderTasks();
+  updateStats();
+}
+
+/* ═══════════════════════════════════════════════════════
+   المهام: إنجاز/حذف/تفاصيل
+   ═══════════════════════════════════════════════════════ */
+function toggleTaskDone(id){
+  const t = state.tasks.find(x => x.id === id);
+  if(!t) return;
+  if(t.status === 'done'){
+    t.status = 'pending';
+    t.doneAt = '';
+    showToast('↩️ تم إرجاع المهمة', 'warn');
+  }else{
+    t.status = 'done';
+    t.doneAt = todayISO();
+    showToast('✅ تم إنجاز المهمة', 'success');
+  }
+  saveTasks();
+  renderTasks();
+  updateStats();
+  if(document.getElementById('detailSheetBg').classList.contains('open')){
+    openDetail(id);
+  }
+}
+
+function deleteTask(id){
+  if(!confirm('هل تريد حذف هذه المهمة نهائياً؟')) return;
+  state.tasks = state.tasks.filter(x => x.id !== id);
+  saveTasks();
+  renderTasks();
+  updateStats();
+  closeSheet('detailSheetBg');
+  showToast('🗑️ تم حذف المهمة', 'warn');
+}
+
+function openDetail(id){
+  const t = state.tasks.find(x => x.id === id);
+  if(!t) return;
+  state.currentTaskId = id;
+  
+  const prioMap = { high:'🔴 عالية', med:'🟡 متوسطة', low:'🟢 منخفضة' };
+  const statusMap = { pending:'⏳ معلقة', done:'✅ منجزة' };
+  const matCount = (t.materials || []).length;
+  
+  const html = `
+    <div style="background:var(--gray-50);border-radius:12px;padding:14px;margin-bottom:12px">
+      <div style="font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:8px">${escapeHtml(t.name)}</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">رقم المهمة: #${t.number}</div>
+      ${t.building ? `<div style="font-size:12.5px;color:var(--gray-700)">🏢 ${escapeHtml(t.building)}</div>` : ''}
+      ${t.room ? `<div style="font-size:12.5px;color:var(--gray-700)">🚪 قاعة رقم: ${escapeHtml(t.room)}</div>` : ''}
+    </div>
+    
+    <div class="field-row" style="margin-bottom:12px">
+      <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px">
+        <div style="font-size:11px;color:var(--gray-500)">الحالة</div>
+        <div style="font-size:13px;font-weight:700;margin-top:2px">${statusMap[t.status]}</div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px">
+        <div style="font-size:11px;color:var(--gray-500)">الأولوية</div>
+        <div style="font-size:13px;font-weight:700;margin-top:2px">${prioMap[t.priority]}</div>
+      </div>
+    </div>
+    
+    <div class="field-row" style="margin-bottom:12px">
+      <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px">
+        <div style="font-size:11px;color:var(--gray-500)">النوع</div>
+        <div style="font-size:13px;font-weight:700;margin-top:2px">${escapeHtml(t.type)}</div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px">
+        <div style="font-size:11px;color:var(--gray-500)">المنطقة</div>
+        <div style="font-size:13px;font-weight:700;margin-top:2px">${escapeHtml(t.area)}</div>
+      </div>
+    </div>
+    
+    ${t.contact ? `<div style="font-size:13px;margin-bottom:8px">👤 المشرف: <b>${escapeHtml(t.contact)}</b></div>` : ''}
+    ${t.notes ? `<div class="task-note" style="margin-bottom:10px">📝 ${escapeHtml(t.notes)}</div>` : ''}
+    ${t.technician ? `<div style="font-size:13px;margin-bottom:8px">👷 الفني: <b>${escapeHtml(t.technician)}</b></div>` : ''}
+    
+    <div style="background:var(--copper-100);border-radius:10px;padding:10px;margin-bottom:12px;font-size:12.5px;color:var(--copper-700)">
+      📦 المواد في الكشف: <b>${matCount}</b> مادة
+    </div>
+    
+    <div style="font-size:11px;color:var(--gray-500);text-align:center;margin-bottom:12px">
+      📅 أضيفت: ${t.createdAt}${t.doneAt ? ' • ✅ أُنجزت: ' + t.doneAt : ''}
+    </div>
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <button class="btn-lg ${t.status==='done'?'btn-ghost':'btn-primary'}" onclick="toggleTaskDone(${t.id})" style="font-size:13px;padding:11px">
+        ${t.status==='done'?'↩️ إرجاع':'✅ إنجاز'}
+      </button>
+      <button class="btn-lg btn-copper" onclick="openMaterialsForTask(${t.id})" style="font-size:13px;padding:11px">
+        📦 المواد
+      </button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <button class="btn-lg btn-primary" onclick="printTask(${t.id})" style="font-size:13px;padding:11px;background:linear-gradient(135deg,#0d5c46,#15803d)">
+        🖨️ طباعة
+      </button>
+      <button class="btn-lg btn-ghost" onclick="openTaskSheet(${t.id})" style="font-size:13px;padding:11px">
+        ✏️ تعديل
+      </button>
+    </div>
+    <button class="btn-lg btn-ghost" style="color:var(--danger);font-size:13px;padding:11px" onclick="deleteTask(${t.id})">
+      🗑️ حذف المهمة
+    </button>
+  `;
+  
+  document.getElementById('detailTitle').textContent = '📋 تفاصيل المهمة #' + t.number;
+  document.getElementById('detailContent').innerHTML = html;
+  openSheet('detailSheetBg');
+}
+
+/* ═══════════════════════════════════════════════════════
+   المواد داخل المهمة
+   ═══════════════════════════════════════════════════════ */
+function openMaterialsForTask(taskId){
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t) return;
+  state.currentTaskId = taskId;
+  if(!t.materials) t.materials = [];
+  
+  document.getElementById('fTechnician').value = t.technician || '';
+  
+  // تعبئة select المواد
+  const sel = document.getElementById('matSelect');
+  sel.innerHTML = '<option value="">-- اختر مادة --</option>' + 
+    state.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (${escapeHtml(m.unit)})</option>`).join('');
+  
+  renderTaskMaterials();
+  closeSheet('detailSheetBg');
+  setTimeout(() => openSheet('matSheetBg'), 200);
+}
+
+function renderTaskMaterials(){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  const container = document.getElementById('taskMaterialsList');
+  
+  if(!t.materials || t.materials.length === 0){
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد مواد مضافة بعد</div>';
+    return;
+  }
+  
+  container.innerHTML = t.materials.map((m, idx) => `
+    <div class="material-row">
+      <span class="mat-name">${escapeHtml(m.name)}</span>
+      <span class="mat-unit">${escapeHtml(m.unit || 'عدد')}</span>
+      <input type="number" class="qty" value="${m.qty || 1}" min="1" onchange="updateMatQty(${idx}, this.value)">
+      <button class="mat-del" onclick="removeTaskMaterial(${idx})">✕</button>
+    </div>
+  `).join('');
+}
+
+function addMaterialToTask(){
+  const sel = document.getElementById('matSelect');
+  const matId = sel.value;
+  if(!matId) return;
+  const mat = state.materials.find(m => m.id === parseInt(matId));
+  if(!mat) return;
+  
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  if(!t.materials) t.materials = [];
+  
+  // هل المادة موجودة؟
+  const exists = t.materials.find(m => m.name === mat.name);
+  if(exists){
+    showToast('⚠️ المادة موجودة مسبقاً', 'warn');
+    sel.value = '';
+    return;
+  }
+  
+  t.materials.push({ name: mat.name, unit: mat.unit, qty: 1 });
+  renderTaskMaterials();
+  sel.value = '';
+  showToast('✅ أُضيفت: ' + mat.name, 'success');
+}
+
+function updateMatQty(idx, val){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t || !t.materials) return;
+  const q = parseInt(val) || 1;
+  t.materials[idx].qty = q < 1 ? 1 : q;
+}
+
+function removeTaskMaterial(idx){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  t.materials.splice(idx, 1);
+  renderTaskMaterials();
+  showToast('🗑️ حُذفت المادة', 'warn');
+}
+
+function saveTaskMaterials(){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  t.technician = document.getElementById('fTechnician').value.trim();
+  saveTasks();
+  showToast('✅ تم حفظ المواد', 'success');
+  closeSheet('matSheetBg');
+  setTimeout(() => openDetail(t.id), 200);
+}
+
+/* ═══════════════════════════════════════════════════════
+   إضافة مادة جديدة من داخل كشف المهمة
+   ═══════════════════════════════════════════════════════ */
+function addNewMaterialInline(){
+  const name = document.getElementById('matNewName').value.trim();
+  const unit = document.getElementById('matNewUnit').value.trim() || 'عدد';
+  if(!name){
+    showToast('أدخل اسم المادة', 'error');
+    return;
+  }
+  
+  // أضف للقائمة الرئيسية
+  const newId = Math.max(...state.materials.map(m => m.id), 0) + 1;
+  state.materials.push({ id: newId, name: name, unit: unit });
+  saveMaterials();
+  
+  // أضف للمهمة الحالية
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(t){
+    if(!t.materials) t.materials = [];
+    t.materials.push({ name: name, unit: unit, qty: 1 });
+    renderTaskMaterials();
+  }
+  
+  // حدّث select
+  const sel = document.getElementById('matSelect');
+  sel.innerHTML = '<option value="">-- اختر مادة --</option>' + 
+    state.materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (${escapeHtml(m.unit)})</option>`).join('');
+  
+  document.getElementById('matNewName').value = '';
+  document.getElementById('matNewUnit').value = 'عدد';
+  showToast('✅ أُضيفت مادة جديدة', 'success');
+}
+
+/* ═══════════════════════════════════════════════════════
+   إدارة قائمة المواد الرئيسية
+   ═══════════════════════════════════════════════════════ */
+function renderMaterials(){
+  const container = document.getElementById('materialsList');
+  if(!state.materials || state.materials.length === 0){
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد مواد</div>';
+    return;
+  }
+  
+  container.innerHTML = state.materials.map(m => `
+    <div class="material-row">
+      <span class="mat-name">${escapeHtml(m.name)}</span>
+      <span class="mat-unit">${escapeHtml(m.unit)}</span>
+      <button class="mat-del" onclick="editMasterMaterial(${m.id})" style="background:var(--emerald-50);color:var(--emerald-700);font-size:11px">✏️</button>
+      <button class="mat-del" onclick="deleteMasterMaterial(${m.id})">✕</button>
+    </div>
+  `).join('');
+}
+
+let editingMasterMatId = null;
+function openMaterialSheet(id){
+  editingMasterMatId = id || null;
+  const title = document.getElementById('masterMatTitle');
+  const nameInput = document.getElementById('masterMatName');
+  const unitInput = document.getElementById('masterMatUnit');
+  
+  if(id){
+    const m = state.materials.find(x => x.id === id);
+    if(!m) return;
+    title.textContent = '✏️ تعديل مادة';
+    nameInput.value = m.name;
+    unitInput.value = m.unit;
+  }else{
+    title.textContent = '➕ إضافة مادة للقائمة';
+    nameInput.value = '';
+    unitInput.value = 'عدد';
+  }
+  openSheet('masterMatSheetBg');
+  setTimeout(() => nameInput.focus(), 350);
+}
+
+function editMasterMaterial(id){
+  openMaterialSheet(id);
+}
+
+function saveMasterMaterial(){
+  const name = document.getElementById('masterMatName').value.trim();
+  const unit = document.getElementById('masterMatUnit').value.trim() || 'عدد';
+  if(!name){
+    showToast('أدخل اسم المادة', 'error');
+    return;
+  }
+  
+  if(editingMasterMatId){
+    const m = state.materials.find(x => x.id === editingMasterMatId);
+    if(m){ m.name = name; m.unit = u
+    /* ═══════════════════════════════════════════════════════
+   الجزء 3: الطباعة على القالب الحكومي
+   ═══════════════════════════════════════════════════════ */
+
+/* ═══ شعار العقاب SVG ═══ */
+const EAGLE_SVG = `
+<svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" class="gov-eagle-svg">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0d060;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#d4a017;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#a67c00;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  <!-- النجمان -->
+  <g fill="#c9a227">
+    <polygon points="70,15 73,24 82,24 75,30 78,39 70,33 62,39 65,30 58,24 67,24"/>
+    <polygon points="130,15 133,24 142,24 135,30 138,39 130,33 122,39 125,30 118,24 127,24"/>
+  </g>
+  <!-- الجنحان -->
+  <g fill="url(#goldGrad)" stroke="#7a5c00" stroke-width="1.2">
+    <path d="M100,50 C80,45 55,50 30,70 C25,74 22,80 25,86 C30,84 40,78 50,72 C45,78 42,84 45,90 C50,86 58,80 68,74 C64,80 62,86 66,92 C72,86 80,78 88,72 L100,68 Z"/>
+    <path d="M100,50 C120,45 145,50 170,70 C175,74 178,80 175,86 C170,84 160,78 150,72 C155,78 158,84 155,90 C150,86 142,80 132,74 C136,80 138,86 134,92 C128,86 120,78 112,72 L100,68 Z"/>
+  </g>
+  <!-- جسم العقاب -->
+  <g fill="url(#goldGrad)" stroke="#7a5c00" stroke-width="1.2">
+    <path d="M100,42 C90,42 82,50 82,62 L82,95 C82,110 88,120 100,125 C112,120 118,110 118,95 L118,62 C118,50 110,42 100,42 Z"/>
+  </g>
+  <!-- الرأس -->
+  <g fill="#c9a227" stroke="#7a5c00" stroke-width="1.2">
+    <circle cx="100" cy="38" r="14"/>
+    <path d="M100,26 L98,20 L102,20 Z"/>
+  </g>
+  <!-- الدرع -->
+  <g fill="#fff8e0" stroke="#7a5c00" stroke-width="1.5">
+    <path d="M100,68 L110,74 L110,90 L100,98 L90,90 L90,74 Z"/>
+  </g>
+  <!-- النجوم الثلاث على الدرع -->
+  <g fill="#8b0000">
+    <polygon points="100,74 101.5,78 105.5,78 102.3,80.5 103.5,84.5 100,82 96.5,84.5 97.7,80.5 94.5,78 98.5,78"/>
+    <polygon points="94,86 95.5,90 99.5,90 96.3,92.5 97.5,96.5 94,94 90.5,96.5 91.7,92.5 88.5,90 92.5,90" transform="scale(0.85) translate(15,14)"/>
+    <polygon points="106,86 107.5,90 111.5,90 108.3,92.5 109.5,96.5 106,94 102.5,96.5 103.7,92.5 100.5,90 104.5,90" transform="scale(0.85) translate(18,14)"/>
+  </g>
+  <!-- حزمة القمح -->
+  <g stroke="#a67c00" stroke-width="1" fill="none">
+    <line x1="100" y1="125" x2="100" y2="145"/>
+    <ellipse cx="96" cy="132" rx="3" ry="6" fill="#d4a017"/>
+    <ellipse cx="104" cy="132" rx="3" ry="6" fill="#d4a017"/>
+    <ellipse cx="96" cy="140" rx="3" ry="6" fill="#d4a017"/>
+    <ellipse cx="104" cy="140" rx="3" ry="6" fill="#d4a017"/>
+  </g>
+  <!-- المخالب -->
+  <g fill="#a67c00">
+    <path d="M88,118 L82,128 L86,128 L90,122 Z"/>
+    <path d="M112,118 L118,128 L114,128 L110,122 Z"/>
+  </g>
+</svg>
+`;
+
+/* ═══════════════════════════════════════════════════════
+   توليد القالب الحكومي وطباعته
+   ═══════════════════════════════════════════════════════ */
+function printTask(taskId){
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t){
+    showToast('❌ المهمة غير موجودة', 'error');
+    return;
+  }
+  
+  const settings = state.settings;
+  const materials = t.materials || [];
+  
+  // تقسيم المواد على عمودين متوازيين
+  const perCol = Math.ceil(materials.length / 2) || 1;
+  const col1 = materials.slice(0, perCol);
+  const col2 = materials.slice(perCol);
+  
+  // عدد الصفوف = أكبر عمود
+  const rowsCount = Math.max(col1.length, col2.length, 1);
+  
+  // بناء صفوف الجدول
+  let tableRows = '';
+  for(let i = 0; i < rowsCount; i++){
+    const m1 = col1[i];
+    const m2 = col2[i];
+    tableRows += `
+      <tr>
+        <td class="mat-name">${m1 ? escapeHtml(m1.name) : ''}</td>
+        <td class="mat-qty">${m1 ? escapeHtml(String(m1.qty || 1)) : ''}</td>
+        <td class="mat-name">${m2 ? escapeHtml(m2.name) : ''}</td>
+        <td class="mat-qty">${m2 ? escapeHtml(String(m2.qty || 1)) : ''}</td>
+      </tr>
+    `;
+  }
+  
+  // بيانات المدرسة
+  let schoolLine = '';
+  if(t.building){
+    schoolLine = `مدرسة ${escapeHtml(t.name)} / ${escapeHtml(t.building)}`;
+  }else{
+    schoolLine = `مدرسة ${escapeHtml(t.name)}`;
+  }
+  
+  const roomLine = t.room 
+    ? `على قاعة ${escapeHtml(t.room)}` 
+    : 'على قاعة ................';
+  
+  const html = `
+    <div class="gov-header">
+      <div class="gov-eagle">${EAGLE_SVG}</div>
+      <div class="gov-header-right">
+        ${escapeHtml(settings.header1 || '')}<br>
+        ${escapeHtml(settings.header2 || '')}<br>
+        ${escapeHtml(settings.header3 || '')}
+      </div>
+      <div class="gov-header-left">
+        رقم ( ${t.number || ''} )
+      </div>
+    </div>
+    
+    <div class="gov-date-line">
+      التاريخ: ${escapeHtml(t.createdAt || todayISO())}
+    </div>
+    
+    <div class="gov-salutation">السيد مدير التربية المحترم</div>
+    
+    <div class="gov-body">
+      ــ بعد الكشف في ${schoolLine} ${roomLine} رقم ( ${escapeHtml(t.room || '1')} ) تبين الحاجة للمواد التالية:
+    </div>
+    
+    <table class="gov-table">
+      <thead>
+        <tr>
+          <th>اسم المادة والقياس</th>
+          <th style="width:60px">العدد</th>
+          <th>اسم المادة والقياس</th>
+          <th style="width:60px">العدد</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableRows}
+      </tbody>
+    </table>
+    
+    <div class="gov-signatures">
+      <div class="gov-sign-box">
+        <span class="role">القائم بالكشف</span>
+        <span class="name">الفني ${escapeHtml(t.technician || '.....................')}</span>
+      </div>
+      <div class="gov-sign-box">
+        <span class="role">رئيس شعبة الصيانة</span>
+        <span class="name">${escapeHtml(settings.sign2 || '')}</span>
+      </div>
+    </div>
+    
+    <div style="text-align:center;font-size:13px;font-weight:700;margin:22px 0 6px">
+      يرجى الاطلاع والتوجيه
+    </div>
+    
+    <hr class="gov-divider">
+    
+    <div style="text-align:right;font-size:13.5px;font-weight:800;padding-right:8px">
+      رئيس دائرة المعلوماتية<br>
+      ${escapeHtml(settings.sign3 || '')}
+    </div>
+    
+    <hr class="gov-divider" style="margin-top:24px">
+    
+    <div class="gov-sub" style="text-align:right">
+      أقترح السيد معاون مدير التربية لشؤون التعليم المهني والفني:
+    </div>
+    
+    <div style="height:60px"></div>
+    
+    <hr class="gov-divider">
+    
+    <div class="gov-sub" style="text-align:right">
+      قرار السيد المدير
+    </div>
+    
+    <div style="height:50px"></div>
+    
+    <div class="gov-end">إنهاء</div>
+    
+    <div style="text-align:right;font-size:13px;font-weight:800;margin-top:18px;padding-right:8px">
+      رئيس ورشة الكهرباء: ${escapeHtml(settings.sign1 || '')}
+    </div>
+  `;
+  
+  document.getElementById('govPaper').innerHTML = html;
+  document.getElementById('printPage').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  document.querySelector('.bottom-nav').style.display = 'none';
+  document.querySelector('.fab').style.display = 'none';
+}
+
+function closePrint(){
+  document.getElementById('printPage').style.display = 'none';
+  document.body.style.overflow = '';
+  document.querySelector('.bottom-nav').style.display = '';
+  if(document.querySelector('.page.active')?.id === 'pageHome'){
+    document.querySelector('.fab').style.display = 'flex';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   تحسين: زر العودة في طباعة الجوال
+   ═══════════════════════════════════════════════════════ */
+window.addEventListener('popstate', () => {
+  if(document.getElementById('printPage').style.display === 'block'){
+    closePrint();
+  }
+});
+
+/* ═══════════════════════════════════════════════════════
+   اختصار: Ctrl+P من داخل التطبيق
+   ═══════════════════════════════════════════════════════ */
+document.addEventListener('keydown', (e) => {
+  if((e.ctrlKey || e.metaKey) && e.key === 'p'){
+    if(document.getElementById('printPage').style.display === 'block'){
+      // اترك المتصفح يكمل العملية الطبيعية
+      return;
+    }
+  }
+  // اختصار Ctrl+K لفتح مهمة جديدة
+  if((e.ctrlKey || e.metaKey) && e.key === 'k'){
+    e.preventDefault();
+    if(document.querySelector('.page.active')?.id === 'pageHome'){
+      openTaskSheet();
+    }
+  }
+});
+
+/* ═══════════════════════════════════════════════════════
+   إصلاح: عند تغيير حجم الطباعة
+   ═══════════════════════════════════════════════════════ */
+window.addEventListener('beforeprint', () => {
+  if(document.getElementById('printPage').style.display !== 'block'){
+    return;
+  }
+});
+
+/* ═══════════════════════════════════════════════════════
+   إضافة: CSS للشعار داخل القالب
+   ═══════════════════════════════════════════════════════ */
+(function injectEagleStyles(){
+  const style = document.createElement('style');
+  style.textContent = `
+    .gov-eagle-svg{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+    .gov-eagle{
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+    }
+    @media print{
+      .gov-eagle-svg{
+        width:52px;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
+/* ═══════════════════════════════════════════════════════
+   تحسين التواريخ في العرض
+   ═══════════════════════════════════════════════════════ */
+(function fixDatesDisplay(){
+  const origRender = window.renderTasks;
+  if(typeof origRender === 'function'){
+    window.renderTasks = function(){
+      origRender.apply(this, arguments);
+    };
+  }
+})();
+
+/* ═══════════════════════════════════════════════════════
+   PWA: تفعيل التثبيت على الجوال
+   ═══════════════════════════════════════════════════════ */
+if('serviceWorker' in navigator && location.protocol === 'https:'){
+  navigator.serviceWorker.register('data:text/javascript,' + encodeURIComponent(`
+    self.addEventListener('install', e => self.skipWaiting());
+    self.addEventListener('activate', e => self.clients.claim());
+    self.addEventListener('fetch', e => {
+      e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    });
+  `)).catch(() => {});
+}
+
+/* ═══════════════════════════════════════════════════════
+   عرض إرشاد التثبيت مرة واحدة
+   ═══════════════════════════════════════════════════════ */
+(function showInstallHint(){
+  const shown = localStorage.getItem('mt_install_hint_shown');
+  if(shown) return;
+  if(window.matchMedia('(display-mode: standalone)').matches) return;
+  if(navigator.standalone === true) return;
+  
+  setTimeout(() => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+    if(!isIOS && !isAndroid) return;
+    
+    const msg = isIOS 
+      ? '💡 لإضافة التطبيق لشاشتك: اضغط زر المشاركة ⎙ ثم "إضافة إلى الشاشة الرئيسية"'
+      : '💡 لإضافة التطبيق لشاشتك: اضغط ⋮ ثم "إضافة إلى الشاشة الرئيسية"';
+    
+    showToast(msg, 'success');
+    localStorage.setItem('mt_install_hint_shown', '1');
+  }, 4000);
+})();
+
+/* ═══════════════════════════════════════════════════════
+   إصلاح التوافق: احفظ آخر تبويب
+   ═══════════════════════════════════════════════════════ */
+(function rememberTab(){
+  const saved = localStorage.getItem('mt_current_page');
+  if(saved && document.getElementById(saved)){
+    setTimeout(() => switchPage(saved), 100);
+  }
+  const origSwitch = window.switchPage;
+  window.switchPage = function(pageId){
+    localStorage.setItem('mt_current_page', pageId);
+    origSwitch.apply(this, arguments);
+  };
+})();
+
+console.log('%c🔧 تطبيق مهام الصيانة جاهز', 'color:#0d5c46;font-size:16px;font-weight:bold');
+console.log('%c🌿 الإصدار 1.0', 'color:#b87333;font-size:12px');
+   ═══════════════════════════════════════════════════════ */
+</script>
+
+</body>
+</html>
