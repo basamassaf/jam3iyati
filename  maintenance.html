@@ -12,32 +12,68 @@
 <style>
 :root{
   --emerald-900:#0d3d2e;--emerald-800:#0d5c46;--emerald-700:#127a5d;--emerald-600:#1a9b76;
-  --emerald-500:#22b88d;--emerald-100:#d4f4e8;--emerald-50:#eefaf5;
+  --emerald-500:#22b88d;--emerald-200:#a7e8d0;--emerald-100:#d4f4e8;--emerald-50:#eefaf5;
   --copper-700:#8b5a2b;--copper-600:#b87333;--copper-500:#d49249;--copper-300:#e8b878;--copper-100:#f5e6d3;
   --danger:#c0392b;--danger-light:#fdecea;--warn:#d97706;--warn-light:#fef3e2;
   --ok:#15803d;--ok-light:#dcfce7;
-  --gray-900:#0f172a;--gray-700:#334155;--gray-500:#64748b;--gray-300:#cbd5e1;
-  --gray-200:#e2e8f0;--gray-100:#f1f5f9;--gray-50:#f8fafc;--white:#fff;
-  --shadow-sm:0 1px 3px rgba(13,92,70,.08);--shadow-md:0 4px 14px rgba(13,92,70,.12);
+  --gray-900:#0f172a;--gray-800:#1e293b;--gray-700:#334155;--gray-600:#475569;--gray-500:#64748b;
+  --gray-400:#94a3b8;--gray-300:#cbd5e1;--gray-200:#e2e8f0;--gray-100:#f1f5f9;
+  --gray-50:#f8fafc;--white:#fff;
+  --shadow-sm:0 1px 3px rgba(13,92,70,.08);
+  --shadow-md:0 4px 14px rgba(13,92,70,.12);
   --shadow-lg:0 10px 30px rgba(13,92,70,.18);
   --radius:14px;--radius-sm:10px;--radius-lg:20px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(160deg,#f0f7f4 0%,#f8fafc 100%);color:var(--gray-900);min-height:100vh;padding-bottom:90px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{
+  font-family:'Segoe UI',Tahoma,Arial,sans-serif;
+  background:linear-gradient(160deg,#f0f7f4 0%,#f8fafc 100%);
+  color:var(--gray-900);min-height:100vh;padding-bottom:90px;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
 
-.app-header{background:linear-gradient(135deg,var(--emerald-800),var(--emerald-700));color:#fff;padding:18px 16px 22px;border-radius:0 0 24px 24px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden}
-.app-header::before{content:'';position:absolute;top:-40%;left:-10%;width:220px;height:220px;background:radial-gradient(circle,rgba(212,146,73,.25),transparent 70%);border-radius:50%}
-.app-header::after{content:'';position:absolute;bottom:-60%;right:-20%;width:260px;height:260px;background:radial-gradient(circle,rgba(34,184,141,.2),transparent 70%);border-radius:50%}
-.header-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1;margin-bottom:14px}
+/* ═══════════ الرأس ═══════════ */
+.app-header{
+  background:linear-gradient(135deg,var(--emerald-800),var(--emerald-700));
+  color:#fff;padding:18px 16px 22px;border-radius:0 0 24px 24px;
+  box-shadow:var(--shadow-lg);position:relative;overflow:hidden;
+}
+.app-header::before{
+  content:'';position:absolute;top:-40%;left:-10%;width:220px;height:220px;
+  background:radial-gradient(circle,rgba(212,146,73,.25),transparent 70%);border-radius:50%;
+}
+.app-header::after{
+  content:'';position:absolute;bottom:-60%;right:-20%;width:260px;height:260px;
+  background:radial-gradient(circle,rgba(34,184,141,.2),transparent 70%);border-radius:50%;
+}
+.header-top{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  position:relative;z-index:1;margin-bottom:14px;
+}
 .header-title{display:flex;align-items:center;gap:10px}
-.header-icon{font-size:26px;background:rgba(255,255,255,.15);width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+.header-icon{
+  font-size:26px;background:rgba(255,255,255,.15);width:42px;height:42px;
+  border-radius:12px;display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(10px);
+}
 .header-title h1{font-size:17px;font-weight:700;letter-spacing:.2px}
 .header-title p{font-size:11px;opacity:.85;margin-top:2px}
-.header-date{background:rgba(255,255,255,.15);padding:6px 12px;border-radius:20px;font-size:11px;font-weight:600;backdrop-filter:blur(10px);white-space:nowrap}
+.header-date{
+  background:rgba(255,255,255,.15);padding:6px 12px;border-radius:20px;
+  font-size:11px;font-weight:600;backdrop-filter:blur(10px);white-space:nowrap;
+}
 
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;position:relative;z-index:1}
-.stat{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:10px 6px;text-align:center;backdrop-filter:blur(10px);transition:.2s}
+/* ═══════════ الإحصائيات ═══════════ */
+.stats-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  position:relative;z-index:1;
+}
+.stat{
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);
+  border-radius:12px;padding:10px 6px;text-align:center;
+  backdrop-filter:blur(10px);transition:.2s;
+}
 .stat:active{transform:scale(.96)}
 .stat-num{font-size:20px;font-weight:800;line-height:1}
 .stat-lbl{font-size:10px;opacity:.9;margin-top:4px;font-weight:500}
@@ -45,19 +81,43 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
 .stat.med .stat-num{color:#ffe08a}
 .stat.done .stat-num{color:#a7f3c9}
 
+/* ═══════════ البحث ═══════════ */
 .search-wrap{padding:14px 16px 8px}
-.search-box{display:flex;align-items:center;gap:10px;background:var(--white);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);transition:.2s}
-.search-box:focus-within{border-color:var(--emerald-600);box-shadow:0 0 0 3px rgba(26,155,118,.1)}
+.search-box{
+  display:flex;align-items:center;gap:10px;background:var(--white);
+  border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-sm);
+  border:1px solid var(--gray-200);transition:.2s;
+}
+.search-box:focus-within{
+  border-color:var(--emerald-600);box-shadow:0 0 0 3px rgba(26,155,118,.1);
+}
 .search-box svg{width:18px;height:18px;color:var(--gray-500);flex-shrink:0}
-.search-box input{flex:1;border:none;outline:none;font-size:14px;background:transparent;font-family:inherit}
+.search-box input{
+  flex:1;border:none;outline:none;font-size:14px;background:transparent;font-family:inherit;
+}
 
-.filters{padding:0 16px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+/* ═══════════ الفلاتر ═══════════ */
+.filters{
+  padding:0 16px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
+}
 .filters::-webkit-scrollbar{display:none}
-.chip{padding:7px 14px;border-radius:20px;border:1px solid var(--gray-200);background:var(--white);font-size:12px;font-weight:600;color:var(--gray-700);cursor:pointer;white-space:nowrap;transition:.2s;font-family:inherit}
-.chip.active{background:var(--emerald-700);color:#fff;border-color:var(--emerald-700);box-shadow:0 4px 10px rgba(13,92,70,.25)}
+.chip{
+  padding:7px 14px;border-radius:20px;border:1px solid var(--gray-200);
+  background:var(--white);font-size:12px;font-weight:600;color:var(--gray-700);
+  cursor:pointer;white-space:nowrap;transition:.2s;font-family:inherit;
+}
+.chip.active{
+  background:var(--emerald-700);color:#fff;border-color:var(--emerald-700);
+  box-shadow:0 4px 10px rgba(13,92,70,.25);
+}
 
+/* ═══════════ قائمة المهام ═══════════ */
 .tasks-list{padding:0 16px 20px;display:flex;flex-direction:column;gap:10px}
-.task-card{background:var(--white);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow-sm);border-right:5px solid var(--gray-300);position:relative;transition:.25s;animation:fadeUp .3s ease}
+.task-card{
+  background:var(--white);border-radius:var(--radius);padding:14px;
+  box-shadow:var(--shadow-sm);border-right:5px solid var(--gray-300);
+  position:relative;transition:.25s;animation:fadeUp .3s ease;
+}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .task-card:active{transform:scale(.99)}
 .task-card.p-high{border-right-color:var(--danger);background:linear-gradient(90deg,var(--white) 60%,var(--danger-light) 100%)}
@@ -65,6 +125,7 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
 .task-card.p-low{border-right-color:var(--ok);background:linear-gradient(90deg,var(--white) 60%,var(--ok-light) 100%)}
 .task-card.is-done{opacity:.65;border-right-color:var(--emerald-500);background:var(--emerald-50)}
 .task-card.is-done .task-name{text-decoration:line-through;color:var(--gray-500)}
+
 .task-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
 .task-name{font-size:15px;font-weight:700;color:var(--gray-900);line-height:1.3;flex:1}
 .task-badges{display:flex;gap:4px;flex-shrink:0}
@@ -73,12 +134,24 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
 .mb-med{background:var(--warn);color:#fff}
 .mb-low{background:var(--ok);color:#fff}
 .mb-done{background:var(--emerald-600);color:#fff}
-.task-meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11.5px;color:var(--gray-500);margin-bottom:10px}
+.task-meta{
+  display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11.5px;
+  color:var(--gray-500);margin-bottom:10px;
+}
 .task-meta span{display:inline-flex;align-items:center;gap:4px}
-.task-note{background:var(--gray-50);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--gray-700);margin-bottom:10px;border-right:3px solid var(--copper-500);line-height:1.5}
-
+.task-note{
+  background:var(--gray-50);border-radius:8px;padding:8px 10px;
+  font-size:12px;color:var(--gray-700);margin-bottom:10px;
+  border-right:3px solid var(--copper-500);line-height:1.5;
+}
 .task-actions{display:flex;gap:6px;flex-wrap:wrap}
-.btn{border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:4px;transition:.2s;flex:1;min-width:auto}
+
+/* ═══════════ الأزرار ═══════════ */
+.btn{
+  border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;
+  justify-content:center;gap:4px;transition:.2s;flex:1;min-width:auto;
+}
 .btn:active{transform:scale(.96)}
 .btn-done{background:var(--ok);color:#fff}
 .btn-undo{background:var(--warn);color:#fff}
@@ -86,90 +159,227 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
 .btn-print{background:var(--emerald-700);color:#fff}
 .btn-del{background:var(--gray-100);color:var(--danger);flex:0 0 auto;padding:8px 10px}
 
-.empty{text-align:center;padding:50px 20px;color:var(--gray-500)}
-.empty-icon{font-size:50px;margin-bottom:12px;opacity:.4}
-.empty p{font-size:14px}
-
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--white);box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;justify-content:space-around;padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:50;border-top:1px solid var(--gray-200)}
-.nav-item{flex:1;text-align:center;padding:6px 4px;cursor:pointer;border-radius:12px;transition:.2s;color:var(--gray-500)}
-.nav-item.active{color:var(--emerald-700);background:var(--emerald-50)}
-.nav-item svg{width:22px;height:22px;display:block;margin:0 auto 3px}
-.nav-item span{font-size:10.5px;font-weight:700}
-
-.fab{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--copper-600),var(--copper-500));color:#fff;border:none;box-shadow:0 8px 24px rgba(184,115,51,.4);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:60;transition:.25s}
-.fab.show{display:flex}
-.fab:active{transform:translateX(-50%) scale(.92)}
-.fab svg{width:28px;height:28px}
-
-.sheet-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);z-index:100;display:none;align-items:flex-end;justify-content:center;animation:fadeIn .2s}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.sheet-bg.open{display:flex}
-.sheet{background:var(--white);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.16,1,.3,1)}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.sheet-handle{width:42px;height:5px;background:var(--gray-300);border-radius:3px;margin:0 auto 16px}
-.sheet-title{font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.sheet-title svg{width:20px;height:20px}
-
-.field{margin-bottom:14px}
-.field label{display:block;font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:6px}
-.field label .req{color:var(--danger)}
-.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--gray-200);border-radius:11px;font-size:14px;font-family:inherit;background:var(--white);color:var(--gray-900);transition:.2s;outline:none}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--emerald-600);box-shadow:0 0 0 3px rgba(26,155,118,.1)}
-.field textarea{resize:vertical;min-height:70px}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
-.btn-lg{width:100%;padding:14px;border-radius:13px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-lg{
+  width:100%;padding:14px;border-radius:13px;border:none;font-size:15px;
+  font-weight:800;cursor:pointer;font-family:inherit;transition:.2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
 .btn-lg:active{transform:scale(.98)}
 .btn-primary{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600));color:#fff;box-shadow:0 6px 16px rgba(13,92,70,.25)}
 .btn-copper{background:linear-gradient(135deg,var(--copper-700),var(--copper-500));color:#fff;box-shadow:0 6px 16px rgba(184,115,51,.25)}
 .btn-ghost{background:var(--gray-100);color:var(--gray-700)}
+.btn-map{background:linear-gradient(135deg,#1a73e8,#4285f4);color:#fff;text-decoration:none}
 
-.material-row{display:flex;align-items:center;gap:8px;background:var(--gray-50);border-radius:11px;padding:10px;margin-bottom:8px;border:1px solid var(--gray-200)}
+/* ═══════════ الحالة الفارغة ═══════════ */
+.empty{text-align:center;padding:50px 20px;color:var(--gray-500)}
+.empty-icon{font-size:50px;margin-bottom:12px;opacity:.4}
+.empty p{font-size:14px}
+
+/* ═══════════ الشريط السفلي ═══════════ */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;background:var(--white);
+  box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;
+  justify-content:space-around;padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+  z-index:50;border-top:1px solid var(--gray-200);
+}
+.nav-item{
+  flex:1;text-align:center;padding:6px 4px;cursor:pointer;
+  border-radius:12px;transition:.2s;color:var(--gray-500);
+}
+.nav-item.active{color:var(--emerald-700);background:var(--emerald-50)}
+.nav-item svg{width:22px;height:22px;display:block;margin:0 auto 3px}
+.nav-item span{font-size:10.5px;font-weight:700}
+
+/* ═══════════ الزر العائم ═══════════ */
+.fab{
+  position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;
+  transform:translateX(-50%);width:58px;height:58px;border-radius:50%;
+  background:linear-gradient(135deg,var(--copper-600),var(--copper-500));
+  color:#fff;border:none;box-shadow:0 8px 24px rgba(184,115,51,.4);
+  cursor:pointer;display:none;align-items:center;justify-content:center;
+  z-index:60;transition:.25s;
+}
+.fab.show{display:flex}
+.fab:active{transform:translateX(-50%) scale(.92)}
+.fab svg{width:28px;height:28px}
+
+/* ═══════════ النوافذ المنبثقة ═══════════ */
+.sheet-bg{
+  position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);
+  z-index:100;display:none;align-items:flex-end;justify-content:center;
+  animation:fadeIn .2s;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.sheet-bg.open{display:flex}
+.sheet{
+  background:var(--white);width:100%;max-width:520px;
+  border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));
+  max-height:92vh;overflow-y:auto;
+  animation:slideUp .3s cubic-bezier(.16,1,.3,1);
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{width:42px;height:5px;background:var(--gray-300);border-radius:3px;margin:0 auto 16px}
+.sheet-title{
+  font-size:17px;font-weight:800;color:var(--emerald-800);
+  margin-bottom:16px;display:flex;align-items:center;gap:8px;
+}
+.sheet-title svg{width:20px;height:20px}
+
+/* ═══════════ الحقول ═══════════ */
+.field{margin-bottom:14px}
+.field label{
+  display:block;font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:6px;
+}
+.field label .req{color:var(--danger)}
+.field input,.field select,.field textarea{
+  width:100%;padding:11px 13px;border:1.5px solid var(--gray-200);
+  border-radius:11px;font-size:14px;font-family:inherit;background:var(--white);
+  color:var(--gray-900);transition:.2s;outline:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--emerald-600);box-shadow:0 0 0 3px rgba(26,155,118,.1);
+}
+.field textarea{resize:vertical;min-height:70px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ═══════════ الصفحات ═══════════ */
+.page{display:none;padding:16px;animation:fadeUp .3s}
+.page.active{display:block}
+.section{
+  background:var(--white);border-radius:var(--radius);padding:16px;
+  margin-bottom:14px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);
+}
+.section-title{
+  font-size:14px;font-weight:800;color:var(--emerald-800);margin-bottom:12px;
+  padding-bottom:10px;border-bottom:2px solid var(--emerald-100);
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.section-title button{
+  background:var(--copper-600);color:#fff;border:none;padding:6px 12px;
+  border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;
+}
+
+/* ═══════════ المواد ═══════════ */
+.material-row{
+  display:flex;align-items:center;gap:8px;background:var(--gray-50);
+  border-radius:11px;padding:10px;margin-bottom:8px;border:1px solid var(--gray-200);
+}
 .material-row .mat-name{flex:1;font-size:13px;font-weight:600;color:var(--gray-900)}
-.material-row .mat-unit{font-size:11px;color:var(--gray-500);background:var(--white);padding:3px 8px;border-radius:6px;border:1px solid var(--gray-200)}
-.material-row input.qty{width:60px;padding:7px;text-align:center;border:1.5px solid var(--gray-300);border-radius:8px;font-size:13px;font-weight:700;font-family:inherit}
-.mat-del{background:var(--danger-light);color:var(--danger);border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.material-row .mat-unit{
+  font-size:11px;color:var(--gray-500);background:var(--white);
+  padding:3px 8px;border-radius:6px;border:1px solid var(--gray-200);
+}
+.material-row input.qty{
+  width:60px;padding:7px;text-align:center;border:1.5px solid var(--gray-300);
+  border-radius:8px;font-size:13px;font-weight:700;font-family:inherit;
+}
+.mat-del{
+  background:var(--danger-light);color:var(--danger);border:none;
+  width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px;
+  font-weight:700;display:flex;align-items:center;justify-content:center;
+}
 
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--emerald-800);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:200;box-shadow:var(--shadow-lg);transition:.35s cubic-bezier(.16,1,.3,1);max-width:90%;text-align:center}
+/* ═══════════ Schools Search ═══════════ */
+.school-results{
+  display:none;max-height:240px;overflow-y:auto;margin-top:6px;
+  border:1.5px solid var(--emerald-200);border-radius:10px;background:#fff;
+}
+.school-results.show{display:block}
+.school-item{
+  padding:10px;border-bottom:1px solid var(--gray-100);cursor:pointer;font-size:12px;
+}
+.school-item:last-child{border-bottom:none}
+.school-item:active{background:var(--emerald-50)}
+.school-item-name{font-weight:700;color:var(--emerald-800);margin-bottom:2px}
+.school-item-name .old-tag{
+  color:var(--copper-600);font-size:10px;font-weight:600;
+}
+.school-item-meta{color:var(--gray-500);font-size:11px}
+
+.selected-school{
+  background:var(--emerald-50);border:1.5px solid var(--emerald-500);
+  border-radius:10px;padding:12px;margin-top:8px;font-size:12px;
+  position:relative;
+}
+.selected-school .close-btn{
+  position:absolute;top:6px;left:6px;background:var(--danger-light);
+  color:var(--danger);border:none;width:22px;height:22px;border-radius:50%;
+  cursor:pointer;font-size:14px;line-height:1;font-weight:700;
+}
+.selected-school .s-name{font-weight:800;color:var(--emerald-800);font-size:13px;margin-bottom:4px}
+.selected-school .s-info{color:var(--gray-600);line-height:1.6}
+
+/* ═══════════ Toast ═══════════ */
+.toast{
+  position:fixed;top:20px;left:50%;
+  transform:translateX(-50%) translateY(-100px);
+  background:var(--emerald-800);color:#fff;padding:12px 20px;
+  border-radius:12px;font-size:13px;font-weight:700;z-index:200;
+  box-shadow:var(--shadow-lg);
+  transition:.35s cubic-bezier(.16,1,.3,1);max-width:90%;text-align:center;
+}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .toast.success{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600))}
 .toast.error{background:linear-gradient(135deg,#991b1b,var(--danger))}
 .toast.warn{background:linear-gradient(135deg,#92400e,var(--warn))}
 
-.page{display:none;padding:16px;animation:fadeUp .3s}
-.page.active{display:block}
-.section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200)}
-.section-title{font-size:14px;font-weight:800;color:var(--emerald-800);margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--emerald-100);display:flex;align-items:center;justify-content:space-between;gap:8px}
-.section-title button{background:var(--copper-600);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit}
-
+/* ═══════════ الطباعة ═══════════ */
 .print-page{padding:20px;background:var(--gray-100);min-height:100vh}
 .print-toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .print-toolbar .btn{flex:1;min-width:130px;padding:12px}
 
-.gov-paper{background:#fff;width:100%;max-width:800px;margin:0 auto;padding:22mm 18mm 18mm;box-shadow:0 4px 20px rgba(0,0,0,.12);direction:rtl;font-family:'Traditional Arabic','Sakkal Majalla','Amiri','Segoe UI',Tahoma,serif;color:#000;line-height:1.7;position:relative}
-.gov-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;position:relative;min-height:80px}
-.gov-eagle{position:absolute;left:50%;top:0;transform:translateX(-50%);width:70px;height:auto}
+.gov-paper{
+  background:#fff;width:100%;max-width:800px;margin:0 auto;
+  padding:22mm 18mm 18mm;box-shadow:0 4px 20px rgba(0,0,0,.12);
+  direction:rtl;
+  font-family:'Traditional Arabic','Sakkal Majalla','Amiri','Segoe UI',Tahoma,serif;
+  color:#000;line-height:1.7;position:relative;
+}
+.gov-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:10px;margin-bottom:8px;position:relative;min-height:80px;
+}
+.gov-eagle{
+  position:absolute;left:50%;top:0;transform:translateX(-50%);
+  width:70px;height:auto;
+}
 .gov-eagle-svg{width:100%;height:auto;display:block}
-.gov-header-right{text-align:right;font-size:13px;font-weight:700;line-height:1.65;margin-right:auto;padding-right:8px;padding-top:4px}
-.gov-header-left{text-align:left;font-size:13px;font-weight:700;padding-left:8px;padding-top:8px}
-.gov-date-line{text-align:right;font-size:13px;font-weight:700;margin:6px 0 20px;padding-right:8px}
+.gov-header-right{
+  text-align:right;font-size:13px;font-weight:700;line-height:1.65;
+  margin-right:auto;padding-right:8px;padding-top:4px;
+}
+.gov-header-left{
+  text-align:left;font-size:13px;font-weight:700;padding-left:8px;padding-top:8px;
+}
+.gov-date-line{
+  text-align:right;font-size:13px;font-weight:700;margin:6px 0 20px;padding-right:8px;
+}
 .gov-salutation{text-align:center;font-size:16px;font-weight:800;margin:8px 0 14px}
-.gov-body{font-size:14.5px;font-weight:600;text-align:justify;margin-bottom:18px;padding:0 6px;line-height:1.9}
-
+.gov-body{
+  font-size:14.5px;font-weight:600;text-align:justify;
+  margin-bottom:18px;padding:0 6px;line-height:1.9;
+}
 .gov-table{width:100%;border-collapse:collapse;margin-bottom:22px;font-size:13px}
-.gov-table th,.gov-table td{border:1px solid #000;padding:5px 8px;text-align:center;font-weight:700;vertical-align:middle}
+.gov-table th,.gov-table td{
+  border:1px solid #000;padding:5px 8px;text-align:center;
+  font-weight:700;vertical-align:middle;
+}
 .gov-table th{background:#f3f3f3;font-weight:800;font-size:12.5px}
 .gov-table td.mat-name{text-align:right;padding-right:10px}
 .gov-table td.mat-qty{width:60px;font-weight:800}
-
-.gov-signatures{display:flex;justify-content:space-between;margin-top:28px;padding:0 20px;font-size:13.5px;font-weight:700;text-align:center;line-height:1.8}
+.gov-signatures{
+  display:flex;justify-content:space-between;margin-top:28px;
+  padding:0 20px;font-size:13.5px;font-weight:700;text-align:center;line-height:1.8;
+}
 .gov-sign-box{flex:1;max-width:45%}
 .gov-sign-box .role{display:block;margin-bottom:2px}
 .gov-sign-box .name{font-weight:800;font-size:14px}
-
 .gov-divider{border:none;border-top:1.5px solid #000;margin:22px 0 14px}
 .gov-sub{font-size:13.5px;font-weight:800;margin:14px 0 6px}
-.gov-end{text-align:center;font-size:12px;font-weight:700;margin-top:35px;color:#666;border-top:1px dashed #999;padding-top:10px}
+.gov-end{
+  text-align:center;font-size:12px;font-weight:700;margin-top:35px;
+  color:#666;border-top:1px dashed #999;padding-top:10px;
+}
 
 @media print{
   @page{size:A4;margin:15mm}
@@ -191,7 +401,9 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
 </head>
 <body>
 
+<!-- ═══════════ صفحة المهام ═══════════ -->
 <div id="pageHome" class="page active">
+
   <header class="app-header">
     <div class="header-top">
       <div class="header-title">
@@ -214,7 +426,7 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
   <div class="search-wrap">
     <div class="search-box">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
-      <input type="text" id="searchInput" placeholder="ابحث باسم المدرسة أو المنطقة...">
+      <input type="text" id="searchInput" placeholder="ابحث باسم المدرسة أو المشرف...">
     </div>
   </div>
 
@@ -234,6 +446,28 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
   </button>
 </div>
 
+<!-- ═══════════ صفحة المدارس ═══════════ -->
+<div id="pageSchools" class="page">
+  <div class="section">
+    <div class="section-title">
+      <span>🏫 قاعدة بيانات المدارس</span>
+      <button onclick="openSchoolSheet()">+ إضافة مدرسة</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <button class="btn-lg btn-primary" onclick="document.getElementById('importSchoolFile').click()" style="font-size:12px;padding:10px">📥 استيراد CSV</button>
+      <button class="btn-lg btn-copper" onclick="exportSchoolsCSV()" style="font-size:12px;padding:10px">📤 تصدير CSV</button>
+    </div>
+    <input type="file" id="importSchoolFile" accept=".csv,.txt" style="display:none" onchange="importSchoolsCSV(event)">
+    <div id="schoolsStats" style="font-size:12px;color:var(--gray-600);margin-bottom:10px"></div>
+    <div class="search-box" style="margin-bottom:12px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="schoolListSearch" placeholder="ابحث في القائمة..." oninput="renderSchoolsList(this.value)">
+    </div>
+    <div id="schoolsList" style="max-height:520px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<!-- ═══════════ صفحة المواد ═══════════ -->
 <div id="pageMaterials" class="page">
   <div class="section">
     <div class="section-title">
@@ -244,6 +478,7 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
   </div>
 </div>
 
+<!-- ═══════════ صفحة الإعدادات ═══════════ -->
 <div id="pageSettings" class="page">
   <div class="section">
     <div class="section-title">🏛️ بيانات القالب الرسمي</div>
@@ -264,7 +499,7 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
     <button class="btn-lg btn-primary" style="margin-bottom:8px" onclick="exportJSON()">📤 تصدير نسخة احتياطية (JSON)</button>
     <button class="btn-lg btn-copper" style="margin-bottom:8px" onclick="document.getElementById('importFile').click()">📥 استيراد نسخة احتياطية</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
-    <button class="btn-lg btn-ghost" onclick="exportCSV()">📊 تصدير Excel (CSV)</button>
+    <button class="btn-lg btn-ghost" onclick="exportTasksCSV()">📊 تصدير المهام (CSV)</button>
   </div>
   <div class="section">
     <div class="section-title">🗑️ منطقة الخطر</div>
@@ -272,10 +507,15 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
   </div>
 </div>
 
+<!-- ═══════════ الشريط السفلي ═══════════ -->
 <nav class="bottom-nav no-print">
   <div class="nav-item active" data-page="pageHome" onclick="switchPage('pageHome')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
     <span>المهام</span>
+  </div>
+  <div class="nav-item" data-page="pageSchools" onclick="switchPage('pageSchools')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>المدارس</span>
   </div>
   <div class="nav-item" data-page="pageMaterials" onclick="switchPage('pageMaterials')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
@@ -287,15 +527,38 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
   </div>
 </nav>
 
+<!-- ═══════════ نافذة المهمة ═══════════ -->
 <div class="sheet-bg" id="taskSheetBg" onclick="if(event.target===this)closeSheet('taskSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title" id="taskSheetTitle">➕ مهمة جديدة</div>
-    <div class="field"><label>اسم المدرسة / الموقع <span class="req">*</span></label><input type="text" id="fName" placeholder="مثال: مدرسة الشاهين"></div>
+
+    <div class="field">
+      <label>🔍 ابحث عن المدرسة (اختياري)</label>
+      <input type="text" id="fSchoolSearch" placeholder="اكتب 2 حروف على الأقل..." autocomplete="off" oninput="searchSchools(this.value)">
+      <div class="school-results" id="schoolResults"></div>
+      <div class="selected-school" id="selectedSchool" style="display:none">
+        <button type="button" class="close-btn" onclick="clearSelectedSchool()">✕</button>
+        <div class="s-name" id="selName"></div>
+        <div class="s-info" id="selInfo"></div>
+      </div>
+    </div>
+
+    <div class="field" id="fNameField">
+      <label>اسم المدرسة / الموقع <span class="req">*</span></label>
+      <input type="text" id="fName" placeholder="مثال: مدرسة الشاهين">
+    </div>
+
+    <div class="field">
+      <label>📛 الاسم الجديد (إن تغير)</label>
+      <input type="text" id="fNewName" placeholder="اتركه فارغاً إن لم يتغير">
+    </div>
+
     <div class="field-row">
       <div class="field"><label>المبنى / القاعة</label><input type="text" id="fBuilding" placeholder="مبنى ح2 - قاعة الحاسوب"></div>
       <div class="field"><label>رقم القاعة</label><input type="text" id="fRoom" placeholder="1"></div>
     </div>
+
     <div class="field-row">
       <div class="field"><label>نوع المهمة</label>
         <select id="fType">
@@ -310,22 +573,38 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
         </select>
       </div>
     </div>
+
     <div class="field-row">
       <div class="field"><label>المنطقة</label>
         <select id="fArea">
-          <option>المزة - أبو زهير</option><option>برزة</option><option>الزاهرة</option>
-          <option>كفرسوسة</option><option>الميدان</option><option>ركن الدين</option>
-          <option>دمر</option><option>أخرى</option>
+          <option>المزة - أبو زهير</option><option>المزة</option><option>برزة</option><option>الزاهرة</option>
+          <option>كفرسوسة</option><option>الميدان</option><option>القنوات</option><option>الشاغور</option>
+          <option>دمشق القديمة</option><option>ساروجا</option><option>ركن الدين</option><option>الصالحية</option>
+          <option>المهاجرين</option><option>القدم</option><option>دمر</option><option>القابون</option>
+          <option>جوبر</option><option>المخيم</option><option>أخرى</option>
         </select>
       </div>
-      <div class="field"><label>المشرف / جهة الاتصال</label><input type="text" id="fContact" placeholder="اسم المشرف"></div>
+      <div class="field"><label>المشرف</label><input type="text" id="fContact" placeholder="اسم المشرف"></div>
     </div>
-    <div class="field"><label>ملاحظات / وصف العطل</label><textarea id="fNotes" placeholder="تفاصيل إضافية..."></textarea></div>
+
+    <div class="field">
+      <label>🔄 تعديل بيانات المدرسة (اختياري)</label>
+      <input type="text" id="fEditPhone" placeholder="الهاتف الجديد (إن تغير)" style="margin-bottom:8px">
+      <input type="text" id="fEditAddress" placeholder="العنوان الجديد (إن تغير)" style="margin-bottom:8px">
+      <input type="text" id="fEditExtra" placeholder="حقل إضافي: رقم/معلومة خاصة">
+    </div>
+
+    <div class="field">
+      <label>ملاحظات / وصف العطل</label>
+      <textarea id="fNotes" placeholder="تفاصيل إضافية..."></textarea>
+    </div>
+
     <button class="btn-lg btn-primary" onclick="saveTask()">💾 حفظ المهمة</button>
     <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('taskSheetBg')">إلغاء</button>
   </div>
 </div>
 
+<!-- ═══════════ نافذة التفاصيل ═══════════ -->
 <div class="sheet-bg" id="detailSheetBg" onclick="if(event.target===this)closeSheet('detailSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -337,6 +616,7 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
   </div>
 </div>
 
+<!-- ═══════════ نافذة المواد داخل المهمة ═══════════ -->
 <div class="sheet-bg" id="matSheetBg" onclick="if(event.target===this)closeSheet('matSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -344,24 +624,35 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
       <span>كشف المواد المطلوبة</span>
     </div>
-    <div class="field"><label>اختر مادة من القائمة</label>
+
+    <div class="field">
+      <label>اختر مادة من القائمة</label>
       <select id="matSelect" onchange="addMaterialToTask()"><option value="">-- اختر مادة --</option></select>
     </div>
-    <div class="field"><label>أو أضف مادة جديدة</label>
+
+    <div class="field">
+      <label>أو أضف مادة جديدة</label>
       <div style="display:flex;gap:8px">
         <input type="text" id="matNewName" placeholder="اسم المادة" style="flex:1">
         <input type="text" id="matNewUnit" placeholder="الوحدة" style="width:90px">
         <button class="btn btn-done" style="flex:0 0 auto;padding:8px 12px" onclick="addNewMaterialInline()">+</button>
       </div>
     </div>
+
     <div style="margin:16px 0 10px;font-size:13px;font-weight:800;color:var(--emerald-800)">📋 المواد في هذه المهمة:</div>
     <div id="taskMaterialsList"></div>
-    <div class="field"><label>اسم الفني (القائم بالكشف)</label><input type="text" id="fTechnician" placeholder="اسم الفني الذي قام بالكشف"></div>
+
+    <div class="field">
+      <label>اسم الفني (القائم بالكشف)</label>
+      <input type="text" id="fTechnician" placeholder="اسم الفني الذي قام بالكشف">
+    </div>
+
     <button class="btn-lg btn-copper" style="margin-top:12px" onclick="saveTaskMaterials()">💾 حفظ المواد</button>
     <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('matSheetBg')">إلغاء</button>
   </div>
 </div>
 
+<!-- ═══════════ نافذة إضافة/تعديل مادة ═══════════ -->
 <div class="sheet-bg" id="masterMatSheetBg" onclick="if(event.target===this)closeSheet('masterMatSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -373,8 +664,32 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
   </div>
 </div>
 
+<!-- ═══════════ نافذة إضافة/تعديل مدرسة ═══════════ -->
+<div class="sheet-bg" id="schoolSheetBg" onclick="if(event.target===this)closeSheet('schoolSheetBg')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="schoolSheetTitle">➕ إضافة مدرسة للقاعدة</div>
+    <div class="field"><label>اسم المدرسة <span class="req">*</span></label><input type="text" id="schName" placeholder="مثال: مدرسة الشاهين"></div>
+    <div class="field"><label>الاسم القديم (اختياري)</label><input type="text" id="schOldName" placeholder="الاسم السابق"></div>
+    <div class="field"><label>المشرف</label><input type="text" id="schSupervisor" placeholder="اسم المشرف"></div>
+    <div class="field-row">
+      <div class="field"><label>المنطقة</label><input type="text" id="schArea" placeholder="الميدان"></div>
+      <div class="field"><label>الحي</label><input type="text" id="schDistrict" placeholder="ميدان وسطاني"></div>
+    </div>
+    <div class="field"><label>العنوان التفصيلي</label><input type="text" id="schAddress" placeholder="ميدان وسطاني-جانب مستوصف..."></div>
+    <div class="field-row">
+      <div class="field"><label>المرحلة</label><input type="text" id="schGrade" placeholder="1 _ 6"></div>
+      <div class="field"><label>الهاتف</label><input type="text" id="schPhone" placeholder="09xxxxxxxx"></div>
+    </div>
+    <button class="btn-lg btn-primary" onclick="saveSchoolMaster()">💾 حفظ</button>
+    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('schoolSheetBg')">إلغاء</button>
+  </div>
+</div>
+
+<!-- ═══════════ Toast ═══════════ -->
 <div class="toast" id="toast"></div>
 
+<!-- ═══════════ صفحة الطباعة ═══════════ -->
 <div id="printPage" style="display:none;position:fixed;inset:0;background:#f1f5f9;z-index:500;overflow-y:auto">
   <div class="print-toolbar no-print" style="position:sticky;top:0;background:#fff;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);z-index:10">
     <button class="btn btn-ghost" style="flex:0 0 auto" onclick="closePrint()">← رجوع</button>
@@ -387,11 +702,12 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(1
 
 <script>
 /* ═══════════════════════════════════════════════════════
-   القسم 1: الحالة والتخزين
+   القسم 1: التخزين والثوابت
    ═══════════════════════════════════════════════════════ */
 const STORAGE_KEYS = {
   TASKS: 'mt_tasks_v1',
   MATERIALS: 'mt_materials_v1',
+  SCHOOLS: 'mt_schools_v1',
   SETTINGS: 'mt_settings_v1',
   COUNTER: 'mt_counter_v1'
 };
@@ -399,13 +715,17 @@ const STORAGE_KEYS = {
 let state = {
   tasks: [],
   materials: [],
+  schools: [],
   settings: {},
   counter: 1,
   currentFilter: 'all',
   editingTaskId: null,
-  currentTaskId: null
+  currentTaskId: null,
+  editingSchoolId: null,
+  selectedSchool: null
 };
 
+/* ═══ المواد الافتراضية ═══ */
 const DEFAULT_MATERIALS = [
   { id: 1, name: 'منظم جهد', unit: 'عدد' },
   { id: 2, name: 'UPS', unit: 'عدد' },
@@ -449,6 +769,7 @@ const DEFAULT_MATERIALS = [
   { id: 40, name: 'مواد أخرى', unit: 'عدد' }
 ];
 
+/* ═══ الإعدادات الافتراضية ═══ */
 const DEFAULT_SETTINGS = {
   header1: 'مديرية التربية في محافظة دمشق',
   header2: 'دائرة المعلوماتية',
@@ -458,33 +779,569 @@ const DEFAULT_SETTINGS = {
   sign3: 'علي العباس'
 };
 
+/* ═══ قاعدة بيانات المدارس (519 مدرسة) ═══ */
+const SCHOOLS_DEFAULT = [
+  {n:'الحسن بن الهيثم',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة خلف مشفى الزاهرة',g:'1 _ 6',p:'5423028'},
+  {n:'قاسم أمين',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة قديمة مقابل أزهار مارينا',g:'رياض أطفال',p:'8880784'},
+  {n:'المعتصم',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة جديدة خلف مشفى البشير',g:'رياض أطفال',p:'6320020'},
+  {n:'السمح بن مالك الخولاني',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة جديدة- جانب معهد البجيرمي',g:'1 _ 6',p:'8889219'},
+  {n:'اسكندرون',s:'باسم العباس',a:'الميدان',d:'التضامن',ad:'تضامن- جانب مستوصف الثورة الصحي',g:'1 _ 6',p:'6317118'},
+  {n:'صفية القرشية',s:'باسم العباس',a:'الميدان',d:'التضامن',ad:'زاهرة- تضامن- شرق محمد اسكندرون',g:'1 _ 6',p:'6323359'},
+  {n:'أسد بن الفرات',s:'باسم العباس',a:'المخيم',d:'',ad:'مخيم اليموك مشروع الوسيم جانب وحدة المياه',g:'رياض أطفال',p:'937601515'},
+  {n:'الشريف الإدريسي',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة خلف الفرن الآلي',g:'رياض أطفال',p:'6311174'},
+  {n:'خالد حسام الدين الناظر',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة جديدة - جانب مستودع الكتب- خلف الهلال الأحمر',g:'7 _ 9',p:'5440166'},
+  {n:'سعد الله الجابري',s:'باسم العباس',a:'الميدان',d:'التضامن',ad:'تضامن مستوصف الثورة',g:'1 _ 6',p:'6315850'},
+  {n:'ام العلاء',s:'باسم العباس',a:'الميدان',d:'التضامن',ad:'تضامن حارة خولة بنت الازور',g:'1 _ 4',p:'6315202'},
+  {n:'زينب الهلالية',s:'باسم العباس',a:'الميدان',d:'التضامن',ad:'تضامن خلف الفرن الالي',g:'1 _ 6',p:'6323373'},
+  {n:'خير الدين الزركلي',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة جديدة مفرق الست',g:'1 _ 6',p:'6315221'},
+  {n:'حليمة السعدية',s:'باسم العباس',a:'الميدان',d:'',ad:'قنوات',g:'1 _ 6',p:'2263706'},
+  {n:'الربيع الأنصارية',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة جديدة-خلف جامع العزيز',g:'7 _ 9',p:'6310507'},
+  {n:'عادل الجزائرلي',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'ميدان-زاهرة',g:'7 _ 9',p:'6313615'},
+  {n:'يونس العبد الله',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'الزاهرة الجديدة-مسبق الصنع-جانب جامع الرضا',g:'7 _ 9',p:'5420578'},
+  {n:'الأم العربية',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة جديدة-خلف تربية ريف دمشق-قرب جامع الأنصاري',g:'7 _ 9',p:'5441459'},
+  {n:'ابن سينا',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة قديمة-خلف الفرن الألي',g:'7 _ 9',p:'6330756'},
+  {n:'16 تشرين',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة جديدة-خلف بناء ث/الشهيد عصام كعور',g:'7 _ 9',p:'5410129',oldName:'الضياء'},
+  {n:'سعيد الحاج علي',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'ميدان-زاهرة-تحت جسر المتحلق',g:'7 _ 9',p:'8810010'},
+  {n:'أحمد مريود',s:'باسم العباس',a:'الميدان',d:'التضامن',ad:'تضامن-تجمع المدارس',g:'1 _ 6',p:'6323360'},
+  {n:'محمد عصام كعور',s:'باسم العباس',a:'ميدان',d:'',ad:'زاهرة جديدة مسبق الصنع جانب برج الخليوي',g:'ثانوي عام',p:'5431761'},
+  {n:'الشيماء السعدية',s:'باسم العباس',a:'زاهرة',d:'',ad:'زاهرة جديدة خلف تربية دمشق',g:'ثانوي عام',p:'5417546'},
+  {n:'أحمد صادق الحاج',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة جديدة جانب جامع أبي أيوب الانصاري',g:'ثانوي صناعي',p:'54117529'},
+  {n:'ثا/ عبد الحميد الزهراوي',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة خلف مدرسة عصام كعور',g:'ثانوي نسوي',p:'5428992'},
+  {n:'معهد تقنيات الحاسوب الثاني',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة جديدة مسبق الصنع جانب مدرسة عدنان بغجاتي',g:'معهد صناعي',p:'5423961'},
+  {n:'أبي حيان التوحيدي',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة قديمة مقابل أزهار مارينا',g:'7 _ 9',p:'8880868'},
+  {n:'محمد بدر الدين عابدين',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'جديدة- شمال المتحلق',g:'ثانوي عام',p:'5410626'},
+  {n:'محمد الاشمر',s:'باسم العباس',a:'الميدان',d:'القاعة',ad:'زاهرة قديمة مقابل مجمع شمس الطبي',g:'1 _ 6',p:'8837894'},
+  {n:'طاهر الجزائري',s:'باسم العباس',a:'الميدان',d:'باب مصر',ad:'ميدان سعد الدين مصطبة',g:'1 _ 6',p:'8840758'},
+  {n:'حسان بن ثابت',s:'باسم العباس',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان وسطاني-جانب مستوصف 8 آذار',g:'7 _ 9',p:'8819675'},
+  {n:'نور الدين الشهيد',s:'باسم العباس',a:'القنوات',d:'السويقة',ad:'خان المغاربة',g:'1 _ 6',p:'2223385'},
+  {n:'علي طلبة حسن',s:'باسم العباس',a:'القنوات',d:'السويقة',ad:'السويقة-خلف الأمن الجنائي',g:'7 _ 9',p:'3211048'},
+  {n:'جميل الخاني',s:'باسم العباس',a:'القنوات',d:'باب سريجة',ad:'قنوات-تعديل حي الشمعة-مقابل حلويات البيك',g:'7 _ 9',p:'2226658'},
+  {n:'حسن الخراط',s:'باسم العباس',a:'قنوات',d:'',ad:'باب سريجة فوق المؤسسة الاستهلاكية',g:'7 _ 9',p:'2218999'},
+  {n:'أبي فراس الحمداني',s:'باسم العباس',a:'القنوات',d:'باب سريجة',ad:'باب سريجة جانب مستوصف اللبودي',g:'ثانوي نسوي',p:''},
+  {n:'ثا/شادي محمود كريدي',s:'باسم العباس',a:'القنوات',d:'السويقة',ad:'السويقة خلف جامع الامن الجنائي',g:'ثانوي تجاري',p:''},
+  {n:'أم عاصم',s:'باسم العباس',a:'القنوات',d:'باب سريجة',ad:'شويكة -حارة التيروزي',g:'1 _ 6',p:'2217982'},
+  {n:'جميل ايمن سعيد',s:'باسم العباس',a:'القنوات',d:'القنوات',ad:'مقابل قيادة الشرطة-جانب فرن الاطفائية',g:'1 _4',p:'2218293'},
+  {n:'رفيدة الاسلمية',s:'باسم العباس',a:'القنوات',d:'باب سريجة',ad:'باب سريجة خلفه مدرسة زنوبيا',g:'رياض أطفال',p:'222359'},
+  {n:'الشهيد محمد أحمد غرة',s:'باسم العباس',a:'الشاغور',d:'الزهور',ad:'زاهرة جديدة شارع البرج',g:'1 _ 6',p:'6559107'},
+  {n:'أم سلمة',s:'باسم العباس',a:'الشاغور',d:'الزهور',ad:'زاهرة مسبق الصنع جانب جامع الرضا',g:'1 _ 6',p:'5421291'},
+  {n:'عدنان بغجاتي',s:'باسم العباس',a:'الشاغور',d:'روضة الميدان',ad:'زاهرة جديدة مقابل جامع الرضا',g:'1 _ 6',p:'5423886'},
+  {n:'أحمد أسعد كادك',s:'باسم العباس',a:'الشاغور',d:'الزهور',ad:'حي الزهور جانب المستوصف',g:'1 _ 6',p:'6565028'},
+  {n:'أم عطية الأنصارية',s:'باسم العباس',a:'الشاغور',d:'الزهور',ad:'حي الزهور-مقابل جامع الرضا',g:'7 _ 9',p:'5421251'},
+  {n:'جميل كعيكاتي',s:'باسم العباس',a:'الميدان',d:'ميدان وسطاني',ad:'باب مصلى-جانب الأمن الجنائي',g:'1 _ 6',p:'2235116'},
+  {n:'نور الدين الحلبي',s:'باسم العباس',a:'الميدان',d:'القاعة',ad:'ميدان قاعة خلف جامع الماجد',g:'ثانوي صناعي',p:'8822894'},
+  {n:'زنوبيا المحدثة',s:'باسم العباس',a:'قنوات',d:'',ad:'باب سريجة جانب ابي فراس الحمداني',g:'ثانوي عام',p:'2222669'},
+  {n:'باب الجابية المهنية',s:'باسم العباس',a:'القنوات',d:'باب الجابية',ad:'باب الجابية جانب المختار',g:'ثانوي صناعي',p:'2262951'},
+  {n:'الامام الغزالي',s:'باسم العباس',a:'القنوات',d:'باب سريجة',ad:'مقابل فروج الشام',g:'1 _ 6',p:'2224779'},
+  {n:'الفقهاء الصالحين',s:'باسم العباس',a:'يرموك',d:'',ad:'',g:'ثانوي عام',p:''},
+  {n:'حسن الحكيم',s:'تمام الصالح',a:'الميدان',d:'الدقاق',ad:'ميدان-دقاق-تحت الجسر-جانب مخفر الميدان',g:'7 _ 9',p:'8819587'},
+  {n:'روضة ياسمين الشام',s:'تمام الصالح',a:'الميدان',d:'الحقلة',ad:'ميدان حقلة تحت الجسر',g:'رياض أطفال',p:'8834337'},
+  {n:'السيدة حفصة',s:'تمام الصالح',a:'الميدان',d:'',ad:'السيدة عائشة جانب وزارة النقل الجديدة',g:'1 _4',p:'8880134'},
+  {n:'عمر أبو ريشة',s:'تمام الصالح',a:'الميدان',d:'باب مصر',ad:'الميدان كواكبي قرب مقسم الهاتف',g:'رياض أطفال',p:'8810008'},
+  {n:'محمد بن حسن الشيباني',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان وسطاني دخلة فرن حمامي',g:'1 _ 6',p:'8819270'},
+  {n:'ناديا سرحان',s:'تمام الصالح',a:'الميدان',d:'باب مصر',ad:'ميدان/ ثريا/ خلف جامع الثريا',g:'1 _ 6',p:'8882845'},
+  {n:'السيدة هاجر',s:'تمام الصالح',a:'الميدان',d:'باب مصر',ad:'ميدان باب مصر- جانب جامع الثريا',g:'1 _ 4',p:'8881596'},
+  {n:'خالد شنانة',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'كورنيش الميدان موقف الغواص',g:'1 _ 6',p:'8881782'},
+  {n:'تاج النساء',s:'تمام الصالح',a:'الميدان',d:'باب مصر',ad:'باب نسر ميدان ثريا جامع ثريا',g:'1 _ 6',p:'88800697'},
+  {n:'مصطفى كامل',s:'تمام الصالح',a:'الميدان',d:'باب مصر',ad:'حقلة مصطبة سعد الدين زقاق الشربجي',g:'1 _ 6',p:'8882256'},
+  {n:'شكري العسلي',s:'تمام الصالح',a:'الميدان',d:'الدقاق',ad:'ميدان حبل ثريا الشارع العام',g:'1 _ 4',p:'8882618'},
+  {n:'الإمام رشيد رضا',s:'تمام الصالح',a:'الميدان',d:'باب مصر',ad:'ميدان أبو حبل مقابل مخفر الحمامي',g:'1 _ 6',p:'8826952'},
+  {n:'عزة الأموية',s:'تمام الصالح',a:'الميدان',d:'باب مصر',ad:'ميدان سعد الدين مصطبة',g:'1 _ 4',p:'8880860'},
+  {n:'ست الوفاء',s:'تمام الصالح',a:'الميدان',d:'باب مصر',ad:'ميدان أبو حبل مقابل فرن الحمامي',g:'1 _ 6',p:'8882598'},
+  {n:'ابن حزم الاندلسي',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'زقاق الطويل',g:'1 _ 4',p:'2114583'},
+  {n:'المقداد بن عمرو الكندي',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'مقابل الوزارة الخارجية',g:'1 _ 6',p:'2129759'},
+  {n:'سليمان الحلبي',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'معصرة زقاق الطويل',g:'1 _ 6',p:'2114579'},
+  {n:'محمد عرفان الصيداوي',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'جامع بلال',g:'رياض أطفال',p:'2112948'},
+  {n:'هيثم مطر',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان-جزماتية-زقاق البصل-حارة المشمشة',g:'7 _ 9',p:'8823946'},
+  {n:'نائلة الوفية',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان-موقف الغواص',g:'7 _ 9',p:'8882487'},
+  {n:'نسيبة الخزرجية',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان-كورنيش-موقف الكواكبي',g:'7 _ 9',p:'8811614'},
+  {n:'عبد القادر المغربي',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'كفرسوسة -المعصرة-زقاق الطويل',g:'7 _ 9',p:'2111407'},
+  {n:'عارف النكدي',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'دمشق-ميدان-جانب دار الأيتام',g:'7 _ 9',p:'8882382'},
+  {n:'عدنان المالكي',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'كورنيش الميدان-موقف الثريا-جانب جامع الثريا',g:'1 _ 6',p:'8881305'},
+  {n:'درة الهاشمية',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'باب مصلى-جانب مشفى شيخ الأرض',g:'1 _ 4',p:'8881569'},
+  {n:'محمود مصطفى',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'كورنيش الميدان-منصور-جانب ثانوية بهجة البيطار',g:'رياض أطفال',p:'8814580'},
+  {n:'عبد الرحمن الكواكبي',s:'تمام الصالح',a:'ميدان',d:'',ad:'ميدان كورنيش جانب البريد',g:'ثانوي عام',p:''},
+  {n:'خالد أحمد عنيز',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'كفر سوسة مقابل الكازية',g:'ثانوي عام',p:'2111938'},
+  {n:'محمد بهجة البيطار',s:'تمام الصالح',a:'ميدان',d:'',ad:'ميدان منصور مقابل جامع المنصور',g:'ثانوي عام',p:'8882186'},
+  {n:'زين العابدين التونسي',s:'تمام الصالح',a:'ميدان',d:'',ad:'ميدان مصطبة جانب شعبة التجنيد',g:'ثانوي عام',p:'8812970'},
+  {n:'نصوح عثمان آغا',s:'تمام الصالح',a:'ميدان',d:'',ad:'ميدان حقلة مقابل المؤسسة الاستهلاكية',g:'7 _ 9',p:'8814647'},
+  {n:'أبو العتاهية',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'',g:'ثانوي صناعي',p:'2110989'},
+  {n:'ثانوية سعاد عبدالله المهنية',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'تنظيم كفرسوسة جانب مدرسة البوادر',g:'ثانوي تجاري',p:'2133498',oldName:'سعاد العبد الله'},
+  {n:'علي عقل حسون',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'الميدان جانب مشفى المهايني',g:'ثانوي صناعي',p:'8824960'},
+  {n:'حسن شعيرية',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'كفرسوسة خزيمة',g:'7 _ 9',p:'2114534'},
+  {n:'عزت حصرية',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان وسطاني كورنيش موقف الجسر',g:'7 _ 9',p:'8882212'},
+  {n:'زيد بن ثابت الأنصاري',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'كفرسوسة خلف مجلس الوزراء',g:'7 _ 9',p:'2110130'},
+  {n:'ياقوت الحموي',s:'تمام الصالح',a:'الميدان',d:'الحقلة',ad:'ميدان حقلة جانب جامع الشيخ يعقوب',g:'7 _ 9',p:'8881461'},
+  {n:'عدنان أبو دبوسة',s:'تمام الصالح',a:'الميدان',d:'الحقلة',ad:'ميدان حقلة مقابل مي زيادة',g:'7 _ 9',p:'8837365'},
+  {n:'روضة البيلسان',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان زقاق موصلي دخلة مطعم زمان',g:'رياض أطفال',p:'8880783'},
+  {n:'روضة رواد المعرفة',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'كفرسوسة معصرة جانب مدرسة عبد القادر المغربي',g:'رياض أطفال',p:'2139775'},
+  {n:'روضة حدائق الطفولة',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان جزماتية زقاق العسكري',g:'رياض أطفال',p:'8837086'},
+  {n:'روضة أنوار تشرين',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'كفرسوسة المعصرة جانب جامع العمري',g:'رياض أطفال',p:'2112864'},
+  {n:'نعيم معصراني',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'دخلة الاحسان',g:'1 _ 6',p:'2111412'},
+  {n:'الامام الشافعي',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'مزراب الشارع العام',g:'1 _ 6',p:'2111812'},
+  {n:'أنس بن مالك',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'خلف مجمع الخدمات',g:'1 _ 6',p:'2114324'},
+  {n:'أبو أيوب الأنصاري',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'كفرسوسة موقف المدارس',g:'1 _ 6',p:'2114686'},
+  {n:'محمد بديع الكسم',s:'تمام الصالح',a:'كفرسوسة',d:'اللوان',ad:'المبارة -جامع بلال الحبشي',g:'رياض أطفال',p:'2110614'},
+  {n:'مؤيد جبر',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'كفرسوسة - جمالة',g:'7 _ 9',p:'2138073'},
+  {n:'فادي خربوطلي',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'كفر سوسة الجمالة خلف البلدية القديمة دخلة صيدلية هدى سرايجي',g:'1_6',p:'2137939'},
+  {n:'عباس محمود العقاد',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'معصرة',g:'',p:'2113017'},
+  {n:'ثا/محمود حماد المهنية/العامة',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان غواص دخلة شوكولا الزنبركجي',g:'ثانوي عام',p:'8816786'},
+  {n:'كفر سوسة المحدثة',s:'تمام الصالح',a:'',d:'',ad:'',g:'1 _ 6',p:''},
+  {n:'مصطفى شمايط',s:'تمام الصالح',a:'',d:'',ad:'',g:'1 _ 6',p:''},
+  {n:'سعد بن معاذ',s:'تمام الصالح',a:'',d:'',ad:'',g:'1 _ 6',p:''},
+  {n:'مركز تدريب كفر سوسة',s:'تمام الصالح',a:'',d:'',ad:'',g:'',p:''},
+  {n:'عمرة البخارية',s:'حسن خرما',a:'القنوات',d:'باب سريجة',ad:'خلف المؤسسة',g:'رياض أطفال',p:''},
+  {n:'عائشة التيمورية الأولى',s:'حسن خرما',a:'دمشق القديمة',d:'',ad:'عمارة-جانب مقام السيدة رقية-زقاق النقيب',g:'1 _ 6',p:'2210038'},
+  {n:'الفاطمية المحدثة الثانية',s:'حسن خرما',a:'دمشق القديمة',d:'',ad:'عمارة جوانية-جانب مقام السيدة رقية-زقاق صلح',g:'1 _ 6',p:'5418901'},
+  {n:'أم الفضل',s:'حسن خرما',a:'دمشق القديمة',d:'مأذنة الشحم',ad:'شاغور جواني دقاقين-بزورية',g:'1 _ 6',p:'2243941'},
+  {n:'العمارة المحدثة',s:'حسن خرما',a:'دمشق القديمة',d:'',ad:'عمارة جوانية زقاق النقب-جانب مقام السيدة رقية',g:'1 _ 6',p:'2219363'},
+  {n:'محمد عدنان ناصر',s:'حسن خرما',a:'دمشق القديمة',d:'مأذنة الشحم',ad:'البزورية حارة مشمس',g:'1 _ 6',p:'2218203'},
+  {n:'غزالة الحرورية',s:'حسن خرما',a:'دمشق القديمة',d:'الجورة',ad:'باب توما-جانب مطعم الياسمين',g:'1 _ 6',p:'5417690'},
+  {n:'الفاطمية الأولى',s:'حسن خرما',a:'دمشق القديمة',d:'',ad:'باب السلام-جانب صيدلية باب السلام',g:'1 _ 6',p:'2217001'},
+  {n:'السكينية',s:'حسن خرما',a:'دمشق القديمة',d:'القيمرية',ad:'قيمرية-مقابل مطعم باب الحارة',g:'1 _ 6',p:'5418645'},
+  {n:'المنصور الرسمية',s:'حسن خرما',a:'دمشق القديمة',d:'باب توما',ad:'دمشق-باب توما-العازرية',g:'7 _ 9',p:'5440783'},
+  {n:'إلياس قدسي',s:'حسن خرما',a:'دمشق القديمة',d:'القيمرية',ad:'قيمرية-جادة غزال',g:'7 _ 9',p:'5416026'},
+  {n:'ابن هانئ الأندلسي',s:'حسن خرما',a:'ساروجا',d:'العمارة البرانية',ad:'الشرف الأعلى-تجمع المدارس',g:'7 _ 9',p:'2221058'},
+  {n:'ذات النطاقين',s:'حسن خرما',a:'ساروجا',d:'العمارة البرانية',ad:'العمارة البرانية-حارة الشرف الأعلى',g:'7 _ 9',p:'22342915'},
+  {n:'عائشة التيمورية الثانية',s:'حسن خرما',a:'ساروجا',d:'العمارة البرانية',ad:'مناخلية- سوق النحاسين',g:'1 _ 6',p:'2331554'},
+  {n:'ابن النديم',s:'حسن خرما',a:'ساروجا',d:'العقيبية',ad:'عمارة-العقيبية-حارة الداقور',g:'1 _ 6',p:'2315437'},
+  {n:'المثنى بن حارثة',s:'حسن خرما',a:'ساروجا',d:'العقيبية',ad:'عقيبية-جامع التوبة',g:'1 _ 6',p:'2315868'},
+  {n:'ثا/نزار قباني',s:'حسن خرما',a:'دمشق القديمة',d:'القيمرية',ad:'قوس السيدة رابعة الشامية',g:'ثانوي عام',p:'5411424'},
+  {n:'رياض قصار',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'صناعة بستان الدور خلف مقسم باب شرقي',g:'1 _ 6',p:'5413196'},
+  {n:'معن بن زائدة',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'ابن عساكر مجمع مدارس أحمد شوقي',g:'1 _ 6',p:'5426396'},
+  {n:'أحمد شوقي',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'ابن عساكر تجمع المدارس',g:'1 _ 6',p:'2216352'},
+  {n:'عبد الكريم الخطابي',s:'حسن خرما',a:'الشاغور',d:'بلال',ad:'المنطقة الصناعية خلف مقسم باب شرقي',g:'1 _ 6',p:'5413214'},
+  {n:'المناضل',s:'حسن خرما',a:'الشاغور',d:'بلال',ad:'خلف مقسم هاتف باب شرقي',g:'1 _ 6',p:'5443499'},
+  {n:'رسلان الدمشقي',s:'حسن خرما',a:'الشاغور',d:'',ad:'شاغور',g:'7 _ 9',p:'5413229'},
+  {n:'بدر الدين محمد الغزال',s:'حسن خرما',a:'شاغور',d:'',ad:'شاغور جادة آل البيت',g:'7 _ 9',p:'2220377'},
+  {n:'جلال فاروق الشريف',s:'حسن خرما',a:'شاغور',d:'',ad:'ابن عساكر تجمع المدارس',g:'7 _ 9',p:'2257336'},
+  {n:'الثانوية الصناعية الأولى',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'طريق المطار جانب كلية الهمك',g:'ثانوي صناعي',p:'5426932'},
+  {n:'المعهد التقاني الصناعي الأول',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'طريق المطار جانب كلية الهمك',g:'معهد صناعي',p:'5426932'},
+  {n:'المعهد التقاني الصناعي الثاني',s:'حسن خرما',a:'الشاغور',d:'بلال',ad:'دمشق طريق المطار جانب كلية الهندسة',g:'معهد صناعي',p:'34225033'},
+  {n:'روضة الطيور المغردة',s:'حسن خرما',a:'الشاغور',d:'ابن عساكر',ad:'شاغور جراح جانب مدرسة جمانة الهلالية',g:'رياض أطفال',p:'2264015'},
+  {n:'روضة نجوم الشام',s:'حسن خرما',a:'الشاغور',d:'بلال',ad:'الشاغور حي بلال تجمع المدارس جانب رياض قصار',g:'رياض أطفال',p:'5428921'},
+  {n:'محمد طلال المفتي',s:'حسن خرما',a:'الميدان',d:'القاعة',ad:'ميدان قاعة خلف جامع سفيان الثوري',g:'رياض أطفال',p:'8820831'},
+  {n:'وجيه أمين قادري',s:'حسن خرما',a:'الميدان',d:'القاعة',ad:'ميدان-قاعة-جانب صيدليةالقاعة',g:'7 _ 9',p:'8884080'},
+  {n:'أحمد عرابي',s:'حسن خرما',a:'الميدان',d:'القاعة',ad:'ميدان-قاعة-جانب جامع الماجد',g:'1 _ 4',p:'8882318'},
+  {n:'شجرة الدر',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'تجمع المدارس',g:'1 _ 6',p:'2239684'},
+  {n:'سماهر الدره',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'الزاهرة سكن أساتذة الجامعة',g:'1 _ 4',p:'5428984'},
+  {n:'سعد الدين قواص',s:'حسن خرما',a:'الميدان',d:'القاعة',ad:'ميدان قاعة وحدات سكنية',g:'رياض أطفال',p:'8822038'},
+  {n:'سعد بن أبي وقاص',s:'حسن خرما',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان جزماتية زقاق المحمص',g:'1 _ 4',p:'8881173'},
+  {n:'رابعة العدوية المهنية',s:'حسن خرما',a:'دمشق القديمة',d:'العمارة الجوانية',ad:'عمارة السبع طوالع جانب مقام السيدة رقية',g:'ثانوي صناعي',p:'2215962'},
+  {n:'المحبة الرسمية',s:'حسن خرما',a:'دمشق القديمة',d:'باب توما',ad:'دمشق القديمة-باب توما-دخلة العازرية',g:'1 _ 6',p:'5441561'},
+  {n:'المنصور الخاصة المستولى عليها',s:'حسن خرما',a:'دمشق القديمة',d:'باب توما',ad:'باب توما -حي العازرية',g:'1 _ 6',p:'5441535'},
+  {n:'القدس الرسمية',s:'حسن خرما',a:'دمشق القديمة',d:'',ad:'باب توما حارة البولاد جانب فندق بيت الوالي',g:'ثانوي عام',p:'5418009'},
+  {n:'المحبة الخاصة',s:'حسن خرما',a:'دمشق القديمة',d:'',ad:'باب توما حارة العازارية',g:'رياض أطفال',p:''},
+  {n:'الثانوية الصناعية الثانية',s:'حسن خرما',a:'دمشق القديمة',d:'باب توما',ad:'باب شرقي طريق المطار جانب كلية الهمك',g:'ثانوي صناعي',p:'5425033'},
+  {n:'روضة رواد الغد',s:'حسن خرما',a:'دمشق القديمة',d:'باب توما',ad:'باب توما دخلة حمام بكري القيمرية',g:'رياض أطفال',p:'5422426'},
+  {n:'مركز تدريب باب شرقي',s:'حسن خرما',a:'',d:'',ad:'',g:'',p:''},
+  {n:'سمية المخزومية',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل موقف فتح شارع أنس بن مالك شارع المدارس',g:'1 _ 6',p:'6612353'},
+  {n:'فيصل ديب',s:'رياض محمد',a:'المزة',d:'السومرية',ad:'مزة أوتستراد مساكن الفرقة الرابعة ضاحية الفرسان',g:'1 _ 6',p:'6620327'},
+  {n:'محمد خير حبال',s:'رياض محمد',a:'كفرسوسة',d:'اللوان',ad:'المتحلق الجنوبي بنايات الرئاسة',g:'1 _ 6',p:'6113359'},
+  {n:'سعيد العاص',s:'رياض محمد',a:'المزة',d:'السومرية',ad:'مزة -استراد السومرية',g:'1 _ 6',p:'613844'},
+  {n:'محمد ياسين النشار',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'مزة فيلات غربية-بجانب مدرسة دوحة الرحاب الخاصة',g:'1 _ 6',p:'6117698'},
+  {n:'محمد علي الجزائري',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة فيلات شرقية جانب المعهد الرياضي',g:'1 _ 6',p:'6122016'},
+  {n:'بكري قدورة',s:'رياض محمد',a:'المزة',d:'المزة القديمة',ad:'مزة استراد-مقابل مشفى الرازي',g:'1 _ 6',p:'6618478'},
+  {n:'هواري بو مدين',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة فيلات شرقية-شارع الفارابي',g:'1 _ 6',p:'6116081'},
+  {n:'محمود عبد الكريم',s:'رياض محمد',a:'المزة',d:'مزة86',ad:'مزة جبل86 جانب مدرسة حافظ ابراهيم',g:'1 _ 6',p:'6610172'},
+  {n:'الشريف الرضي',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل خلف المؤسسة العسكرية',g:'1 _ 6',p:'6666504'},
+  {n:'قتيبة بن مسلم الباهلي',s:'رياض محمد',a:'المزة',d:'المزة القديمة',ad:'مزة الشيخ سعد خلف المشفى العسكري',g:'1 _ 6',p:'6615144'},
+  {n:'هند الأنصارية',s:'رياض محمد',a:'المزة',d:'الربوة',ad:'الربوة طريق المشاتل-خلف جامع الربوة',g:'1 _ 6',p:'3745252'},
+  {n:'سليمان حسن شبيب',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'مزة فيلات غربية خلف السفارة الكويتية',g:'1 _ 6',p:'6113198'},
+  {n:'السيدة نفيسة',s:'رياض محمد',a:'المزة',d:'',ad:'مزة استراد-خلف مشفى الرازي',g:'1 _ 4',p:'2128784'},
+  {n:'الشهيدة نهلة زيدان',s:'رياض محمد',a:'المزة',d:'',ad:'مزة استراد طلعة الاسكان',g:'1 _ 6',p:'6624328'},
+  {n:'تيسير صوان',s:'رياض محمد',a:'المزة',d:'',ad:'مزة جبل شارع المدارس',g:'1 _ 6',p:'6612732'},
+  {n:'زيد بن حارثة',s:'رياض محمد',a:'المزة',d:'',ad:'سومرية-طريق بيروت',g:'1 _ 6',p:'6115010'},
+  {n:'أبو اليسر عابدين',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'فيلات شرقية-شارع الفارابي-خلف بنك بركة',g:'1 _ 6',p:'6117208'},
+  {n:'ابن زهر الأندلسي',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'المزة-خلف السفارة الكويتية',g:'1 _ 6',p:'6121459'},
+  {n:'ابراهيم ناعمة',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'مزة فيلات غربية خلف معهد السكرتارية',g:'1 _ 6',p:'6110981'},
+  {n:'النيربين',s:'رياض محمد',a:'المزة',d:'الربوة',ad:'مزة-فتالة-مقابل المدينة الجامعية',g:'1 _ 6',p:'2129993'},
+  {n:'يامي محمد فياض',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل-مقابل مدارس أبناء الشهداء',g:'1 _ 6',p:'6613412'},
+  {n:'حافظ ابراهيم',s:'رياض محمد',a:'المزة',d:'مزة86',ad:'مزة 86-طريق السجن',g:'1 _ 6',p:'6623770'},
+  {n:'السيدة ناعسة',s:'رياض محمد',a:'المزة',d:'',ad:'المزة-كراج السومرية',g:'1 _ 6',p:'6131214'},
+  {n:'ابن كثير الدمشقي',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'المزة فيلات غربية-جانب السفارة الكويتية',g:'1 _ 6',p:'6121464'},
+  {n:'محمد النجدي البغدادي',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل-شارع المدارس-شارع أنس بن مالك',g:'7 _ 9',p:'6617324',oldName:'نجدي البغدادي'},
+  {n:'سليم حسن شعيب',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل-موقف الفتح-شارع المدارس',g:'7 _ 9',p:'6612412'},
+  {n:'معاذ بن جبل',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة-خلف الهلال الأحمر',g:'7 _ 9',p:'6110500'},
+  {n:'ذات الصواري',s:'رياض محمد',a:'المزة',d:'السومرية',ad:'دمشق-سومرية شهداء-جانب الكراج',g:'7 _ 9',p:'6131216'},
+  {n:'عزالدين التنوخي',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'مزة-فيلات غربية-جانب معهد السكرتاريا سابقا',g:'7 _ 9',p:'631099'},
+  {n:'عبد الرحمن السفرجلاني',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'مزة-فيلات غربية-جانب السفارة الأرمنية',g:'7 _ 9',p:'6624478'},
+  {n:'سجيع هيفا',s:'رياض محمد',a:'المزة',d:'',ad:'السومرية مقابل مطار المزة',g:'ثانوي عام',p:'6131218'},
+  {n:'عمر بن عبد العزيز',s:'رياض محمد',a:'المزة',d:'',ad:'مزة فيلات شرقية خلف جامع الشافعي',g:'ثانوي عام',p:'6114639'},
+  {n:'عبد القادر المبارك',s:'رياض محمد',a:'المزة',d:'',ad:'مزة فيلات شرقية القنصلية السعودية',g:'ثانوي عام',p:'6113068'},
+  {n:'بسام بكورة',s:'رياض محمد',a:'المزة',d:'',ad:'مزة جبل جانب المخفر الغربي',g:'ثانوي عام',p:'6623829'},
+  {n:'أحمد اسكندر أحمد',s:'رياض محمد',a:'المزة',d:'',ad:'مزة فيلات غربية جانب برج تالة',g:'ثانوي عام',p:'6119714'},
+  {n:'ابن رشد',s:'رياض محمد',a:'المزة',d:'',ad:'مزة قديمة خلف مشفى الاطفال',g:'7 _ 9',p:'6665987'},
+  {n:'محمد صلاح الدين الهبج',s:'رياض محمد',a:'المزة',d:'',ad:'مزة شيخ سعد جانب جامع المزة الكبير',g:'7 _ 9',p:'6615282',oldName:'الهبج'},
+  {n:'عثمان بن عفان',s:'رياض محمد',a:'المزة',d:'',ad:'مزة طلعة الاسكان خلف فرع الحزب',g:'7 _ 9',p:'6616649'},
+  {n:'المعهد التقاني للاقتصاد المنزلي الأول',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة أتوستراد شرقية مقابل جامع الشافعي',g:'معهد نسوي',p:'6124588'},
+  {n:'مصطفى صادق الرافعي',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل شارع المدارس',g:'ثانوي صناعي',p:'6663541'},
+  {n:'مطيع المعلم المهنية النسوية',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل جانب بنات الشهداء',g:'ثانوي نسوي',p:'66622793'},
+  {n:'السومرية المهنية',s:'رياض محمد',a:'المزة',d:'السومرية',ad:'مزة السومرية خلف الكراجات جانب مدرسة مقداد فيصل علي',g:'ثانوي صناعي',p:'6110398'},
+  {n:'محمد عيد كحلوس الصناعية',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'فيلات غربية مقابل مدرسة بناة الأجيال',g:'ثانوي صناعي',p:'6133150'},
+  {n:'معهد التربية الرياضية للمعلمات',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة فيلات شرقية جانب السفارة الأردنية',g:'معهد رياضي',p:'6112951'},
+  {n:'معهد التربية الموسيقية',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة فيلات خلف غولدن مزة',g:'معهد إعداد المدرسين',p:'6115576'},
+  {n:'محمد أحمد محمود المهنية',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة اتوستراد طلعة جامع الأكرم',g:'ثانوي تجاري',p:'6124508'},
+  {n:'معهد إعداد المدرسين',s:'رياض محمد',a:'المزة',d:'المزة القديمة',ad:'مزة شيخ سعد جانب موقف الإسكان',g:'معهد إعداد المدرسين',p:'6611094',oldName:'إعداد مدرسين المزة'},
+  {n:'عدنان مردم المهنية',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة فيلات شرقية مقابل السفارة السودانية',g:'ثانوي صناعي',p:'6118125'},
+  {n:'ثا محمود جلال التجارية',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة فيلات شرقية خلف جامع الأكرم',g:'ثانوي تجاري',p:''},
+  {n:'معهد تربية الفنية التشكيلية التطبيقية يوشع منصور',s:'رياض محمد',a:'المزة',d:'المزة القديمة',ad:'الشيخ سعد طلعة الاسكان',g:'معهد إعداد المدرسين',p:''},
+  {n:'شراع الطفولة',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل مقابل حديقة الطلائع',g:'رياض أطفال',p:'6612561'},
+  {n:'روضة السومرية',s:'رياض محمد',a:'المزة',d:'السومرية',ad:'مزة سومرية جانب المستوصف',g:'رياض أطفال',p:'6110753'},
+  {n:'ثانوية محمود شحادة خليل',s:'رياض محمد',a:'المزة',d:'السومرية',ad:'',g:'7 _ 9',p:'6118305'},
+  {n:'ثا/يائيل الكنج للمتفوقين',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'جانب جامع الامام الشافعي',g:'7 _ 9',p:'6118091'},
+  {n:'ثا/نذير نبعة للمتفوقين',s:'رياض محمد',a:'المزة',d:'المزة القديمة',ad:'ش الفارابي - جامع عمر بن عبد العزيز',g:'7 _ 9',p:'6114807'},
+  {n:'عين جالوت',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'جانب جامع الاكرم- مقابل مدينة الشباب',g:'7 _ 9',p:'6124014'},
+  {n:'مركز التدريب الإلكتروني',s:'رياض محمد',a:'',d:'',ad:'',g:'',p:''},
+  {n:'مركز التدريب على الحاسب',s:'رياض محمد',a:'',d:'',ad:'',g:'',p:''},
+  {n:'دائرة البحوث',s:'رياض محمد',a:'',d:'',ad:'',g:'',p:''},
+  {n:'الدائرة القانونية',s:'رياض محمد',a:'',d:'',ad:'',g:'',p:''},
+  {n:'دائرة الإمتحانات',s:'رياض محمد',a:'',d:'',ad:'',g:'',p:''},
+  {n:'ربيعة الايوبية',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة خلف جامع إبراهيم الخليل',g:'1 _ 6',p:'5113397'},
+  {n:'6 تشرين',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'جانب الشرطة العسكرية',g:'1 _ 6',p:'4542236'},
+  {n:'أم عمار',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'حاميش حي العائدون',g:'1 _ 6',p:'5117108'},
+  {n:'عدنان المدني',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد جادة المزرعة',g:'1 _ 6',p:'5128980'},
+  {n:'تقي الدين الدمشقي',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد مقابل مجمع الخدمات',g:'1 _ 6',p:'5127197'},
+  {n:'حسن الخير',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة موقف الرحبة خلف جامع الحكيم',g:'1 _ 6',p:'5124883'},
+  {n:'أحمد شفيق السادات',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة مسبق الصنع جانب الفرن الآلي',g:'1 _ 6',p:'5135499'},
+  {n:'عبد القادر المازني',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة مقابل جامع إبراهيم الخليل',g:'1 _ 6',p:'5122956'},
+  {n:'زين العابدين نعمان',s:'علاء وهيبي',a:'برزة',d:'الحرية/عش الورور',ad:'برزة البلد عش الورور',g:'1 _ 6',p:'5129453'},
+  {n:'عش الورور المحدثة',s:'علاء وهيبي',a:'برزة',d:'الحرية/عش الورور',ad:'برزة ضهر المسطاح',g:'1 _ 6',p:'5110365'},
+  {n:'غالية فرحات',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة مقابل السكن الجامعي',g:'1 _ 6',p:'5114731'},
+  {n:'محمد ضامن',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد جانب ثا/ مسلم عابدين',g:'1 _ 6',p:'5142837'},
+  {n:'موسى بن نصير',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة جنوب جامع إبراهيم الخليل',g:'1 _ 6',p:'5132570'},
+  {n:'7 نيسان',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'برزة خلف قصر الحفيلي',g:'رياض أطفال',p:'4548224'},
+  {n:'رشاد قصيباتي',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة خلف أمية كلاس',g:'1 _ 6',p:'5125398'},
+  {n:'آمنة الزهرية',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'خلف جامع الحسنين',g:'رياض أطفال',p:'5129048'},
+  {n:'الخليل بن أحمد الفراهيدي',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد آخر عش الورور',g:'1 _ 6',p:'5135720'},
+  {n:'ليلى الاخيلية',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'خلف جامع السلام',g:'1 _ 6',p:'5128013'},
+  {n:'8 اذار',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد عش الورور',g:'رياض أطفال',p:'5117316'},
+  {n:'مصعب بن عمير',s:'علاء وهيبي',a:'القابون',d:'القابون',ad:'قابون جنوب مدارس الشرطة مقابل الحديقة',g:'رياض أطفال',p:'4528889'},
+  {n:'أحمد حامد جنيد',s:'علاء وهيبي',a:'القابون',d:'القابون',ad:'القابون -أبو جرش-جانب كلية الشرطة',g:'7 _ 9',p:'4525814'},
+  {n:'فايز غباري',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة-جانب الشرطة العسكرية',g:'7 _ 9',p:'4542870'},
+  {n:'ابتسام حرب',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة-شارع الحكيم',g:'7 _ 9',p:'5122905'},
+  {n:'محمد عدنان كولكي',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد-جادة خليل رجب',g:'7 _ 9',p:'5120927',oldName:'كولكلي برزة'},
+  {n:'عمر بن الخطاب',s:'علاء وهيبي',a:'برزة',d:'',ad:'برزة مسبق الصنع حي المنارة',g:'7 _ 9',p:'5118508'},
+  {n:'هاشم الفصيح',s:'علاء وهيبي',a:'برزة',d:'',ad:'برزة البلد مقابل الكلية السياسية',g:'7 _ 9',p:'4542439'},
+  {n:'ممدوح قره جولي',s:'علاء وهيبي',a:'مساكن برزة',d:'',ad:'مساكن برزة خلف جامع الخليل',g:'7 _ 9',p:'5132388'},
+  {n:'عبد الرؤوف سعيد',s:'علاء وهيبي',a:'مساكن برزة',d:'',ad:'مساكن برزة موقف البدوي جانب أفران تفاحة',g:'ثانوي عام',p:'5122972'},
+  {n:'مروان علي البارودي',s:'علاء وهيبي',a:'مساكن برزة',d:'',ad:'مساكن برزة خلف جامع الحسنين',g:'7 _ 9',p:'5137250'},
+  {n:'بسام كيكي المهنية',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'برزة مسبق الصنع خلف جامع القزاز',g:'ثانوي صناعي',p:'5117353'},
+  {n:'ثانوية أبو بكر الرازي المهنية المختلطة',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مسبق الصنع خلف جامع القزاز',g:'ثانوي صناعي',p:'5135574'},
+  {n:'المعهد التفاني التجاري الثاني',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'برزة مسبق الصنع بل مشفى حاميش',g:'معهد تجاري',p:'5140851',oldName:'المعهد التقاني التجاري الثاني'},
+  {n:'المعهد التقاني للاقتصاد المنزلي الثاني',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة حاميش طلعة مول قاسيون',g:'معهد نسوي',p:'5117364'},
+  {n:'سعد الله ونوس المهنية',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة حاميش مسبق الصنع المرحلة الرابعة',g:'ثانوي صناعي',p:'5111443'},
+  {n:'أحمد منيف العائدي',s:'علاء وهيبي',a:'القابون',d:'القابون',ad:'القابون دوار الوحدات',g:'7 _ 9',p:'4526837'},
+  {n:'مايا العلي',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد جامع السلام حي العائدون',g:'7 _ 9',p:'5124110'},
+  {n:'الفارابي',s:'علاء وهيبي',a:'برزة',d:'المنارة',ad:'برزة مسبق الصنع جامع الرحمة',g:'7 _ 9',p:'5114992'},
+  {n:'روضة الأطفال المرحة',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة خلف جامع ابراهيم الخليل',g:'رياض أطفال',p:'5132890'},
+  {n:'روضة أفنان المعرفة',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة جانب فرع مكافحة المخدرات بعد البلدية',g:'رياض أطفال',p:'5136042'},
+  {n:'روضة سنابل الخير',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة البناء الخلفي لابتدائية غالية فرحات',g:'رياض أطفال',p:'5140197'},
+  {n:'محمد مسلم عابدين',s:'علاء وهيبي',a:'برزة',d:'',ad:'جادة خليل رجب',g:'7 _ 9',p:'5119277'},
+  {n:'محمد غالب الرفاعي',s:'علاء وهيبي',a:'القابون',d:'المصنع',ad:'قابون',g:'رياض أطفال',p:'4524233'},
+  {n:'عاتكة بنت عبدالمطلب',s:'علاء وهيبي',a:'القابون',d:'',ad:'دوار الوحدات الخاصة',g:'1 _ 6',p:'4523800'},
+  {n:'برزة المحدثة',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة الشارع العام جادة العائدون',g:'ثانوي عام',p:'5135671'},
+  {n:'خليل مردم بك',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'حاميش طلعة مول قاسيون',g:'ثانوي نسوي',p:'5119089'},
+  {n:'مركز تدريب القيادات التربوية',s:'علاء وهيبي',a:'',d:'',ad:'',g:'',p:''},
+  {n:'رشدي الشمعة',s:'علي بيكو',a:'المهاجرين',d:'المصطبة',ad:'مهاجرين مصطبة جادة رابعة',g:'7 _ 9',p:'3730136'},
+  {n:'ابراهيم هنانو',s:'علي بيكو',a:'المهاجرين',d:'الروضة',ad:'الجسر الابيض-شارع نوري باشا',g:'1 _ 6',p:'3337540'},
+  {n:'خولة بنت الأزور',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'مهاجرين-شورى-جادة ابن عياد',g:'1 _ 6',p:'3736214'},
+  {n:'فاطمة المخزومية',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين-شمسية جادة ثالثة',g:'1 _ 6',p:'3715714'},
+  {n:'الشهيد عادل أبو قرعة',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'مهاجرين-الجادة التاسعة جنب جامع الرضوان',g:'1 _ 6',p:'3715936'},
+  {n:'عقبة بن نافع',s:'علي بيكو',a:'المهاجرين',d:'الروضة',ad:'طلعت نوري باشا-ساحة سعدي الشيرازي',g:'1 _ 6',p:'3334042'},
+  {n:'عبد الفتاح قطيط',s:'علي بيكو',a:'المهاجرين',d:'المرابط',ad:'مهاجرين-خورشيد أول-مقابل القصر القديم',g:'1 _ 6',p:'3715570'},
+  {n:'علية المهدية',s:'علي بيكو',a:'المهاجرين',d:'الروضة',ad:'روضة-دخلة المحاربين القدماء-مقابل نقابة المعلمين',g:'1 _ 6',p:'3336462'},
+  {n:'محمد نجيب حليمة',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين-جادة 6',g:'1 _ 6',p:'3712958'},
+  {n:'الشهيد عدنان دياب',s:'علي بيكو',a:'المهاجرين',d:'المصطبة',ad:'مهاجرين-مصطبة جادة رابعة',g:'1 _ 6',p:'3718920'},
+  {n:'محمد أسامة البيروتي',s:'علي بيكو',a:'المهاجرين',d:'المالكي',ad:'المالكي-شارع عبد المنعم رياض',g:'1 _ 6',p:'3710246'},
+  {n:'أحمد الططرى',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'شورى-زين العابدين',g:'1 _ 6',p:'3335434'},
+  {n:'جميلة العقسية',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'مهاجرين-شكاتب-جادة6',g:'1 _ 6',p:'3716624'},
+  {n:'نصوح بابيل',s:'علي بيكو',a:'المهاجرين',d:'أبو رمانة',ad:'ابو رمانة-شارع احمد شوقي',g:'1 _ 6',p:'3334654'},
+  {n:'الشهيد نضال عبود الطبري',s:'علي بيكو',a:'المهاجرين',d:'',ad:'المهاجرين-الشعلان-جادة ابو تمام',g:'1 _ 6',p:'3346156'},
+  {n:'عصام حسن',s:'علي بيكو',a:'المهاجرين',d:'الروضة',ad:'روضة-شارع نوري باشا -فرع الشبيبة',g:'1 _ 6',p:'3338880'},
+  {n:'هدى شعراوي',s:'علي بيكو',a:'المهاجرين',d:'المرابط',ad:'المهاجرين-خورشيد ثاني -مرابط',g:'1 _ 6',p:'3739950'},
+  {n:'طارق بن زياد',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين-شمسية-جادة رابعة',g:'1 _ 6',p:'3712722'},
+  {n:'لبنى الأندلسية',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين-باشكاتب-جادة 3',g:'1 _ 6',p:'3712401'},
+  {n:'الشهيد أحمد فائق الكردي',s:'علي بيكو',a:'المهاجرين',d:'',ad:'باشكابت-جامع نافذ أفندي',g:'1 _ 6',p:'3711103'},
+  {n:'الأخوة الابتدائية الخاصة المستولى عليها',s:'علي بيكو',a:'المهاجرين',d:'أبو رمانة',ad:'المالكي مقابل السفارة الامريكية',g:'1 _ 6',p:'3338484'},
+  {n:'ابن خلدون',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين-التجهيز-شارع الفردوس',g:'7 _ 9',p:''},
+  {n:'أحمد الصباغ',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين-جادة ثالثة-موقف الشمسية',g:'7 _ 9',p:'3732205'},
+  {n:'برهان الدين شمدين',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'شرقي ركن الدين-جانب طارق بن زياد',g:'7 _ 9',p:'2719960'},
+  {n:'محمد عدنان الصباغ',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'المهاجرين-حي العفيف',g:'7 _ 9',p:'3332717'},
+  {n:'لبانة المحدثة',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'مهاجرين-جادة سنبل-حارة المدارس',g:'7 _ 9',p:'3317043'},
+  {n:'ساطع الحصري',s:'علي بيكو',a:'المهاجرين',d:'أبو رمانة',ad:'أبو رمانة-جانب المكتب الاحصائي',g:'7 _ 9',p:'3335850'},
+  {n:'عمر الأبرش',s:'علي بيكو',a:'المهاجرين',d:'',ad:'دمشق-ساحة الميسات-جانب مشفى أمية',g:'7 _ 9',p:'2741260'},
+  {n:'ابن النفيس',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-مفرق أبو النور-مقابل حديقة شكو',g:'7 _ 9',p:'2778119'},
+  {n:'خولة الكندية',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'مهاجرين-شورى-مقابل مستودع الكتب',g:'7 _ 9',p:'3731724'},
+  {n:'سامر الأعرج',s:'علي بيكو',a:'الصالحية',d:'الشيخ محيي الدين',ad:'شيخ محي الدين-حارة الشعارة',g:'7 _ 9',p:'2741466'},
+  {n:'سليم البخاري',s:'علي بيكو',a:'الصالحية',d:'المزرعة',ad:'سبع بحرات-مقابل هيئة الاستثمار',g:'7 _ 9',p:'4441713'},
+  {n:'محمد بن قاسم الثقفي',s:'علي بيكو',a:'المهاجرين',d:'المالكي',ad:'مالكي-جانب السفارة الألمانية',g:'7 _ 9',p:'3715455'},
+  {n:'السفيرة المحدثة',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-مجمع مدارس-خلف مشفى ابن النفيس',g:'7 _ 9',p:'2710850'},
+  {n:'سناء محيدلي',s:'علي بيكو',a:'ركن الدين',d:'',ad:'ركن الدين-برنية-خلف مشفى هشام سنان',g:'7 _ 9',p:'2761655'},
+  {n:'محمد أحمد ناصيف',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'المزرعة-الهجرة والجوازات-خلف امتحانات الريف',g:'7 _ 9',p:'2713075'},
+  {n:'عباس ابن فرناس',s:'علي بيكو',a:'ركن الدين',d:'الأيوبية',ad:'ركن الدين جادة الأربعين',g:'1 _ 6',p:'2778411'},
+  {n:'العصماء',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'الجسر الأبيض-جادة الرئيس',g:'1 _ 6',p:'3324512'},
+  {n:'ست الشام',s:'علي بيكو',a:'',d:'',ad:'',g:'1 _ 6',p:'2771133'},
+  {n:'عثمان ذي النورين',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين ساحة شمدين',g:'1 _ 6',p:'2771517'},
+  {n:'إبراهيم الزرفالي',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-خلف جامع كردان',g:'1 _ 6',p:'2773002'},
+  {n:'محمد البزم',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'العفيف- دخلة سوق الجمعة',g:'1 _ 6',p:'3343718'},
+  {n:'الشهيد حسين جمعة',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-خلف ابن النفيس',g:'1 _ 6',p:'2713727'},
+  {n:'أم البنين',s:'علي بيكو',a:'الصالحية',d:'الشيخ محيي الدين',ad:'الجسر الأبيض-فوق جامع الدلامية',g:'1 _ 6',p:'3317145'},
+  {n:'صلاح الدين الأيوبي',s:'علي بيكو',a:'المهاجرين',d:'أبو رمانة',ad:'مهاجرين-زين العابدين-موقف الحارس',g:'1 _ 6',p:'3338865'},
+  {n:'بسام بربور',s:'علي بيكو',a:'الصالحية',d:'الشيخ محيي الدين',ad:'الشيخ محي الدين-مقابل جامع عبد الغني النابلسي',g:'1 _ 6',p:'2777321'},
+  {n:'محمد رشدي بركات',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-أسد الدين-مقهى الخوالي',g:'1 _ 6',p:'2772142'},
+  {n:'أبي عبيدة بن الجراح',s:'علي بيكو',a:'ركن الدين',d:'النقشبندي',ad:'ركن الدين-النقشبندي',g:'1 _ 6',p:'2762586'},
+  {n:'تماضر العربية',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-جادة الأرمن',g:'1 _ 6',p:'2773600'},
+  {n:'مروان خليل',s:'علي بيكو',a:'ركن الدين',d:'النقشبندي',ad:'ركن الدين-مقابل جامع النقشبندي',g:'1 _ 6',p:'2761869'},
+  {n:'فاطمة جريدة',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-خلف ابن النفيس',g:'1 _ 6',p:'2713723'},
+  {n:'أميمة الغفارية',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-وائلي أول-جبل',g:'1 _ 4',p:'2712713'},
+  {n:'محي الدين بن عربي',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'ركن الدين-الشارع العام-مقاومة',g:'1 _ 6',p:'2773169'},
+  {n:'أم هانئ القرشية',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'ركن الدين-شرقي-شارع الهجرة والجوازات',g:'1 _ 6',p:'2712125'},
+  {n:'مهند الملا',s:'علي بيكو',a:'ركن الدين',d:'الأيوبية',ad:'ركن الدين-كيكية-ساحة لورين',g:'1 _ 4',p:'2716613'},
+  {n:'الشهيدة رؤى الصاري',s:'علي بيكو',a:'الصالحية',d:'الشهداء',ad:'دمشق-ساحة عرنوس-تمثال السيد الرئيس',g:'1 _ 6',p:'3346104'},
+  {n:'المجاهد أحمد الملا',s:'علي بيكو',a:'ركن الدين',d:'الأيوبية',ad:'ركن الدين-الأيوبية',g:'1 _ 4',p:'2712634'},
+  {n:'ابن المعتز',s:'علي بيكو',a:'ركن الدين',d:'الأيوبية',ad:'ركن الدين-أسد الدين',g:'1 _ 4',p:'2772612'},
+  {n:'هالة بنت خويلد',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-أسد الدين-مقابل قسم الشرطة',g:'1 _ 6',p:'2712957'},
+  {n:'أحمد بن حنبل',s:'علي بيكو',a:'الصالحية',d:'قاسيون',ad:'الشيخ إبراهيم-ساحة الدانة',g:'1 _ 4',p:'2773448'},
+  {n:'أحمد أومري',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-أسد الدين-جانب جامع يونس آغا',g:'1 _ 6',p:'2764945'},
+  {n:'بنت الشاطئ',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-أسد الدين-مقابل مطعم العافية',g:'1 _ 6',p:'2772183'},
+  {n:'داليا زنود',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-ساحة شمدين-حارة الزبادنة',g:'1 _ 6',p:'2770078'},
+  {n:'وائل ريا',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'أسد الدين-طلعة المتينية',g:'1 _ 6',p:'2772324'},
+  {n:'الصاحبة',s:'علي بيكو',a:'الصالحية',d:'أبو جرش',ad:'صالحية-أبو جرش-جانب جامع النور',g:'1 _ 4',p:'2771972'},
+  {n:'نسيبة المازنية',s:'علي بيكو',a:'ركن الدين',d:'النقشبندي',ad:'',g:'1 _ 4',p:'2774396'},
+  {n:'محمد غازي الخالدي',s:'علي بيكو',a:'المهاجرين',d:'',ad:'شورى جادة أبي حنيفة النعمان',g:'ثانوي عام',p:'3346961'},
+  {n:'ابن العميد',s:'علي بيكو',a:'ركن الدين',d:'',ad:'ركن الدين مقابل أفران ابن العميد',g:'ثانوي عام',p:'2726354'},
+  {n:'17 نيسان',s:'علي بيكو',a:'مهاجرين',d:'',ad:'مهاجرين مصطبة',g:'ثانوي عام',p:'3715101'},
+  {n:'عادلة بيهم الجزائري',s:'علي بيكو',a:'مهاجرين',d:'',ad:'مهاجرين سكة جامع المرابط',g:'ثانوي عام',p:'3712512'},
+  {n:'بورسعيد',s:'علي بيكو',a:'مهاجرين',d:'',ad:'الجسر الابيض خلف جامع الدلامية',g:'ثانوي عام',p:'3317144'},
+  {n:'نبيل يونس',s:'علي بيكو',a:'ركن الدين',d:'',ad:'ركن الدين برنية خلف مشفى سنان',g:'ثانوي عام',p:'2760013'},
+  {n:'جودة الهاشمي',s:'علي بيكو',a:'ساروجا',d:'',ad:'تجهيز جانب الفورسيزون',g:'ثانوي عام',p:'2215718'},
+  {n:'زكي الارسوزي',s:'علي بيكو',a:'ركن الدين',d:'',ad:'ميسات مقابل مجمع العثمان',g:'ثانوي عام',p:'4424600'},
+  {n:'سوا',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين نزلة المرابط جادة قرطبة',g:'1 _ 6',p:'3712328',oldName:'المالكي سوا'},
+  {n:'محمد حسن الملا',s:'علي بيكو',a:'ركن الدين',d:'',ad:'ركن الدين ساحة شمدين',g:'7 _ 9',p:'2771536'},
+  {n:'عبد الرحمن الشهبندر',s:'علي بيكو',a:'المهاجرين',d:'',ad:'ساحة الشهبندر جانب مديرية صحة ريف دمشق',g:'7 _ 9',p:'4455179'},
+  {n:'الاخوة الخاصة',s:'علي بيكو',a:'مهاجرين',d:'',ad:'مهاجرين مرابط',g:'7 _ 9',p:'3710987'},
+  {n:'دار السلام',s:'علي بيكو',a:'مهاجرين',d:'',ad:'الشعلان ساحة النجمة',g:'رياض أطفال',p:''},
+  {n:'ثانوية أروى القريشية المهنية',s:'علي بيكو',a:'الصالحية',d:'المدارس',ad:'الجسر الأبيض جادة البسام جانب نادي الصحفين',g:'ثانوي نسوي',p:'3331258'},
+  {n:'ثا/عبدالوهاب أبو السعود المهنية',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'شرقي ركن الدين جانب الهجرة والجوازات',g:'ثانوي تجاري',p:'2710812'},
+  {n:'الصناعة الخامسة',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين هجرة والجوزات',g:'ثانوي صناعي',p:'2718501'},
+  {n:'ثا/جول جمال التجارية',s:'علي بيكو',a:'الصالحية',d:'الشهداء',ad:'الصالحية الشهداء',g:'ثانوي تجاري',p:'2315690'},
+  {n:'صالح الشاطر',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين مقاومة الشارع العام مقابل جامع صلاح الدين',g:'7 _ 9',p:'2772100'},
+  {n:'روضة المنى',s:'علي بيكو',a:'المهاجرين',d:'المرابط',ad:'مهاجرين مرابط مقابل ثانوية عادلة بيهم الجزائري',g:'رياض أطفال',p:'3711984'},
+  {n:'روضة ركن الدين المحدثة',s:'علي بيكو',a:'ركن الدين',d:'الأيوبية',ad:'ركن الدين شارع صلاح الدين',g:'رياض أطفال',p:'2712512'},
+  {n:'روضة أزهار نيسان',s:'علي بيكو',a:'الصالحية',d:'المزرعة',ad:'شهبندر مقابل وزارة التربية',g:'رياض أطفال',p:'3324880'},
+  {n:'روضة بسمة الطفولة',s:'علي بيكو',a:'ركن الدين',d:'النقشبندي',ad:'ركن الدين الشيخ خالد',g:'رياض أطفال',p:'2760102'},
+  {n:'روضة أزهار المستقبل',s:'علي بيكو',a:'المهاجرين',d:'أبو رمانة',ad:'عفيف مقابل السفارة الفرنسية جادة سنبل',g:'رياض أطفال',p:'3340516'},
+  {n:'روضة تيسير الحموي',s:'علي بيكو',a:'الصالحية',d:'الشيخ محيي الدين',ad:'سوق الجمعة مقابل مستوصف أبو جرش خلف جامع النور',g:'رياض أطفال',p:'2773347'},
+  {n:'روضة المستقبل المشرق',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين موقف المقاومة',g:'رياض أطفال',p:'2750129'},
+  {n:'روضة أبناء العاملين في وزارة التربية',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين ساحة شمدين جامع أبو النور',g:'رياض أطفال',p:'2753134'},
+  {n:'الرشيد',s:'علي بيكو',a:'الصالحية',d:'الشيخ محيي الدين',ad:'شيخ محي الدين-مقابل جامع النابلسي',g:'1 _ 6',p:'2752635'},
+  {n:'الشهيد محمد علي فرح',s:'علي بيكو',a:'الصالحية',d:'الشهداء',ad:'مقابل مدخل مشفى الطلياني',g:'1 _ 6',p:'3325493'},
+  {n:'معروف الرصافي',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'أسد الدين-زقاق فلاحة',g:'1 _ 6',p:'2772243'},
+  {n:'الكهف المحدثة',s:'علي بيكو',a:'المهاجرين',d:'أبو رمانة',ad:'مهاجرين-نبعة-جامع الكهف',g:'1 _ 6',p:'3340699'},
+  {n:'محمد آلان جنكيز ديري',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'ركن الدين-جانب جامع صلاح الدين',g:'1 _ 4',p:'2771798'},
+  {n:'التطبيقات المسلكية',s:'علي بيكو',a:'الصالحية',d:'المزرعة',ad:'الجسر الأبيض-خلف مبنى وزارة التربية',g:'رياض أطفال',p:'3315266'},
+  {n:'النضال العربي',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'ركن الدين-ابن العميد-جانب ثانوية ابن العميد',g:'1 _ 6',p:'2716163'},
+  {n:'محمد جميل سلطان',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-شرقي ركن الدين-مقابل جامع طارق بن زياد',g:'1 _ 6',p:'2720371'},
+  {n:'نايف تللو',s:'علي بيكو',a:'الصالحية',d:'المزرعة',ad:'ركن الدين-وادي سفيرا-دخلة المختار',g:'1 _ 4',p:'2715964'},
+  {n:'درويش الزوني',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'ركن الدين الشرقي',g:'7 _ 9',p:'2714982'},
+  {n:'سامي الدروبي',s:'علي بيكو',a:'المهاجرين',d:'المالكي',ad:'حواكير نزلة الشامي -مقابل مول المالكي',g:'ثانوي عام',p:'3713140'},
+  {n:'مركز تدريب ركن الدين',s:'علي بيكو',a:'',d:'',ad:'',g:'',p:''},
+  {n:'عائشة الصديقة',s:'علي شاليش',a:'الميدان',d:'الحقلة',ad:'ميدان حقلة جانب مشفى الفيحاء',g:'1 _ 6',p:'8880897'},
+  {n:'ابن زيدون',s:'علي شاليش',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان وسطاني مجتهد مقابل مشفى المجتهد',g:'7 _ 9',p:'8881157'},
+  {n:'خالد بن الوليد',s:'علي شاليش',a:'الميدان',d:'ميدان وسطاني',ad:'جزماتية-جانب قسم شرطة الميدان',g:'1 _ 6',p:'8882517'},
+  {n:'مروان بن الحكم',s:'علي شاليش',a:'القنوات',d:'المجتهد',ad:'ساحة الدروز',g:'1 _ 4',p:'2222410'},
+  {n:'محمد مصطفى جويد',s:'علي شاليش',a:'الميدان',d:'ميدان وسطاني',ad:'مجتهد خلف مدرسة ابن زيدون',g:'1 _ 6',p:'8882107'},
+  {n:'عماد الدين الزنكي',s:'علي شاليش',a:'الميدان',d:'الدقاق',ad:'ميدان-أبو حبل-جانب جامع الدقاق',g:'1 _ 4',p:'8880562'},
+  {n:'عبد الرحمن الغامعي',s:'علي شاليش',a:'الميدان',d:'',ad:'نهر عيشة الجويزانية - صيدلية التل',g:'1 _4',p:'8814209'},
+  {n:'المأمون',s:'علي شاليش',a:'القنوات',d:'قبر عاتكة',ad:'ميدان شويكة - جادة السلطان',g:'1 _ 4',p:'2258768'},
+  {n:'الملكة بلقيس',s:'علي شاليش',a:'القنوات',d:'الحجاز',ad:'الحلبوني جانب المؤسسة العسكرية',g:'1 _ 6',p:'2226462'},
+  {n:'آية حبيب',s:'علي شاليش',a:'القنوات',d:'البرامكة',ad:'برامكة-بختيار-مقابل ملعب تشرين',g:'7 _ 9',p:'2211347'},
+  {n:'عباس الحامض',s:'علي شاليش',a:'القنوات',d:'البرامكة',ad:'برامكة-مقابل مجمع الأمويين',g:'7 _ 9',p:'2120279'},
+  {n:'فايز منصور',s:'علي شاليش',a:'القنوات',d:'',ad:'برامكة حلبوني غرب أسعد عبد الله',g:'ثانوي عام',p:'2224906'},
+  {n:'علي خلوف',s:'علي شاليش',a:'البرامكة',d:'',ad:'برامكة مقابل مجمع الامويين',g:'ثانوي عام',p:'2124979'},
+  {n:'أسعد عبد الله',s:'علي شاليش',a:'قنوات',d:'',ad:'حلبوني جانب ثا/فايز منصور',g:'7 _ 9',p:'2215729'},
+  {n:'عمر شخاشيرو',s:'علي شاليش',a:'البرامكة',d:'',ad:'البرامكة مقابل مؤسسة المطبوعات',g:'ثانوي تجاري',p:''},
+  {n:'ثا/س نور فاطر حراير الصناعية',s:'علي شاليش',a:'القنوات',d:'البرامكة',ad:'برامكة مقابل سانا جامب وزارة الزراعة',g:'ثانوي صناعي',p:'2122592'},
+  {n:'المعهد التقاني التجاري الأول',s:'علي شاليش',a:'القنوات',d:'البرامكة',ad:'شارع علي بن أبي طالب مقابل مجمع الأمويين',g:'معهد تجاري',p:'2119766'},
+  {n:'ثا/الباسل للمتفوقين المختلطة',s:'علي شاليش',a:'القنوات',d:'البرامكة',ad:'بختيار جانب نادي المعلمين',g:'7 _ 9',p:'2254206'},
+  {n:'جمال الدين القاسمي',s:'علي شاليش',a:'القنوات',d:'الأنصاري',ad:'فحامة -خلف جامع زيد بن حارث',g:'1 _ 6',p:'2258199'},
+  {n:'عبدالرحمن الخازن',s:'علي شاليش',a:'القنوات',d:'البرامكة',ad:'مقابل ملعب تشرين',g:'رياض أطفال',p:'2260133'},
+  {n:'الدداحيل المحدثة',s:'علي شاليش',a:'القدم',d:'الدداحيل',ad:'مقابل مؤسسة عين الفيجة',g:'1 _ 6',p:'8127336'},
+  {n:'جلال الدين السيوطي',s:'علي شاليش',a:'القدم',d:'السيدة عائشة',ad:'أول سوق عاصم',g:'1 _ 6',p:'8880810'},
+  {n:'الشهيد مراد خزام',s:'علي شاليش',a:'القدم',d:'القدم',ad:'اتستراد درعا الجديد - بستان شاحوطة',g:'رياض أطفال',p:'81261606'},
+  {n:'الملك الناصر',s:'علي شاليش',a:'القدم',d:'القدم',ad:'حي الذهبا',g:'1 _ 6',p:'8121871'},
+  {n:'شمس الجلاء',s:'علي شاليش',a:'القدم',d:'الدداحيل',ad:'اتستراد دحاديل - مقابل جامع انس',g:'1 _ 6',p:'8111765'},
+  {n:'شكري القوتلي',s:'علي شاليش',a:'القدم',d:'القدم',ad:'محطة القطار- الباب الثاني',g:'رياض أطفال',p:'8122640'},
+  {n:'أبي حنيفة النعمان',s:'علي شاليش',a:'القدم',d:'السيدة عائشة',ad:'السيدة عائشة - دخلة مخبر بندق',g:'1 _ 6',p:'8883188'},
+  {n:'الشهيد جعفر خزام',s:'علي شاليش',a:'القدم',d:'',ad:'خلف قسم الشرطة',g:'رياض أطفال',p:'8121437'},
+  {n:'رشيد الخطيب',s:'علي شاليش',a:'القدم',d:'القدم',ad:'دمشق-القدم-حي الإعلام',g:'7 _ 9',p:''},
+  {n:'القعقاع بن عمرو التميمي',s:'علي شاليش',a:'القدم',d:'القدم',ad:'القدم-جانب بناء الإعلام',g:'7 _ 9',p:''},
+  {n:'معروف الارناؤوط',s:'علي شاليش',a:'القدم',d:'',ad:'القدم خلف قسم شرطة القدم',g:'7 _ 9',p:'8112959'},
+  {n:'روضة نرجس الشام',s:'علي شاليش',a:'القدم',d:'جورة الشريباتي',ad:'القدم حارة الشريباتي بين مدرستي حطين ورقية القرشية',g:'رياض أطفال',p:'8141144'},
+  {n:'الرزاي',s:'علي شاليش',a:'القدم',d:'القدم',ad:'دحاديل القدم جانب مكتبة وسيم',g:'1 _ 6',p:'8113364'},
+  {n:'امجد الطرابلسي',s:'علي شاليش',a:'القدم',d:'القدم',ad:'بناء المحاربين القدماء -جانب مدرسة شكري القوتلي',g:'رياض أطفال',p:'8119969'},
+  {n:'حطين',s:'علي شاليش',a:'القدم',d:'القدم',ad:'شرق جامع خديجة كبرى',g:'1 _ 6',p:'8113367'},
+  {n:'رقية القرشية',s:'علي شاليش',a:'القدم',d:'الدداحيل',ad:'حارة شريباتي',g:'1 _ 6',p:'8123362'},
+  {n:'ابن الرومي',s:'علي شاليش',a:'القدم',d:'الدداحيل',ad:'كرم نوح- عين الفيجة',g:'1 _ 6',p:'8113372'},
+  {n:'ابي يوسف الكندي',s:'علي شاليش',a:'القدم',d:'السيدة عائشة',ad:'أول سوق غاصم',g:'1 _ 6',p:'8885038'},
+  {n:'مي زيادة',s:'علي شاليش',a:'القدم',d:'الدداحيل',ad:'قرب فرن السعدي',g:'1 _4',p:'8121743'},
+  {n:'عمار بن ياسر',s:'علي شاليش',a:'القدم',d:'',ad:'نهر بلاط حي الزهبا',g:'1 _ 6',p:'8127878'},
+  {n:'عمر المختار',s:'علي شاليش',a:'القدم',d:'',ad:'دوار الضبع',g:'1 _ 6',p:'8113358'},
+  {n:'رضا سعيد',s:'علي شاليش',a:'القدم',d:'الدداحيل',ad:'إشارة سوق الخضرة',g:'رياض أطفال',p:'8131876'},
+  {n:'مجاهد العامري الدمشقي',s:'علي شاليش',a:'القدم',d:'القدم',ad:'القدم حي الجلاء مقابل مدرسة ديب الرفاعي',g:'1-6',p:'8112056'},
+  {n:'ثا محمد كرد علي',s:'علي شاليش',a:'القدم',d:'القدم',ad:'مشتل - مقسم هاتف',g:'7 _ 9',p:'8129317'},
+  {n:'إيليا أبو ماضي',s:'علي شاليش',a:'دمشق القديمة',d:'باب توما',ad:'صوفانية خلف النادي العائلي',g:'7 _ 9',p:'5422181'},
+  {n:'ثا/جميل صليبا',s:'علي شاليش',a:'جوبر',d:'',ad:'شيخ ارسلان',g:'7 _ 9',p:'4722769'},
+  {n:'عبد الجليل النحاس',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر -نزلة ثالثة -جامع التقوى',g:'ثانوي عام',p:'3117864'},
+  {n:'الشهيد محمد عبد الله',s:'محمود يوسف',a:'دمر',d:'دمر الغربية',ad:'مساكن الحرس الجديدة - جانب الفرن',g:'1 _ 6',p:'3216926'},
+  {n:'سعد بن عبادة',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر جزيرة 6 خلف طوارئ الكهرباء',g:'1 _ 6',p:'3110748'},
+  {n:'عبد الله بن جبير',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر الجزيرة 10 جانب فوج الإطفاء',g:'1 _ 6',p:'3142236'},
+  {n:'محمد أديب قلاجو',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر الجزيرة 19 خلف الشركة السورية للنفط',g:'1 _ 6',p:'3131294'},
+  {n:'دمر المحدثة',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'دمر البلد- ساحة المدارس',g:'1 _ 6',p:'3113587'},
+  {n:'سمير النحاس',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر الجزيرة 5 مقابل بنك بيمو السعودي الفرنسي',g:'1 _ 6',p:'3117340'},
+  {n:'ش/نرفت صقر',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'مشروع دمر حي العرين',g:'1 _ 6',p:'3211898'},
+  {n:'الشهيد صالح صالح',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر ج3',g:'1 _ 6',p:'3117944'},
+  {n:'باسل الأسد الأولى',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'مساكن الحرس جانب ثانوية راجح محمود',g:'1 _ 6',p:'3211375'},
+  {n:'عبد الرحمن الداخل',s:'محمود يوسف',a:'دمر',d:'دمر الغربية',ad:'دمر الحارة الجديدة جانب فرن العيطة',g:'1 _ 4',p:'3110139'},
+  {n:'محمد أمير الخطيب',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر ج11 دوار الكنيسة',g:'1 _ 6',p:'3113648'},
+  {n:'حكمت هاشم',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'دمر البلد-طلعة قاسيون',g:'7 _ 9',p:'3113586'},
+  {n:'ممدوح حمدي أباظة',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر',g:'7 _ 9',p:'3117004'},
+  {n:'محمد علي خضر',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر-مساكن الحرس',g:'7 _ 9',p:'3211048'},
+  {n:'شذى قدور',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'دمر البلد-ساحة المدارس',g:'7 _ 9',p:'3111839'},
+  {n:'غسان حمود',s:'محمود يوسف',a:'دمر',d:'الورود',ad:'مشروع دمر-حي الورود-نزلة الصفصاف',g:'1 _ 6',p:'3117042'},
+  {n:'محمد المقداد',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'دمر العرين-حي العرين',g:'1 _ 6',p:'3211049'},
+  {n:'الشهيد باسل الأسد الثانية',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'مساكن الحرس-جانب اعدادية وسيم الجاموس',g:'1 _ 6',p:'3211378'},
+  {n:'البحتري',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'دمر البلد الشرقية-جانب التربة',g:'1 _ 6',p:'3110451'},
+  {n:'راجح محمود',s:'محمود يوسف',a:'دمر',d:'',ad:'دمر مساكن العرين',g:'ثانوي عام',p:'3216877'},
+  {n:'مدحت تقي الدين',s:'محمود يوسف',a:'دمر',d:'',ad:'مشروع دمر ج16 خلف جامع البوطي',g:'7 _ 9',p:''},
+  {n:'الباسل ح1',s:'محمود يوسف',a:'قاسيون',d:'',ad:'مشروع دمر حي العرين',g:'7 _ 9',p:'3214020'},
+  {n:'علي يوسف صبح',s:'محمود يوسف',a:'قاسيون',d:'',ad:'دمر الغربية حي الورود',g:'7 _ 9',p:'3131675'},
+  {n:'عدنان الطباع',s:'محمود يوسف',a:'دمر',d:'',ad:'دمر الشرقية خلف مستودع الكتب المدرسية',g:'7 _ 9',p:'3116561'},
+  {n:'جنود الاسد',s:'محمود يوسف',a:'قاسيون',d:'',ad:'دمر طريق البحوث العلمية',g:'7 _ 9',p:'3114708'},
+  {n:'ياسين الشيخ نعيم',s:'محمود يوسف',a:'دمر',d:'دمر الغربية',ad:'مشروع دمر جزيرة عاشرة جانب فوج الاطفاء',g:'ثانوي تجاري',p:'3111058'},
+  {n:'ثا غالب أصلان',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر الجزيرة 16 جانب جامع البوطي',g:'ثانوي صناعي',p:'3110432',oldName:'غالب أصلان'},
+  {n:'عدنان اللحفي',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'مشروع دمر الجزيرة 11',g:'ثانوي صناعي',p:'3113060'},
+  {n:'الشهيدة نوال اسمندر',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'مشروع دمر حي العرين جانب الفرن',g:'ثانوي عام',p:'3210413'},
+  {n:'كنان محمد يوسف للتلمذة',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر الجيرة العاشرة مقابل سوق السابعة',g:'ثانوي صناعي',p:'3131250'},
+  {n:'وسيم جاموس',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'مساكن الحرس الجمهوري العرين',g:'7 _ 9',p:'3230316'},
+  {n:'روضة المروج',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'دمر شرقية جنود الأسد جانب المؤسسة الاجتماعية العسكرية',g:'رياض أطفال',p:'3132144'},
+  {n:'روضة عبير الطفولة',s:'محمود يوسف',a:'دمر',d:'دمر الغربية',ad:'توسع مشروع دمر خلف الشركة السورية للنفط',g:'رياض أطفال',p:'3134970'},
+  {n:'روضة الكواكب المنيرة',s:'محمود يوسف',a:'دمر',d:'الورود',ad:'حي الورود نزلة الصفصاف جانب مدرسة غسان حمود',g:'رياض أطفال',p:'3117076'},
+  {n:'روضة الشهيد أوس صالح',s:'محمود يوسف',a:'دمر',d:'دمر الغربية',ad:'مساكن الحرس مقابل ثانوية راجح محمود',g:'رياض أطفال',p:'3230817'},
+  {n:'المتنبي',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'دمر البلد ساحة المدارس',g:'1 _ 6',p:'3113603'},
+  {n:'جنود الأسد',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'دمر شرقية جنود الأسد طريق البحوث العلمية',g:'1 _ 6',p:'3112023'},
+  {n:'ثانوية يعقوب الكندي',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر التعمير',g:'7 _ 9',p:'3114314'},
+  {n:'جعفر صالح',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'مساكن الحرس حي العرين مقابل مركز القيصر',g:'1 _ 6',p:'3228789'},
+  {n:'الهدى',s:'وسيم سعيد',a:'ساروجا',d:'مسجد أقصاب',ad:'شارع بغداد-قزازين',g:'1 _ 4',p:'4447759'},
+  {n:'معاوية بن أبي سفيان',s:'وسيم سعيد',a:'ساروجا',d:'ساروجا',ad:'ساروجا-خلف البرج الفضي',g:'1 _ 6',p:'2314216'},
+  {n:'أمية',s:'وسيم سعيد',a:'ساروجا',d:'',ad:'قصاع جانب ساحة التحرير',g:'ثانوي عام',p:'4445745'},
+  {n:'سمير حنا سلوم',s:'وسيم سعيد',a:'شاغور',d:'',ad:'باب شرقي دويلعة تجمع مدارس',g:'ثانوي عام',p:'4713416'},
+  {n:'ضرار بن الأزور',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة كشكول',g:'1 _ 4',p:'4730228'},
+  {n:'أبو زيد الأنصاري',s:'وسيم سعيد',a:'الشاغور',d:'الوحدة',ad:'الطبالة الشارع العام قرب كازية زغلول مقابل محلات حلاوة',g:'1 _ 6',p:'4714905'},
+  {n:'الياس فرحات',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة تجمع المدارس',g:'1 _ 6',p:'4714249'},
+  {n:'الياس الريس',s:'وسيم سعيد',a:'الشاغور',d:'النضال',ad:'كباس جانب صيدلية دعد المصلح',g:'1 _ 4',p:'4724121'},
+  {n:'الزبير بن العوام',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة طبالة كازية زغلول مستوصف حي بلال',g:'1 _ 6',p:'4726103'},
+  {n:'أسامة بن منقذ',s:'وسيم سعيد',a:'الشاغور',d:'النضال',ad:'دويلعة صيدلية منى بركيل ط2',g:'1 _ 4',p:'4721901'},
+  {n:'عبد القادر الخرساء',s:'وسيم سعيد',a:'الشاغور',d:'شاغور براني',ad:'باب شرقي جانب دار الكرامة',g:'1 _ 6',p:'4717422'},
+  {n:'زينب فواز',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة تجمع المدارس',g:'1 _ 6',p:'4714248'},
+  {n:'هند القرشية',s:'وسيم سعيد',a:'الشاغور',d:'الوحدة',ad:'طبالة طريق جرمانا خافية كازية زغلول',g:'1 _ 4',p:'4715179'},
+  {n:'بلال الحبشي',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة مقابل جامع الهدى',g:'1 _ 4',p:'4731107'},
+  {n:'ماريا القبطية',s:'وسيم سعيد',a:'الشاغور',d:'النضال',ad:'دويلعة كباس مقابل فروج السلطان',g:'1 _ 4',p:'430100'},
+  {n:'أبي بن كعب الانصاري',s:'وسيم سعيد',a:'الشاغور',d:'الوحدة',ad:'طبالة مقابل كازية زغلول',g:'1 _ 6',p:'4717109'},
+  {n:'سامر منصور البشارة',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة تجمع المدارس',g:'1 _ 6',p:'4714247'},
+  {n:'الأحنف بن قيس',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'طريق جرمانا',g:'1 _ 4',p:'4731112'},
+  {n:'حمزة بن عبد المطلب',s:'وسيم سعيد',a:'الشاغور',d:'النضال',ad:'دويلعة جانب جامع إبراهيم الخليل',g:'1 _ 4',p:'4722767'},
+  {n:'رابعة الشامية',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'جسر الكباس شارع الحسن',g:'1 _ 4',p:'4728036'},
+  {n:'ابن الجوزي',s:'وسيم سعيد',a:'الشاغور',d:'الوحدة',ad:'طبالة كازية زغلول',g:'1 _ 4',p:'4710655'},
+  {n:'وسام جرجي الجط',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة تجمع المدارس',g:'1 _ 6',p:'4710141'},
+  {n:'عامر مجيد السمارة',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'كباس مقابل صيدلية دعد المصلح',g:'1 _ 4',p:'4715129'},
+  {n:'مصطفى الترك',s:'وسيم سعيد',a:'الشاغور',d:'',ad:'دويلعة-مجمع المدارس',g:'7 _ 9',p:'4714250'},
+  {n:'روضة ورد الربيع',s:'وسيم سعيد',a:'الشاغور',d:'شاغور براني',ad:'دويلعة تجمع المدارس',g:'رياض أطفال',p:'4711589'},
+  {n:'جمانة الهلالية',s:'وسيم سعيد',a:'الشاغور',d:'شاغور براني',ad:'شاغور جراح',g:'1 _ 6',p:'2215913'},
+  {n:'جميلة الأنصارية',s:'وسيم سعيد',a:'دمشق القديمة',d:'باب توما',ad:'حي الدوامنة جانب اسرة الاخاء خلف المخفر',g:'1 _ 6',p:'5419203'},
+  {n:'س/فريز مالك',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'عدوي-جادة الخطيب الخامسة',g:'7 _ 9',p:'4449939'},
+  {n:'أبي العلاء المعري',s:'وسيم سعيد',a:'ساروجا',d:'القصاع',ad:'شرقي التجارة',g:'1 _ 6',p:'4474410'},
+  {n:'الوليد بن عبد الملك',s:'وسيم سعيد',a:'ساروجا',d:'العقيبية',ad:'شارع بغداد-مقابل تربة الدحداح',g:'1 _ 6',p:'2312008'},
+  {n:'شكيب أرسلان',s:'وسيم سعيد',a:'ساروجا',d:'ساروجا',ad:'ساحة التحرير-ساحة الغدير-جادة عاصم',g:'1 _ 6',p:'4456398'},
+  {n:'عصام صافية',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'عدوي-دخلة المعهد الصحي',g:'1 _ 6',p:'4464282'},
+  {n:'نبيل نقرور',s:'وسيم سعيد',a:'ساروجا',d:'ساروجا',ad:'ساحة التحرير-جانب ثانوية أمية',g:'1 _ 6',p:'4457760'},
+  {n:'الجاحظ',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'شارع بغداد-القزازين',g:'1 _ 6',p:'4444904'},
+  {n:'البيروني',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'قصور-جانب بسام حمشو',g:'1 _ 6',p:'4460085'},
+  {n:'ماري العجمي',s:'وسيم سعيد',a:'ساروجا',d:'القصاع',ad:'قصاع-ساحة جورج خوري',g:'رياض أطفال',p:'4462868'},
+  {n:'أم الخير',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'قصور-جادة الجادة الخامسة',g:'1 _ 6',p:'4440157'},
+  {n:'أحمد المناديلي',s:'وسيم سعيد',a:'ساروجا',d:'العمارة البرانية',ad:'عمارة-الشرف الأعلى',g:'رياض أطفال',p:'2224496'},
+  {n:'المنفلوطي',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'ساروجا-عين الكرش-دخلة مشفى العربي',g:'1 _ 6',p:'23250298'},
+  {n:'ياسر محمد سلمان',s:'وسيم سعيد',a:'',d:'',ad:'عباسيين شرق كازية ديوانة',g:'7 _ 9',p:'4445360'},
+  {n:'الفاروق',s:'وسيم سعيد',a:'ساروجا',d:'',ad:'عدوي جانب المعهد الصحي',g:'ثانوي عام',p:'4451573'},
+  {n:'ابن الاثير',s:'وسيم سعيد',a:'ساروجا',d:'',ad:'العدوي',g:'7 _ 9',p:'4444906'},
+  {n:'الواقدي للمتفوقين',s:'وسيم سعيد',a:'العدوي',d:'',ad:'شرقي التجارة خلف كراج العباسيين',g:'7 _ 9',p:'4429906'},
+  {n:'معهد الحرية',s:'وسيم سعيد',a:'ساروجا',d:'',ad:'مزرعة شارع بغداد',g:'رياض أطفال',p:'4427316'},
+  {n:'المعونة الخاصة',s:'وسيم سعيد',a:'ساروجا',d:'',ad:'القصاع',g:'رياض أطفال',p:'4443344'},
+  {n:'ثا/بسام حمشو المهنية',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'حي التجارة مقابل الحديقة',g:'ثانوي نسوي',p:''},
+  {n:'علي حسن علي',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'القصور مقابل كازية القصور',g:'ثانوي تجاري',p:'4416791'},
+  {n:'معهد تقنيات الحاسوب الأول',s:'وسيم سعيد',a:'',d:'',ad:'شرقي التجارة بناء المعهد الصناعي الثالث',g:'معهد صناعي',p:''},
+  {n:'عبد الفتاح عبد الفتاح',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'العدوي',g:'ثانوي تجاري',p:'4445612'},
+  {n:'ثانوية جميل الشطي المهنية',s:'وسيم سعيد',a:'دمشق القديمة',d:'باب توما',ad:'باب توما قيمرية جانب مطعم باب الحارة',g:'ثانوي نسوي',p:'5445476'},
+  {n:'المعهد التقاني الصناعي الثالث',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'شرقي التجارة جانب ثا الوفدة للمتفوقين',g:'معهد صناعي',p:'4419988'},
+  {n:'أنيس سلوم التجارية',s:'وسيم سعيد',a:'دمشق القديمة',d:'باب توما',ad:'باب توما شارع الحجر مقابل دير اللاتين',g:'ثانوي تجاري',p:'5441003'},
+  {n:'معهد التربية الرياضية للمعلمين',s:'وسيم سعيد',a:'برزة',d:'العباسيين',ad:'خلف ملعب العباسين',g:'معهد رياضي',p:'4415875'},
+  {n:'جورج حداد',s:'وسيم سعيد',a:'جوبر',d:'جوبر الشرقي',ad:'جوبر شرقي جانب دار الكرامة',g:'7 _ 9',p:'4729879'},
+  {n:'مروان مرشه',s:'وسيم سعيد',a:'ساروجا',d:'القصاع',ad:'قصاع ساحة جورج خوري جانب ثانوية المعونة',g:'7 _ 9',p:'4445710',oldName:'مروان مرشة'},
+  {n:'غسان عبود',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'عدوي خلف مشفى دار الشفاء',g:'7 _ 9',p:'4453317'},
+  {n:'أنور العطار',s:'وسيم سعيد',a:'ساروجا',d:'القصاع',ad:'قصور شارع الكندي',g:'7 _ 9',p:'4450849'},
+  {n:'محي الدين داوود',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'قصور خطيب جادة سادسة',g:'7 _ 9',p:'4447877'},
+  {n:'روضة براعم آذار',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'القصور الخطيب مقابل مدرسة محي الدين داود',g:'رياض أطفال',p:'4447574'},
+  {n:'عائشة الباعونية',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'شارع بغداد-موقف القزازين-مقابل جامع الفاروق',g:'1 _ 6',p:'4440624'},
+  {n:'زين العرب',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'شارع بغداد-دخلة مشفى الغزالي',g:'1 _ 6',p:'4448584'},
+  {n:'الزهراء',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'شارع بغداد-خلف ساحة القزازين',g:'1 _ 6',p:'4459608'},
+  {n:'عبد القادر أرناؤوط',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'القصور- جانب متحف العلوم',g:'1 _ 6',p:'4449608'},
+  {n:'زيد بن الخطاب',s:'وسيم سعيد',a:'جوبر',d:'جوبر الشرقي',ad:'ساحة العباسين خلف المخفر',g:'1 _ 6',p:'4416789'},
+  {n:'حسن سالم محمد',s:'وسيم سعيد',a:'جوبر',d:'جوبر الشرقي',ad:'ساحة العباسيين خلف محضر العباسيين',g:'7_9',p:'4416781'},
+  {n:'ثا/يوسف العظمة',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'جادة الخطيب -كازية القصور',g:'ثانوي عام',p:'4441781'},
+  {n:'لورا دغلاوي',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'جانب معهد صحي',g:'ثانوي عام',p:'4444881'},
+  {n:'عبد الله بن الزبير',s:'وسيم سعيد',a:'الصالحية',d:'المزرعة',ad:'مزرعة-مقابل السفارة الروسية',g:'1 _ 6',p:'4441382'}
+];
+
+/* ═══════════════════════════════════════════════════════
+   القسم 2: التحميل والحفظ
+   ═══════════════════════════════════════════════════════ */
 function loadState(){
   try{
     state.tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.TASKS) || '[]');
     state.materials = JSON.parse(localStorage.getItem(STORAGE_KEYS.MATERIALS) || 'null') || DEFAULT_MATERIALS;
+    state.schools = JSON.parse(localStorage.getItem(STORAGE_KEYS.SCHOOLS) || 'null') || SCHOOLS_DEFAULT;
     state.settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS) || 'null') || DEFAULT_SETTINGS;
     state.counter = parseInt(localStorage.getItem(STORAGE_KEYS.COUNTER) || '1');
   }catch(e){
+    console.error('خطأ تحميل:', e);
     state.tasks = [];
     state.materials = DEFAULT_MATERIALS;
+    state.schools = SCHOOLS_DEFAULT;
     state.settings = DEFAULT_SETTINGS;
     state.counter = 1;
   }
 }
-
 function saveTasks(){ localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(state.tasks)); }
 function saveMaterials(){ localStorage.setItem(STORAGE_KEYS.MATERIALS, JSON.stringify(state.materials)); }
+function saveSchools(){ localStorage.setItem(STORAGE_KEYS.SCHOOLS, JSON.stringify(state.schools)); }
 function saveSettings(){ localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(state.settings)); }
 function saveCounter(){ localStorage.setItem(STORAGE_KEYS.COUNTER, String(state.counter)); }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 2: أدوات مساعدة
+   القسم 3: أدوات عامة
    ═══════════════════════════════════════════════════════ */
 function escapeHtml(s){
   if(s == null) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-
+function escapeCSV(s){
+  if(s == null) return '';
+  s = String(s);
+  if(s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1 || s.indexOf('\r') !== -1){
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
 let toastTimer = null;
 function showToast(msg, type){
   const t = document.getElementById('toast');
@@ -493,7 +1350,6 @@ function showToast(msg, type){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
-
 function todayISO(){
   const d = new Date();
   const y = d.getFullYear();
@@ -501,25 +1357,24 @@ function todayISO(){
   const day = String(d.getDate()).padStart(2,'0');
   return y + '/' + m + '/' + day;
 }
-
 function updateHeaderDate(){
   const d = new Date();
   const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
   document.getElementById('headerDate').textContent = days[d.getDay()] + ' ' + d.toLocaleDateString('ar-SY');
 }
-
 function switchPage(pageId){
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
+  const page = document.getElementById(pageId);
+  if(page) page.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const nav = document.querySelector('.nav-item[data-page="' + pageId + '"]');
   if(nav) nav.classList.add('active');
   if(pageId === 'pageMaterials') renderMaterials();
   if(pageId === 'pageSettings') loadSettingsToForm();
+  if(pageId === 'pageSchools'){ renderSchoolsList(); updateSchoolsStats(); }
   localStorage.setItem('mt_current_page', pageId);
   window.scrollTo(0, 0);
 }
-
 function openSheet(id){
   document.getElementById(id).classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -530,18 +1385,92 @@ function closeSheet(id){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 3: إدارة المهام
+   القسم 4: البحث عن المدارس
+   ═══════════════════════════════════════════════════════ */
+function searchSchools(query){
+  const results = document.getElementById('schoolResults');
+  const q = (query || '').trim().toLowerCase();
+  if(q.length < 2){ results.classList.remove('show'); return; }
+  const matches = state.schools.filter(function(s){
+    return (s.n && s.n.toLowerCase().indexOf(q) !== -1)
+        || (s.oldName && s.oldName.toLowerCase().indexOf(q) !== -1)
+        || (s.a && s.a.toLowerCase().indexOf(q) !== -1)
+        || (s.s && s.s.toLowerCase().indexOf(q) !== -1)
+        || (s.ad && s.ad.toLowerCase().indexOf(q) !== -1);
+  }).slice(0, 30);
+  if(matches.length === 0){
+    results.innerHTML = '<div style="padding:12px;text-align:center;color:var(--gray-500);font-size:12px">لا توجد نتائج في القاعدة</div>';
+    results.classList.add('show');
+    return;
+  }
+  let html = '';
+  matches.forEach(function(s){
+    const idx = state.schools.indexOf(s);
+    html += '<div class="school-item" onclick="pickSchool(' + idx + ')">';
+    html += '<div class="school-item-name">' + escapeHtml(s.n);
+    if(s.oldName) html += ' <span class="old-tag">(سابقاً: ' + escapeHtml(s.oldName) + ')</span>';
+    html += '</div>';
+    html += '<div class="school-item-meta">👤 ' + escapeHtml(s.s || '') + ' • 📍 ' + escapeHtml(s.a || '') + (s.d ? ' - ' + escapeHtml(s.d) : '') + '</div>';
+    html += '</div>';
+  });
+  results.innerHTML = html;
+  results.classList.add('show');
+}
+
+function pickSchool(idx){
+  const s = state.schools[idx];
+  if(!s) return;
+  state.selectedSchool = s;
+  document.getElementById('fSchoolSearch').value = s.n;
+  document.getElementById('schoolResults').classList.remove('show');
+  document.getElementById('selName').textContent = s.n + (s.oldName ? ' (سابقاً: ' + s.oldName + ')' : '');
+  let info = '';
+  if(s.s) info += '👤 ' + escapeHtml(s.s);
+  if(s.a) info += ' • 📍 ' + escapeHtml(s.a);
+  if(s.d) info += ' - ' + escapeHtml(s.d);
+  if(s.g) info += '<br>📚 ' + escapeHtml(s.g);
+  if(s.p) info += ' • 📞 ' + escapeHtml(s.p);
+  if(s.ad) info += '<br>📌 ' + escapeHtml(s.ad);
+  document.getElementById('selInfo').innerHTML = info;
+  document.getElementById('selectedSchool').style.display = 'block';
+  document.getElementById('fName').value = s.n;
+  if(s.s) document.getElementById('fContact').value = s.s;
+  const areaSel = document.getElementById('fArea');
+  if(s.a){
+    for(let i=0; i<areaSel.options.length; i++){
+      if(areaSel.options[i].value === s.a || areaSel.options[i].text === s.a){ areaSel.selectedIndex = i; break; }
+    }
+  }
+  if(s.d) document.getElementById('fBuilding').value = s.d;
+}
+
+function clearSelectedSchool(){
+  state.selectedSchool = null;
+  document.getElementById('fSchoolSearch').value = '';
+  document.getElementById('selectedSchool').style.display = 'none';
+  document.getElementById('schoolResults').classList.remove('show');
+  document.getElementById('fName').value = '';
+  document.getElementById('fContact').value = '';
+  document.getElementById('fBuilding').value = '';
+}
+/* ═══════════════════════════════════════════════════════
+   القسم 5: إدارة المهام
    ═══════════════════════════════════════════════════════ */
 function openTaskSheet(taskId){
   state.editingTaskId = taskId || null;
   const title = document.getElementById('taskSheetTitle');
   const fName = document.getElementById('fName');
-  
+  document.getElementById('fSchoolSearch').value = '';
+  document.getElementById('schoolResults').classList.remove('show');
+  document.getElementById('selectedSchool').style.display = 'none';
+  state.selectedSchool = null;
+
   if(taskId){
     const t = state.tasks.find(x => x.id === taskId);
     if(!t) return;
     title.textContent = '✏️ تعديل المهمة';
     fName.value = t.name || '';
+    document.getElementById('fNewName').value = t.newName || '';
     document.getElementById('fBuilding').value = t.building || '';
     document.getElementById('fRoom').value = t.room || '';
     document.getElementById('fType').value = t.type || 'كشف عطل';
@@ -549,9 +1478,13 @@ function openTaskSheet(taskId){
     document.getElementById('fArea').value = t.area || 'أخرى';
     document.getElementById('fContact').value = t.contact || '';
     document.getElementById('fNotes').value = t.notes || '';
+    document.getElementById('fEditPhone').value = t.editPhone || '';
+    document.getElementById('fEditAddress').value = t.editAddress || '';
+    document.getElementById('fEditExtra').value = t.editExtra || '';
   }else{
     title.textContent = '➕ مهمة جديدة';
     fName.value = '';
+    document.getElementById('fNewName').value = '';
     document.getElementById('fBuilding').value = '';
     document.getElementById('fRoom').value = '';
     document.getElementById('fType').value = 'كشف عطل';
@@ -559,59 +1492,61 @@ function openTaskSheet(taskId){
     document.getElementById('fArea').value = 'المزة - أبو زهير';
     document.getElementById('fContact').value = '';
     document.getElementById('fNotes').value = '';
+    document.getElementById('fEditPhone').value = '';
+    document.getElementById('fEditAddress').value = '';
+    document.getElementById('fEditExtra').value = '';
   }
   openSheet('taskSheetBg');
-  setTimeout(() => fName.focus(), 350);
+  setTimeout(() => document.getElementById('fSchoolSearch').focus(), 350);
 }
 
 function saveTask(){
   const name = document.getElementById('fName').value.trim();
-  if(!name){
-    showToast('الرجاء إدخال اسم المدرسة', 'error');
-    document.getElementById('fName').focus();
-    return;
-  }
-  
+  if(!name){ showToast('الرجاء إدخال اسم المدرسة', 'error'); return; }
+
   const data = {
     name: name,
+    newName: document.getElementById('fNewName').value.trim(),
     building: document.getElementById('fBuilding').value.trim(),
     room: document.getElementById('fRoom').value.trim(),
     type: document.getElementById('fType').value,
     priority: document.getElementById('fPriority').value,
     area: document.getElementById('fArea').value,
     contact: document.getElementById('fContact').value.trim(),
-    notes: document.getElementById('fNotes').value.trim()
+    notes: document.getElementById('fNotes').value.trim(),
+    editPhone: document.getElementById('fEditPhone').value.trim(),
+    editAddress: document.getElementById('fEditAddress').value.trim(),
+    editExtra: document.getElementById('fEditExtra').value.trim()
   };
-  
+
+  if(state.selectedSchool){
+    data.schoolName = state.selectedSchool.n;
+    data.schoolSupervisor = state.selectedSchool.s || '';
+    data.schoolArea = state.selectedSchool.a || '';
+    data.schoolDistrict = state.selectedSchool.d || '';
+    data.schoolAddress = state.selectedSchool.ad || '';
+    data.schoolGrade = state.selectedSchool.g || '';
+    data.schoolPhone = state.selectedSchool.p || '';
+    data.oldName = state.selectedSchool.oldName || '';
+  }
+
   if(state.editingTaskId){
     const t = state.tasks.find(x => x.id === state.editingTaskId);
-    if(t){
-      Object.assign(t, data);
-      showToast('✅ تم تحديث المهمة', 'success');
-    }
+    if(t){ Object.assign(t, data); showToast('✅ تم تحديث المهمة', 'success'); }
   }else{
-    const task = {
+    const task = Object.assign({
       id: Date.now(),
       number: state.counter++,
-      name: data.name,
-      building: data.building,
-      room: data.room,
-      type: data.type,
-      priority: data.priority,
-      area: data.area,
-      contact: data.contact,
-      notes: data.notes,
       materials: [],
       technician: '',
       status: 'pending',
       createdAt: todayISO(),
       doneAt: ''
-    };
+    }, data);
     state.tasks.unshift(task);
     saveCounter();
     showToast('✅ تمت إضافة المهمة', 'success');
   }
-  
   saveTasks();
   closeSheet('taskSheetBg');
   renderTasks();
@@ -621,105 +1556,115 @@ function saveTask(){
 function toggleTaskDone(id){
   const t = state.tasks.find(x => x.id === id);
   if(!t) return;
-  if(t.status === 'done'){
-    t.status = 'pending';
-    t.doneAt = '';
-    showToast('↩️ تم إرجاع المهمة', 'warn');
-  }else{
-    t.status = 'done';
-    t.doneAt = todayISO();
-    showToast('✅ تم إنجاز المهمة', 'success');
-  }
-  saveTasks();
-  renderTasks();
-  updateStats();
-  if(document.getElementById('detailSheetBg').classList.contains('open')){
-    openDetail(id);
-  }
+  if(t.status === 'done'){ t.status = 'pending'; t.doneAt = ''; showToast('↩️ تم إرجاع المهمة', 'warn'); }
+  else { t.status = 'done'; t.doneAt = todayISO(); showToast('✅ تم إنجاز المهمة', 'success'); }
+  saveTasks(); renderTasks(); updateStats();
+  if(document.getElementById('detailSheetBg').classList.contains('open')) openDetail(id);
 }
 
 function deleteTask(id){
   if(!confirm('هل تريد حذف هذه المهمة نهائياً؟')) return;
   state.tasks = state.tasks.filter(x => x.id !== id);
-  saveTasks();
-  renderTasks();
-  updateStats();
+  saveTasks(); renderTasks(); updateStats();
   closeSheet('detailSheetBg');
   showToast('🗑️ تم حذف المهمة', 'warn');
 }
 
+/* ═══════════════════════════════════════════════════════
+   القسم 6: تفاصيل المهمة
+   ═══════════════════════════════════════════════════════ */
 function openDetail(id){
   const t = state.tasks.find(x => x.id === id);
   if(!t) return;
   state.currentTaskId = id;
-  
   const prioMap = { high:'🔴 عالية', med:'🟡 متوسطة', low:'🟢 منخفضة' };
   const statusMap = { pending:'⏳ معلقة', done:'✅ منجزة' };
   const matCount = (t.materials || []).length;
-  
+  const displayName = t.newName || t.name;
+
   let html = '';
   html += '<div style="background:var(--gray-50);border-radius:12px;padding:14px;margin-bottom:12px">';
-  html += '<div style="font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:8px">' + escapeHtml(t.name) + '</div>';
+  html += '<div style="font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:8px">' + escapeHtml(displayName) + '</div>';
+  if(t.newName && t.name !== t.newName){
+    html += '<div style="font-size:12px;color:var(--copper-600);margin-bottom:4px">📛 الاسم الأصلي: ' + escapeHtml(t.name) + '</div>';
+  }
+  if(t.oldName){
+    html += '<div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">📜 الاسم القديم: ' + escapeHtml(t.oldName) + '</div>';
+  }
   html += '<div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">رقم المهمة: #' + t.number + '</div>';
   if(t.building) html += '<div style="font-size:12.5px;color:var(--gray-700)">🏢 ' + escapeHtml(t.building) + '</div>';
   if(t.room) html += '<div style="font-size:12.5px;color:var(--gray-700)">🚪 قاعة رقم: ' + escapeHtml(t.room) + '</div>';
   html += '</div>';
-  
+
   html += '<div class="field-row" style="margin-bottom:12px">';
   html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px"><div style="font-size:11px;color:var(--gray-500)">الحالة</div><div style="font-size:13px;font-weight:700;margin-top:2px">' + statusMap[t.status] + '</div></div>';
   html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px"><div style="font-size:11px;color:var(--gray-500)">الأولوية</div><div style="font-size:13px;font-weight:700;margin-top:2px">' + prioMap[t.priority] + '</div></div>';
   html += '</div>';
-  
+
   html += '<div class="field-row" style="margin-bottom:12px">';
   html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px"><div style="font-size:11px;color:var(--gray-500)">النوع</div><div style="font-size:13px;font-weight:700;margin-top:2px">' + escapeHtml(t.type) + '</div></div>';
   html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px"><div style="font-size:11px;color:var(--gray-500)">المنطقة</div><div style="font-size:13px;font-weight:700;margin-top:2px">' + escapeHtml(t.area) + '</div></div>';
   html += '</div>';
-  
+
   if(t.contact) html += '<div style="font-size:13px;margin-bottom:8px">👤 المشرف: <b>' + escapeHtml(t.contact) + '</b></div>';
   if(t.notes) html += '<div class="task-note" style="margin-bottom:10px">📝 ' + escapeHtml(t.notes) + '</div>';
   if(t.technician) html += '<div style="font-size:13px;margin-bottom:8px">👷 الفني: <b>' + escapeHtml(t.technician) + '</b></div>';
-  
+
+  // بيانات المدرسة
+  const hasSchoolInfo = t.schoolAddress || t.schoolDistrict || t.schoolGrade || t.schoolPhone || t.editPhone || t.editAddress || t.editExtra;
+  if(hasSchoolInfo){
+    html += '<div style="background:var(--copper-100);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--copper-700);line-height:1.7">';
+    if(t.editAddress) html += '📍 <b>العنوان:</b> ' + escapeHtml(t.editAddress) + '<br>';
+    else if(t.schoolAddress) html += '📍 <b>العنوان:</b> ' + escapeHtml(t.schoolAddress) + '<br>';
+    if(t.schoolDistrict) html += '🏘️ <b>الحي:</b> ' + escapeHtml(t.schoolDistrict) + '<br>';
+    if(t.schoolGrade) html += '📚 <b>المرحلة:</b> ' + escapeHtml(t.schoolGrade) + '<br>';
+    if(t.editPhone) html += '📞 <b>الهاتف:</b> ' + escapeHtml(t.editPhone) + '<br>';
+    else if(t.schoolPhone) html += '📞 <b>الهاتف:</b> ' + escapeHtml(t.schoolPhone) + '<br>';
+    if(t.editExtra) html += '➕ ' + escapeHtml(t.editExtra);
+    html += '</div>';
+  }
+
   html += '<div style="background:var(--copper-100);border-radius:10px;padding:10px;margin-bottom:12px;font-size:12.5px;color:var(--copper-700)">';
   html += '📦 المواد في الكشف: <b>' + matCount + '</b> مادة</div>';
-  
+
+  // زر الخريطة
+  const mapQuery = encodeURIComponent(displayName + ' ' + (t.editAddress || t.schoolAddress || '') + ' دمشق');
+  html += '<a href="https://www.google.com/maps/search/?api=1&query=' + mapQuery + '" target="_blank" class="btn-lg btn-map" style="margin-bottom:8px;font-size:14px;padding:12px;text-decoration:none">';
+  html += '📍 فتح الموقع على الخريطة</a>';
+
   html += '<div style="font-size:11px;color:var(--gray-500);text-align:center;margin-bottom:12px">';
   html += '📅 أضيفت: ' + t.createdAt + (t.doneAt ? ' • ✅ أُنجزت: ' + t.doneAt : '') + '</div>';
-  
+
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
   html += '<button class="btn-lg ' + (t.status === 'done' ? 'btn-ghost' : 'btn-primary') + '" onclick="toggleTaskDone(' + t.id + ')" style="font-size:13px;padding:11px">' + (t.status === 'done' ? '↩️ إرجاع' : '✅ إنجاز') + '</button>';
   html += '<button class="btn-lg btn-copper" onclick="openMaterialsForTask(' + t.id + ')" style="font-size:13px;padding:11px">📦 المواد</button>';
   html += '</div>';
-  
+
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
   html += '<button class="btn-lg btn-primary" onclick="printTask(' + t.id + ')" style="font-size:13px;padding:11px">🖨️ طباعة</button>';
   html += '<button class="btn-lg btn-ghost" onclick="openTaskSheet(' + t.id + ')" style="font-size:13px;padding:11px">✏️ تعديل</button>';
   html += '</div>';
-  
+
   html += '<button class="btn-lg btn-ghost" style="color:var(--danger);font-size:13px;padding:11px" onclick="deleteTask(' + t.id + ')">🗑️ حذف المهمة</button>';
-  
+
   document.getElementById('detailTitle').textContent = '📋 تفاصيل المهمة #' + t.number;
   document.getElementById('detailContent').innerHTML = html;
   openSheet('detailSheetBg');
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 4: المواد داخل المهمة
+   القسم 7: المواد داخل المهمة
    ═══════════════════════════════════════════════════════ */
 function openMaterialsForTask(taskId){
   const t = state.tasks.find(x => x.id === taskId);
   if(!t) return;
   state.currentTaskId = taskId;
   if(!t.materials) t.materials = [];
-  
   document.getElementById('fTechnician').value = t.technician || '';
-  
   const sel = document.getElementById('matSelect');
   let opts = '<option value="">-- اختر مادة --</option>';
-  state.materials.forEach(m => {
-    opts += '<option value="' + m.id + '">' + escapeHtml(m.name) + ' (' + escapeHtml(m.unit) + ')</option>';
-  });
+  state.materials.forEach(m => { opts += '<option value="' + m.id + '">' + escapeHtml(m.name) + ' (' + escapeHtml(m.unit) + ')</option>'; });
   sel.innerHTML = opts;
-  
   renderTaskMaterials();
   closeSheet('detailSheetBg');
   setTimeout(() => openSheet('matSheetBg'), 200);
@@ -729,12 +1674,10 @@ function renderTaskMaterials(){
   const t = state.tasks.find(x => x.id === state.currentTaskId);
   if(!t) return;
   const container = document.getElementById('taskMaterialsList');
-  
   if(!t.materials || t.materials.length === 0){
     container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد مواد مضافة بعد</div>';
     return;
   }
-  
   let html = '';
   t.materials.forEach((m, idx) => {
     html += '<div class="material-row">';
@@ -753,18 +1696,11 @@ function addMaterialToTask(){
   if(!matId) return;
   const mat = state.materials.find(m => m.id === parseInt(matId));
   if(!mat) return;
-  
   const t = state.tasks.find(x => x.id === state.currentTaskId);
   if(!t) return;
   if(!t.materials) t.materials = [];
-  
   const exists = t.materials.find(m => m.name === mat.name);
-  if(exists){
-    showToast('⚠️ المادة موجودة مسبقاً', 'warn');
-    sel.value = '';
-    return;
-  }
-  
+  if(exists){ showToast('⚠️ المادة موجودة مسبقاً', 'warn'); sel.value = ''; return; }
   t.materials.push({ name: mat.name, unit: mat.unit, qty: 1 });
   renderTaskMaterials();
   sel.value = '';
@@ -799,36 +1735,23 @@ function saveTaskMaterials(){
 function addNewMaterialInline(){
   const name = document.getElementById('matNewName').value.trim();
   const unit = document.getElementById('matNewUnit').value.trim() || 'عدد';
-  if(!name){
-    showToast('أدخل اسم المادة', 'error');
-    return;
-  }
-  
+  if(!name){ showToast('أدخل اسم المادة', 'error'); return; }
   const newId = Math.max.apply(null, state.materials.map(m => m.id).concat([0])) + 1;
   state.materials.push({ id: newId, name: name, unit: unit });
   saveMaterials();
-  
   const t = state.tasks.find(x => x.id === state.currentTaskId);
-  if(t){
-    if(!t.materials) t.materials = [];
-    t.materials.push({ name: name, unit: unit, qty: 1 });
-    renderTaskMaterials();
-  }
-  
+  if(t){ if(!t.materials) t.materials = []; t.materials.push({ name: name, unit: unit, qty: 1 }); renderTaskMaterials(); }
   const sel = document.getElementById('matSelect');
   let opts = '<option value="">-- اختر مادة --</option>';
-  state.materials.forEach(m => {
-    opts += '<option value="' + m.id + '">' + escapeHtml(m.name) + ' (' + escapeHtml(m.unit) + ')</option>';
-  });
+  state.materials.forEach(m => { opts += '<option value="' + m.id + '">' + escapeHtml(m.name) + ' (' + escapeHtml(m.unit) + ')</option>'; });
   sel.innerHTML = opts;
-  
   document.getElementById('matNewName').value = '';
   document.getElementById('matNewUnit').value = 'عدد';
   showToast('✅ أُضيفت مادة جديدة', 'success');
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 5: إدارة قائمة المواد الرئيسية
+   القسم 8: إدارة قائمة المواد الرئيسية
    ═══════════════════════════════════════════════════════ */
 function renderMaterials(){
   const container = document.getElementById('materialsList');
@@ -836,7 +1759,6 @@ function renderMaterials(){
     container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد مواد</div>';
     return;
   }
-  
   let html = '';
   state.materials.forEach(m => {
     html += '<div class="material-row">';
@@ -850,13 +1772,11 @@ function renderMaterials(){
 }
 
 let editingMasterMatId = null;
-
 function openMaterialSheet(id){
   editingMasterMatId = id || null;
   const title = document.getElementById('masterMatTitle');
   const nameInput = document.getElementById('masterMatName');
   const unitInput = document.getElementById('masterMatUnit');
-  
   if(id){
     const m = state.materials.find(x => x.id === id);
     if(!m) return;
@@ -871,37 +1791,24 @@ function openMaterialSheet(id){
   openSheet('masterMatSheetBg');
   setTimeout(() => nameInput.focus(), 350);
 }
-
-function editMasterMaterial(id){
-  openMaterialSheet(id);
-}
-
+function editMasterMaterial(id){ openMaterialSheet(id); }
 function saveMasterMaterial(){
   const name = document.getElementById('masterMatName').value.trim();
   const unit = document.getElementById('masterMatUnit').value.trim() || 'عدد';
-  if(!name){
-    showToast('أدخل اسم المادة', 'error');
-    return;
-  }
-  
+  if(!name){ showToast('أدخل اسم المادة', 'error'); return; }
   if(editingMasterMatId){
     const m = state.materials.find(x => x.id === editingMasterMatId);
-    if(m){
-      m.name = name;
-      m.unit = unit;
-    }
+    if(m){ m.name = name; m.unit = unit; }
     showToast('✅ تم تحديث المادة', 'success');
   }else{
     const newId = Math.max.apply(null, state.materials.map(m => m.id).concat([0])) + 1;
     state.materials.push({ id: newId, name: name, unit: unit });
     showToast('✅ أُضيفت مادة جديدة', 'success');
   }
-  
   saveMaterials();
   closeSheet('masterMatSheetBg');
   renderMaterials();
 }
-
 function deleteMasterMaterial(id){
   if(!confirm('حذف هذه المادة من القائمة؟')) return;
   state.materials = state.materials.filter(m => m.id !== id);
@@ -911,56 +1818,157 @@ function deleteMasterMaterial(id){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 6: عرض المهام والإحصائيات
+   القسم 9: إدارة المدارس
+   ═══════════════════════════════════════════════════════ */
+function renderSchoolsList(query){
+  const container = document.getElementById('schoolsList');
+  const q = (query || '').trim().toLowerCase();
+  let list = state.schools;
+  if(q){
+    list = state.schools.filter(s =>
+      (s.n && s.n.toLowerCase().indexOf(q) !== -1) ||
+      (s.oldName && s.oldName.toLowerCase().indexOf(q) !== -1) ||
+      (s.s && s.s.toLowerCase().indexOf(q) !== -1) ||
+      (s.a && s.a.toLowerCase().indexOf(q) !== -1)
+    );
+  }
+  if(list.length === 0){
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد نتائج</div>';
+    return;
+  }
+  let html = '';
+  list.slice(0, 300).forEach(s => {
+    const idx = state.schools.indexOf(s);
+    html += '<div class="material-row" style="align-items:flex-start;flex-direction:column;gap:6px">';
+    html += '<div style="display:flex;width:100%;align-items:center;gap:6px">';
+    html += '<span class="mat-name" style="font-weight:700">' + escapeHtml(s.n);
+    if(s.oldName) html += ' <span style="color:var(--copper-600);font-size:10px">(سابقاً: ' + escapeHtml(s.oldName) + ')</span>';
+    html += '</span>';
+    html += '<button class="mat-del" onclick="editSchool(' + idx + ')" style="background:var(--emerald-50);color:var(--emerald-700)">✏️</button>';
+    html += '<button class="mat-del" onclick="deleteSchool(' + idx + ')">✕</button>';
+    html += '</div>';
+    let meta = '';
+    if(s.s) meta += '👤 ' + escapeHtml(s.s);
+    if(s.a) meta += (meta ? ' • ' : '') + '📍 ' + escapeHtml(s.a);
+    if(s.d) meta += ' - ' + escapeHtml(s.d);
+    if(s.p) meta += (meta ? ' • ' : '') + '📞 ' + escapeHtml(s.p);
+    html += '<div style="font-size:11px;color:var(--gray-500)">' + meta + '</div>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function updateSchoolsStats(){
+  const total = state.schools.length;
+  const sups = new Set(state.schools.map(s => s.s).filter(Boolean));
+  const areas = new Set(state.schools.map(s => s.a).filter(Boolean));
+  document.getElementById('schoolsStats').innerHTML =
+    '📊 <b>' + total + '</b> مدرسة • 👤 <b>' + sups.size + '</b> مشرف • 📍 <b>' + areas.size + '</b> منطقة';
+}
+
+let editingSchoolIdx = null;
+function openSchoolSheet(){
+  editingSchoolIdx = null;
+  document.getElementById('schoolSheetTitle').textContent = '➕ إضافة مدرسة للقاعدة';
+  ['schName','schOldName','schSupervisor','schArea','schDistrict','schAddress','schGrade','schPhone'].forEach(id => document.getElementById(id).value = '');
+  openSheet('schoolSheetBg');
+  setTimeout(() => document.getElementById('schName').focus(), 350);
+}
+
+function editSchool(idx){
+  const s = state.schools[idx];
+  if(!s) return;
+  editingSchoolIdx = idx;
+  document.getElementById('schoolSheetTitle').textContent = '✏️ تعديل المدرسة';
+  document.getElementById('schName').value = s.n || '';
+  document.getElementById('schOldName').value = s.oldName || '';
+  document.getElementById('schSupervisor').value = s.s || '';
+  document.getElementById('schArea').value = s.a || '';
+  document.getElementById('schDistrict').value = s.d || '';
+  document.getElementById('schAddress').value = s.ad || '';
+  document.getElementById('schGrade').value = s.g || '';
+  document.getElementById('schPhone').value = s.p || '';
+  openSheet('schoolSheetBg');
+}
+
+function saveSchoolMaster(){
+  const name = document.getElementById('schName').value.trim();
+  if(!name){ showToast('أدخل اسم المدرسة', 'error'); return; }
+  const data = {
+    n: name,
+    oldName: document.getElementById('schOldName').value.trim(),
+    s: document.getElementById('schSupervisor').value.trim(),
+    a: document.getElementById('schArea').value.trim(),
+    d: document.getElementById('schDistrict').value.trim(),
+    ad: document.getElementById('schAddress').value.trim(),
+    g: document.getElementById('schGrade').value.trim(),
+    p: document.getElementById('schPhone').value.trim()
+  };
+  if(editingSchoolIdx !== null){
+    state.schools[editingSchoolIdx] = data;
+    showToast('✅ تم تحديث المدرسة', 'success');
+  }else{
+    state.schools.push(data);
+    showToast('✅ أُضيفت مدرسة جديدة', 'success');
+  }
+  saveSchools();
+  closeSheet('schoolSheetBg');
+  renderSchoolsList(document.getElementById('schoolListSearch').value);
+  updateSchoolsStats();
+}
+
+function deleteSchool(idx){
+  const s = state.schools[idx];
+  if(!s) return;
+  if(!confirm('حذف المدرسة "' + s.n + '" من القاعدة؟')) return;
+  state.schools.splice(idx, 1);
+  saveSchools();
+  renderSchoolsList(document.getElementById('schoolListSearch').value);
+  updateSchoolsStats();
+  showToast('🗑️ تم الحذف', 'warn');
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 10: عرض المهام والإحصائيات
    ═══════════════════════════════════════════════════════ */
 function renderTasks(){
   const container = document.getElementById('tasksList');
   const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
   const filter = state.currentFilter;
-  
   let list = state.tasks.filter(function(t){
     if(filter === 'pending' && t.status !== 'pending') return false;
     if(filter === 'done' && t.status !== 'done') return false;
     if(filter === 'high' && t.priority !== 'high') return false;
     if(filter === 'med' && t.priority !== 'med') return false;
     if(filter === 'low' && t.priority !== 'low') return false;
-    
     if(search){
-      const blob = (t.name + ' ' + t.area + ' ' + (t.contact || '') + ' ' + (t.notes || '')).toLowerCase();
+      const blob = ((t.name||'') + ' ' + (t.newName||'') + ' ' + (t.area||'') + ' ' + (t.contact||'') + ' ' + (t.notes||'') + ' ' + (t.schoolAddress||'')).toLowerCase();
       if(blob.indexOf(search) === -1) return false;
     }
     return true;
   });
-  
   const prioOrder = { high: 0, med: 1, low: 2 };
   list.sort(function(a, b){
     if(a.status !== b.status) return a.status === 'pending' ? -1 : 1;
     return prioOrder[a.priority] - prioOrder[b.priority];
   });
-  
   if(list.length === 0){
     container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>لا توجد مهام مطابقة</p></div>';
     return;
   }
-  
   const prioLabel = { high: '🔴 عالية', med: '🟡 متوسطة', low: '🟢 منخفضة' };
   const prioClass = { high: 'mb-high', med: 'mb-med', low: 'mb-low' };
-  
   let html = '';
   list.forEach(function(t){
     const matCount = (t.materials || []).length;
+    const displayName = t.newName || t.name;
     html += '<div class="task-card p-' + t.priority + (t.status === 'done' ? ' is-done' : '') + '">';
-    
     html += '<div class="task-head">';
-    html += '<div class="task-name" onclick="openDetail(' + t.id + ')">' + (t.status === 'done' ? '✅ ' : '') + escapeHtml(t.name) + '</div>';
+    html += '<div class="task-name" onclick="openDetail(' + t.id + ')">' + (t.status === 'done' ? '✅ ' : '') + escapeHtml(displayName) + '</div>';
     html += '<div class="task-badges">';
-    if(t.status === 'done'){
-      html += '<span class="mini-badge mb-done">منجزة</span>';
-    }else{
-      html += '<span class="mini-badge ' + prioClass[t.priority] + '">' + prioLabel[t.priority] + '</span>';
-    }
+    if(t.status === 'done'){ html += '<span class="mini-badge mb-done">منجزة</span>'; }
+    else { html += '<span class="mini-badge ' + prioClass[t.priority] + '">' + prioLabel[t.priority] + '</span>'; }
     html += '</div></div>';
-    
     html += '<div class="task-meta" onclick="openDetail(' + t.id + ')">';
     html += '<span>📌 #' + t.number + '</span>';
     html += '<span>📋 ' + escapeHtml(t.type) + '</span>';
@@ -968,18 +1976,13 @@ function renderTasks(){
     if(t.contact) html += '<span>👤 ' + escapeHtml(t.contact) + '</span>';
     if(matCount > 0) html += '<span>📦 ' + matCount + ' مادة</span>';
     html += '</div>';
-    
-    if(t.notes){
-      html += '<div class="task-note" onclick="openDetail(' + t.id + ')">' + escapeHtml(t.notes) + '</div>';
-    }
-    
+    if(t.notes){ html += '<div class="task-note" onclick="openDetail(' + t.id + ')">' + escapeHtml(t.notes) + '</div>'; }
     html += '<div class="task-actions">';
     html += '<button class="btn ' + (t.status === 'done' ? 'btn-undo' : 'btn-done') + '" onclick="toggleTaskDone(' + t.id + ')">' + (t.status === 'done' ? '↩️ إرجاع' : '✅ إنجاز') + '</button>';
     html += '<button class="btn btn-note" onclick="openDetail(' + t.id + ')">📋 تفاصيل</button>';
     html += '<button class="btn btn-print" onclick="printTask(' + t.id + ')">🖨️</button>';
     html += '<button class="btn btn-del" onclick="deleteTask(' + t.id + ')">🗑️</button>';
     html += '</div>';
-    
     html += '</div>';
   });
   container.innerHTML = html;
@@ -993,7 +1996,7 @@ function updateStats(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 7: الإعدادات
+   القسم 11: الإعدادات والفلاتر
    ═══════════════════════════════════════════════════════ */
 function loadSettingsToForm(){
   document.getElementById('setHeader1').value = state.settings.header1 || '';
@@ -1003,29 +2006,14 @@ function loadSettingsToForm(){
   document.getElementById('setSign2').value = state.settings.sign2 || '';
   document.getElementById('setSign3').value = state.settings.sign3 || '';
 }
-
 function setupSettingsListeners(){
-  const map = {
-    setHeader1: 'header1',
-    setHeader2: 'header2',
-    setHeader3: 'header3',
-    setSign1: 'sign1',
-    setSign2: 'sign2',
-    setSign3: 'sign3'
-  };
+  const map = { setHeader1: 'header1', setHeader2: 'header2', setHeader3: 'header3', setSign1: 'sign1', setSign2: 'sign2', setSign3: 'sign3' };
   Object.keys(map).forEach(function(elId){
     const el = document.getElementById(elId);
     if(!el) return;
-    el.addEventListener('input', function(){
-      state.settings[map[elId]] = el.value;
-      saveSettings();
-    });
+    el.addEventListener('input', function(){ state.settings[map[elId]] = el.value; saveSettings(); });
   });
 }
-
-/* ═══════════════════════════════════════════════════════
-   القسم 8: الفلاتر
-   ═══════════════════════════════════════════════════════ */
 function setupFilters(){
   document.querySelectorAll('#filters .chip').forEach(function(chip){
     chip.addEventListener('click', function(){
@@ -1039,17 +2027,10 @@ function setupFilters(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 9: التصدير والاستيراد
+   القسم 12: التصدير والاستيراد
    ═══════════════════════════════════════════════════════ */
 function exportJSON(){
-  const data = {
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    tasks: state.tasks,
-    materials: state.materials,
-    settings: state.settings,
-    counter: state.counter
-  };
+  const data = { version: 1, exportedAt: new Date().toISOString(), tasks: state.tasks, materials: state.materials, schools: state.schools, settings: state.settings, counter: state.counter };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1070,57 +2051,32 @@ function importJSON(event){
       if(!confirm('سيتم استبدال جميع البيانات الحالية. متابعة؟')) return;
       state.tasks = data.tasks || [];
       state.materials = data.materials || DEFAULT_MATERIALS;
+      state.schools = data.schools || SCHOOLS_DEFAULT;
       state.settings = data.settings || DEFAULT_SETTINGS;
       state.counter = data.counter || 1;
-      saveTasks();
-      saveMaterials();
-      saveSettings();
-      saveCounter();
-      renderTasks();
-      updateStats();
-      renderMaterials();
-      loadSettingsToForm();
+      saveTasks(); saveMaterials(); saveSchools(); saveSettings(); saveCounter();
+      renderTasks(); updateStats(); renderMaterials(); renderSchoolsList(); updateSchoolsStats();
       showToast('✅ تم استيراد البيانات', 'success');
-    }catch(err){
-      showToast('❌ ملف غير صالح', 'error');
-    }
+    }catch(err){ showToast('❌ ملف غير صالح', 'error'); }
   };
   reader.readAsText(file);
   event.target.value = '';
 }
 
-function exportCSV(){
-  if(state.tasks.length === 0){
-    showToast('لا توجد مهام للتصدير', 'warn');
-    return;
-  }
-  const headers = ['الرقم','المدرسة','المبنى','القاعة','النوع','الأولوية','المنطقة','المشرف','الحالة','الفني','عدد المواد','ملاحظات','تاريخ الإضافة','تاريخ الإنجاز'];
+function exportTasksCSV(){
+  if(state.tasks.length === 0){ showToast('لا توجد مهام للتصدير', 'warn'); return; }
+  const headers = ['الرقم','المدرسة','الاسم الجديد','المبنى','القاعة','النوع','الأولوية','المنطقة','المشرف','الحالة','الفني','عدد المواد','ملاحظات','تاريخ الإضافة','تاريخ الإنجاز'];
   const prioMap = { high:'عالية', med:'متوسطة', low:'منخفضة' };
   const statusMap = { pending:'معلقة', done:'منجزة' };
-  
-  let csv = '\uFEFF';
-  csv += headers.map(function(h){ return '"' + h + '"'; }).join(',') + '\n';
-  
-  state.tasks.forEach(function(t){
-    const row = [
-      t.number,
-      t.name,
-      t.building || '',
-      t.room || '',
-      t.type,
-      prioMap[t.priority],
-      t.area,
-      t.contact || '',
-      statusMap[t.status],
-      t.technician || '',
-      (t.materials || []).length,
-      t.notes || '',
-      t.createdAt,
-      t.doneAt || ''
-    ];
-    csv += row.map(function(c){ return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+  let csv = '\uFEFF' + headers.map(escapeCSV).join(',') + '\n';
+  state.tasks.forEach(t => {
+    csv += [
+      t.number, t.name, t.newName || '', t.building || '', t.room || '', t.type,
+      prioMap[t.priority], t.area, t.contact || '', statusMap[t.status],
+      t.technician || '', (t.materials || []).length, t.notes || '',
+      t.createdAt, t.doneAt || ''
+    ].map(escapeCSV).join(',') + '\n';
   });
-  
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -1129,31 +2085,99 @@ function exportCSV(){
   showToast('✅ تم التصدير', 'success');
 }
 
-function clearDone(){
-  const count = state.tasks.filter(function(t){ return t.status === 'done'; }).length;
-  if(count === 0){
-    showToast('لا توجد مهام منجزة', 'warn');
-    return;
+function exportSchoolsCSV(){
+  if(state.schools.length === 0){ showToast('لا توجد مدارس للتصدير', 'warn'); return; }
+  const headers = ['الاسم','الاسم_القديم','المشرف','المنطقة','الحي','العنوان','المرحلة','الهاتف'];
+  let csv = '\uFEFF' + headers.map(escapeCSV).join(',') + '\n';
+  state.schools.forEach(s => {
+    csv += [s.n||'', s.oldName||'', s.s||'', s.a||'', s.d||'', s.ad||'', s.g||'', s.p||''].map(escapeCSV).join(',') + '\n';
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'المدارس_' + todayISO().replace(/\//g, '-') + '.csv';
+  a.click();
+  showToast('✅ تم التصدير — افتحه في Excel', 'success');
+}
+
+function importSchoolsCSV(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const text = e.target.result.replace(/^\uFEFF/, '');
+      const lines = text.split(/\r?\n/).filter(l => l.trim());
+      if(lines.length < 2){ showToast('❌ الملف فارغ', 'error'); return; }
+      // تخطي الرأس
+      const imported = [];
+      for(let i = 1; i < lines.length; i++){
+        const parts = parseCSVLine(lines[i]);
+        if(!parts[0]) continue;
+        imported.push({
+          n: parts[0] || '',
+          oldName: parts[1] || '',
+          s: parts[2] || '',
+          a: parts[3] || '',
+          d: parts[4] || '',
+          ad: parts[5] || '',
+          g: parts[6] || '',
+          p: parts[7] || ''
+        });
+      }
+      if(imported.length === 0){ showToast('❌ لم يتم العثور على بيانات', 'error'); return; }
+      const mode = confirm('اضغط "موافق" لإضافة ' + imported.length + ' مدرسة للقائمة\nاضغط "إلغاء" لاستبدال القائمة كاملة');
+      if(mode){
+        state.schools = state.schools.concat(imported);
+      }else{
+        if(!confirm('هل أنت متأكد من استبدال ' + state.schools.length + ' مدرسة بـ ' + imported.length + '؟')) return;
+        state.schools = imported;
+      }
+      saveSchools();
+      renderSchoolsList(); updateSchoolsStats();
+      showToast('✅ تم استيراد ' + imported.length + ' مدرسة', 'success');
+    }catch(err){ showToast('❌ خطأ في الملف: ' + err.message, 'error'); }
+  };
+  reader.readAsText(file, 'UTF-8');
+  event.target.value = '';
+}
+
+function parseCSVLine(line){
+  const result = [];
+  let cur = '';
+  let inQ = false;
+  for(let i = 0; i < line.length; i++){
+    const c = line[i];
+    if(inQ){
+      if(c === '"' && line[i+1] === '"'){ cur += '"'; i++; }
+      else if(c === '"'){ inQ = false; }
+      else cur += c;
+    }else{
+      if(c === '"') inQ = true;
+      else if(c === ','){ result.push(cur); cur = ''; }
+      else cur += c;
+    }
   }
+  result.push(cur);
+  return result.map(s => s.trim());
+}
+
+function clearDone(){
+  const count = state.tasks.filter(t => t.status === 'done').length;
+  if(count === 0){ showToast('لا توجد مهام منجزة', 'warn'); return; }
   if(!confirm('حذف ' + count + ' مهمة منجزة؟')) return;
-  state.tasks = state.tasks.filter(function(t){ return t.status !== 'done'; });
-  saveTasks();
-  renderTasks();
-  updateStats();
+  state.tasks = state.tasks.filter(t => t.status !== 'done');
+  saveTasks(); renderTasks(); updateStats();
   showToast('🗑️ تم الحذف', 'warn');
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 10: شعار العقاب SVG
+   القسم 13: الطباعة — شعار العقاب
    ═══════════════════════════════════════════════════════ */
 const EAGLE_SVG = '<svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" class="gov-eagle-svg">'
-  + '<defs>'
-  + '<linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">'
-  + '<stop offset="0%" stop-color="#f0d060"/>'
-  + '<stop offset="50%" stop-color="#d4a017"/>'
-  + '<stop offset="100%" stop-color="#a67c00"/>'
-  + '</linearGradient>'
-  + '</defs>'
+  + '<defs><linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">'
+  + '<stop offset="0%" stop-color="#f0d060"/><stop offset="50%" stop-color="#d4a017"/><stop offset="100%" stop-color="#a67c00"/>'
+  + '</linearGradient></defs>'
   + '<g fill="#c9a227">'
   + '<polygon points="70,15 73,24 82,24 75,30 78,39 70,33 62,39 65,30 58,24 67,24"/>'
   + '<polygon points="130,15 133,24 142,24 135,30 138,39 130,33 122,39 125,30 118,24 127,24"/>'
@@ -1166,15 +2190,12 @@ const EAGLE_SVG = '<svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg"
   + '<path d="M100,42 C90,42 82,50 82,62 L82,95 C82,110 88,120 100,125 C112,120 118,110 118,95 L118,62 C118,50 110,42 100,42 Z"/>'
   + '</g>'
   + '<g fill="#c9a227" stroke="#7a5c00" stroke-width="1.2">'
-  + '<circle cx="100" cy="38" r="14"/>'
-  + '<path d="M100,26 L98,20 L102,20 Z"/>'
+  + '<circle cx="100" cy="38" r="14"/><path d="M100,26 L98,20 L102,20 Z"/>'
   + '</g>'
   + '<g fill="#fff8e0" stroke="#7a5c00" stroke-width="1.5">'
   + '<path d="M100,68 L110,74 L110,90 L100,98 L90,90 L90,74 Z"/>'
   + '</g>'
-  + '<g fill="#8b0000">'
-  + '<polygon points="100,74 101.5,78 105.5,78 102.3,80.5 103.5,84.5 100,82 96.5,84.5 97.7,80.5 94.5,78 98.5,78"/>'
-  + '</g>'
+  + '<g fill="#8b0000"><polygon points="100,74 101.5,78 105.5,78 102.3,80.5 103.5,84.5 100,82 96.5,84.5 97.7,80.5 94.5,78 98.5,78"/></g>'
   + '<g stroke="#a67c00" stroke-width="1" fill="none">'
   + '<line x1="100" y1="125" x2="100" y2="145"/>'
   + '<ellipse cx="96" cy="132" rx="3" ry="6" fill="#d4a017"/>'
@@ -1188,27 +2209,19 @@ const EAGLE_SVG = '<svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg"
   + '</g>'
   + '</svg>';
 
-/* ═══════════════════════════════════════════════════════
-   القسم 11: الطباعة على القالب الحكومي
-   ═══════════════════════════════════════════════════════ */
 function printTask(taskId){
-  const t = state.tasks.find(function(x){ return x.id === taskId; });
-  if(!t){
-    showToast('❌ المهمة غير موجودة', 'error');
-    return;
-  }
-  
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t){ showToast('❌ المهمة غير موجودة', 'error'); return; }
   const settings = state.settings;
   const materials = t.materials || [];
+  const displayName = t.newName || t.name;
   const perCol = Math.ceil(materials.length / 2) || 1;
   const col1 = materials.slice(0, perCol);
   const col2 = materials.slice(perCol);
   const rowsCount = Math.max(col1.length, col2.length, 1);
-  
   let tableRows = '';
   for(let i = 0; i < rowsCount; i++){
-    const m1 = col1[i];
-    const m2 = col2[i];
+    const m1 = col1[i]; const m2 = col2[i];
     tableRows += '<tr>';
     tableRows += '<td class="mat-name">' + (m1 ? escapeHtml(m1.name) : '') + '</td>';
     tableRows += '<td class="mat-qty">' + (m1 ? escapeHtml(String(m1.qty || 1)) : '') + '</td>';
@@ -1216,13 +2229,10 @@ function printTask(taskId){
     tableRows += '<td class="mat-qty">' + (m2 ? escapeHtml(String(m2.qty || 1)) : '') + '</td>';
     tableRows += '</tr>';
   }
-  
-  let schoolLine = 'مدرسة ' + escapeHtml(t.name);
-  if(t.building){
-    schoolLine += ' / ' + escapeHtml(t.building);
-  }
+  let schoolLine = 'مدرسة ' + escapeHtml(displayName);
+  if(t.building) schoolLine += ' / ' + escapeHtml(t.building);
   const roomLine = t.room ? 'على قاعة ' + escapeHtml(t.room) : 'على قاعة ................';
-  
+
   let html = '';
   html += '<div class="gov-header">';
   html += '<div class="gov-eagle">' + EAGLE_SVG + '</div>';
@@ -1233,21 +2243,17 @@ function printTask(taskId){
   html += '</div>';
   html += '<div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div>';
   html += '</div>';
-  
   html += '<div class="gov-date-line">التاريخ: ' + escapeHtml(t.createdAt || todayISO()) + '</div>';
   html += '<div class="gov-salutation">السيد مدير التربية المحترم</div>';
   html += '<div class="gov-body">ــ بعد الكشف في ' + schoolLine + ' ' + roomLine + ' رقم ( ' + escapeHtml(t.room || '1') + ' ) تبين الحاجة للمواد التالية:</div>';
-  
   html += '<table class="gov-table">';
   html += '<thead><tr><th>اسم المادة والقياس</th><th style="width:60px">العدد</th><th>اسم المادة والقياس</th><th style="width:60px">العدد</th></tr></thead>';
   html += '<tbody>' + tableRows + '</tbody>';
   html += '</table>';
-  
   html += '<div class="gov-signatures">';
   html += '<div class="gov-sign-box"><span class="role">القائم بالكشف</span><span class="name">الفني ' + escapeHtml(t.technician || '.....................') + '</span></div>';
   html += '<div class="gov-sign-box"><span class="role">رئيس شعبة الصيانة</span><span class="name">' + escapeHtml(settings.sign2 || '') + '</span></div>';
   html += '</div>';
-  
   html += '<div style="text-align:center;font-size:13px;font-weight:700;margin:22px 0 6px">يرجى الاطلاع والتوجيه</div>';
   html += '<hr class="gov-divider">';
   html += '<div style="text-align:right;font-size:13.5px;font-weight:800;padding-right:8px">رئيس دائرة المعلوماتية<br>' + escapeHtml(settings.sign3 || '') + '</div>';
@@ -1259,7 +2265,7 @@ function printTask(taskId){
   html += '<div style="height:50px"></div>';
   html += '<div class="gov-end">إنهاء</div>';
   html += '<div style="text-align:right;font-size:13px;font-weight:800;margin-top:18px;padding-right:8px">رئيس ورشة الكهرباء: ' + escapeHtml(settings.sign1 || '') + '</div>';
-  
+
   document.getElementById('govPaper').innerHTML = html;
   document.getElementById('printPage').style.display = 'block';
   document.body.style.overflow = 'hidden';
@@ -1280,7 +2286,7 @@ function closePrint(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 12: التهيئة والأحداث
+   القسم 14: التهيئة
    ═══════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', function(){
   loadState();
@@ -1290,14 +2296,12 @@ document.addEventListener('DOMContentLoaded', function(){
   setupFilters();
   setupSettingsListeners();
   loadSettingsToForm();
-  
-  // استعادة آخر تبويب
+  renderSchoolsList();
+  updateSchoolsStats();
+
   const saved = localStorage.getItem('mt_current_page');
-  if(saved && document.getElementById(saved)){
-    switchPage(saved);
-  }
-  
-  // Escape لإغلاق النوافذ
+  if(saved && document.getElementById(saved)){ switchPage(saved); }
+
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape'){
       document.querySelectorAll('.sheet-bg.open').forEach(function(s){ s.classList.remove('open'); });
@@ -1306,13 +2310,19 @@ document.addEventListener('DOMContentLoaded', function(){
     if((e.ctrlKey || e.metaKey) && e.key === 'k'){
       e.preventDefault();
       const activePage = document.querySelector('.page.active');
-      if(activePage && activePage.id === 'pageHome'){
-        openTaskSheet();
-      }
+      if(activePage && activePage.id === 'pageHome'){ openTaskSheet(); }
     }
   });
-  
+
   showToast('مرحباً بك 🌿', 'success');
+});
+
+// إغلاق النتائج عند النقر خارجها
+document.addEventListener('click', function(e){
+  const results = document.getElementById('schoolResults');
+  const search = document.getElementById('fSchoolSearch');
+  if(!results || !search) return;
+  if(!results.contains(e.target) && e.target !== search){ results.classList.remove('show'); }
 });
 </script>
 
