@@ -10,7 +10,6 @@
 <title>ورشة الكهرباء</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 <style>
-/* ═══════════════ المتغيرات ═══════════════ */
 :root{
   --emerald-900:#0d3d2e;--emerald-800:#0d5c46;--emerald-700:#127a5d;--emerald-600:#1a9b76;
   --emerald-500:#22b88d;--emerald-200:#a7e8d0;--emerald-100:#d4f4e8;--emerald-50:#eefaf5;
@@ -21,10 +20,10 @@
   --yellow-700:#a16207;--yellow-600:#ca8a04;--yellow-100:#fef9c3;--yellow-50:#fefce8;
   --cyan-700:#0e7490;--cyan-600:#0891b2;--cyan-100:#cffafe;--cyan-50:#ecfeff;
   --green-700:#15803d;--green-600:#16a34a;--green-100:#dcfce7;--green-50:#f0fdf4;
+  --brown-700:#78350f;--brown-600:#92400e;--brown-100:#fef3c7;--brown-50:#fffbeb;
   --gray-900:#0f172a;--gray-800:#1e293b;--gray-700:#334155;--gray-600:#475569;--gray-500:#64748b;
   --gray-400:#94a3b8;--gray-300:#cbd5e1;--gray-200:#e2e8f0;--gray-100:#f1f5f9;--gray-50:#f8fafc;
-  --white:#fff;
-  --danger:#c0392b;--danger-light:#fdecea;
+  --white:#fff;--danger:#c0392b;--danger-light:#fdecea;
   --shadow-sm:0 1px 3px rgba(13,92,70,.08);
   --shadow-md:0 4px 14px rgba(13,92,70,.12);
   --shadow-lg:0 10px 30px rgba(13,92,70,.18);
@@ -36,16 +35,13 @@ body{
   font-family:'Segoe UI',Tahoma,Arial,sans-serif;
   background:linear-gradient(160deg,#f0f7f4 0%,#f8fafc 100%);
   color:var(--gray-700);min-height:100vh;
-  padding-bottom:170px;
+  padding-bottom:180px;
   overflow-x:hidden;-webkit-font-smoothing:antialiased;
   transition:background .3s,color .3s;
 }
 
 /* ═══════════════ الوضع الليلي ═══════════════ */
-body.night-mode{
-  background:linear-gradient(160deg,#0f172a 0%,#1e293b 100%);
-  color:#e2e8f0;
-}
+body.night-mode{background:linear-gradient(160deg,#0f172a 0%,#1e293b 100%);color:#e2e8f0}
 body.night-mode .app-header{background:linear-gradient(135deg,#0a2922,#0d3d2e)}
 body.night-mode .search-box{background:#1e293b;border-color:#334155}
 body.night-mode .search-box input{color:#e2e8f0}
@@ -56,15 +52,17 @@ body.night-mode .task-name{color:#e2e8f0}
 body.night-mode .task-note{background:#0f172a;color:#cbd5e1}
 body.night-mode .section{background:#1e293b;border-color:#334155;color:#e2e8f0}
 body.night-mode .section-title{color:#a7e8d0;border-color:#0d5c46}
-body.night-mode .field input,
-body.night-mode .field select,
-body.night-mode .field textarea{background:#0f172a;border-color:#334155;color:#e2e8f0}
+body.night-mode .field input,body.night-mode .field select,body.night-mode .field textarea{background:#0f172a;border-color:#334155;color:#e2e8f0}
 body.night-mode .sheet{background:#1e293b}
 body.night-mode .sheet-title{color:#a7e8d0}
 body.night-mode .material-row{background:#0f172a;border-color:#334155}
 body.night-mode .bottom-nav{background:#1e293b;border-color:#334155}
 body.night-mode .nav-item{color:#94a3b8}
 body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
+body.night-mode .selected-school{background:#0d3d2e;border-color:#22b88d}
+body.night-mode .school-results{background:#1e293b;border-color:#334155}
+body.night-mode .school-item{border-color:#334155}
+body.night-mode .school-item:active{background:#0d3d2e}
 
 /* ═══════════════ الرأس ═══════════════ */
 .app-header{
@@ -72,122 +70,64 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
   color:#fff;padding:18px 16px 22px;border-radius:0 0 24px 24px;
   box-shadow:var(--shadow-lg);position:relative;overflow:hidden;
 }
-.app-header::before{
-  content:'';position:absolute;top:-40%;left:-10%;width:220px;height:220px;
-  background:radial-gradient(circle,rgba(212,146,73,.25),transparent 70%);border-radius:50%;
-}
-.app-header::after{
-  content:'';position:absolute;bottom:-60%;right:-20%;width:260px;height:260px;
-  background:radial-gradient(circle,rgba(34,184,141,.2),transparent 70%);border-radius:50%;
-}
-.header-top{
-  display:flex;justify-content:space-between;align-items:flex-start;
-  position:relative;z-index:1;margin-bottom:14px;
-}
+.app-header::before{content:'';position:absolute;top:-40%;left:-10%;width:220px;height:220px;background:radial-gradient(circle,rgba(212,146,73,.25),transparent 70%);border-radius:50%}
+.app-header::after{content:'';position:absolute;bottom:-60%;right:-20%;width:260px;height:260px;background:radial-gradient(circle,rgba(34,184,141,.2),transparent 70%);border-radius:50%}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:1;margin-bottom:14px}
 .header-title{display:flex;align-items:center;gap:10px}
-.header-icon{
-  font-size:26px;background:rgba(255,255,255,.15);width:44px;height:44px;
-  border-radius:12px;display:flex;align-items:center;justify-content:center;
-  backdrop-filter:blur(10px);
-}
+.header-icon{font-size:26px;background:rgba(255,255,255,.15);width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
 .header-title h1{font-size:17px;font-weight:700}
 .header-title p{font-size:11px;opacity:.85;margin-top:2px}
 .header-actions{display:flex;gap:6px;align-items:center}
-.header-date{
-  background:rgba(255,255,255,.15);padding:6px 12px;border-radius:20px;
-  font-size:11px;font-weight:600;backdrop-filter:blur(10px);white-space:nowrap;
-}
-.night-toggle{
-  background:rgba(255,255,255,.15);border:none;color:#fff;
-  width:36px;height:36px;border-radius:12px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;font-size:16px;
-  backdrop-filter:blur(10px);transition:.2s;
-}
+.header-date{background:rgba(255,255,255,.15);padding:6px 12px;border-radius:20px;font-size:11px;font-weight:600;backdrop-filter:blur(10px);white-space:nowrap}
+.night-toggle{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;backdrop-filter:blur(10px);transition:.2s}
 .night-toggle:active{transform:scale(.92)}
 
-/* ═══════════════ بطاقات الإحصائيات ═══════════════ */
-.stats-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
-  position:relative;z-index:1;
-}
-.stat-card{
-  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);
-  border-radius:12px;padding:10px 6px;text-align:center;
-  backdrop-filter:blur(10px);transition:.2s;cursor:pointer;
-}
+/* ═══════════════ الإحصائيات ═══════════════ */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;position:relative;z-index:1}
+.stat-card{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 4px;text-align:center;backdrop-filter:blur(10px);transition:.2s;cursor:pointer}
 .stat-card:active{transform:scale(.96)}
-.stat-num{font-size:20px;font-weight:800;line-height:1}
-.stat-lbl{font-size:10px;opacity:.9;margin-top:4px;font-weight:500}
+.stat-num{font-size:18px;font-weight:800;line-height:1}
+.stat-lbl{font-size:9px;opacity:.9;margin-top:3px;font-weight:500}
 .stat-card.c-new .stat-num{color:#93c5fd}
 .stat-card.c-inspecting .stat-num{color:#c4b5fd}
 .stat-card.c-awaiting .stat-num{color:#fdba74}
 .stat-card.c-materials .stat-num{color:#fde047}
 .stat-card.c-working .stat-num{color:#67e8f9}
 .stat-card.c-done .stat-num{color:#86efac}
-.stat-card.c-overdue .stat-num{color:#fca5a5}
+.stat-card.c-canceled .stat-num{color:#cbd5e1}
+.stat-card.c-transferred .stat-num{color:#d6b28a}
 
 /* ═══════════════ البحث ═══════════════ */
 .search-wrap{padding:14px 16px 8px}
-.search-box{
-  display:flex;align-items:center;gap:10px;background:var(--white);
-  border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-sm);
-  border:1px solid var(--gray-200);transition:.2s;
-}
-.search-box:focus-within{
-  border-color:var(--emerald-600);box-shadow:0 0 0 3px rgba(26,155,118,.1);
-}
+.search-box{display:flex;align-items:center;gap:10px;background:var(--white);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);transition:.2s}
+.search-box:focus-within{border-color:var(--emerald-600);box-shadow:0 0 0 3px rgba(26,155,118,.1)}
 .search-box svg{width:18px;height:18px;color:var(--gray-500);flex-shrink:0}
-.search-box input{
-  flex:1;border:none;outline:none;font-size:14px;background:transparent;font-family:inherit;color:inherit;
-}
+.search-box input{flex:1;border:none;outline:none;font-size:14px;background:transparent;font-family:inherit;color:inherit}
 
 /* ═══════════════ الفلاتر ═══════════════ */
-.filters{
-  padding:0 16px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
-}
+.filters{padding:0 16px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 .filters::-webkit-scrollbar{display:none}
-.chip{
-  padding:7px 14px;border-radius:20px;border:1px solid var(--gray-200);
-  background:var(--white);font-size:12px;font-weight:600;color:var(--gray-600);
-  cursor:pointer;white-space:nowrap;transition:.2s;font-family:inherit;
-  display:inline-flex;align-items:center;gap:5px;
-}
-.chip.active{
-  background:var(--emerald-700);color:#fff;border-color:var(--emerald-700);
-  box-shadow:0 4px 10px rgba(13,92,70,.25);
-}
-.chip .count{
-  background:rgba(255,255,255,.25);padding:1px 6px;border-radius:10px;
-  font-size:10px;font-weight:700;
-}
+.chip{padding:7px 14px;border-radius:20px;border:1px solid var(--gray-200);background:var(--white);font-size:12px;font-weight:600;color:var(--gray-600);cursor:pointer;white-space:nowrap;transition:.2s;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+.chip.active{background:var(--emerald-700);color:#fff;border-color:var(--emerald-700);box-shadow:0 4px 10px rgba(13,92,70,.25)}
+.chip .count{background:rgba(255,255,255,.25);padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700}
 .chip:not(.active) .count{background:var(--gray-100);color:var(--gray-500)}
+.filters-advanced{padding:0 16px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.filters-advanced select{padding:8px 10px;border-radius:10px;border:1px solid var(--gray-200);background:var(--white);font-size:12px;font-family:inherit;color:var(--gray-700);outline:none}
+.filters-advanced select:focus{border-color:var(--emerald-600)}
 
 /* ═══════════════ التنبيهات ═══════════════ */
 .alerts-container{padding:0 16px 12px;display:flex;flex-direction:column;gap:8px}
-.alert-row{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;
-  background:var(--orange-50);border-right:4px solid var(--orange-600);
-  border-radius:10px;font-size:12.5px;
-  animation:fadeUp .3s ease;
-}
+.alert-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--orange-50);border-right:4px solid var(--orange-600);border-radius:10px;font-size:12.5px;animation:fadeUp .3s ease}
 .alert-row.danger{background:var(--danger-light);border-color:var(--danger)}
 .alert-row.info{background:var(--blue-50);border-color:var(--blue-600)}
 .alert-row.warn{background:var(--yellow-50);border-color:var(--yellow-600)}
 .alert-icon{font-size:20px;flex-shrink:0}
 .alert-text{flex:1;color:var(--gray-700);font-weight:600}
-.alert-close{
-  background:transparent;border:none;color:var(--gray-500);cursor:pointer;
-  font-size:16px;padding:4px;
-}
+.alert-close{background:transparent;border:none;color:var(--gray-500);cursor:pointer;font-size:16px;padding:4px}
 
 /* ═══════════════ قائمة المهام ═══════════════ */
 .tasks-list{padding:0 16px 40px;display:flex;flex-direction:column;gap:10px}
-.task-card{
-  background:var(--white);border-radius:var(--radius);padding:14px;
-  box-shadow:var(--shadow-sm);border-right:5px solid var(--gray-300);
-  position:relative;transition:.25s;animation:fadeUp .3s ease;
-  cursor:pointer;
-}
+.task-card{background:var(--white);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow-sm);border-right:5px solid var(--gray-300);position:relative;transition:.25s;animation:fadeUp .3s ease;cursor:pointer}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .task-card:active{transform:scale(.99)}
 .task-card.st-new{border-right-color:var(--blue-600)}
@@ -197,12 +137,14 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
 .task-card.st-working{border-right-color:var(--cyan-600)}
 .task-card.st-done{border-right-color:var(--green-600);background:var(--green-50);opacity:.75}
 .task-card.st-suspended{border-right-color:var(--gray-400);opacity:.7}
+.task-card.st-canceled{border-right-color:var(--gray-500);opacity:.6;background:var(--gray-100)}
+.task-card.st-transferred{border-right-color:var(--brown-600);opacity:.85}
 .task-card.st-done .task-name{text-decoration:line-through;color:var(--gray-500)}
 .task-card.overdue{border-right-width:6px;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{box-shadow:var(--shadow-sm)}50%{box-shadow:0 0 0 4px rgba(192,57,43,.15)}}
 
 .task-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
-.task-name{font-size:15px;font-weight:700;color:var(--gray-700);line-height:1.3;flex:1}
+.task-name{font-size:17px;font-weight:800;color:var(--gray-800);line-height:1.3;flex:1}
 .task-badges{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
 .mini-badge{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap}
 .mb-new{background:var(--blue-100);color:var(--blue-700)}
@@ -212,28 +154,22 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
 .mb-working{background:var(--cyan-100);color:var(--cyan-700)}
 .mb-done{background:var(--green-100);color:var(--green-700)}
 .mb-suspended{background:var(--gray-100);color:var(--gray-600)}
+.mb-canceled{background:var(--gray-200);color:var(--gray-700)}
+.mb-transferred{background:var(--brown-100);color:var(--brown-700)}
 .mb-urgent{background:var(--danger);color:#fff}
 .mb-overdue{background:var(--danger);color:#fff;animation:blink 1.5s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.6}}
+.mb-high{background:var(--danger-light);color:var(--danger)}
+.mb-med{background:var(--orange-100);color:var(--orange-700)}
+.mb-low{background:var(--green-100);color:var(--green-700)}
 
-.task-meta{
-  display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11.5px;
-  color:var(--gray-500);margin-bottom:10px;
-}
+.task-meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11.5px;color:var(--gray-500);margin-bottom:10px}
 .task-meta span{display:inline-flex;align-items:center;gap:4px}
-.task-note{
-  background:var(--gray-50);border-radius:8px;padding:8px 10px;
-  font-size:12px;color:var(--gray-600);margin-bottom:10px;
-  border-right:3px solid var(--copper-500);line-height:1.5;
-}
+.task-note{background:var(--gray-50);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--gray-600);margin-bottom:10px;border-right:3px solid var(--copper-500);line-height:1.5}
 .task-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 
 /* ═══════════════ الأزرار ═══════════════ */
-.btn{
-  border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;
-  cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;
-  justify-content:center;gap:4px;transition:.2s;
-}
+.btn{border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:4px;transition:.2s}
 .btn:active{transform:scale(.96)}
 .btn-done{background:var(--green-600);color:#fff}
 .btn-undo{background:var(--orange-600);color:#fff}
@@ -243,18 +179,15 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
 .btn-call{background:var(--blue-600);color:#fff}
 .btn-del{background:var(--gray-100);color:var(--danger)}
 .btn-map{background:linear-gradient(135deg,#1a73e8,#4285f4);color:#fff;text-decoration:none}
-.btn-stage{background:var(--emerald-600);color:#fff}
+.btn-word{background:linear-gradient(135deg,#2b579a,#1e4073);color:#fff}
+.btn-file{background:var(--purple-600);color:#fff}
+.btn-sm{padding:6px 10px;font-size:11px;border-radius:8px}
 
-.btn-lg{
-  width:100%;padding:14px;border-radius:13px;border:none;font-size:15px;
-  font-weight:800;cursor:pointer;font-family:inherit;transition:.2s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
+.btn-lg{width:100%;padding:14px;border-radius:13px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-lg:active{transform:scale(.98)}
 .btn-primary{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600));color:#fff;box-shadow:0 6px 16px rgba(13,92,70,.25)}
 .btn-copper{background:linear-gradient(135deg,var(--copper-700),var(--copper-500));color:#fff;box-shadow:0 6px 16px rgba(184,115,51,.25)}
 .btn-ghost{background:var(--gray-100);color:var(--gray-700)}
-.btn-sm{padding:6px 10px;font-size:11px;border-radius:8px}
 
 /* ═══════════════ الحالة الفارغة ═══════════════ */
 .empty{text-align:center;padding:50px 20px;color:var(--gray-500)}
@@ -262,168 +195,95 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
 .empty p{font-size:14px}
 
 /* ═══════════════ الشريط السفلي ═══════════════ */
-.bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;background:var(--white);
-  box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;
-  justify-content:space-around;padding:8px 8px calc(8px + env(safe-area-inset-bottom));
-  z-index:50;border-top:1px solid var(--gray-200);
-}
-.nav-item{
-  flex:1;text-align:center;padding:6px 4px;cursor:pointer;
-  border-radius:12px;transition:.2s;color:var(--gray-500);
-}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--white);box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:50;border-top:1px solid var(--gray-200);overflow-x:auto}
+.nav-item{flex:0 0 auto;min-width:56px;text-align:center;padding:4px 2px;cursor:pointer;border-radius:10px;transition:.2s;color:var(--gray-500)}
 .nav-item.active{color:var(--emerald-700);background:var(--emerald-50)}
-.nav-item svg{width:22px;height:22px;display:block;margin:0 auto 3px}
-.nav-item span{font-size:10.5px;font-weight:700}
+.nav-item svg{width:20px;height:20px;display:block;margin:0 auto 2px}
+.nav-item span{font-size:9.5px;font-weight:700}
 
 /* ═══════════════ الزر العائم ═══════════════ */
-.fab{
-  position:fixed;bottom:calc(85px + env(safe-area-inset-bottom));left:50%;
-  transform:translateX(-50%);width:60px;height:60px;border-radius:50%;
-  background:linear-gradient(135deg,var(--copper-600),var(--copper-500));
-  color:#fff;border:none;box-shadow:0 8px 24px rgba(184,115,51,.4);
-  cursor:pointer;display:none;align-items:center;justify-content:center;
-  z-index:60;transition:.25s;
-}
+.fab{position:fixed;bottom:calc(85px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--copper-600),var(--copper-500));color:#fff;border:none;box-shadow:0 8px 24px rgba(184,115,51,.4);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:60;transition:.25s}
 .fab.show{display:flex}
 .fab:active{transform:translateX(-50%) scale(.92)}
 .fab svg{width:30px;height:30px}
 
 /* ═══════════════ النوافذ المنبثقة ═══════════════ */
-.sheet-bg{
-  position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);
-  z-index:100;display:none;align-items:flex-end;justify-content:center;
-  animation:fadeIn .2s;
-}
+.sheet-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);z-index:100;display:none;align-items:flex-end;justify-content:center;animation:fadeIn .2s}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .sheet-bg.open{display:flex}
-.sheet{
-  background:var(--white);width:100%;max-width:520px;
-  border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));
-  max-height:92vh;overflow-y:auto;
-  animation:slideUp .3s cubic-bezier(.16,1,.3,1);
-}
+.sheet{background:var(--white);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.16,1,.3,1)}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .sheet-handle{width:42px;height:5px;background:var(--gray-300);border-radius:3px;margin:0 auto 16px}
-.sheet-title{
-  font-size:17px;font-weight:800;color:var(--emerald-800);
-  margin-bottom:16px;display:flex;align-items:center;gap:8px;
-}
+.sheet-title{font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .sheet-title svg{width:20px;height:20px}
 
 /* ═══════════════ الحقول ═══════════════ */
 .field{margin-bottom:14px}
-.field label{
-  display:block;font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:6px;
-}
+.field label{display:block;font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:6px}
 .field label .req{color:var(--danger)}
-.field input,.field select,.field textarea{
-  width:100%;padding:11px 13px;border:1.5px solid var(--gray-200);
-  border-radius:11px;font-size:14px;font-family:inherit;background:var(--white);
-  color:var(--gray-700);transition:.2s;outline:none;
-}
-.field input:focus,.field select:focus,.field textarea:focus{
-  border-color:var(--emerald-600);box-shadow:0 0 0 3px rgba(26,155,118,.1);
-}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--gray-200);border-radius:11px;font-size:14px;font-family:inherit;background:var(--white);color:var(--gray-700);transition:.2s;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--emerald-600);box-shadow:0 0 0 3px rgba(26,155,118,.1)}
 .field textarea{resize:vertical;min-height:70px}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
 /* ═══════════════ الصفحات ═══════════════ */
 .page{display:none;padding:16px;animation:fadeUp .3s}
 .page.active{display:block}
-.section{
-  background:var(--white);border-radius:var(--radius);padding:16px;
-  margin-bottom:14px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);
-}
-.section-title{
-  font-size:14px;font-weight:800;color:var(--emerald-800);margin-bottom:12px;
-  padding-bottom:10px;border-bottom:2px solid var(--emerald-100);
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-}
-.section-title button{
-  background:var(--copper-600);color:#fff;border:none;padding:6px 12px;
-  border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;
-}
+.section{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200)}
+.section-title{font-size:14px;font-weight:800;color:var(--emerald-800);margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--emerald-100);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.section-title button{background:var(--copper-600);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit}
 
 /* ═══════════════ المواد ═══════════════ */
-.material-row{
-  display:flex;align-items:center;gap:8px;background:var(--gray-50);
-  border-radius:11px;padding:10px;margin-bottom:8px;border:1px solid var(--gray-200);
-}
+.material-row{display:flex;align-items:center;gap:8px;background:var(--gray-50);border-radius:11px;padding:10px;margin-bottom:8px;border:1px solid var(--gray-200)}
 .material-row .mat-name{flex:1;font-size:13px;font-weight:600;color:var(--gray-700)}
-.material-row .mat-unit{
-  font-size:11px;color:var(--gray-500);background:var(--white);
-  padding:3px 8px;border-radius:6px;border:1px solid var(--gray-200);
-}
-.material-row input.qty{
-  width:60px;padding:7px;text-align:center;border:1.5px solid var(--gray-300);
-  border-radius:8px;font-size:13px;font-weight:700;font-family:inherit;
-}
-.mat-del{
-  background:var(--danger-light);color:var(--danger);border:none;
-  width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px;
-  font-weight:700;display:flex;align-items:center;justify-content:center;
-}
+.material-row .mat-unit{font-size:11px;color:var(--gray-500);background:var(--white);padding:3px 8px;border-radius:6px;border:1px solid var(--gray-200)}
+.material-row input.qty{width:60px;padding:7px;text-align:center;border:1.5px solid var(--gray-300);border-radius:8px;font-size:13px;font-weight:700;font-family:inherit}
+.mat-del{background:var(--danger-light);color:var(--danger);border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+/* ═══════════════ البحث الذكي (Autocomplete) ═══════════════ */
+.autocomplete-wrap{position:relative}
+.autocomplete-input{width:100%;padding:11px 13px;border:1.5px solid var(--gray-200);border-radius:11px;font-size:14px;font-family:inherit;background:var(--white);color:var(--gray-700);outline:none;transition:.2s}
+.autocomplete-input:focus{border-color:var(--emerald-600);box-shadow:0 0 0 3px rgba(26,155,118,.1)}
+.autocomplete-results{display:none;position:absolute;top:100%;right:0;left:0;background:var(--white);border:1.5px solid var(--emerald-200);border-radius:10px;margin-top:4px;max-height:220px;overflow-y:auto;z-index:10;box-shadow:var(--shadow-md)}
+.autocomplete-results.show{display:block}
+.autocomplete-item{padding:10px 12px;border-bottom:1px solid var(--gray-100);cursor:pointer;font-size:13px;transition:.15s}
+.autocomplete-item:last-child{border-bottom:none}
+.autocomplete-item:hover,.autocomplete-item:active{background:var(--emerald-50)}
+.autocomplete-item.selected{background:var(--emerald-100);font-weight:700}
 
 /* ═══════════════ نتائج البحث عن المدارس ═══════════════ */
-.school-results{
-  display:none;max-height:240px;overflow-y:auto;margin-top:6px;
-  border:1.5px solid var(--emerald-200);border-radius:10px;background:#fff;
-}
+.school-results{display:none;max-height:240px;overflow-y:auto;margin-top:6px;border:1.5px solid var(--emerald-200);border-radius:10px;background:#fff}
 .school-results.show{display:block}
-.school-item{
-  padding:10px;border-bottom:1px solid var(--gray-100);cursor:pointer;font-size:12px;
-}
+.school-item{padding:10px;border-bottom:1px solid var(--gray-100);cursor:pointer;font-size:12px}
 .school-item:last-child{border-bottom:none}
 .school-item:active{background:var(--emerald-50)}
 .school-item-name{font-weight:700;color:var(--emerald-800);margin-bottom:2px}
 .school-item-name .old-tag{color:var(--copper-600);font-size:10px;font-weight:600}
 .school-item-meta{color:var(--gray-500);font-size:11px}
 
-.selected-school{
-  background:var(--emerald-50);border:1.5px solid var(--emerald-500);
-  border-radius:10px;padding:12px;margin-top:8px;font-size:12px;position:relative;
-}
-.selected-school .close-btn{
-  position:absolute;top:6px;left:6px;background:var(--danger-light);
-  color:var(--danger);border:none;width:22px;height:22px;border-radius:50%;
-  cursor:pointer;font-size:14px;line-height:1;font-weight:700;
-}
+.selected-school{background:var(--emerald-50);border:1.5px solid var(--emerald-500);border-radius:10px;padding:12px;margin-top:8px;font-size:12px;position:relative}
+.selected-school .close-btn{position:absolute;top:6px;left:6px;background:var(--danger-light);color:var(--danger);border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;font-weight:700}
 .selected-school .s-name{font-weight:800;color:var(--emerald-800);font-size:13px;margin-bottom:4px}
 .selected-school .s-info{color:var(--gray-600);line-height:1.6}
 
-/* ═══════════════ الاقتراحات الذكية ═══════════════ */
-.suggestions{
-  margin-top:10px;padding:10px;background:var(--copper-100);
-  border-radius:10px;border-right:4px solid var(--copper-500);
-}
-.suggestions-title{
-  font-size:12px;font-weight:800;color:var(--copper-700);margin-bottom:8px;
-}
-.suggestion-item{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:6px 0;font-size:12px;border-bottom:1px dashed var(--copper-300);
-}
-.suggestion-item:last-child{border-bottom:none}
-.suggestion-name{flex:1;color:var(--copper-700);font-weight:600}
-.suggestion-dist{font-size:10.5px;color:var(--copper-600);font-weight:700}
+/* ═══════════════ المرفقات ═══════════════ */
+.attachments-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.attachment-item{display:flex;align-items:center;gap:8px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:8px 10px;font-size:12px}
+.attachment-icon{font-size:20px;flex-shrink:0}
+.attachment-info{flex:1;min-width:0}
+.attachment-name{font-weight:700;color:var(--gray-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.attachment-meta{font-size:10.5px;color:var(--gray-500);margin-top:2px}
+.attachment-actions{display:flex;gap:4px}
+.attachment-thumb{width:50px;height:50px;border-radius:8px;object-fit:cover;border:1px solid var(--gray-300);cursor:pointer}
 
-/* ═══════════════ تتبع الموافقات ═══════════════ */
-.timeline{
-  position:relative;padding-right:20px;margin:10px 0;
-}
-.timeline::before{
-  content:'';position:absolute;right:6px;top:6px;bottom:6px;
-  width:2px;background:var(--gray-200);
-}
-.timeline-item{
-  position:relative;padding:6px 0 6px 0;font-size:12.5px;
-}
-.timeline-item::before{
-  content:'';position:absolute;right:-18px;top:12px;
-  width:10px;height:10px;border-radius:50%;
-  background:var(--gray-300);border:2px solid var(--white);
-}
+.upload-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:var(--purple-50);border:2px dashed var(--purple-600);border-radius:10px;color:var(--purple-700);font-size:13px;font-weight:700;cursor:pointer;transition:.2s;font-family:inherit}
+.upload-btn:active{background:var(--purple-100)}
+
+/* ═══════════════ Timeline ═══════════════ */
+.timeline{position:relative;padding-right:20px;margin:10px 0}
+.timeline::before{content:'';position:absolute;right:6px;top:6px;bottom:6px;width:2px;background:var(--gray-200)}
+.timeline-item{position:relative;padding:6px 0 6px 0;font-size:12.5px}
+.timeline-item::before{content:'';position:absolute;right:-18px;top:12px;width:10px;height:10px;border-radius:50%;background:var(--gray-300);border:2px solid var(--white)}
 .timeline-item.done::before{background:var(--green-600)}
 .timeline-item.pending::before{background:var(--orange-500)}
 .timeline-item.pending{color:var(--orange-700);font-weight:700}
@@ -432,11 +292,7 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
 .timeline-item-date{font-size:10.5px;color:var(--gray-500);margin-top:2px}
 
 /* ═══════════════ سجل الزيارات ═══════════════ */
-.visit-row{
-  display:flex;gap:8px;padding:8px 10px;
-  background:var(--gray-50);border-radius:8px;margin-bottom:6px;
-  border-right:3px solid var(--cyan-600);font-size:12px;
-}
+.visit-row{display:flex;gap:8px;padding:8px 10px;background:var(--gray-50);border-radius:8px;margin-bottom:6px;border-right:3px solid var(--cyan-600);font-size:12px}
 .visit-icon{font-size:16px}
 .visit-info{flex:1}
 .visit-type{font-weight:700;color:var(--gray-700)}
@@ -444,65 +300,31 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
 .visit-note{color:var(--gray-600);font-size:11.5px;margin-top:3px;font-style:italic}
 
 /* ═══════════════ الإجراءات السريعة ═══════════════ */
-.quick-actions{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
-  padding:10px;background:var(--gray-50);border-radius:10px;margin-bottom:10px;
-}
-.quick-action-btn{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;padding:8px 4px;background:var(--white);border:1px solid var(--gray-200);
-  border-radius:10px;cursor:pointer;font-family:inherit;transition:.2s;
-}
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px;background:var(--gray-50);border-radius:10px;margin-bottom:10px}
+.quick-action-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 4px;background:var(--white);border:1px solid var(--gray-200);border-radius:10px;cursor:pointer;font-family:inherit;transition:.2s}
 .quick-action-btn:active{transform:scale(.95);background:var(--emerald-50)}
 .quick-action-btn .qa-icon{font-size:20px}
 .quick-action-btn .qa-label{font-size:9.5px;font-weight:700;color:var(--gray-600);text-align:center}
 
-/* ═══════════════ الإحصائيات حسب المنطقة ═══════════════ */
-.area-stat-row{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;
-  background:var(--white);border:1px solid var(--gray-200);
-  border-radius:10px;margin-bottom:8px;font-size:13px;
-}
+/* ═══════════════ الإحصائيات ═══════════════ */
+.area-stat-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--white);border:1px solid var(--gray-200);border-radius:10px;margin-bottom:8px;font-size:13px}
 .area-stat-name{flex:1;font-weight:700;color:var(--gray-700)}
-.area-stat-bar{
-  height:8px;border-radius:4px;background:var(--gray-200);
-  width:100px;overflow:hidden;
-}
-.area-stat-bar-fill{
-  height:100%;background:linear-gradient(90deg,var(--emerald-600),var(--emerald-500));
-  border-radius:4px;transition:width .5s;
-}
+.area-stat-bar{height:8px;border-radius:4px;background:var(--gray-200);width:100px;overflow:hidden}
+.area-stat-bar-fill{height:100%;background:linear-gradient(90deg,var(--emerald-600),var(--emerald-500));border-radius:4px;transition:width .5s}
 .area-stat-count{font-weight:800;color:var(--emerald-700);min-width:30px;text-align:center}
 
 /* ═══════════════ جولة اليوم ═══════════════ */
-.trip-summary{
-  background:var(--emerald-50);border-radius:10px;padding:12px;margin-bottom:12px;
-  font-size:12.5px;color:var(--emerald-800);
-}
-.trip-stop{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;
-  background:var(--white);border-radius:10px;margin-bottom:8px;
-  border:1px solid var(--gray-200);font-size:13px;
-  cursor:pointer;transition:.2s;
-}
+.trip-summary{background:var(--emerald-50);border-radius:10px;padding:12px;margin-bottom:12px;font-size:12.5px;color:var(--emerald-800)}
+.trip-stop{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--white);border-radius:10px;margin-bottom:8px;border:1px solid var(--gray-200);font-size:13px;cursor:pointer;transition:.2s}
 .trip-stop:active{background:var(--emerald-50)}
-.trip-stop .stop-num{
-  background:var(--emerald-700);color:#fff;width:26px;height:26px;
-  border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:800;flex-shrink:0;
-}
+.trip-stop .stop-num{background:var(--emerald-700);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
 .trip-stop .stop-info{flex:1}
 .trip-stop .stop-name{font-weight:700;color:var(--gray-700)}
 .trip-stop .stop-meta{font-size:11px;color:var(--gray-500);margin-top:2px}
 .trip-stop .stop-type{font-size:16px}
 
 /* ═══════════════ Toast ═══════════════ */
-.toast{
-  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
-  background:var(--emerald-800);color:#fff;padding:12px 20px;border-radius:12px;
-  font-size:13px;font-weight:700;z-index:200;box-shadow:var(--shadow-lg);
-  transition:.35s cubic-bezier(.16,1,.3,1);max-width:90%;text-align:center;
-}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--emerald-800);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:200;box-shadow:var(--shadow-lg);transition:.35s cubic-bezier(.16,1,.3,1);max-width:90%;text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .toast.success{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600))}
 .toast.error{background:linear-gradient(135deg,#991b1b,var(--danger))}
@@ -512,48 +334,21 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
 .print-page{padding:20px;background:var(--gray-100);min-height:100vh}
 .print-toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .print-toolbar .btn{flex:1;min-width:130px;padding:12px}
-
-.gov-paper{
-  background:#fff;width:100%;max-width:800px;margin:0 auto;
-  padding:15mm 15mm 12mm;box-shadow:0 4px 20px rgba(0,0,0,.12);
-  direction:rtl;font-family:'Traditional Arabic','Sakkal Majalla','Amiri','Segoe UI',Tahoma,serif;
-  color:#000;line-height:1.5;position:relative;
-}
+.gov-paper{background:#fff;width:100%;max-width:800px;margin:0 auto;padding:15mm 15mm 12mm;box-shadow:0 4px 20px rgba(0,0,0,.12);direction:rtl;font-family:'Traditional Arabic','Sakkal Majalla','Amiri','Segoe UI',Tahoma,serif;color:#000;line-height:1.5;position:relative}
 .gov-header{position:relative;margin-bottom:15px;min-height:130px}
-.gov-eagle{
-  position:absolute;left:50%;top:0;transform:translateX(-50%);
-  width:85px;height:auto;z-index:2;
-}
+.gov-eagle{position:absolute;left:50%;top:0;transform:translateX(-50%);width:85px;height:auto;z-index:2}
 .gov-eagle img,.gov-eagle-svg{width:100%;height:auto;display:block}
-.gov-header-top{
-  display:flex;justify-content:space-between;align-items:flex-start;
-  padding-top:6px;direction:rtl;
-}
-.gov-header-right{
-  text-align:right;font-size:12.5px;font-weight:700;line-height:1.5;
-  padding-right:4px;flex:1;
-}
-.gov-header-left{
-  text-align:left;font-size:12.5px;font-weight:700;
-  padding-top:14px;padding-left:4px;flex:0 0 auto;
-}
+.gov-header-top{display:flex;justify-content:space-between;align-items:flex-start;padding-top:6px;direction:rtl}
+.gov-header-right{text-align:right;font-size:12.5px;font-weight:700;line-height:1.5;padding-right:4px;flex:1}
+.gov-header-left{text-align:left;font-size:12.5px;font-weight:700;padding-top:14px;padding-left:4px;flex:0 0 auto}
 .gov-salutation{text-align:center;font-size:15px;font-weight:800;margin:6px 0 10px}
-.gov-body{
-  font-size:13.5px;font-weight:600;text-align:justify;
-  margin-bottom:12px;padding:0 6px;line-height:1.7;
-}
+.gov-body{font-size:13.5px;font-weight:600;text-align:justify;margin-bottom:12px;padding:0 6px;line-height:1.7}
 .gov-table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:12.5px}
-.gov-table th,.gov-table td{
-  border:1px solid #000;padding:4px 6px;text-align:center;
-  font-weight:700;vertical-align:middle;
-}
+.gov-table th,.gov-table td{border:1px solid #000;padding:4px 6px;text-align:center;font-weight:700;vertical-align:middle}
 .gov-table th{background:#f3f3f3;font-weight:800;font-size:12px}
 .gov-table td.mat-name{text-align:right;padding-right:8px}
 .gov-table td.mat-qty{width:55px;font-weight:800}
-.gov-signatures{
-  display:flex;justify-content:space-between;margin-top:14px;
-  padding:0 15px;font-size:13px;font-weight:700;text-align:center;line-height:1.6;
-}
+.gov-signatures{display:flex;justify-content:space-between;margin-top:14px;padding:0 15px;font-size:13px;font-weight:700;text-align:center;line-height:1.6}
 .gov-sign-box{flex:1;max-width:45%}
 .gov-sign-box .role{display:block;margin-bottom:2px}
 .gov-sign-box .name{font-weight:800;font-size:13.5px}
@@ -571,15 +366,14 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
 }
 
 @media (max-width:400px){
-  .stat-num{font-size:17px}
-  .stat-lbl{font-size:9px}
+  .stat-num{font-size:15px}
+  .stat-lbl{font-size:8px}
   .header-title h1{font-size:15px}
   .gov-header-right,.gov-header-left{font-size:11px}
   .gov-eagle{width:75px}
-  .quick-actions{grid-template-columns:repeat(4,1fr)}
+  .task-name{font-size:16px}
 }
 
-/* ═══════════════ Scrollbar مخصص ═══════════════ */
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:3px}
@@ -630,10 +424,17 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
         <div class="stat-num" id="statDone">0</div>
         <div class="stat-lbl">✅ منجزة</div>
       </div>
+      <div class="stat-card c-canceled" onclick="quickFilter('canceled')">
+        <div class="stat-num" id="statCanceled">0</div>
+        <div class="stat-lbl">🚫 ملغاة</div>
+      </div>
+      <div class="stat-card c-transferred" onclick="quickFilter('transferred')">
+        <div class="stat-num" id="statTransferred">0</div>
+        <div class="stat-lbl">↔️ محوّلة</div>
+      </div>
     </div>
   </header>
 
-  <!-- التنبيهات -->
   <div class="alerts-container" id="alertsContainer"></div>
 
   <div class="search-wrap">
@@ -651,6 +452,39 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
     <button class="chip" data-filter="materials">📦 مواد <span class="count" id="cntMaterials">0</span></button>
     <button class="chip" data-filter="working">🔧 تنفيذ <span class="count" id="cntWorking">0</span></button>
     <button class="chip" data-filter="done">✅ منجزة <span class="count" id="cntDone">0</span></button>
+    <button class="chip" data-filter="canceled">🚫 ملغاة <span class="count" id="cntCanceled">0</span></button>
+    <button class="chip" data-filter="transferred">↔️ محوّلة <span class="count" id="cntTransferred">0</span></button>
+  </div>
+
+  <div class="filters-advanced">
+    <select id="filterArea" onchange="renderTasks()">
+      <option value="">📍 كل المناطق</option>
+    </select>
+    <select id="filterSupervisor" onchange="renderTasks()">
+      <option value="">👤 كل المشرفين</option>
+    </select>
+    <select id="filterType" onchange="renderTasks()">
+      <option value="">📋 كل الأنواع</option>
+      <option>🔌 إصلاح عطل</option>
+      <option>🔧 صيانة دورية</option>
+      <option>🏗️ تمديد قاعة</option>
+      <option>🚚 نقل قاعة</option>
+      <option>🆕 إحداث قاعة</option>
+      <option>💡 تركيب إنارة</option>
+      <option>⚡ توصيل أجهزة</option>
+      <option>📦 تأمين مواد</option>
+      <option>📝 كشف فني</option>
+      <option>🖨️ صيانة حواسب</option>
+      <option>🔄 إعادة تأهيل</option>
+      <option>أخرى</option>
+    </select>
+    <select id="filterDate" onchange="renderTasks()">
+      <option value="">📅 كل التواريخ</option>
+      <option value="today">اليوم</option>
+      <option value="week">هذا الأسبوع</option>
+      <option value="month">هذا الشهر</option>
+      <option value="overdue">⚠️ متأخرة فقط</option>
+    </select>
   </div>
 
   <div class="tasks-list" id="tasksList"></div>
@@ -672,6 +506,31 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
   </div>
 </div>
 
+<!-- ═══════════ صفحة الزيارات ═══════════ -->
+<div id="pageVisits" class="page">
+  <div class="section">
+    <div class="section-title">📅 سجل الزيارات</div>
+    <div class="filters-advanced" style="padding:0;margin-bottom:12px">
+      <select id="visitFilterType" onchange="renderVisits()">
+        <option value="">🔍 كل الأنواع</option>
+        <option value="inspection">🔍 كشف مبدئي</option>
+        <option value="execution">🔧 تنفيذ عمل</option>
+        <option value="maintenance">🛠️ صيانة دورية</option>
+        <option value="followup">📋 متابعة</option>
+        <option value="emergency">🚨 طارئ</option>
+      </select>
+      <select id="visitFilterDate" onchange="renderVisits()">
+        <option value="">📅 كل التواريخ</option>
+        <option value="today">اليوم</option>
+        <option value="week">هذا الأسبوع</option>
+        <option value="month">هذا الشهر</option>
+      </select>
+    </div>
+    <div id="visitsStats" style="font-size:12px;color:var(--gray-600);margin-bottom:10px"></div>
+    <div id="visitsList"></div>
+  </div>
+</div>
+
 <!-- ═══════════ صفحة الإحصائيات ═══════════ -->
 <div id="pageStats" class="page">
   <div class="section">
@@ -685,6 +544,10 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
   <div class="section">
     <div class="section-title">👤 المهام حسب المشرف</div>
     <div id="supervisorStats"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">🎯 المهام حسب النوع</div>
+    <div id="typeStats"></div>
   </div>
 </div>
 
@@ -701,9 +564,31 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
     </div>
     <input type="file" id="importSchoolFile" accept=".csv,.txt" style="display:none" onchange="importSchoolsCSV(event)">
     <div id="schoolsStats" style="font-size:12px;color:var(--gray-600);margin-bottom:10px"></div>
-    <div class="search-box" style="margin-bottom:12px">
+    <div class="search-box" style="margin-bottom:8px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
       <input type="text" id="schoolListSearch" placeholder="ابحث في القائمة..." oninput="renderSchoolsList(this.value)">
+    </div>
+    <div class="filters-advanced" style="padding:0;margin-bottom:12px">
+      <select id="schoolFilterArea" onchange="renderSchoolsList(document.getElementById('schoolListSearch').value)">
+        <option value="">📍 كل المناطق</option>
+      </select>
+      <select id="schoolFilterSupervisor" onchange="renderSchoolsList(document.getElementById('schoolListSearch').value)">
+        <option value="">👤 كل المشرفين</option>
+      </select>
+      <select id="schoolFilterGrade" onchange="renderSchoolsList(document.getElementById('schoolListSearch').value)">
+        <option value="">🎓 كل المراحل</option>
+        <option value="1 _ 6">ابتدائي (1-6)</option>
+        <option value="1 _ 4">ابتدائي (1-4)</option>
+        <option value="7 _ 9">إعدادي (7-9)</option>
+        <option value="ثانوي">ثانوي</option>
+        <option value="معهد">معاهد</option>
+        <option value="رياض أطفال">رياض أطفال</option>
+      </select>
+      <select id="schoolSortBy" onchange="renderSchoolsList(document.getElementById('schoolListSearch').value)">
+        <option value="name">🔤 حسب الاسم</option>
+        <option value="area">📍 حسب المنطقة</option>
+        <option value="supervisor">👤 حسب المشرف</option>
+      </select>
     </div>
     <div id="schoolsList" style="max-height:520px;overflow-y:auto"></div>
   </div>
@@ -716,7 +601,22 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
       <span>📦 قائمة المواد الكهربائية</span>
       <button onclick="openMaterialSheet()">+ إضافة</button>
     </div>
+    <div class="search-box" style="margin-bottom:12px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="materialSearch" placeholder="ابحث في المواد..." oninput="renderMaterials(this.value)">
+    </div>
     <div id="materialsList"></div>
+  </div>
+</div>
+
+<!-- ═══════════ صفحة المشرفين ═══════════ -->
+<div id="pageSupervisors" class="page">
+  <div class="section">
+    <div class="section-title">
+      <span>👤 إدارة المشرفين</span>
+      <button onclick="openSupervisorSheet()">+ إضافة</button>
+    </div>
+    <div id="supervisorsList"></div>
   </div>
 </div>
 
@@ -778,6 +678,10 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
     <span>الجولة</span>
   </div>
+  <div class="nav-item" data-page="pageVisits" onclick="switchPage('pageVisits')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>الزيارات</span>
+  </div>
   <div class="nav-item" data-page="pageStats" onclick="switchPage('pageStats')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
     <span>إحصائيات</span>
@@ -789,6 +693,10 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
   <div class="nav-item" data-page="pageMaterials" onclick="switchPage('pageMaterials')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
     <span>المواد</span>
+  </div>
+  <div class="nav-item" data-page="pageSupervisors" onclick="switchPage('pageSupervisors')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    <span>المشرفون</span>
   </div>
   <div class="nav-item" data-page="pageSettings" onclick="switchPage('pageSettings')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -821,7 +729,6 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
         <div class="s-name" id="selName"></div>
         <div class="s-info" id="selInfo"></div>
       </div>
-      <div class="suggestions" id="suggestions" style="display:none"></div>
     </div>
 
     <div class="field">
@@ -846,11 +753,13 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
           <option>🔧 صيانة دورية</option>
           <option>🏗️ تمديد قاعة</option>
           <option>🚚 نقل قاعة</option>
+          <option>🆕 إحداث قاعة</option>
           <option>💡 تركيب إنارة</option>
-          <option>🔌 توصيل أجهزة</option>
+          <option>⚡ توصيل أجهزة</option>
           <option>📦 تأمين مواد</option>
           <option>📝 كشف فني</option>
           <option>🖨️ صيانة حواسب</option>
+          <option>🔄 إعادة تأهيل</option>
           <option>أخرى</option>
         </select>
       </div>
@@ -866,19 +775,37 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
     <div class="field-row">
       <div class="field"><label>المنطقة</label>
         <select id="fArea">
-          <option>المزة</option><option>المزة - أبو زهير</option>
-          <option>برزة</option><option>الزاهرة</option>
-          <option>كفرسوسة</option><option>الميدان</option>
-          <option>القنوات</option><option>الشاغور</option>
-          <option>دمشق القديمة</option><option>ساروجا</option>
-          <option>ركن الدين</option><option>الصالحية</option>
-          <option>المهاجرين</option><option>القدم</option>
-          <option>دمر</option><option>القابون</option>
-          <option>جوبر</option><option>المخيم</option>
+          <option>المزة</option>
+          <option>المزة - أبو زهير</option>
+          <option>برزة</option>
+          <option>الزاهرة</option>
+          <option>كفرسوسة</option>
+          <option>الميدان</option>
+          <option>القنوات</option>
+          <option>الشاغور</option>
+          <option>دمشق القديمة</option>
+          <option>ساروجا</option>
+          <option>ركن الدين</option>
+          <option>الصالحية</option>
+          <option>المهاجرين</option>
+          <option>القدم</option>
+          <option>دمر</option>
+          <option>القابون</option>
+          <option>جوبر</option>
+          <option>المخيم</option>
           <option>أخرى</option>
         </select>
       </div>
-      <div class="field"><label>المشرف</label><input type="text" id="fContact" placeholder="اسم المشرف"></div>
+      <div class="field"><label>المشرف</label>
+        <select id="fContact">
+          <option value="">-- اختر مشرف --</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>📞 جوال المشرف (تلقائي)</label>
+      <input type="tel" id="fContactPhone" placeholder="يُعبّأ تلقائياً" readonly style="background:var(--gray-100)">
     </div>
 
     <div class="field-row">
@@ -919,8 +846,11 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
     <div class="sheet-handle"></div>
     <div class="sheet-title">📦 كشف المواد</div>
     <div class="field">
-      <label>اختر مادة</label>
-      <select id="matSelect" onchange="addMaterialToTask()"><option value="">-- اختر مادة --</option></select>
+      <label>🔍 ابحث عن مادة</label>
+      <div class="autocomplete-wrap">
+        <input type="text" class="autocomplete-input" id="matSearchInput" placeholder="اكتب 2 حروف..." autocomplete="off" oninput="searchMaterialsForTask(this.value)" onfocus="searchMaterialsForTask(this.value)">
+        <div class="autocomplete-results" id="matSearchResults"></div>
+      </div>
     </div>
     <div class="field">
       <label>أو أضف مادة جديدة</label>
@@ -972,12 +902,12 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
 </div>
 
 <!-- ═══════════ نافذة تتبع الموافقات ═══════════ -->
-<div class="sheet-bg" id="approvalSheetBg" onclick="if(event===this.target)closeSheet('approvalSheetBg')">
+<div class="sheet-bg" id="approvalSheetBg" onclick="if(event.target===this)closeSheet('approvalSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">📄 تتبع الموافقات</div>
     <div class="field">
-      <label>📌 الحالة الحالية</label>
+      <label>📌 الحالة</label>
       <select id="approvalStage">
         <option value="raised">📤 رُفع الكشف</option>
         <option value="delivered">📬 وصل للجهة</option>
@@ -989,8 +919,38 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
       <label>ملاحظات</label>
       <textarea id="approvalNotes" placeholder="تفاصيل إضافية..."></textarea>
     </div>
-    <button class="btn-lg btn-primary" onclick="saveApproval()">💾 حفظ التحديث</button>
+    <button class="btn-lg btn-primary" onclick="saveApproval()">💾 حفظ</button>
     <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('approvalSheetBg')">إلغاء</button>
+  </div>
+</div>
+
+<!-- ═══════════ نافذة رفع المرفقات ═══════════ -->
+<div class="sheet-bg" id="attachSheetBg" onclick="if(event.target===this)closeSheet('attachSheetBg')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">📎 رفع مرفقات (صور / PDF)</div>
+    <div class="field">
+      <label>نوع المرفق</label>
+      <select id="attachType">
+        <option value="letter">📄 كتاب رسمي</option>
+        <option value="approval">✅ موافقة</option>
+        <option value="before">📷 صورة قبل العمل</option>
+        <option value="after">📸 صورة بعد العمل</option>
+        <option value="invoice">🧾 فاتورة</option>
+        <option value="other">📎 أخرى</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>وصف المرفق (اختياري)</label>
+      <input type="text" id="attachDesc" placeholder="ملاحظة عن المرفق">
+    </div>
+    <label class="upload-btn">
+      📎 اختر ملفاً (صورة أو PDF)
+      <input type="file" id="attachFileInput" accept="image/*,.pdf" style="display:none" onchange="handleAttachment(event)">
+    </label>
+    <div id="attachPreview" style="margin-top:12px"></div>
+    <button class="btn-lg btn-primary" style="margin-top:12px" onclick="saveAttachment()">💾 حفظ المرفق</button>
+    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('attachSheetBg')">إلغاء</button>
   </div>
 </div>
 
@@ -1013,7 +973,6 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
     <div class="sheet-title" id="schoolSheetTitle">➕ إضافة مدرسة</div>
     <div class="field"><label>اسم المدرسة <span class="req">*</span></label><input type="text" id="schName"></div>
     <div class="field"><label>الاسم القديم (اختياري)</label><input type="text" id="schOldName"></div>
-    <div class="field"><label>المشرف</label><input type="text" id="schSupervisor"></div>
     <div class="field-row">
       <div class="field"><label>المنطقة</label><input type="text" id="schArea"></div>
       <div class="field"><label>الحي</label><input type="text" id="schDistrict"></div>
@@ -1022,6 +981,14 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
     <div class="field-row">
       <div class="field"><label>المرحلة</label><input type="text" id="schGrade"></div>
       <div class="field"><label>الهاتف</label><input type="text" id="schPhone"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>🏫 عدد القاعات</label><input type="number" id="schHalls" placeholder="مثال: 3" min="0"></div>
+      <div class="field"><label>👤 المشرف</label>
+        <select id="schSupervisor">
+          <option value="">-- اختر مشرف --</option>
+        </select>
+      </div>
     </div>
     <div class="field-row">
       <div class="field"><label>👤 مدير المدرسة</label><input type="text" id="schPrincipal"></div>
@@ -1046,6 +1013,19 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
     <div class="field"><label>ملاحظات</label><input type="text" id="techNotes" placeholder="مثال: يعمل جزئياً"></div>
     <button class="btn-lg btn-primary" onclick="saveTechnician()">💾 حفظ</button>
     <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('techSheetBg')">إلغاء</button>
+  </div>
+</div>
+
+<!-- ═══════════ نافذة إضافة مشرف ═══════════ -->
+<div class="sheet-bg" id="supervisorSheetBg" onclick="if(event.target===this)closeSheet('supervisorSheetBg')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="supervisorSheetTitle">➕ إضافة مشرف</div>
+    <div class="field"><label>اسم المشرف <span class="req">*</span></label><input type="text" id="supervisorName"></div>
+    <div class="field"><label>📞 الجوال</label><input type="tel" id="supervisorPhone" placeholder="09xxxxxxxx"></div>
+    <div class="field"><label>📍 المناطق المسؤول عنها (مفصولة بفاصلة)</label><textarea id="supervisorAreas" placeholder="المزة، كفرسوسة، برزة"></textarea></div>
+    <button class="btn-lg btn-primary" onclick="saveSupervisor()">💾 حفظ</button>
+    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('supervisorSheetBg')">إلغاء</button>
   </div>
 </div>
 
@@ -1075,6 +1055,7 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
 <div id="printPage" style="display:none;position:fixed;inset:0;background:#f1f5f9;z-index:500;overflow-y:auto">
   <div class="print-toolbar no-print" style="position:sticky;top:0;background:#fff;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);z-index:10">
     <button class="btn btn-ghost" style="flex:0 0 auto" onclick="closePrint()">← رجوع</button>
+    <button class="btn btn-word" onclick="exportToWord()">📄 Word</button>
     <button class="btn btn-primary" onclick="window.print()">🖨️ طباعة / PDF</button>
   </div>
   <div class="print-page">
@@ -1087,12 +1068,13 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
    القسم 1: الثوابت
    ═══════════════════════════════════════════════════════ */
 const STORAGE_KEYS = {
-  TASKS: 'wk_tasks_v2',
-  MATERIALS: 'wk_materials_v2',
-  SCHOOLS: 'wk_schools_v2',
-  TECHNICIANS: 'wk_technicians_v2',
-  SETTINGS: 'wk_settings_v2',
-  COUNTER: 'wk_counter_v2',
+  TASKS: 'wk_tasks_v3',
+  MATERIALS: 'wk_materials_v3',
+  SCHOOLS: 'wk_schools_v3',
+  TECHNICIANS: 'wk_technicians_v3',
+  SUPERVISORS: 'wk_supervisors_v3',
+  SETTINGS: 'wk_settings_v3',
+  COUNTER: 'wk_counter_v3',
   NIGHT: 'wk_night_mode'
 };
 
@@ -1101,6 +1083,7 @@ let state = {
   materials: [],
   schools: [],
   technicians: [],
+  supervisors: [],
   settings: {},
   counter: 1,
   currentFilter: 'all',
@@ -1108,9 +1091,10 @@ let state = {
   currentTaskId: null,
   editingSchoolIdx: null,
   editingTechIdx: null,
+  editingSupervisorIdx: null,
   editingMasterMatId: null,
   selectedSchool: null,
-  searchQuery: ''
+  currentAttachment: null
 };
 
 const STATUS_LABELS = {
@@ -1120,12 +1104,25 @@ const STATUS_LABELS = {
   materials: { label: '📦 مواد', cls: 'mb-materials' },
   working: { label: '🔧 تنفيذ', cls: 'mb-working' },
   done: { label: '✅ منجزة', cls: 'mb-done' },
-  suspended: { label: '⏸️ معلقة', cls: 'mb-suspended' }
+  suspended: { label: '⏸️ معلقة', cls: 'mb-suspended' },
+  canceled: { label: '🚫 ملغاة', cls: 'mb-canceled' },
+  transferred: { label: '↔️ محوّلة', cls: 'mb-transferred' }
 };
+
+const CANCEL_REASONS = [
+  'متعهد خارجي',
+  'مجتمع محلي',
+  'مشروع حكومي',
+  'تم الترميم',
+  'لا حاجة للمهمة',
+  'مكررة',
+  'سبب آخر'
+];
 
 const SOURCE_ICONS = { call:'📞', urgent:'🚨', letter:'📄', routine:'🔄' };
 const SOURCE_LABELS = { call:'طلب', urgent:'طارئ', letter:'كتاب', routine:'دورية' };
 const PRIORITY_LABELS = { high:'🔴 عالية', med:'🟡 متوسطة', low:'🟢 منخفضة' };
+
 const VISIT_TYPES = {
   inspection: { icon:'🔍', label:'كشف مبدئي' },
   execution: { icon:'🔧', label:'تنفيذ عمل' },
@@ -1133,11 +1130,21 @@ const VISIT_TYPES = {
   followup: { icon:'📋', label:'متابعة' },
   emergency: { icon:'🚨', label:'طارئ' }
 };
+
 const APPROVAL_STAGES = {
-  raised: { icon:'📤', label:'رُفع الكشف', color:'blue' },
-  delivered: { icon:'📬', label:'وصل للجهة', color:'purple' },
-  approved: { icon:'✅', label:'وصلت الموافقة', color:'green' },
-  rejected: { icon:'❌', label:'رُفض الطلب', color:'red' }
+  raised: { icon:'📤', label:'رُفع الكشف' },
+  delivered: { icon:'📬', label:'وصل للجهة' },
+  approved: { icon:'✅', label:'وصلت الموافقة' },
+  rejected: { icon:'❌', label:'رُفض الطلب' }
+};
+
+const ATTACH_TYPES = {
+  letter: { icon:'📄', label:'كتاب رسمي' },
+  approval: { icon:'✅', label:'موافقة' },
+  before: { icon:'📷', label:'صورة قبل' },
+  after: { icon:'📸', label:'صورة بعد' },
+  invoice: { icon:'🧾', label:'فاتورة' },
+  other: { icon:'📎', label:'مرفق آخر' }
 };
 
 const DEFAULT_MATERIALS = [
@@ -1195,6 +1202,18 @@ const DEFAULT_SETTINGS = {
 
 const DEFAULT_TECHNICIANS = [
   { id: 1, name: 'أنا', phone: '', notes: 'رئيس الورشة' }
+];
+
+const DEFAULT_SUPERVISORS = [
+  { id: 1, name: 'باسم العباس', phone: '', areas: 'الميدان، الزاهرة، القنوات، الشاغور' },
+  { id: 2, name: 'تمام الصالح', phone: '', areas: 'الميدان، كفرسوسة' },
+  { id: 3, name: 'حسن خرما', phone: '', areas: 'دمشق القديمة، ساروجا، الشاغور' },
+  { id: 4, name: 'رياض محمد', phone: '', areas: 'المزة، كفرسوسة' },
+  { id: 5, name: 'علاء وهيبي', phone: '', areas: 'برزة، القابون' },
+  { id: 6, name: 'علي بيكو', phone: '', areas: 'المهاجرين، ركن الدين، الصالحية' },
+  { id: 7, name: 'علي شاليش', phone: '', areas: 'الميدان، القنوات، القدم' },
+  { id: 8, name: 'محمود يوسف', phone: '', areas: 'دمر' },
+  { id: 9, name: 'وسيم سعيد', phone: '', areas: 'ساروجا، الشاغور، جوبر' }
 ];
 
 const SCHOOLS_DEFAULT = [
@@ -1311,7 +1330,6 @@ const SCHOOLS_DEFAULT = [
   {n:'ربيعة الايوبية',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة خلف جامع إبراهيم الخليل',g:'1 _ 6',p:'5113397'},
   {n:'عبد القادر المازني',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة مقابل جامع إبراهيم الخليل',g:'1 _ 6',p:'5122956'},
   {n:'محمد عدنان كولكي',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد-جادة خليل رجب',g:'7 _ 9',p:'5120927',oldName:'كولكلي برزة'},
-  {n:'المعهد التفاني التجاري الثاني',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'برزة مسبق الصنع بل مشفى حاميش',g:'معهد تجاري',p:'5140851'},
   {n:'ثا/بسام حمشو المهنية',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'حي التجارة مقابل الحديقة',g:'ثانوي نسوي',p:''},
   {n:'بسام حمشو المهنية النسوية',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'القصور - حي التجارة',g:'ثانوي نسوي',p:''},
   {n:'محمد النجدي البغدادي',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل-شارع المدارس-شارع أنس بن مالك',g:'7 _ 9',p:'6617324',oldName:'نجدي البغدادي'},
@@ -1330,7 +1348,7 @@ const SCHOOLS_DEFAULT = [
 ];
 
 /* ═══════════════════════════════════════════════════════
-   القسم 2: التخزين
+   القسم 2: التخزين والتحميل
    ═══════════════════════════════════════════════════════ */
 function loadState(){
   try{
@@ -1338,22 +1356,50 @@ function loadState(){
     state.materials = JSON.parse(localStorage.getItem(STORAGE_KEYS.MATERIALS) || 'null') || DEFAULT_MATERIALS;
     state.schools = JSON.parse(localStorage.getItem(STORAGE_KEYS.SCHOOLS) || 'null') || SCHOOLS_DEFAULT;
     state.technicians = JSON.parse(localStorage.getItem(STORAGE_KEYS.TECHNICIANS) || 'null') || DEFAULT_TECHNICIANS;
+    state.supervisors = JSON.parse(localStorage.getItem(STORAGE_KEYS.SUPERVISORS) || 'null') || DEFAULT_SUPERVISORS;
     state.settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS) || 'null') || DEFAULT_SETTINGS;
     state.counter = parseInt(localStorage.getItem(STORAGE_KEYS.COUNTER) || '1');
+    migrateTasks();
   }catch(e){
     state.tasks = [];
     state.materials = DEFAULT_MATERIALS;
     state.schools = SCHOOLS_DEFAULT;
     state.technicians = DEFAULT_TECHNICIANS;
+    state.supervisors = DEFAULT_SUPERVISORS;
     state.settings = DEFAULT_SETTINGS;
     state.counter = 1;
   }
+}
+
+function migrateTasks(){
+  let changed = false;
+  state.tasks.forEach(t => {
+    if(!t.materials){ t.materials = []; changed = true; }
+    if(!t.visitLog){ t.visitLog = []; changed = true; }
+    if(!t.approvalLog){ t.approvalLog = []; changed = true; }
+    if(!t.attachments){ t.attachments = []; changed = true; }
+    if(!t.status){ t.status = 'new'; changed = true; }
+    if(!t.source){ t.source = 'call'; changed = true; }
+    if(!t.priority){ t.priority = 'med'; changed = true; }
+    if(!t.technician){ t.technician = ''; changed = true; }
+    if(!t.executionNotes){ t.executionNotes = ''; changed = true; }
+    if(!t.createdAt){ t.createdAt = todayISO(); changed = true; }
+    if(t.doneAt === undefined){ t.doneAt = ''; changed = true; }
+    if(!t.principal){ t.principal = ''; changed = true; }
+    if(!t.principalPhone){ t.principalPhone = ''; changed = true; }
+    if(!t.secretary){ t.secretary = ''; changed = true; }
+    if(!t.secretaryPhone){ t.secretaryPhone = ''; changed = true; }
+    if(!t.contactPhone){ t.contactPhone = ''; changed = true; }
+    if(!t.number){ t.number = state.counter++; changed = true; }
+  });
+  if(changed) saveTasks();
 }
 
 function saveTasks(){ localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(state.tasks)); }
 function saveMaterials(){ localStorage.setItem(STORAGE_KEYS.MATERIALS, JSON.stringify(state.materials)); }
 function saveSchools(){ localStorage.setItem(STORAGE_KEYS.SCHOOLS, JSON.stringify(state.schools)); }
 function saveTechnicians(){ localStorage.setItem(STORAGE_KEYS.TECHNICIANS, JSON.stringify(state.technicians)); }
+function saveSupervisors(){ localStorage.setItem(STORAGE_KEYS.SUPERVISORS, JSON.stringify(state.supervisors)); }
 function saveSettings(){ localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(state.settings)); }
 function saveCounter(){ localStorage.setItem(STORAGE_KEYS.COUNTER, String(state.counter)); }
 
@@ -1401,7 +1447,7 @@ function getDaysDiff(dateStr){
   return Math.floor((now - d) / (1000*60*60*24));
 }
 function isOverdue(t){
-  if(t.status === 'done') return false;
+  if(t.status === 'done' || t.status === 'canceled' || t.status === 'transferred') return false;
   const days = getDaysDiff(t.createdAt);
   const threshold = state.settings.overdueDays || 7;
   return days >= threshold;
@@ -1418,6 +1464,8 @@ function switchPage(pageId){
   if(pageId === 'pageSchools'){ renderSchoolsList(); updateSchoolsStats(); }
   if(pageId === 'pageTrip') buildTodayTrip();
   if(pageId === 'pageStats') renderStats();
+  if(pageId === 'pageVisits') renderVisits();
+  if(pageId === 'pageSupervisors') renderSupervisorsList();
   localStorage.setItem('wk_current_page', pageId);
   window.scrollTo(0, 0);
 }
@@ -1448,6 +1496,36 @@ function fillTechnicianSelects(){
     }
   });
 }
+function fillSupervisorSelects(){
+  const opts = '<option value="">-- اختر مشرف --</option>' + state.supervisors.map(s => '<option value="' + escapeHtml(s.name) + '">' + escapeHtml(s.name) + '</option>').join('');
+  ['fContact','schSupervisor'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el){
+      const cur = el.value;
+      el.innerHTML = opts;
+      if(cur) el.value = cur;
+    }
+  });
+}
+function fillAreaFilters(){
+  const areas = [...new Set(state.schools.map(s => s.a).filter(Boolean))].sort();
+  ['filterArea','schoolFilterArea'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    let html = '<option value="">📍 كل المناطق</option>';
+    areas.forEach(a => { html += '<option value="' + escapeHtml(a) + '">' + escapeHtml(a) + '</option>'; });
+    el.innerHTML = html;
+  });
+}
+function fillSupervisorFilters(){
+  ['filterSupervisor','schoolFilterSupervisor'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    let html = '<option value="">👤 كل المشرفين</option>';
+    state.supervisors.forEach(s => { html += '<option value="' + escapeHtml(s.name) + '">' + escapeHtml(s.name) + '</option>'; });
+    el.innerHTML = html;
+  });
+}
 
 /* ═══════════════════════════════════════════════════════
    القسم 4: الوضع الليلي
@@ -1475,7 +1553,7 @@ function applyNightMode(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 5: البحث عن المدارس + الاقتراحات
+   القسم 5: البحث عن المدارس
    ═══════════════════════════════════════════════════════ */
 function searchSchools(query){
   const results = document.getElementById('schoolResults');
@@ -1519,12 +1597,16 @@ function pickSchool(idx){
   if(s.a) info += ' • 📍 ' + escapeHtml(s.a);
   if(s.d) info += ' - ' + escapeHtml(s.d);
   if(s.g) info += '<br>📚 ' + escapeHtml(s.g);
+  if(s.halls) info += ' • 🏫 ' + escapeHtml(s.halls) + ' قاعة';
   if(s.p) info += ' • 📞 ' + escapeHtml(s.p);
   if(s.ad) info += '<br>📌 ' + escapeHtml(s.ad);
   document.getElementById('selInfo').innerHTML = info;
   document.getElementById('selectedSchool').style.display = 'block';
   document.getElementById('fName').value = s.n;
   if(s.s) document.getElementById('fContact').value = s.s;
+  // تعبئة جوال المشرف تلقائياً
+  const sup = state.supervisors.find(x => x.name === s.s);
+  if(sup && sup.phone) document.getElementById('fContactPhone').value = sup.phone;
   if(s.principal) document.getElementById('fPrincipal').value = s.principal;
   if(s.principalPhone) document.getElementById('fPrincipalPhone').value = s.principalPhone;
   if(s.secretary) document.getElementById('fSecretary').value = s.secretary;
@@ -1536,30 +1618,6 @@ function pickSchool(idx){
     }
   }
   if(s.d) document.getElementById('fBuilding').value = s.d;
-  // اقتراح المدارس المجاورة
-  showSuggestions(s);
-}
-
-function showSuggestions(selectedSchool){
-  const box = document.getElementById('suggestions');
-  if(!selectedSchool.a){ box.style.display = 'none'; return; }
-  // مدارس نفس المنطقة والحي
-  const near = state.schools.filter(s => 
-    s !== selectedSchool && 
-    s.a === selectedSchool.a && 
-    (s.d === selectedSchool.d || s.d === selectedSchool.a)
-  ).slice(0, 5);
-  if(near.length === 0){ box.style.display = 'none'; return; }
-  let html = '<div class="suggestions-title">💡 مدارس قريبة (نفس المنطقة):</div>';
-  near.forEach(s => {
-    const idx = state.schools.indexOf(s);
-    html += '<div class="suggestion-item">';
-    html += '<span class="suggestion-name">' + escapeHtml(s.n) + '</span>';
-    html += '<button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); pickSchool(' + idx + ')" style="font-size:10px;padding:4px 8px">اختيار</button>';
-    html += '</div>';
-  });
-  box.innerHTML = html;
-  box.style.display = 'block';
 }
 
 function clearSelectedSchool(){
@@ -1567,11 +1625,50 @@ function clearSelectedSchool(){
   document.getElementById('fSchoolSearch').value = '';
   document.getElementById('selectedSchool').style.display = 'none';
   document.getElementById('schoolResults').classList.remove('show');
-  document.getElementById('suggestions').style.display = 'none';
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 6: إدارة المهام
+   القسم 6: البحث الذكي في المواد (Autocomplete)
+   ═══════════════════════════════════════════════════════ */
+function searchMaterialsForTask(query){
+  const results = document.getElementById('matSearchResults');
+  const q = (query || '').trim().toLowerCase();
+  if(q.length < 2){ results.classList.remove('show'); return; }
+  const matches = state.materials.filter(m => m.name.toLowerCase().indexOf(q) !== -1).slice(0, 15);
+  if(matches.length === 0){
+    results.innerHTML = '<div style="padding:10px;text-align:center;color:var(--gray-500);font-size:12px">لا توجد نتائج</div>';
+    results.classList.add('show');
+    return;
+  }
+  let html = '';
+  matches.forEach(m => {
+    html += '<div class="autocomplete-item" onclick="pickMaterialToTask(' + m.id + ')">';
+    html += '📦 ' + escapeHtml(m.name) + ' <span style="color:var(--gray-500);font-size:11px">(' + escapeHtml(m.unit) + ')</span>';
+    html += '</div>';
+  });
+  results.innerHTML = html;
+  results.classList.add('show');
+}
+
+function pickMaterialToTask(matId){
+  const mat = state.materials.find(m => m.id === matId);
+  if(!mat) return;
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  if(!t.materials) t.materials = [];
+  const exists = t.materials.find(m => m.name === mat.name);
+  if(exists){ showToast('⚠️ المادة موجودة', 'warn'); }
+  else {
+    t.materials.push({ name: mat.name, unit: mat.unit, qty: 1 });
+    renderTaskMaterials();
+    showToast('✅ ' + mat.name, 'success');
+  }
+  document.getElementById('matSearchInput').value = '';
+  document.getElementById('matSearchResults').classList.remove('show');
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 7: إدارة المهام (إصلاح التعديل)
    ═══════════════════════════════════════════════════════ */
 function openTaskSheet(taskId){
   state.editingTaskId = taskId || null;
@@ -1579,7 +1676,6 @@ function openTaskSheet(taskId){
   document.getElementById('fSchoolSearch').value = '';
   document.getElementById('schoolResults').classList.remove('show');
   document.getElementById('selectedSchool').style.display = 'none';
-  document.getElementById('suggestions').style.display = 'none';
   state.selectedSchool = null;
 
   if(taskId){
@@ -1595,19 +1691,18 @@ function openTaskSheet(taskId){
     document.getElementById('fPriority').value = t.priority || 'med';
     document.getElementById('fArea').value = t.area || 'المزة';
     document.getElementById('fContact').value = t.contact || '';
+    document.getElementById('fContactPhone').value = t.contactPhone || '';
     document.getElementById('fPrincipal').value = t.principal || '';
     document.getElementById('fPrincipalPhone').value = t.principalPhone || '';
     document.getElementById('fSecretary').value = t.secretary || '';
     document.getElementById('fSecretaryPhone').value = t.secretaryPhone || '';
     document.getElementById('fNotes').value = t.notes || '';
-    // استرجاع المدرسة المختارة
     const foundSchool = state.schools.find(s => s.n === t.name);
     if(foundSchool){
       state.selectedSchool = foundSchool;
       document.getElementById('fSchoolSearch').value = foundSchool.n;
       document.getElementById('selName').textContent = foundSchool.n + (foundSchool.oldName ? ' (سابقاً: ' + foundSchool.oldName + ')' : '');
-      let info = '👤 ' + escapeHtml(foundSchool.s || '') + ' • 📍 ' + escapeHtml(foundSchool.a || '');
-      document.getElementById('selInfo').innerHTML = info;
+      document.getElementById('selInfo').innerHTML = '👤 ' + escapeHtml(foundSchool.s || '') + ' • 📍 ' + escapeHtml(foundSchool.a || '');
       document.getElementById('selectedSchool').style.display = 'block';
     }
   }else{
@@ -1621,6 +1716,7 @@ function openTaskSheet(taskId){
     document.getElementById('fPriority').value = 'med';
     document.getElementById('fArea').value = 'المزة';
     document.getElementById('fContact').value = '';
+    document.getElementById('fContactPhone').value = '';
     document.getElementById('fPrincipal').value = '';
     document.getElementById('fPrincipalPhone').value = '';
     document.getElementById('fSecretary').value = '';
@@ -1645,6 +1741,7 @@ function saveTask(){
     priority: document.getElementById('fPriority').value,
     area: document.getElementById('fArea').value,
     contact: document.getElementById('fContact').value.trim(),
+    contactPhone: document.getElementById('fContactPhone').value.trim(),
     principal: document.getElementById('fPrincipal').value.trim(),
     principalPhone: document.getElementById('fPrincipalPhone').value.trim(),
     secretary: document.getElementById('fSecretary').value.trim(),
@@ -1656,6 +1753,7 @@ function saveTask(){
     data.schoolAddress = state.selectedSchool.ad || '';
     data.schoolGrade = state.selectedSchool.g || '';
     data.schoolPhone = state.selectedSchool.p || '';
+    data.schoolHalls = state.selectedSchool.halls || '';
     data.oldName = state.selectedSchool.oldName || '';
   }
 
@@ -1682,6 +1780,7 @@ function saveTask(){
       executionNotes: '',
       approvalLog: [],
       visitLog: [],
+      attachments: [],
       createdAt: todayISO(),
       doneAt: ''
     }, data);
@@ -1700,6 +1799,12 @@ function saveTask(){
 function changeTaskStatus(id, newStatus){
   const t = state.tasks.find(x => x.id === id);
   if(!t) return;
+  // إذا كانت الحالة "ملغاة" أو "محوّلة" — نطلب السبب
+  if(newStatus === 'canceled' || newStatus === 'transferred'){
+    const reason = prompt('سبب ' + (newStatus === 'canceled' ? 'الإلغاء' : 'التحويل') + ':\n' + CANCEL_REASONS.map((r,i) => (i+1) + '. ' + r).join('\n') + '\n\nاكتب الرقم أو السبب:');
+    if(reason === null) return;
+    t.reason = reason;
+  }
   t.status = newStatus;
   if(newStatus === 'done') t.doneAt = todayISO();
   else t.doneAt = '';
@@ -1729,16 +1834,998 @@ function editTaskFromDetail(taskId){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 7: المواد
+   القسم 8: المواد داخل المهمة
    ═══════════════════════════════════════════════════════ */
-function renderMaterials(){
-  const container = document.getElementById('materialsList');
-  if(!state.materials || state.materials.length === 0){
+function openMaterialsForTask(taskId){
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t) return;
+  state.currentTaskId = taskId;
+  if(!t.materials) t.materials = [];
+  fillTechnicianSelects();
+  document.getElementById('fTechnician').value = t.technician || '';
+  document.getElementById('fExecutionNotes').value = t.executionNotes || '';
+  document.getElementById('matSearchInput').value = '';
+  document.getElementById('matSearchResults').classList.remove('show');
+  renderTaskMaterials();
+  closeSheet('detailSheetBg');
+  setTimeout(() => openSheet('matSheetBg'), 200);
+}
+
+function renderTaskMaterials(){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  const container = document.getElementById('taskMaterialsList');
+  if(!t.materials || t.materials.length === 0){
     container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد مواد</div>';
     return;
   }
   let html = '';
-  state.materials.forEach(m => {
+  t.materials.forEach((m, idx) => {
+    html += '<div class="material-row">';
+    html += '<span class="mat-name">' + escapeHtml(m.name) + '</span>';
+    html += '<span class="mat-unit">' + escapeHtml(m.unit || 'عدد') + '</span>';
+    html += '<input type="number" class="qty" value="' + (m.qty || 1) + '" min="1" onchange="updateMatQty(' + idx + ', this.value)">';
+    html += '<button class="mat-del" onclick="removeTaskMaterial(' + idx + ')">✕</button>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function updateMatQty(idx, val){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t || !t.materials) return;
+  const q = parseInt(val) || 1;
+  t.materials[idx].qty = q < 1 ? 1 : q;
+}
+
+function removeTaskMaterial(idx){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  t.materials.splice(idx, 1);
+  renderTaskMaterials();
+  showToast('🗑️ حُذفت', 'warn');
+}
+
+function addNewMaterialInline(){
+  const name = document.getElementById('matNewName').value.trim();
+  const unit = document.getElementById('matNewUnit').value.trim() || 'عدد';
+  if(!name){ showToast('أدخل اسم المادة', 'error'); return; }
+  const newId = Math.max.apply(null, state.materials.map(m => m.id).concat([0])) + 1;
+  state.materials.push({ id: newId, name: name, unit: unit });
+  saveMaterials();
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(t){ if(!t.materials) t.materials = []; t.materials.push({ name: name, unit: unit, qty: 1 }); renderTaskMaterials(); }
+  document.getElementById('matNewName').value = '';
+  document.getElementById('matNewUnit').value = 'عدد';
+  showToast('✅ أُضيفت', 'success');
+}
+
+function saveTaskMaterials(){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  t.technician = document.getElementById('fTechnician').value;
+  t.executionNotes = document.getElementById('fExecutionNotes').value.trim();
+  saveTasks();
+  showToast('✅ تم الحفظ', 'success');
+  closeSheet('matSheetBg');
+  setTimeout(() => openDetail(t.id), 200);
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 9: إدارة المدارس والمشرفين
+   ═══════════════════════════════════════════════════════ */
+function renderSchoolsList(query){
+  const container = document.getElementById('schoolsList');
+  const q = (query || '').trim().toLowerCase();
+  const areaFilter = document.getElementById('schoolFilterArea')?.value || '';
+  const supFilter = document.getElementById('schoolFilterSupervisor')?.value || '';
+  const gradeFilter = document.getElementById('schoolFilterGrade')?.value || '';
+  const sortBy = document.getElementById('schoolSortBy')?.value || 'name';
+
+  let list = state.schools.filter(s => {
+    if(q){
+      const blob = ((s.n||'') + ' ' + (s.oldName||'') + ' ' + (s.s||'') + ' ' + (s.a||'') + ' ' + (s.d||'')).toLowerCase();
+      if(blob.indexOf(q) === -1) return false;
+    }
+    if(areaFilter && s.a !== areaFilter) return false;
+    if(supFilter && s.s !== supFilter) return false;
+    if(gradeFilter && (s.g || '').indexOf(gradeFilter) === -1) return false;
+    return true;
+  });
+
+  if(sortBy === 'area') list.sort((a,b) => (a.a||'').localeCompare(b.a||'', 'ar'));
+  else if(sortBy === 'supervisor') list.sort((a,b) => (a.s||'').localeCompare(b.s||'', 'ar'));
+  else list.sort((a,b) => (a.n||'').localeCompare(b.n||'', 'ar'));
+
+  if(list.length === 0){
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد نتائج</div>';
+    return;
+  }
+  let html = '';
+  list.slice(0, 500).forEach(s => {
+    const idx = state.schools.indexOf(s);
+    html += '<div class="material-row" style="align-items:flex-start;flex-direction:column;gap:6px">';
+    html += '<div style="display:flex;width:100%;align-items:center;gap:6px">';
+    html += '<span class="mat-name" style="font-weight:700">' + escapeHtml(s.n);
+    if(s.oldName) html += ' <span style="color:var(--copper-600);font-size:10px">(سابقاً: ' + escapeHtml(s.oldName) + ')</span>';
+    html += '</span>';
+    html += '<button class="mat-del" onclick="editSchool(' + idx + ')" style="background:var(--emerald-50);color:var(--emerald-700)">✏️</button>';
+    html += '<button class="mat-del" onclick="deleteSchool(' + idx + ')">✕</button>';
+    html += '</div>';
+    let meta = '';
+    if(s.s) meta += '👤 ' + escapeHtml(s.s);
+    if(s.a) meta += (meta ? ' • ' : '') + '📍 ' + escapeHtml(s.a) + (s.d ? ' - ' + escapeHtml(s.d) : '');
+    if(s.g) meta += (meta ? ' • ' : '') + '🎓 ' + escapeHtml(s.g);
+    if(s.halls) meta += ' • 🏫 ' + escapeHtml(s.halls) + ' قاعة';
+    if(s.p) meta += ' • 📞 ' + escapeHtml(s.p);
+    html += '<div style="font-size:11px;color:var(--gray-500)">' + meta + '</div>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function updateSchoolsStats(){
+  const total = state.schools.length;
+  const sups = new Set(state.schools.map(s => s.s).filter(Boolean));
+  const areas = new Set(state.schools.map(s => s.a).filter(Boolean));
+  document.getElementById('schoolsStats').innerHTML =
+    '📊 <b>' + total + '</b> مدرسة • 👤 <b>' + sups.size + '</b> مشرف • 📍 <b>' + areas.size + '</b> منطقة';
+}
+
+function openSchoolSheet(){
+  state.editingSchoolIdx = null;
+  document.getElementById('schoolSheetTitle').textContent = '➕ إضافة مدرسة';
+  ['schName','schOldName','schArea','schDistrict','schAddress','schGrade','schPhone','schHalls','schPrincipal','schPrincipalPhone','schSecretary','schSecretaryPhone'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  document.getElementById('schSupervisor').value = '';
+  openSheet('schoolSheetBg');
+  setTimeout(() => document.getElementById('schName').focus(), 350);
+}
+
+function editSchool(idx){
+  const s = state.schools[idx];
+  if(!s) return;
+  state.editingSchoolIdx = idx;
+  document.getElementById('schoolSheetTitle').textContent = '✏️ تعديل المدرسة';
+  document.getElementById('schName').value = s.n || '';
+  document.getElementById('schOldName').value = s.oldName || '';
+  document.getElementById('schSupervisor').value = s.s || '';
+  document.getElementById('schArea').value = s.a || '';
+  document.getElementById('schDistrict').value = s.d || '';
+  document.getElementById('schAddress').value = s.ad || '';
+  document.getElementById('schGrade').value = s.g || '';
+  document.getElementById('schPhone').value = s.p || '';
+  document.getElementById('schHalls').value = s.halls || '';
+  document.getElementById('schPrincipal').value = s.principal || '';
+  document.getElementById('schPrincipalPhone').value = s.principalPhone || '';
+  document.getElementById('schSecretary').value = s.secretary || '';
+  document.getElementById('schSecretaryPhone').value = s.secretaryPhone || '';
+  openSheet('schoolSheetBg');
+}
+
+function saveSchoolMaster(){
+  const name = document.getElementById('schName').value.trim();
+  if(!name){ showToast('أدخل اسم المدرسة', 'error'); return; }
+  const data = {
+    n: name,
+    oldName: document.getElementById('schOldName').value.trim(),
+    s: document.getElementById('schSupervisor').value.trim(),
+    a: document.getElementById('schArea').value.trim(),
+    d: document.getElementById('schDistrict').value.trim(),
+    ad: document.getElementById('schAddress').value.trim(),
+    g: document.getElementById('schGrade').value.trim(),
+    p: document.getElementById('schPhone').value.trim(),
+    halls: document.getElementById('schHalls').value.trim(),
+    principal: document.getElementById('schPrincipal').value.trim(),
+    principalPhone: document.getElementById('schPrincipalPhone').value.trim(),
+    secretary: document.getElementById('schSecretary').value.trim(),
+    secretaryPhone: document.getElementById('schSecretaryPhone').value.trim()
+  };
+  if(state.editingSchoolIdx !== null){
+    state.schools[state.editingSchoolIdx] = data;
+    showToast('✅ تم تحديث المدرسة', 'success');
+  }else{
+    state.schools.push(data);
+    showToast('✅ أُضيفت مدرسة', 'success');
+  }
+  saveSchools();
+  closeSheet('schoolSheetBg');
+  renderSchoolsList(document.getElementById('schoolListSearch').value);
+  updateSchoolsStats();
+  fillAreaFilters();
+}
+
+function deleteSchool(idx){
+  const s = state.schools[idx];
+  if(!s) return;
+  if(!confirm('حذف "' + s.n + '"؟')) return;
+  state.schools.splice(idx, 1);
+  saveSchools();
+  renderSchoolsList(document.getElementById('schoolListSearch').value);
+  updateSchoolsStats();
+  showToast('🗑️ تم الحذف', 'warn');
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 10: إدارة المشرفين
+   ═══════════════════════════════════════════════════════ */
+function renderSupervisorsList(){
+  const container = document.getElementById('supervisorsList');
+  if(!state.supervisors || state.supervisors.length === 0){
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا يوجد مشرفون</div>';
+    return;
+  }
+  let html = '';
+  state.supervisors.forEach((s, idx) => {
+    const schoolsCount = state.schools.filter(x => x.s === s.name).length;
+    html += '<div class="material-row" style="flex-direction:column;align-items:flex-start;gap:6px">';
+    html += '<div style="display:flex;width:100%;align-items:center;gap:6px">';
+    html += '<span class="mat-name" style="font-weight:700">👤 ' + escapeHtml(s.name) + '</span>';
+    html += '<button class="mat-del" onclick="editSupervisor(' + idx + ')" style="background:var(--emerald-50);color:var(--emerald-700)">✏️</button>';
+    html += '<button class="mat-del" onclick="deleteSupervisor(' + idx + ')">✕</button>';
+    html += '</div>';
+    let meta = '';
+    if(s.phone) meta += '📞 ' + escapeHtml(s.phone);
+    if(s.areas) meta += (meta ? ' • ' : '') + '📍 ' + escapeHtml(s.areas);
+    if(meta) html += '<div style="font-size:11px;color:var(--gray-500)">' + meta + '</div>';
+    html += '<div style="font-size:11px;color:var(--emerald-700);font-weight:700">🏫 ' + schoolsCount + ' مدرسة</div>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function openSupervisorSheet(){
+  state.editingSupervisorIdx = null;
+  document.getElementById('supervisorSheetTitle').textContent = '➕ إضافة مشرف';
+  document.getElementById('supervisorName').value = '';
+  document.getElementById('supervisorPhone').value = '';
+  document.getElementById('supervisorAreas').value = '';
+  openSheet('supervisorSheetBg');
+  setTimeout(() => document.getElementById('supervisorName').focus(), 350);
+}
+
+function editSupervisor(idx){
+  const s = state.supervisors[idx];
+  if(!s) return;
+  state.editingSupervisorIdx = idx;
+  document.getElementById('supervisorSheetTitle').textContent = '✏️ تعديل المشرف';
+  document.getElementById('supervisorName').value = s.name || '';
+  document.getElementById('supervisorPhone').value = s.phone || '';
+  document.getElementById('supervisorAreas').value = s.areas || '';
+  openSheet('supervisorSheetBg');
+}
+
+function saveSupervisor(){
+  const name = document.getElementById('supervisorName').value.trim();
+  if(!name){ showToast('أدخل اسم المشرف', 'error'); return; }
+  const data = {
+    name: name,
+    phone: document.getElementById('supervisorPhone').value.trim(),
+    areas: document.getElementById('supervisorAreas').value.trim()
+  };
+  if(state.editingSupervisorIdx !== null){
+    data.id = state.supervisors[state.editingSupervisorIdx].id;
+    state.supervisors[state.editingSupervisorIdx] = data;
+    showToast('✅ تم تحديث المشرف', 'success');
+  }else{
+    data.id = Math.max.apply(null, state.supervisors.map(t => t.id || 0).concat([0])) + 1;
+    state.supervisors.push(data);
+    showToast('✅ أُضيف مشرف', 'success');
+  }
+  saveSupervisors();
+  closeSheet('supervisorSheetBg');
+  renderSupervisorsList();
+  fillSupervisorSelects();
+  fillSupervisorFilters();
+}
+
+function deleteSupervisor(idx){
+  const s = state.supervisors[idx];
+  if(!s) return;
+  if(!confirm('حذف "' + s.name + '"؟')) return;
+  state.supervisors.splice(idx, 1);
+  saveSupervisors();
+  renderSupervisorsList();
+  fillSupervisorSelects();
+  fillSupervisorFilters();
+  showToast('🗑️ تم الحذف', 'warn');
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 11: سجل الزيارات (تبويب مستقل)
+   ═══════════════════════════════════════════════════════ */
+function renderVisits(){
+  const container = document.getElementById('visitsList');
+  const typeFilter = document.getElementById('visitFilterType')?.value || '';
+  const dateFilter = document.getElementById('visitFilterDate')?.value || '';
+  const stats = document.getElementById('visitsStats');
+
+  let allVisits = [];
+  state.tasks.forEach(t => {
+    if(t.visitLog && t.visitLog.length > 0){
+      t.visitLog.forEach(v => {
+        allVisits.push({
+          taskId: t.id,
+          taskNumber: t.number,
+          school: t.newName || t.name,
+          area: t.area,
+          type: v.type,
+          notes: v.notes,
+          date: v.date
+        });
+      });
+    }
+  });
+
+  // فلترة
+  allVisits = allVisits.filter(v => {
+    if(typeFilter && v.type !== typeFilter) return false;
+    if(dateFilter){
+      const days = getDaysDiff(v.date);
+      if(dateFilter === 'today' && days !== 0) return false;
+      if(dateFilter === 'week' && days > 7) return false;
+      if(dateFilter === 'month' && days > 30) return false;
+    }
+    return true;
+  });
+
+  allVisits.sort((a,b) => {
+    const da = a.date.split('/').reverse().join('');
+    const db = b.date.split('/').reverse().join('');
+    return db.localeCompare(da);
+  });
+
+  if(stats){
+    stats.innerHTML = '📅 إجمالي: <b>' + allVisits.length + '</b> زيارة';
+  }
+
+  if(allVisits.length === 0){
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-500);font-size:13px">لا توجد زيارات</div>';
+    return;
+  }
+
+  let html = '';
+  allVisits.slice(0, 200).forEach(v => {
+    const vt = VISIT_TYPES[v.type] || { icon:'📌', label:v.type };
+    html += '<div class="visit-row" onclick="openDetail(' + v.taskId + ')">';
+    html += '<div class="visit-icon">' + vt.icon + '</div>';
+    html += '<div class="visit-info">';
+    html += '<div class="visit-type">' + vt.label + ' — ' + escapeHtml(v.school) + '</div>';
+    html += '<div class="visit-date">📅 ' + v.date + ' • 📍 ' + escapeHtml(v.area || '') + ' • #' + v.taskNumber + '</div>';
+    if(v.notes) html += '<div class="visit-note">' + escapeHtml(v.notes) + '</div>';
+    html += '</div></div>';
+  });
+  container.innerHTML = html;
+}
+
+function openVisitSheet(taskId){
+  state.currentTaskId = taskId;
+  document.getElementById('visitType').value = 'inspection';
+  document.getElementById('visitNotes').value = '';
+  closeSheet('detailSheetBg');
+  setTimeout(() => openSheet('visitSheetBg'), 200);
+}
+
+function saveVisit(){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  if(!t.visitLog) t.visitLog = [];
+  t.visitLog.unshift({
+    type: document.getElementById('visitType').value,
+    notes: document.getElementById('visitNotes').value.trim(),
+    date: todayISO()
+  });
+  saveTasks();
+  showToast('✅ تم تسجيل الزيارة', 'success');
+  closeSheet('visitSheetBg');
+  setTimeout(() => openDetail(t.id), 200);
+}
+
+function deleteVisit(taskId, visitIdx){
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t || !t.visitLog) return;
+  if(!confirm('حذف هذه الزيارة؟')) return;
+  t.visitLog.splice(visitIdx, 1);
+  saveTasks();
+  openDetail(taskId);
+  showToast('🗑️ حُذفت', 'warn');
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 12: تتبع الموافقات
+   ═══════════════════════════════════════════════════════ */
+function openApprovalSheet(taskId){
+  state.currentTaskId = taskId;
+  document.getElementById('approvalStage').value = 'raised';
+  document.getElementById('approvalNotes').value = '';
+  closeSheet('detailSheetBg');
+  setTimeout(() => openSheet('approvalSheetBg'), 200);
+}
+
+function saveApproval(){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  if(!t.approvalLog) t.approvalLog = [];
+  t.approvalLog.unshift({
+    stage: document.getElementById('approvalStage').value,
+    notes: document.getElementById('approvalNotes').value.trim(),
+    date: todayISO()
+  });
+  const stage = document.getElementById('approvalStage').value;
+  if(stage === 'raised' || stage === 'delivered') t.status = 'awaiting';
+  else if(stage === 'approved') t.status = 'materials';
+  saveTasks();
+  renderTasks();
+  updateStats();
+  updateFilterCounts();
+  showToast('✅ تم تحديث الموافقة', 'success');
+  closeSheet('approvalSheetBg');
+  setTimeout(() => openDetail(t.id), 200);
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 13: المرفقات (رفع + عرض)
+   ═══════════════════════════════════════════════════════ */
+function openAttachSheet(taskId){
+  state.currentTaskId = taskId;
+  state.currentAttachment = null;
+  document.getElementById('attachType').value = 'letter';
+  document.getElementById('attachDesc').value = '';
+  document.getElementById('attachPreview').innerHTML = '';
+  document.getElementById('attachFileInput').value = '';
+  closeSheet('detailSheetBg');
+  setTimeout(() => openSheet('attachSheetBg'), 200);
+}
+
+function handleAttachment(event){
+  const file = event.target.files[0];
+  if(!file){ state.currentAttachment = null; return; }
+  if(file.size > 2 * 1024 * 1024){
+    showToast('⚠️ الحجم كبير (>2MB) — حاول ضغط الصورة', 'warn');
+  }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    state.currentAttachment = {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      data: e.target.result
+    };
+    const preview = document.getElementById('attachPreview');
+    if(file.type.indexOf('image/') === 0){
+      preview.innerHTML = '<img src="' + e.target.result + '" style="max-width:100%;max-height:200px;border-radius:10px;border:1px solid var(--gray-200)">';
+    }else{
+      preview.innerHTML = '<div style="padding:10px;background:var(--gray-50);border-radius:10px;font-size:12px">📄 ' + escapeHtml(file.name) + ' (' + Math.round(file.size/1024) + ' KB)</div>';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveAttachment(){
+  if(!state.currentAttachment){ showToast('❌ لم تختر ملفاً', 'error'); return; }
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  if(!t.attachments) t.attachments = [];
+  t.attachments.unshift({
+    id: Date.now(),
+    type: document.getElementById('attachType').value,
+    desc: document.getElementById('attachDesc').value.trim(),
+    name: state.currentAttachment.name,
+    mimeType: state.currentAttachment.type,
+    size: state.currentAttachment.size,
+    data: state.currentAttachment.data,
+    date: todayISO()
+  });
+  saveTasks();
+  showToast('✅ تم حفظ المرفق', 'success');
+  state.currentAttachment = null;
+  closeSheet('attachSheetBg');
+  setTimeout(() => openDetail(t.id), 200);
+}
+
+function viewAttachment(taskId, attachId){
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t) return;
+  const a = t.attachments.find(x => x.id === attachId);
+  if(!a) return;
+  const w = window.open('');
+  w.document.write('<html><head><title>' + escapeHtml(a.name) + '</title></head><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh">');
+  if(a.mimeType.indexOf('image/') === 0){
+    w.document.write('<img src="' + a.data + '" style="max-width:100%;max-height:100vh">');
+  }else{
+    w.document.write('<iframe src="' + a.data + '" style="width:100%;height:100vh;border:none"></iframe>');
+  }
+  w.document.write('</body></html>');
+  w.document.close();
+}
+
+function deleteAttachment(taskId, attachId){
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t || !t.attachments) return;
+  if(!confirm('حذف هذا المرفق؟')) return;
+  t.attachments = t.attachments.filter(a => a.id !== attachId);
+  saveTasks();
+  openDetail(taskId);
+  showToast('🗑️ حُذف المرفق', 'warn');
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 14: عرض المهام
+   ═══════════════════════════════════════════════════════ */
+function renderTasks(){
+  const container = document.getElementById('tasksList');
+  const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+  const filter = state.currentFilter;
+  const areaFilter = document.getElementById('filterArea')?.value || '';
+  const supFilter = document.getElementById('filterSupervisor')?.value || '';
+  const typeFilter = document.getElementById('filterType')?.value || '';
+  const dateFilter = document.getElementById('filterDate')?.value || '';
+
+  let list = state.tasks.filter(t => {
+    if(filter !== 'all' && t.status !== filter) return false;
+    if(search){
+      const blob = ((t.name||'') + ' ' + (t.newName||'') + ' ' + (t.area||'') + ' ' + (t.contact||'') + ' ' + (t.notes||'') + ' ' + (t.schoolAddress||'')).toLowerCase();
+      if(blob.indexOf(search) === -1) return false;
+    }
+    if(areaFilter && t.area !== areaFilter) return false;
+    if(supFilter && t.contact !== supFilter) return false;
+    if(typeFilter && t.type !== typeFilter) return false;
+    if(dateFilter){
+      const days = getDaysDiff(t.createdAt);
+      if(dateFilter === 'today' && days !== 0) return false;
+      if(dateFilter === 'week' && days > 7) return false;
+      if(dateFilter === 'month' && days > 30) return false;
+      if(dateFilter === 'overdue' && !isOverdue(t)) return false;
+    }
+    return true;
+  });
+
+  const statusOrder = { new:0, inspecting:1, awaiting:2, materials:3, working:4, suspended:6, transferred:7, canceled:8, done:5 };
+  const prioOrder = { high:0, med:1, low:2 };
+  list.sort((a,b) => {
+    if(a.status !== b.status){
+      const so = (statusOrder[a.status]||0) - (statusOrder[b.status]||0);
+      if(so !== 0) return so;
+    }
+    return prioOrder[a.priority] - prioOrder[b.priority];
+  });
+
+  if(list.length === 0){
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>لا توجد مهام</p></div>';
+    return;
+  }
+
+  const srcIcon = { call:'📞', urgent:'🚨', letter:'📄', routine:'🔄' };
+
+  let html = '';
+  list.forEach(t => {
+    const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
+    const matCount = (t.materials || []).length;
+    const attachCount = (t.attachments || []).length;
+    const displayName = t.newName || t.name;
+    const overdue = isOverdue(t);
+    const days = getDaysDiff(t.createdAt);
+
+    html += '<div class="task-card st-' + t.status + (overdue ? ' overdue' : '') + '" onclick="openDetail(' + t.id + ')">';
+    html += '<div class="task-head">';
+    html += '<div class="task-name">' + (t.status === 'done' ? '✅ ' : '') + escapeHtml(displayName) + '</div>';
+    html += '<div class="task-badges">';
+    if(overdue) html += '<span class="mini-badge mb-overdue">⚠️ متأخرة</span>';
+    if(t.source) html += '<span class="mini-badge ' + (t.source === 'urgent' ? 'mb-urgent' : 'mb-high') + '">' + (srcIcon[t.source]||'') + ' ' + (SOURCE_LABELS[t.source]||'') + '</span>';
+    html += '<span class="mini-badge ' + st.cls + '">' + st.label + '</span>';
+    html += '</div></div>';
+    html += '<div class="task-meta">';
+    html += '<span>📌 #' + t.number + '</span>';
+    html += '<span>📍 ' + escapeHtml(t.area) + '</span>';
+    if(t.contact) html += '<span>👤 ' + escapeHtml(t.contact) + '</span>';
+    if(matCount > 0) html += '<span>📦 ' + matCount + '</span>';
+    if(attachCount > 0) html += '<span>📎 ' + attachCount + '</span>';
+    html += '<span>📅 ' + t.createdAt + '</span>';
+    if(overdue) html += '<span style="color:var(--danger);font-weight:700">⏱️ ' + days + ' يوم</span>';
+    html += '</div>';
+    if(t.notes) html += '<div class="task-note">' + escapeHtml(t.notes) + '</div>';
+    html += '<div class="task-actions" onclick="event.stopPropagation()">';
+    html += '<button class="btn btn-note" onclick="openDetail(' + t.id + ')">📋 تفاصيل</button>';
+    if(t.status !== 'done' && t.status !== 'canceled' && t.status !== 'transferred'){
+      html += '<button class="btn btn-done" onclick="changeTaskStatus(' + t.id + ',\'done\')">✅ إنجاز</button>';
+    } else if(t.status === 'done'){
+      html += '<button class="btn btn-undo" onclick="changeTaskStatus(' + t.id + ',\'working\')">↩️ إرجاع</button>';
+    }
+    html += '<button class="btn btn-print" onclick="printTask(' + t.id + ')">🖨️</button>';
+    html += '<button class="btn btn-whats" onclick="openWhatsForTask(' + t.id + ')">📱</button>';
+    html += '<button class="btn btn-del" onclick="deleteTask(' + t.id + ')">🗑️</button>';
+    html += '</div>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function updateStats(){
+  const c = (s) => state.tasks.filter(t => t.status === s).length;
+  document.getElementById('statNew').textContent = c('new');
+  document.getElementById('statInspecting').textContent = c('inspecting');
+  document.getElementById('statAwaiting').textContent = c('awaiting');
+  document.getElementById('statMaterials').textContent = c('materials');
+  document.getElementById('statWorking').textContent = c('working');
+  document.getElementById('statDone').textContent = c('done');
+  document.getElementById('statCanceled').textContent = c('canceled');
+  document.getElementById('statTransferred').textContent = c('transferred');
+}
+
+function updateFilterCounts(){
+  const c = (s) => state.tasks.filter(t => t.status === s).length;
+  document.getElementById('cntAll').textContent = state.tasks.length;
+  document.getElementById('cntNew').textContent = c('new');
+  document.getElementById('cntInspecting').textContent = c('inspecting');
+  document.getElementById('cntAwaiting').textContent = c('awaiting');
+  document.getElementById('cntMaterials').textContent = c('materials');
+  document.getElementById('cntWorking').textContent = c('working');
+  document.getElementById('cntDone').textContent = c('done');
+  document.getElementById('cntCanceled').textContent = c('canceled');
+  document.getElementById('cntTransferred').textContent = c('transferred');
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 15: التنبيهات الذكية
+   ═══════════════════════════════════════════════════════ */
+function renderAlerts(){
+  const container = document.getElementById('alertsContainer');
+  if(!container) return;
+  const overdueTasks = state.tasks.filter(t => isOverdue(t));
+  const awaitingTasks = state.tasks.filter(t => t.status === 'awaiting' && getDaysDiff(t.createdAt) >= 3);
+  const approvedTasks = state.tasks.filter(t => t.status === 'materials');
+  const oldDone = state.tasks.filter(t => t.status === 'done' && getDaysDiff(t.doneAt) === 0);
+
+  let html = '';
+  if(overdueTasks.length > 0){
+    html += '<div class="alert-row danger"><div class="alert-icon">⚠️</div><div class="alert-text">' + overdueTasks.length + ' مهمة متأخرة</div><button class="alert-close" onclick="quickFilter(\'all\')">›</button></div>';
+  }
+  if(awaitingTasks.length > 0){
+    html += '<div class="alert-row warn"><div class="alert-icon">📄</div><div class="alert-text">' + awaitingTasks.length + ' كشف بانتظار الموافقة</div><button class="alert-close" onclick="quickFilter(\'awaiting\')">›</button></div>';
+  }
+  if(approvedTasks.length > 0){
+    html += '<div class="alert-row info"><div class="alert-icon">📦</div><div class="alert-text">' + approvedTasks.length + ' مهمة جاهزة للتنفيذ</div><button class="alert-close" onclick="quickFilter(\'materials\')">›</button></div>';
+  }
+  if(oldDone.length > 0){
+    html += '<div class="alert-row info"><div class="alert-icon">🎉</div><div class="alert-text">أنجزت ' + oldDone.length + ' مهمة اليوم!</div></div>';
+  }
+  container.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 16: تفاصيل المهمة
+   ═══════════════════════════════════════════════════════ */
+function openDetail(id){
+  const t = state.tasks.find(x => x.id === id);
+  if(!t) return;
+  state.currentTaskId = id;
+  const displayName = t.newName || t.name;
+  const matCount = (t.materials || []).length;
+  const attachCount = (t.attachments || []).length;
+  const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
+  const overdue = isOverdue(t);
+  const days = getDaysDiff(t.createdAt);
+
+  let html = '';
+  html += '<div style="background:var(--gray-50);border-radius:12px;padding:14px;margin-bottom:12px">';
+  html += '<div style="font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:6px">' + escapeHtml(displayName) + '</div>';
+  if(t.newName && t.name !== t.newName) html += '<div style="font-size:12px;color:var(--copper-600);margin-bottom:4px">📛 الأصلي: ' + escapeHtml(t.name) + '</div>';
+  if(t.oldName) html += '<div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">📜 القديم: ' + escapeHtml(t.oldName) + '</div>';
+  html += '<div style="font-size:11.5px;color:var(--gray-500)"># ' + t.number + ' • ' + escapeHtml(t.area) + ' • ' + t.createdAt + '</div>';
+  if(overdue) html += '<div style="margin-top:8px;background:var(--danger-light);color:var(--danger);padding:6px 10px;border-radius:6px;font-size:11.5px;font-weight:700">⚠️ متأخرة — منذ ' + days + ' يوم</div>';
+  if(t.reason) html += '<div style="margin-top:8px;background:var(--gray-100);color:var(--gray-700);padding:6px 10px;border-radius:6px;font-size:11.5px">📌 السبب: ' + escapeHtml(t.reason) + '</div>';
+  html += '</div>';
+
+  // إجراءات سريعة
+  html += '<div class="quick-actions">';
+  html += '<button class="quick-action-btn" onclick="openMaterialsForTask(' + t.id + ')"><span class="qa-icon">📦</span><span class="qa-label">المواد</span></button>';
+  html += '<button class="quick-action-btn" onclick="openVisitSheet(' + t.id + ')"><span class="qa-icon">📅</span><span class="qa-label">زيارة</span></button>';
+  html += '<button class="quick-action-btn" onclick="openApprovalSheet(' + t.id + ')"><span class="qa-icon">📄</span><span class="qa-label">موافقة</span></button>';
+  html += '<button class="quick-action-btn" onclick="openAttachSheet(' + t.id + ')"><span class="qa-icon">📎</span><span class="qa-label">مرفق</span></button>';
+  html += '</div>';
+
+  // شريط الحالات
+  html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:12px">';
+  html += '<div style="font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:8px">🔄 تغيير الحالة:</div>';
+  html += '<div style="display:flex;gap:5px;flex-wrap:wrap">';
+  Object.keys(STATUS_LABELS).forEach(k => {
+    const s = STATUS_LABELS[k];
+    const active = k === t.status;
+    html += '<button class="mini-badge ' + s.cls + '" style="cursor:pointer;border:' + (active?'2px solid var(--emerald-700)':'1px solid transparent') + ';opacity:' + (active?'1':'0.6') + ';font-size:11px;padding:5px 10px" onclick="changeTaskStatus(' + t.id + ',\'' + k + '\')">' + s.label + '</button>';
+  });
+  html += '</div></div>';
+
+  // جهات الاتصال
+  if(t.contact || t.contactPhone || t.principal || t.principalPhone || t.secretary || t.secretaryPhone){
+    html += '<div style="background:var(--emerald-50);border:1px solid var(--emerald-200);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12.5px">';
+    html += '<div style="font-weight:700;color:var(--emerald-800);margin-bottom:6px">📞 جهات الاتصال</div>';
+    if(t.contact){
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span>👨‍💼 مشرف: <b>' + escapeHtml(t.contact) + '</b></span>';
+      if(t.contactPhone) html += '<a href="tel:' + t.contactPhone + '" class="btn btn-call btn-sm">📞</a>';
+      html += '</div>';
+    }
+    if(t.principal){
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span>👤 مدير: <b>' + escapeHtml(t.principal) + '</b></span>';
+      if(t.principalPhone) html += '<a href="tel:' + t.principalPhone + '" class="btn btn-call btn-sm">📞</a>';
+      html += '</div>';
+    }
+    if(t.secretary){
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span>💻 أمين سر: <b>' + escapeHtml(t.secretary) + '</b></span>';
+      if(t.secretaryPhone) html += '<a href="tel:' + t.secretaryPhone + '" class="btn btn-call btn-sm">📞</a>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  // معلومات المدرسة
+  if(t.schoolAddress || t.schoolGrade || t.schoolPhone || t.building || t.room || t.schoolHalls){
+    html += '<div style="background:var(--copper-100);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--copper-700);line-height:1.7">';
+    if(t.schoolAddress) html += '📍 ' + escapeHtml(t.schoolAddress) + '<br>';
+    if(t.building) html += '🏢 ' + escapeHtml(t.building) + '<br>';
+    if(t.room) html += '🚪 قاعة: ' + escapeHtml(t.room) + '<br>';
+    if(t.schoolGrade) html += '📚 ' + escapeHtml(t.schoolGrade) + '<br>';
+    if(t.schoolHalls) html += '🏫 عدد القاعات: ' + escapeHtml(t.schoolHalls);
+    html += '</div>';
+  }
+
+  // المواد والفني
+  html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12.5px">';
+  html += '<div style="display:flex;justify-content:space-between"><span>📦 المواد: <b>' + matCount + '</b></span>';
+  html += '<span>📎 المرفقات: <b>' + attachCount + '</b></span>';
+  html += '<span>👷 الفني: <b>' + (t.technician ? escapeHtml(t.technician) : '—') + '</b></span></div>';
+  if(t.executionNotes) html += '<div style="margin-top:6px;color:var(--gray-600);font-size:12px">📝 ' + escapeHtml(t.executionNotes) + '</div>';
+  html += '</div>';
+
+  if(t.notes) html += '<div class="task-note" style="margin-bottom:10px">📝 ' + escapeHtml(t.notes) + '</div>';
+
+  // المرفقات
+  if(t.attachments && t.attachments.length > 0){
+    html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px">';
+    html += '<div style="font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📎 المرفقات (' + t.attachments.length + '):</div>';
+    html += '<div class="attachments-list">';
+    t.attachments.forEach(a => {
+      const at = ATTACH_TYPES[a.type] || { icon:'📎', label:a.type };
+      html += '<div class="attachment-item">';
+      html += '<div class="attachment-icon">' + at.icon + '</div>';
+      html += '<div class="attachment-info">';
+      html += '<div class="attachment-name">' + at.label + ' — ' + escapeHtml(a.name) + '</div>';
+      html += '<div class="attachment-meta">📅 ' + a.date + ' • ' + Math.round(a.size/1024) + ' KB' + (a.desc ? ' • ' + escapeHtml(a.desc) : '') + '</div>';
+      html += '</div>';
+      html += '<div class="attachment-actions">';
+      html += '<button class="btn btn-primary btn-sm" onclick="viewAttachment(' + t.id + ',' + a.id + ')">👁️</button>';
+      html += '<button class="btn btn-del btn-sm" onclick="deleteAttachment(' + t.id + ',' + a.id + ')">✕</button>';
+      html += '</div>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  }
+
+  // تتبع الموافقات
+  if(t.approvalLog && t.approvalLog.length > 0){
+    html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px">';
+    html += '<div style="font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📄 تتبع الموافقات:</div>';
+    html += '<div class="timeline">';
+    t.approvalLog.forEach(a => {
+      const stg = APPROVAL_STAGES[a.stage] || { icon:'📌', label:a.stage };
+      html += '<div class="timeline-item done">';
+      html += '<div class="timeline-item-label">' + stg.icon + ' ' + stg.label + '</div>';
+      html += '<div class="timeline-item-date">📅 ' + a.date + (a.notes ? ' — ' + escapeHtml(a.notes) : '') + '</div>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  }
+
+  // سجل الزيارات
+  if(t.visitLog && t.visitLog.length > 0){
+    html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px">';
+    html += '<div style="font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📅 سجل الزيارات (' + t.visitLog.length + '):</div>';
+    t.visitLog.forEach((v, idx) => {
+      const vt = VISIT_TYPES[v.type] || { icon:'📌', label:v.type };
+      html += '<div class="visit-row">';
+      html += '<div class="visit-icon">' + vt.icon + '</div>';
+      html += '<div class="visit-info">';
+      html += '<div class="visit-type">' + vt.label + '</div>';
+      html += '<div class="visit-date">' + v.date + '</div>';
+      if(v.notes) html += '<div class="visit-note">' + escapeHtml(v.notes) + '</div>';
+      html += '</div>';
+      html += '<button class="mat-del" style="width:24px;height:24px;font-size:12px" onclick="deleteVisit(' + t.id + ',' + idx + ')">✕</button>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  const mapQuery = encodeURIComponent(displayName + ' ' + (t.schoolAddress || '') + ' دمشق');
+  const mapLink = 'https://maps.google.com/?q=' + mapQuery;
+  html += '<a href="' + mapLink + '" target="_blank" class="btn-lg btn-map" style="margin-bottom:8px;font-size:13px;padding:11px;text-decoration:none">📍 فتح الخريطة</a>';
+
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
+  html += '<button class="btn-lg" style="background:#25d366;color:#fff;font-size:13px;padding:11px" onclick="openWhatsForTask(' + t.id + ')">📱 واتس</button>';
+  html += '<button class="btn-lg btn-ghost" onclick="editTaskFromDetail(' + t.id + ')" style="font-size:13px;padding:11px">✏️ تعديل</button>';
+  html += '</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
+  html += '<button class="btn-lg btn-primary" onclick="printTask(' + t.id + ')" style="font-size:13px;padding:11px">🖨️ كشف المواد</button>';
+  html += '<button class="btn-lg btn-word" onclick="printVisitReport(' + t.id + ')" style="font-size:13px;padding:11px">📄 تقرير زيارة</button>';
+  html += '</div>';
+  html += '<button class="btn-lg btn-ghost" style="color:var(--danger);font-size:13px;padding:11px" onclick="deleteTask(' + t.id + ')">🗑️ حذف</button>';
+
+  document.getElementById('detailTitle').textContent = '📋 تفاصيل المهمة #' + t.number;
+  document.getElementById('detailContent').innerHTML = html;
+  openSheet('detailSheetBg');
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 17: WhatsApp
+   ═══════════════════════════════════════════════════════ */
+function openWhatsForTask(taskId){
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t) return;
+  state.currentTaskId = taskId;
+  fillTechnicianSelects();
+  if(t.technician) document.getElementById('whatsTech').value = t.technician;
+  const displayName = t.newName || t.name;
+  const fullAddress = displayName + (t.schoolAddress ? ' ' + t.schoolAddress : '') + ' ' + (t.area || '') + ' دمشق';
+  const mapQuery = encodeURIComponent(fullAddress);
+  const mapLink = 'https://maps.google.com/?q=' + mapQuery;
+  const msg = '🔧 *مهمة صيانة*\n\n' +
+    '🏫 *المدرسة:* ' + displayName + '\n' +
+    '📍 *المنطقة:* ' + (t.area || '') + (t.building ? '\n🏢 *المبنى:* ' + t.building : '') + (t.room ? '\n🚪 *القاعة:* ' + t.room : '') + '\n' +
+    '📋 *نوع العمل:* ' + (t.type || '') + '\n' +
+    '⚡ *الأولوية:* ' + (PRIORITY_LABELS[t.priority] || '') + '\n' +
+    (t.notes ? '📝 *الملاحظات:* ' + t.notes + '\n' : '') +
+    (t.contact ? '👤 *المشرف:* ' + t.contact + '\n' : '') +
+    '\n📍 *الموقع:*\n' + mapLink;
+  document.getElementById('whatsMessage').value = msg;
+  closeSheet('detailSheetBg');
+  setTimeout(() => openSheet('whatsSheetBg'), 200);
+}
+
+function sendWhatsApp(){
+  const techName = document.getElementById('whatsTech').value;
+  const tech = state.technicians.find(t => t.name === techName);
+  const msg = encodeURIComponent(document.getElementById('whatsMessage').value);
+  if(!tech || !tech.phone){
+    const num = prompt('أدخل رقم جوال الفني (مثال: 963xxxxxxxxx)');
+    if(!num) return;
+    window.open('https://wa.me/' + num.replace(/[^0-9]/g,'') + '?text=' + msg, '_blank');
+    return;
+  }
+  const phone = tech.phone.replace(/[^0-9]/g, '');
+  const intl = phone.startsWith('963') ? phone : (phone.startsWith('0') ? '963' + phone.substring(1) : '963' + phone);
+  window.open('https://wa.me/' + intl + '?text=' + msg, '_blank');
+  closeSheet('whatsSheetBg');
+}
+
+function copyWhatsMessage(){
+  const msg = document.getElementById('whatsMessage');
+  msg.select();
+  msg.setSelectionRange(0, 99999);
+  document.execCommand('copy');
+  showToast('✅ تم النسخ', 'success');
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 18: جولة اليوم + الإحصائيات
+   ═══════════════════════════════════════════════════════ */
+function buildTodayTrip(){
+  const tripSummary = document.getElementById('tripSummary');
+  const tripStops = document.getElementById('tripStops');
+  const pending = state.tasks.filter(t => t.status !== 'done' && t.status !== 'suspended' && t.status !== 'canceled' && t.status !== 'transferred');
+  if(pending.length === 0){
+    tripSummary.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">✅ لا توجد مهام معلقة</div>';
+    tripStops.innerHTML = '';
+    return;
+  }
+  const byArea = {};
+  pending.forEach(t => {
+    const a = t.area || 'غير محدد';
+    if(!byArea[a]) byArea[a] = [];
+    byArea[a].push(t);
+  });
+  let html = '<div class="trip-summary">📊 <b>' + pending.length + '</b> مهمة معلقة في <b>' + Object.keys(byArea).length + '</b> منطقة</div>';
+  const sortedAreas = Object.keys(byArea).sort((a,b) => byArea[b].length - byArea[a].length);
+  sortedAreas.forEach(area => {
+    const tasks = byArea[area];
+    html += '<div style="font-weight:800;font-size:13px;color:var(--emerald-700);margin:14px 0 6px;padding-right:4px">📍 ' + escapeHtml(area) + ' (' + tasks.length + ')</div>';
+    const prioOrder = { high:0, med:1, low:2 };
+    tasks.sort((a,b) => prioOrder[a.priority] - prioOrder[b.priority]);
+    let stopNum = 1;
+    tasks.forEach(t => {
+      const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
+      const displayName = t.newName || t.name;
+      html += '<div class="trip-stop" onclick="openDetail(' + t.id + ')">';
+      html += '<div class="stop-num">' + stopNum + '</div>';
+      html += '<div class="stop-info"><div class="stop-name">' + escapeHtml(displayName) + '</div><div class="stop-meta">' + st.label + ' • ' + PRIORITY_LABELS[t.priority] + '</div></div>';
+      html += '<div class="stop-type">' + (SOURCE_ICONS[t.source] || '📞') + '</div>';
+      html += '</div>';
+      stopNum++;
+    });
+  });
+  tripSummary.innerHTML = html;
+  tripStops.innerHTML = '';
+}
+
+function renderStats(){
+  const generalStats = document.getElementById('generalStats');
+  const areaStats = document.getElementById('areaStats');
+  const supervisorStats = document.getElementById('supervisorStats');
+  const typeStats = document.getElementById('typeStats');
+
+  const total = state.tasks.length;
+  const done = state.tasks.filter(t => t.status === 'done').length;
+  const pending = total - done - state.tasks.filter(t => t.status === 'canceled').length;
+  const overdue = state.tasks.filter(t => isOverdue(t)).length;
+  const canceled = state.tasks.filter(t => t.status === 'canceled').length;
+  const completion = total > 0 ? Math.round((done/total)*100) : 0;
+
+  let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  html += '<div style="background:var(--emerald-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--emerald-700)">' + total + '</div><div style="font-size:11px;color:var(--gray-600)">📋 إجمالي</div></div>';
+  html += '<div style="background:var(--green-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--green-700)">' + done + '</div><div style="font-size:11px;color:var(--gray-600)">✅ منجزة</div></div>';
+  html += '<div style="background:var(--orange-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--orange-700)">' + pending + '</div><div style="font-size:11px;color:var(--gray-600)">⏳ معلقة</div></div>';
+  html += '<div style="background:var(--danger-light);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--danger)">' + overdue + '</div><div style="font-size:11px;color:var(--gray-600)">⚠️ متأخرة</div></div>';
+  html += '<div style="background:var(--gray-100);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--gray-600)">' + canceled + '</div><div style="font-size:11px;color:var(--gray-600)">🚫 ملغاة</div></div>';
+  html += '<div style="background:var(--emerald-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--emerald-700)">' + completion + '%</div><div style="font-size:11px;color:var(--gray-600)">📈 الإنجاز</div></div>';
+  html += '</div>';
+  generalStats.innerHTML = html;
+
+  // مناطق
+  const byArea = {};
+  state.tasks.forEach(t => {
+    const a = t.area || 'غير محدد';
+    byArea[a] = (byArea[a] || 0) + 1;
+  });
+  const maxArea = Math.max.apply(null, Object.values(byArea).concat([1]));
+  let areaHtml = '';
+  Object.keys(byArea).sort((a,b) => byArea[b] - byArea[a]).forEach(a => {
+    const perc = Math.round((byArea[a] / maxArea) * 100);
+    areaHtml += '<div class="area-stat-row"><span class="area-stat-name">' + escapeHtml(a) + '</span><div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + perc + '%"></div></div><span class="area-stat-count">' + byArea[a] + '</span></div>';
+  });
+  areaStats.innerHTML = areaHtml || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
+
+  // مشرفين
+  const bySup = {};
+  state.tasks.forEach(t => {
+    const s = t.contact || 'غير محدد';
+    bySup[s] = (bySup[s] || 0) + 1;
+  });
+  const maxSup = Math.max.apply(null, Object.values(bySup).concat([1]));
+  let supHtml = '';
+  Object.keys(bySup).sort((a,b) => bySup[b] - bySup[a]).forEach(s => {
+    const perc = Math.round((bySup[s] / maxSup) * 100);
+    supHtml += '<div class="area-stat-row"><span class="area-stat-name">👤 ' + escapeHtml(s) + '</span><div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + perc + '%"></div></div><span class="area-stat-count">' + bySup[s] + '</span></div>';
+  });
+  supervisorStats.innerHTML = supHtml || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
+
+  // أنواع
+  const byType = {};
+  state.tasks.forEach(t => {
+    const ty = t.type || 'غير محدد';
+    byType[ty] = (byType[ty] || 0) + 1;
+  });
+  const maxType = Math.max.apply(null, Object.values(byType).concat([1]));
+  let typeHtml = '';
+  Object.keys(byType).sort((a,b) => byType[b] - byType[a]).forEach(ty => {
+    const perc = Math.round((byType[ty] / maxType) * 100);
+    typeHtml += '<div class="area-stat-row"><span class="area-stat-name">' + escapeHtml(ty) + '</span><div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + perc + '%"></div></div><span class="area-stat-count">' + byType[ty] + '</span></div>';
+  });
+  typeStats.innerHTML = typeHtml || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 19: المواد الرئيسية (مع بحث)
+   ═══════════════════════════════════════════════════════ */
+function renderMaterials(query){
+  const container = document.getElementById('materialsList');
+  const q = (query || document.getElementById('materialSearch')?.value || '').trim().toLowerCase();
+  let list = state.materials;
+  if(q) list = state.materials.filter(m => m.name.toLowerCase().indexOf(q) !== -1);
+  if(list.length === 0){
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد مواد</div>';
+    return;
+  }
+  let html = '';
+  list.forEach(m => {
     html += '<div class="material-row">';
     html += '<span class="mat-name">' + escapeHtml(m.name) + '</span>';
     html += '<span class="mat-unit">' + escapeHtml(m.unit) + '</span>';
@@ -1780,7 +2867,7 @@ function saveMasterMaterial(){
   }else{
     const newId = Math.max.apply(null, state.materials.map(m => m.id).concat([0])) + 1;
     state.materials.push({ id: newId, name: name, unit: unit });
-    showToast('✅ أُضيفت مادة جديدة', 'success');
+    showToast('✅ أُضيفت مادة', 'success');
   }
   saveMaterials();
   closeSheet('masterMatSheetBg');
@@ -1793,292 +2880,8 @@ function deleteMasterMaterial(id){
   showToast('🗑️ تم الحذف', 'warn');
 }
 
-function openMaterialsForTask(taskId){
-  const t = state.tasks.find(x => x.id === taskId);
-  if(!t) return;
-  state.currentTaskId = taskId;
-  if(!t.materials) t.materials = [];
-  fillTechnicianSelects();
-  document.getElementById('fTechnician').value = t.technician || '';
-  document.getElementById('fExecutionNotes').value = t.executionNotes || '';
-  const sel = document.getElementById('matSelect');
-  let opts = '<option value="">-- اختر مادة --</option>';
-  state.materials.forEach(m => { opts += '<option value="' + m.id + '">' + escapeHtml(m.name) + ' (' + escapeHtml(m.unit) + ')</option>'; });
-  sel.innerHTML = opts;
-  renderTaskMaterials();
-  closeSheet('detailSheetBg');
-  setTimeout(() => openSheet('matSheetBg'), 200);
-}
-
-function renderTaskMaterials(){
-  const t = state.tasks.find(x => x.id === state.currentTaskId);
-  if(!t) return;
-  const container = document.getElementById('taskMaterialsList');
-  if(!t.materials || t.materials.length === 0){
-    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد مواد</div>';
-    return;
-  }
-  let html = '';
-  t.materials.forEach((m, idx) => {
-    html += '<div class="material-row">';
-    html += '<span class="mat-name">' + escapeHtml(m.name) + '</span>';
-    html += '<span class="mat-unit">' + escapeHtml(m.unit || 'عدد') + '</span>';
-    html += '<input type="number" class="qty" value="' + (m.qty || 1) + '" min="1" onchange="updateMatQty(' + idx + ', this.value)">';
-    html += '<button class="mat-del" onclick="removeTaskMaterial(' + idx + ')">✕</button>';
-    html += '</div>';
-  });
-  container.innerHTML = html;
-}
-
-function addMaterialToTask(){
-  const sel = document.getElementById('matSelect');
-  const matId = sel.value;
-  if(!matId) return;
-  const mat = state.materials.find(m => m.id === parseInt(matId));
-  if(!mat) return;
-  const t = state.tasks.find(x => x.id === state.currentTaskId);
-  if(!t) return;
-  if(!t.materials) t.materials = [];
-  const exists = t.materials.find(m => m.name === mat.name);
-  if(exists){ showToast('⚠️ المادة موجودة', 'warn'); sel.value = ''; return; }
-  t.materials.push({ name: mat.name, unit: mat.unit, qty: 1 });
-  renderTaskMaterials();
-  sel.value = '';
-  showToast('✅ ' + mat.name, 'success');
-}
-
-function updateMatQty(idx, val){
-  const t = state.tasks.find(x => x.id === state.currentTaskId);
-  if(!t || !t.materials) return;
-  const q = parseInt(val) || 1;
-  t.materials[idx].qty = q < 1 ? 1 : q;
-}
-
-function removeTaskMaterial(idx){
-  const t = state.tasks.find(x => x.id === state.currentTaskId);
-  if(!t) return;
-  t.materials.splice(idx, 1);
-  renderTaskMaterials();
-  showToast('🗑️ حُذفت', 'warn');
-}
-
-function addNewMaterialInline(){
-  const name = document.getElementById('matNewName').value.trim();
-  const unit = document.getElementById('matNewUnit').value.trim() || 'عدد';
-  if(!name){ showToast('أدخل اسم المادة', 'error'); return; }
-  const newId = Math.max.apply(null, state.materials.map(m => m.id).concat([0])) + 1;
-  state.materials.push({ id: newId, name: name, unit: unit });
-  saveMaterials();
-  const t = state.tasks.find(x => x.id === state.currentTaskId);
-  if(t){ if(!t.materials) t.materials = []; t.materials.push({ name: name, unit: unit, qty: 1 }); renderTaskMaterials(); }
-  const sel = document.getElementById('matSelect');
-  let opts = '<option value="">-- اختر مادة --</option>';
-  state.materials.forEach(m => { opts += '<option value="' + m.id + '">' + escapeHtml(m.name) + ' (' + escapeHtml(m.unit) + ')</option>'; });
-  sel.innerHTML = opts;
-  document.getElementById('matNewName').value = '';
-  document.getElementById('matNewUnit').value = 'عدد';
-  showToast('✅ أُضيفت', 'success');
-}
-
-function saveTaskMaterials(){
-  const t = state.tasks.find(x => x.id === state.currentTaskId);
-  if(!t) return;
-  t.technician = document.getElementById('fTechnician').value;
-  t.executionNotes = document.getElementById('fExecutionNotes').value.trim();
-  saveTasks();
-  showToast('✅ تم الحفظ', 'success');
-  closeSheet('matSheetBg');
-  setTimeout(() => openDetail(t.id), 200);
-}
-
 /* ═══════════════════════════════════════════════════════
-   القسم 8: سجل الزيارات
-   ═══════════════════════════════════════════════════════ */
-function openVisitSheet(taskId){
-  state.currentTaskId = taskId;
-  document.getElementById('visitType').value = 'inspection';
-  document.getElementById('visitNotes').value = '';
-  closeSheet('detailSheetBg');
-  setTimeout(() => openSheet('visitSheetBg'), 200);
-}
-
-function saveVisit(){
-  const t = state.tasks.find(x => x.id === state.currentTaskId);
-  if(!t) return;
-  if(!t.visitLog) t.visitLog = [];
-  t.visitLog.unshift({
-    type: document.getElementById('visitType').value,
-    notes: document.getElementById('visitNotes').value.trim(),
-    date: todayISO()
-  });
-  saveTasks();
-  showToast('✅ تم تسجيل الزيارة', 'success');
-  closeSheet('visitSheetBg');
-  setTimeout(() => openDetail(t.id), 200);
-}
-
-function deleteVisit(taskId, visitIdx){
-  const t = state.tasks.find(x => x.id === taskId);
-  if(!t || !t.visitLog) return;
-  if(!confirm('حذف هذه الزيارة؟')) return;
-  t.visitLog.splice(visitIdx, 1);
-  saveTasks();
-  openDetail(taskId);
-  showToast('🗑️ حُذفت', 'warn');
-}
-
-/* ═══════════════════════════════════════════════════════
-   القسم 9: تتبع الموافقات
-   ═══════════════════════════════════════════════════════ */
-function openApprovalSheet(taskId){
-  state.currentTaskId = taskId;
-  document.getElementById('approvalStage').value = 'raised';
-  document.getElementById('approvalNotes').value = '';
-  closeSheet('detailSheetBg');
-  setTimeout(() => openSheet('approvalSheetBg'), 200);
-}
-
-function saveApproval(){
-  const t = state.tasks.find(x => x.id === state.currentTaskId);
-  if(!t) return;
-  if(!t.approvalLog) t.approvalLog = [];
-  t.approvalLog.unshift({
-    stage: document.getElementById('approvalStage').value,
-    notes: document.getElementById('approvalNotes').value.trim(),
-    date: todayISO()
-  });
-  // تحديث الحالة تلقائياً
-  const stage = document.getElementById('approvalStage').value;
-  if(stage === 'raised' || stage === 'delivered') t.status = 'awaiting';
-  else if(stage === 'approved') t.status = 'materials';
-  saveTasks();
-  renderTasks();
-  updateStats();
-  updateFilterCounts();
-  showToast('✅ تم تحديث الموافقة', 'success');
-  closeSheet('approvalSheetBg');
-  setTimeout(() => openDetail(t.id), 200);
-}
-
-/* ═══════════════════════════════════════════════════════
-   القسم 10: إدارة المدارس
-   ═══════════════════════════════════════════════════════ */
-function renderSchoolsList(query){
-  const container = document.getElementById('schoolsList');
-  const q = (query || '').trim().toLowerCase();
-  let list = state.schools;
-  if(q){
-    list = state.schools.filter(s =>
-      (s.n && s.n.toLowerCase().indexOf(q) !== -1) ||
-      (s.oldName && s.oldName.toLowerCase().indexOf(q) !== -1) ||
-      (s.s && s.s.toLowerCase().indexOf(q) !== -1) ||
-      (s.a && s.a.toLowerCase().indexOf(q) !== -1)
-    );
-  }
-  if(list.length === 0){
-    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد نتائج</div>';
-    return;
-  }
-  let html = '';
-  list.slice(0, 300).forEach(s => {
-    const idx = state.schools.indexOf(s);
-    html += '<div class="material-row" style="align-items:flex-start;flex-direction:column;gap:6px">';
-    html += '<div style="display:flex;width:100%;align-items:center;gap:6px">';
-    html += '<span class="mat-name" style="font-weight:700">' + escapeHtml(s.n);
-    if(s.oldName) html += ' <span style="color:var(--copper-600);font-size:10px">(سابقاً: ' + escapeHtml(s.oldName) + ')</span>';
-    html += '</span>';
-    html += '<button class="mat-del" onclick="editSchool(' + idx + ')" style="background:var(--emerald-50);color:var(--emerald-700)">✏️</button>';
-    html += '<button class="mat-del" onclick="deleteSchool(' + idx + ')">✕</button>';
-    html += '</div>';
-    let meta = '';
-    if(s.s) meta += '👤 ' + escapeHtml(s.s);
-    if(s.a) meta += (meta ? ' • ' : '') + '📍 ' + escapeHtml(s.a);
-    if(s.p) meta += (meta ? ' • ' : '') + '📞 ' + escapeHtml(s.p);
-    html += '<div style="font-size:11px;color:var(--gray-500)">' + meta + '</div>';
-    html += '</div>';
-  });
-  container.innerHTML = html;
-}
-
-function updateSchoolsStats(){
-  const total = state.schools.length;
-  const sups = new Set(state.schools.map(s => s.s).filter(Boolean));
-  const areas = new Set(state.schools.map(s => s.a).filter(Boolean));
-  document.getElementById('schoolsStats').innerHTML =
-    '📊 <b>' + total + '</b> مدرسة • 👤 <b>' + sups.size + '</b> مشرف • 📍 <b>' + areas.size + '</b> منطقة';
-}
-
-function openSchoolSheet(){
-  state.editingSchoolIdx = null;
-  document.getElementById('schoolSheetTitle').textContent = '➕ إضافة مدرسة';
-  ['schName','schOldName','schSupervisor','schArea','schDistrict','schAddress','schGrade','schPhone','schPrincipal','schPrincipalPhone','schSecretary','schSecretaryPhone'].forEach(id => document.getElementById(id).value = '');
-  openSheet('schoolSheetBg');
-  setTimeout(() => document.getElementById('schName').focus(), 350);
-}
-
-function editSchool(idx){
-  const s = state.schools[idx];
-  if(!s) return;
-  state.editingSchoolIdx = idx;
-  document.getElementById('schoolSheetTitle').textContent = '✏️ تعديل المدرسة';
-  document.getElementById('schName').value = s.n || '';
-  document.getElementById('schOldName').value = s.oldName || '';
-  document.getElementById('schSupervisor').value = s.s || '';
-  document.getElementById('schArea').value = s.a || '';
-  document.getElementById('schDistrict').value = s.d || '';
-  document.getElementById('schAddress').value = s.ad || '';
-  document.getElementById('schGrade').value = s.g || '';
-  document.getElementById('schPhone').value = s.p || '';
-  document.getElementById('schPrincipal').value = s.principal || '';
-  document.getElementById('schPrincipalPhone').value = s.principalPhone || '';
-  document.getElementById('schSecretary').value = s.secretary || '';
-  document.getElementById('schSecretaryPhone').value = s.secretaryPhone || '';
-  openSheet('schoolSheetBg');
-}
-
-function saveSchoolMaster(){
-  const name = document.getElementById('schName').value.trim();
-  if(!name){ showToast('أدخل اسم المدرسة', 'error'); return; }
-  const data = {
-    n: name,
-    oldName: document.getElementById('schOldName').value.trim(),
-    s: document.getElementById('schSupervisor').value.trim(),
-    a: document.getElementById('schArea').value.trim(),
-    d: document.getElementById('schDistrict').value.trim(),
-    ad: document.getElementById('schAddress').value.trim(),
-    g: document.getElementById('schGrade').value.trim(),
-    p: document.getElementById('schPhone').value.trim(),
-    principal: document.getElementById('schPrincipal').value.trim(),
-    principalPhone: document.getElementById('schPrincipalPhone').value.trim(),
-    secretary: document.getElementById('schSecretary').value.trim(),
-    secretaryPhone: document.getElementById('schSecretaryPhone').value.trim()
-  };
-  if(state.editingSchoolIdx !== null){
-    state.schools[state.editingSchoolIdx] = data;
-    showToast('✅ تم تحديث المدرسة', 'success');
-  }else{
-    state.schools.push(data);
-    showToast('✅ أُضيفت مدرسة', 'success');
-  }
-  saveSchools();
-  closeSheet('schoolSheetBg');
-  renderSchoolsList(document.getElementById('schoolListSearch').value);
-  updateSchoolsStats();
-}
-
-function deleteSchool(idx){
-  const s = state.schools[idx];
-  if(!s) return;
-  if(!confirm('حذف "' + s.n + '"؟')) return;
-  state.schools.splice(idx, 1);
-  saveSchools();
-  renderSchoolsList(document.getElementById('schoolListSearch').value);
-  updateSchoolsStats();
-  showToast('🗑️ تم الحذف', 'warn');
-}
-
-/* ═══════════════════════════════════════════════════════
-   القسم 11: الفنيون
+   القسم 20: الفنيون
    ═══════════════════════════════════════════════════════ */
 function renderTechniciansList(){
   const container = document.getElementById('techniciansList');
@@ -2153,7 +2956,7 @@ function deleteTechnician(idx){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 12: الإعدادات
+   القسم 21: الإعدادات + الفلاتر
    ═══════════════════════════════════════════════════════ */
 function loadSettingsToForm(){
   document.getElementById('setHeader1').value = state.settings.header1 || '';
@@ -2173,18 +2976,9 @@ function setupSettingsListeners(){
     el.addEventListener('input', () => { state.settings[map[elId]] = el.value; saveSettings(); });
   });
   const night = document.getElementById('setNightMode');
-  if(night) night.addEventListener('change', () => {
-    state.settings.nightMode = night.value;
-    saveSettings();
-    applyNightMode();
-  });
+  if(night) night.addEventListener('change', () => { state.settings.nightMode = night.value; saveSettings(); applyNightMode(); });
   const overdue = document.getElementById('setOverdueDays');
-  if(overdue) overdue.addEventListener('change', () => {
-    state.settings.overdueDays = parseInt(overdue.value) || 7;
-    saveSettings();
-    renderAlerts();
-    renderTasks();
-  });
+  if(overdue) overdue.addEventListener('change', () => { state.settings.overdueDays = parseInt(overdue.value) || 7; saveSettings(); renderAlerts(); renderTasks(); });
 }
 
 function setupFilters(){
@@ -2199,448 +2993,33 @@ function setupFilters(){
   document.getElementById('searchInput').addEventListener('input', renderTasks);
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 13: عرض المهام
-   ═══════════════════════════════════════════════════════ */
-function renderTasks(){
-  const container = document.getElementById('tasksList');
-  const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
-  const filter = state.currentFilter;
-
-  let list = state.tasks.filter(t => {
-    if(filter !== 'all' && t.status !== filter) return false;
-    if(search){
-      const blob = ((t.name||'') + ' ' + (t.newName||'') + ' ' + (t.area||'') + ' ' + (t.contact||'') + ' ' + (t.notes||'') + ' ' + (t.schoolAddress||'')).toLowerCase();
-      if(blob.indexOf(search) === -1) return false;
-    }
-    return true;
-  });
-
-  const statusOrder = { new:0, inspecting:1, awaiting:2, materials:3, working:4, suspended:6, done:5 };
-  const prioOrder = { high:0, med:1, low:2 };
-  list.sort((a,b) => {
-    if(a.status !== b.status){
-      const so = (statusOrder[a.status]||0) - (statusOrder[b.status]||0);
-      if(so !== 0) return so;
-    }
-    return prioOrder[a.priority] - prioOrder[b.priority];
-  });
-
-  if(list.length === 0){
-    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>لا توجد مهام</p></div>';
-    return;
+// تعبئة جوال المشرف تلقائياً
+document.addEventListener('change', (e) => {
+  if(e.target && e.target.id === 'fContact'){
+    const sup = state.supervisors.find(s => s.name === e.target.value);
+    const phoneField = document.getElementById('fContactPhone');
+    if(phoneField) phoneField.value = sup && sup.phone ? sup.phone : '';
   }
+});
 
-  const srcIcon = { call:'📞', urgent:'🚨', letter:'📄', routine:'🔄' };
-
-  let html = '';
-  list.forEach(t => {
-    const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
-    const matCount = (t.materials || []).length;
-    const displayName = t.newName || t.name;
-    const overdue = isOverdue(t);
-    const days = getDaysDiff(t.createdAt);
-
-    html += '<div class="task-card st-' + t.status + (overdue ? ' overdue' : '') + '" onclick="openDetail(' + t.id + ')">';
-    html += '<div class="task-head">';
-    html += '<div class="task-name">' + (t.status === 'done' ? '✅ ' : '') + escapeHtml(displayName) + '</div>';
-    html += '<div class="task-badges">';
-    if(overdue) html += '<span class="mini-badge mb-overdue">⚠️ متأخرة</span>';
-    if(t.source) html += '<span class="mini-badge ' + (t.source === 'urgent' ? 'mb-urgent' : 'mb-high') + '">' + (srcIcon[t.source]||'') + ' ' + (SOURCE_LABELS[t.source]||'') + '</span>';
-    html += '<span class="mini-badge ' + st.cls + '">' + st.label + '</span>';
-    html += '</div></div>';
-    html += '<div class="task-meta">';
-    html += '<span>📌 #' + t.number + '</span>';
-    html += '<span>📍 ' + escapeHtml(t.area) + '</span>';
-    if(t.contact) html += '<span>👤 ' + escapeHtml(t.contact) + '</span>';
-    if(matCount > 0) html += '<span>📦 ' + matCount + ' مادة</span>';
-    html += '<span>📅 ' + t.createdAt + '</span>';
-    if(overdue) html += '<span style="color:var(--danger);font-weight:700">⏱️ ' + days + ' يوم</span>';
-    html += '</div>';
-    if(t.notes) html += '<div class="task-note">' + escapeHtml(t.notes) + '</div>';
-    html += '<div class="task-actions" onclick="event.stopPropagation()">';
-    html += '<button class="btn btn-note" onclick="openDetail(' + t.id + ')">📋 تفاصيل</button>';
-    if(t.status !== 'done'){
-      html += '<button class="btn btn-done" onclick="changeTaskStatus(' + t.id + ',\'done\')">✅ إنجاز</button>';
-    } else {
-      html += '<button class="btn btn-undo" onclick="changeTaskStatus(' + t.id + ',\'working\')">↩️ إرجاع</button>';
-    }
-    html += '<button class="btn btn-print" onclick="printTask(' + t.id + ')">🖨️</button>';
-    html += '<button class="btn btn-whats" onclick="openWhatsForTask(' + t.id + ')">📱</button>';
-    html += '<button class="btn btn-del" onclick="deleteTask(' + t.id + ')">🗑️</button>';
-    html += '</div>';
-    html += '</div>';
-  });
-  container.innerHTML = html;
-}
-
-function updateStats(){
-  const c = (s) => state.tasks.filter(t => t.status === s).length;
-  document.getElementById('statNew').textContent = c('new');
-  document.getElementById('statInspecting').textContent = c('inspecting');
-  document.getElementById('statAwaiting').textContent = c('awaiting');
-  document.getElementById('statMaterials').textContent = c('materials');
-  document.getElementById('statWorking').textContent = c('working');
-  document.getElementById('statDone').textContent = c('done');
-}
-
-function updateFilterCounts(){
-  const c = (s) => state.tasks.filter(t => t.status === s).length;
-  document.getElementById('cntAll').textContent = state.tasks.length;
-  document.getElementById('cntNew').textContent = c('new');
-  document.getElementById('cntInspecting').textContent = c('inspecting');
-  document.getElementById('cntAwaiting').textContent = c('awaiting');
-  document.getElementById('cntMaterials').textContent = c('materials');
-  document.getElementById('cntWorking').textContent = c('working');
-  document.getElementById('cntDone').textContent = c('done');
-}
+// إغلاق نتائج البحث عند النقر خارجها
+document.addEventListener('click', (e) => {
+  const results = document.getElementById('schoolResults');
+  const search = document.getElementById('fSchoolSearch');
+  if(results && search && !results.contains(e.target) && e.target !== search){ results.classList.remove('show'); }
+  const matResults = document.getElementById('matSearchResults');
+  const matSearch = document.getElementById('matSearchInput');
+  if(matResults && matSearch && !matResults.contains(e.target) && e.target !== matSearch){ matResults.classList.remove('show'); }
+});
 
 /* ═══════════════════════════════════════════════════════
-   القسم 14: التنبيهات الذكية
+   القسم 22: الطباعة — شعار العقاب
    ═══════════════════════════════════════════════════════ */
-function renderAlerts(){
-  const container = document.getElementById('alertsContainer');
-  if(!container) return;
-  const overdueTasks = state.tasks.filter(t => isOverdue(t));
-  const awaitingTasks = state.tasks.filter(t => t.status === 'awaiting' && getDaysDiff(t.createdAt) >= 3);
-  const approvedTasks = state.tasks.filter(t => t.status === 'materials');
-  const oldDone = state.tasks.filter(t => t.status === 'done' && getDaysDiff(t.doneAt) === 0);
-
-  let html = '';
-  if(overdueTasks.length > 0){
-    html += '<div class="alert-row danger">';
-    html += '<div class="alert-icon">⚠️</div>';
-    html += '<div class="alert-text">' + overdueTasks.length + ' مهمة متأخرة (أكثر من ' + (state.settings.overdueDays || 7) + ' أيام)</div>';
-    html += '<button class="alert-close" onclick="quickFilter(\'all\')">›</button>';
-    html += '</div>';
-  }
-  if(awaitingTasks.length > 0){
-    html += '<div class="alert-row warn">';
-    html += '<div class="alert-icon">📄</div>';
-    html += '<div class="alert-text">' + awaitingTasks.length + ' كشف بانتظار الموافقة منذ 3 أيام</div>';
-    html += '<button class="alert-close" onclick="quickFilter(\'awaiting\')">›</button>';
-    html += '</div>';
-  }
-  if(approvedTasks.length > 0){
-    html += '<div class="alert-row info">';
-    html += '<div class="alert-icon">📦</div>';
-    html += '<div class="alert-text">' + approvedTasks.length + ' مهمة جاهزة لصرف المواد والتنفيذ</div>';
-    html += '<button class="alert-close" onclick="quickFilter(\'materials\')">›</button>';
-    html += '</div>';
-  }
-  if(oldDone.length > 0){
-    html += '<div class="alert-row info">';
-    html += '<div class="alert-icon">🎉</div>';
-    html += '<div class="alert-text">أنجزت ' + oldDone.length + ' مهمة اليوم!</div>';
-    html += '</div>';
-  }
-  container.innerHTML = html;
-}
+const EAGLE_SVG = '<img src="https://basamassaf.github.io/jam3iyati/eagle.png" alt="شعار" style="width:100%;height:auto;display:block">';
 
 /* ═══════════════════════════════════════════════════════
-   القسم 15: تفاصيل المهمة
+   القسم 23: طباعة كشف المواد
    ═══════════════════════════════════════════════════════ */
-function openDetail(id){
-  const t = state.tasks.find(x => x.id === id);
-  if(!t) return;
-  state.currentTaskId = id;
-  const displayName = t.newName || t.name;
-  const matCount = (t.materials || []).length;
-  const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
-  const overdue = isOverdue(t);
-  const days = getDaysDiff(t.createdAt);
-
-  let html = '';
-  // الرأس
-  html += '<div style="background:var(--gray-50);border-radius:12px;padding:14px;margin-bottom:12px">';
-  html += '<div style="font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:6px">' + escapeHtml(displayName) + '</div>';
-  if(t.newName && t.name !== t.newName) html += '<div style="font-size:12px;color:var(--copper-600);margin-bottom:4px">📛 الأصلي: ' + escapeHtml(t.name) + '</div>';
-  if(t.oldName) html += '<div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">📜 القديم: ' + escapeHtml(t.oldName) + '</div>';
-  html += '<div style="font-size:11.5px;color:var(--gray-500)"># ' + t.number + ' • ' + escapeHtml(t.area) + ' • ' + t.createdAt + '</div>';
-  if(overdue) html += '<div style="margin-top:8px;background:var(--danger-light);color:var(--danger);padding:6px 10px;border-radius:6px;font-size:11.5px;font-weight:700">⚠️ متأخرة — منذ ' + days + ' يوم</div>';
-  html += '</div>';
-
-  // الإجراءات السريعة
-  html += '<div class="quick-actions">';
-  html += '<button class="quick-action-btn" onclick="openMaterialsForTask(' + t.id + ')"><span class="qa-icon">📦</span><span class="qa-label">المواد</span></button>';
-  html += '<button class="quick-action-btn" onclick="openVisitSheet(' + t.id + ')"><span class="qa-icon">📅</span><span class="qa-label">زيارة</span></button>';
-  html += '<button class="quick-action-btn" onclick="openApprovalSheet(' + t.id + ')"><span class="qa-icon">📄</span><span class="qa-label">موافقة</span></button>';
-  html += '<button class="quick-action-btn" onclick="printTask(' + t.id + ')"><span class="qa-icon">🖨️</span><span class="qa-label">طباعة</span></button>';
-  html += '</div>';
-
-  // شريط تغيير الحالة
-  html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:12px">';
-  html += '<div style="font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:8px">🔄 تغيير الحالة:</div>';
-  html += '<div style="display:flex;gap:5px;flex-wrap:wrap">';
-  Object.keys(STATUS_LABELS).forEach(k => {
-    const s = STATUS_LABELS[k];
-    const active = k === t.status;
-    html += '<button class="mini-badge ' + s.cls + '" style="cursor:pointer;border:' + (active?'2px solid var(--emerald-700)':'1px solid transparent') + ';opacity:' + (active?'1':'0.6') + ';font-size:11px;padding:5px 10px" onclick="changeTaskStatus(' + t.id + ',\'' + k + '\')">' + s.label + '</button>';
-  });
-  html += '</div></div>';
-
-  // جهات الاتصال
-  if(t.principal || t.principalPhone || t.secretary || t.secretaryPhone || t.contact){
-    html += '<div style="background:var(--emerald-50);border:1px solid var(--emerald-200);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12.5px">';
-    html += '<div style="font-weight:700;color:var(--emerald-800);margin-bottom:6px">📞 جهات الاتصال</div>';
-    if(t.contact){
-      html += '<div style="padding:4px 0">👨‍💼 <b>المشرف:</b> ' + escapeHtml(t.contact) + '</div>';
-    }
-    if(t.principal){
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span>👤 مدير: <b>' + escapeHtml(t.principal) + '</b></span>';
-      if(t.principalPhone) html += '<a href="tel:' + t.principalPhone + '" class="btn btn-call btn-sm">📞 ' + escapeHtml(t.principalPhone) + '</a>';
-      html += '</div>';
-    }
-    if(t.secretary){
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span>💻 أمين سر: <b>' + escapeHtml(t.secretary) + '</b></span>';
-      if(t.secretaryPhone) html += '<a href="tel:' + t.secretaryPhone + '" class="btn btn-call btn-sm">📞 ' + escapeHtml(t.secretaryPhone) + '</a>';
-      html += '</div>';
-    }
-    html += '</div>';
-  }
-
-  // معلومات المدرسة
-  if(t.schoolAddress || t.schoolGrade || t.schoolPhone || t.building || t.room){
-    html += '<div style="background:var(--copper-100);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--copper-700);line-height:1.7">';
-    if(t.schoolAddress) html += '📍 ' + escapeHtml(t.schoolAddress) + '<br>';
-    if(t.building) html += '🏢 ' + escapeHtml(t.building) + '<br>';
-    if(t.room) html += '🚪 قاعة: ' + escapeHtml(t.room) + '<br>';
-    if(t.schoolGrade) html += '📚 ' + escapeHtml(t.schoolGrade);
-    html += '</div>';
-  }
-
-  // المواد والفني
-  html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12.5px">';
-  html += '<div style="display:flex;justify-content:space-between"><span>📦 المواد: <b>' + matCount + '</b></span>';
-  html += '<span>👷 الفني: <b>' + (t.technician ? escapeHtml(t.technician) : '—') + '</b></span></div>';
-  if(t.executionNotes) html += '<div style="margin-top:6px;color:var(--gray-600);font-size:12px">📝 ' + escapeHtml(t.executionNotes) + '</div>';
-  html += '</div>';
-
-  if(t.notes) html += '<div class="task-note" style="margin-bottom:10px">📝 ' + escapeHtml(t.notes) + '</div>';
-
-  // تتبع الموافقات (Timeline)
-  if(t.approvalLog && t.approvalLog.length > 0){
-    html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px">';
-    html += '<div style="font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📄 تتبع الموافقات:</div>';
-    html += '<div class="timeline">';
-    t.approvalLog.forEach(a => {
-      const stg = APPROVAL_STAGES[a.stage] || { icon:'📌', label:a.stage };
-      html += '<div class="timeline-item done">';
-      html += '<div class="timeline-item-label">' + stg.icon + ' ' + stg.label + '</div>';
-      html += '<div class="timeline-item-date">📅 ' + a.date + (a.notes ? ' — ' + escapeHtml(a.notes) : '') + '</div>';
-      html += '</div>';
-    });
-    html += '</div></div>';
-  }
-
-  // سجل الزيارات
-  if(t.visitLog && t.visitLog.length > 0){
-    html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px">';
-    html += '<div style="font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📅 سجل الزيارات (' + t.visitLog.length + '):</div>';
-    t.visitLog.forEach((v, idx) => {
-      const vt = VISIT_TYPES[v.type] || { icon:'📌', label:v.type };
-      html += '<div class="visit-row">';
-      html += '<div class="visit-icon">' + vt.icon + '</div>';
-      html += '<div class="visit-info">';
-      html += '<div class="visit-type">' + vt.label + '</div>';
-      html += '<div class="visit-date">' + v.date + '</div>';
-      if(v.notes) html += '<div class="visit-note">' + escapeHtml(v.notes) + '</div>';
-      html += '</div>';
-      html += '<button class="mat-del" style="width:24px;height:24px;font-size:12px" onclick="deleteVisit(' + t.id + ',' + idx + ')">✕</button>';
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-
-  // زر الخريطة
-  const mapQuery = encodeURIComponent(displayName + ' ' + (t.schoolAddress || '') + ' دمشق');
-  html += '<a href="https://www.google.com/maps/search/?api=1&query=' + mapQuery + '" target="_blank" class="btn-lg btn-map" style="margin-bottom:8px;font-size:13px;padding:11px;text-decoration:none">📍 فتح الخريطة</a>';
-
-  // أزرار العمليات
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
-  html += '<button class="btn-lg" style="background:#25d366;color:#fff;font-size:13px;padding:11px" onclick="openWhatsForTask(' + t.id + ')">📱 واتس الفني</button>';
-  html += '<button class="btn-lg btn-ghost" onclick="editTaskFromDetail(' + t.id + ')" style="font-size:13px;padding:11px">✏️ تعديل</button>';
-  html += '</div>';
-  html += '<button class="btn-lg btn-ghost" style="color:var(--danger);font-size:13px;padding:11px" onclick="deleteTask(' + t.id + ')">🗑️ حذف</button>';
-
-  document.getElementById('detailTitle').textContent = '📋 تفاصيل المهمة #' + t.number;
-  document.getElementById('detailContent').innerHTML = html;
-  openSheet('detailSheetBg');
-}
-
-/* ═══════════════════════════════════════════════════════
-   القسم 16: WhatsApp للفني
-   ═══════════════════════════════════════════════════════ */
-function openWhatsForTask(taskId){
-  const t = state.tasks.find(x => x.id === taskId);
-  if(!t) return;
-  state.currentTaskId = taskId;
-  fillTechnicianSelects();
-  if(t.technician) document.getElementById('whatsTech').value = t.technician;
-  const displayName = t.newName || t.name;
-  const mapLink = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(displayName + ' ' + (t.schoolAddress || '') + ' دمشق');
-  const msg = '🔧 *مهمة صيانة*\n\n' +
-    '🏫 *المدرسة:* ' + displayName + '\n' +
-    '📍 *المنطقة:* ' + (t.area || '') + (t.building ? '\n🏢 *المبنى:* ' + t.building : '') + (t.room ? '\n🚪 *القاعة:* ' + t.room : '') + '\n' +
-    '📋 *نوع العمل:* ' + (t.type || '') + '\n' +
-    '⚡ *الأولوية:* ' + (PRIORITY_LABELS[t.priority] || '') + '\n' +
-    (t.notes ? '📝 *الملاحظات:* ' + t.notes + '\n' : '') +
-    (t.contact ? '👤 *المشرف:* ' + t.contact + '\n' : '') +
-    '\n🗺️ *الموقع:*\n' + mapLink;
-  document.getElementById('whatsMessage').value = msg;
-  closeSheet('detailSheetBg');
-  setTimeout(() => openSheet('whatsSheetBg'), 200);
-}
-
-function sendWhatsApp(){
-  const techName = document.getElementById('whatsTech').value;
-  const tech = state.technicians.find(t => t.name === techName);
-  const msg = encodeURIComponent(document.getElementById('whatsMessage').value);
-  if(!tech || !tech.phone){
-    const num = prompt('أدخل رقم جوال الفني (مع رمز الدولة، مثال: 963...)');
-    if(!num) return;
-    window.open('https://wa.me/' + num.replace(/[^0-9]/g,'') + '?text=' + msg, '_blank');
-    return;
-  }
-  const phone = tech.phone.replace(/[^0-9]/g, '');
-  const intl = phone.startsWith('963') ? phone : (phone.startsWith('0') ? '963' + phone.substring(1) : '963' + phone);
-  window.open('https://wa.me/' + intl + '?text=' + msg, '_blank');
-  closeSheet('whatsSheetBg');
-}
-
-function copyWhatsMessage(){
-  const msg = document.getElementById('whatsMessage');
-  msg.select();
-  msg.setSelectionRange(0, 99999);
-  document.execCommand('copy');
-  showToast('✅ تم النسخ', 'success');
-}
-
-/* ═══════════════════════════════════════════════════════
-   القسم 17: جولة اليوم
-   ═══════════════════════════════════════════════════════ */
-function buildTodayTrip(){
-  const tripSummary = document.getElementById('tripSummary');
-  const tripStops = document.getElementById('tripStops');
-
-  const pending = state.tasks.filter(t => t.status !== 'done' && t.status !== 'suspended');
-  if(pending.length === 0){
-    tripSummary.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">✅ لا توجد مهام معلقة</div>';
-    tripStops.innerHTML = '';
-    return;
-  }
-
-  const byArea = {};
-  pending.forEach(t => {
-    const a = t.area || 'غير محدد';
-    if(!byArea[a]) byArea[a] = [];
-    byArea[a].push(t);
-  });
-
-  let html = '<div class="trip-summary">';
-  html += '📊 <b>' + pending.length + '</b> مهمة معلقة في <b>' + Object.keys(byArea).length + '</b> منطقة';
-  html += '</div>';
-
-  const sortedAreas = Object.keys(byArea).sort((a,b) => byArea[b].length - byArea[a].length);
-
-  sortedAreas.forEach(area => {
-    const tasks = byArea[area];
-    html += '<div style="font-weight:800;font-size:13px;color:var(--emerald-700);margin:14px 0 6px;padding-right:4px">📍 ' + escapeHtml(area) + ' (' + tasks.length + ')</div>';
-    const prioOrder = { high:0, med:1, low:2 };
-    tasks.sort((a,b) => prioOrder[a.priority] - prioOrder[b.priority]);
-    let stopNum = 1;
-    tasks.forEach(t => {
-      const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
-      const displayName = t.newName || t.name;
-      html += '<div class="trip-stop" onclick="openDetail(' + t.id + ')">';
-      html += '<div class="stop-num">' + stopNum + '</div>';
-      html += '<div class="stop-info">';
-      html += '<div class="stop-name">' + escapeHtml(displayName) + '</div>';
-      html += '<div class="stop-meta">' + st.label + ' • ' + PRIORITY_LABELS[t.priority] + '</div>';
-      html += '</div>';
-      html += '<div class="stop-type">' + (SOURCE_ICONS[t.source] || '📞') + '</div>';
-      html += '</div>';
-      stopNum++;
-    });
-  });
-
-  tripSummary.innerHTML = html;
-  tripStops.innerHTML = '';
-}
-
-/* ═══════════════════════════════════════════════════════
-   القسم 18: الإحصائيات
-   ═══════════════════════════════════════════════════════ */
-function renderStats(){
-  const generalStats = document.getElementById('generalStats');
-  const areaStats = document.getElementById('areaStats');
-  const supervisorStats = document.getElementById('supervisorStats');
-
-  const total = state.tasks.length;
-  const done = state.tasks.filter(t => t.status === 'done').length;
-  const pending = total - done;
-  const overdue = state.tasks.filter(t => isOverdue(t)).length;
-  const completion = total > 0 ? Math.round((done/total)*100) : 0;
-
-  let html = '';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  html += '<div style="background:var(--emerald-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--emerald-700)">' + total + '</div><div style="font-size:11px;color:var(--gray-600)">📋 إجمالي</div></div>';
-  html += '<div style="background:var(--green-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--green-700)">' + done + '</div><div style="font-size:11px;color:var(--gray-600)">✅ منجزة</div></div>';
-  html += '<div style="background:var(--orange-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--orange-700)">' + pending + '</div><div style="font-size:11px;color:var(--gray-600)">⏳ معلقة</div></div>';
-  html += '<div style="background:var(--danger-light);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--danger)">' + overdue + '</div><div style="font-size:11px;color:var(--gray-600)">⚠️ متأخرة</div></div>';
-  html += '</div>';
-  html += '<div style="margin-top:12px"><div style="font-size:12px;color:var(--gray-600);margin-bottom:6px">نسبة الإنجاز: <b>' + completion + '%</b></div>';
-  html += '<div style="height:12px;background:var(--gray-200);border-radius:6px;overflow:hidden"><div style="height:100%;width:' + completion + '%;background:linear-gradient(90deg,var(--emerald-600),var(--emerald-500))"></div></div></div>';
-  generalStats.innerHTML = html;
-
-  // إحصائيات المناطق
-  const byArea = {};
-  state.tasks.forEach(t => {
-    const a = t.area || 'غير محدد';
-    if(!byArea[a]) byArea[a] = { total: 0, done: 0 };
-    byArea[a].total++;
-    if(t.status === 'done') byArea[a].done++;
-  });
-  const maxArea = Math.max.apply(null, Object.values(byArea).map(v => v.total).concat([1]));
-  let areaHtml = '';
-  Object.keys(byArea).sort((a,b) => byArea[b].total - byArea[a].total).forEach(a => {
-    const v = byArea[a];
-    const perc = Math.round((v.total / maxArea) * 100);
-    areaHtml += '<div class="area-stat-row">';
-    areaHtml += '<span class="area-stat-name">' + escapeHtml(a) + '</span>';
-    areaHtml += '<div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + perc + '%"></div></div>';
-    areaHtml += '<span class="area-stat-count">' + v.total + '</span>';
-    areaHtml += '</div>';
-  });
-  areaStats.innerHTML = areaHtml || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
-
-  // إحصائيات المشرفين
-  const bySup = {};
-  state.tasks.forEach(t => {
-    const s = t.contact || 'غير محدد';
-    if(!bySup[s]) bySup[s] = { total: 0, done: 0 };
-    bySup[s].total++;
-    if(t.status === 'done') bySup[s].done++;
-  });
-  const maxSup = Math.max.apply(null, Object.values(bySup).map(v => v.total).concat([1]));
-  let supHtml = '';
-  Object.keys(bySup).sort((a,b) => bySup[b].total - bySup[a].total).forEach(s => {
-    const v = bySup[s];
-    const perc = Math.round((v.total / maxSup) * 100);
-    supHtml += '<div class="area-stat-row">';
-    supHtml += '<span class="area-stat-name">👤 ' + escapeHtml(s) + '</span>';
-    supHtml += '<div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + perc + '%"></div></div>';
-    supHtml += '<span class="area-stat-count">' + v.total + '</span>';
-    supHtml += '</div>';
-  });
-  supervisorStats.innerHTML = supHtml || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
-}
-
-/* ═══════════════════════════════════════════════════════
-   القسم 19: الطباعة
-   ═══════════════════════════════════════════════════════ */
-const EAGLE_SVG = '<img src="eagle.png" alt="شعار" style="width:100%;height:auto;display:block">';
-
 function printTask(taskId){
   const t = state.tasks.find(x => x.id === taskId);
   if(!t){ showToast('❌ المهمة غير موجودة', 'error'); return; }
@@ -2709,6 +3088,9 @@ function printTask(taskId){
   if(fab) fab.style.display = 'none';
 }
 
+/* ═══════════════════════════════════════════════════════
+   القسم 24: طباعة تقرير زيارة
+   ═══════════════════════════════════════════════════════ */
 function printVisitReport(taskId){
   const t = state.tasks.find(x => x.id === taskId);
   if(!t){ showToast('❌ المهمة غير موجودة', 'error'); return; }
@@ -2731,13 +3113,12 @@ function printVisitReport(taskId){
 
   html += '<div class="gov-salutation" style="font-size:16px;font-weight:800">تقرير زيارة ميدانية</div>';
 
-  html += '<table class="gov-table">';
-  html += '<tbody>';
+  html += '<table class="gov-table"><tbody>';
   html += '<tr><td style="width:130px;text-align:right;font-weight:800;background:#f3f3f3">المدرسة</td><td style="text-align:right;padding-right:10px">' + escapeHtml(displayName) + '</td></tr>';
   html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">المنطقة</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.area || '') + (t.building ? ' — ' + escapeHtml(t.building) : '') + '</td></tr>';
   html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">نوع العمل</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.type || '') + '</td></tr>';
   html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">الحالة</td><td style="text-align:right;padding-right:10px">' + (STATUS_LABELS[t.status] ? STATUS_LABELS[t.status].label : '') + '</td></tr>';
-  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">المشرف</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.contact || '') + '</td></tr>';
+  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">المشرف</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.contact || '') + (t.contactPhone ? ' — ' + escapeHtml(t.contactPhone) : '') + '</td></tr>';
   html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">مدير المدرسة</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.principal || '') + (t.principalPhone ? ' — ' + escapeHtml(t.principalPhone) : '') + '</td></tr>';
   html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">أمين السر</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.secretary || '') + (t.secretaryPhone ? ' — ' + escapeHtml(t.secretaryPhone) : '') + '</td></tr>';
   html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">الفني المنفذ</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.technician || '') + '</td></tr>';
@@ -2766,6 +3147,46 @@ function printVisitReport(taskId){
   if(fab) fab.style.display = 'none';
 }
 
+/* ═══════════════════════════════════════════════════════
+   القسم 25: تصدير Word
+   ═══════════════════════════════════════════════════════ */
+function exportToWord(){
+  const content = document.getElementById('govPaper').innerHTML;
+  if(!content || content.trim() === ''){
+    showToast('⚠️ لا يوجد محتوى للتصدير', 'warn');
+    return;
+  }
+  const fullHtml = '<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>مستند</title>'
+    + '<style>'
+    + 'body{font-family:"Traditional Arabic","Sakkal Majalla","Amiri",Tahoma,serif;direction:rtl;padding:20px;font-size:14px;line-height:1.7}'
+    + 'table{width:100%;border-collapse:collapse;margin:10px 0}'
+    + 'th,td{border:1px solid #000;padding:5px 8px;text-align:center;font-weight:700}'
+    + 'th{background:#f3f3f3}'
+    + 'td.mat-name{text-align:right}'
+    + '.gov-eagle img{width:85px}'
+    + '.gov-eagle{text-align:center}'
+    + '.gov-header{text-align:center;margin-bottom:15px}'
+    + '.gov-header-right{text-align:right;font-size:13px;font-weight:700}'
+    + '.gov-header-left{text-align:left;font-size:13px;font-weight:700}'
+    + '.gov-salutation{text-align:center;font-size:16px;font-weight:800;margin:10px 0}'
+    + '.gov-body{font-size:14px;font-weight:600;margin:10px 0;line-height:1.9}'
+    + '.gov-signatures{display:flex;justify-content:space-between;margin-top:30px}'
+    + '.gov-sign-box{text-align:center}'
+    + '.gov-sign-box .role{display:block;margin-bottom:4px}'
+    + '.gov-sign-box .name{font-weight:800}'
+    + 'hr{border:none;border-top:1.5px solid #000;margin:15px 0}'
+    + '</style></head><body>' + content + '</body></html>';
+
+  const blob = new Blob(['\ufeff', fullHtml], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'مستند_الورشة_' + todayISO().replace(/\//g, '-') + '.doc';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ تم تصدير Word', 'success');
+}
+
 function closePrint(){
   document.getElementById('printPage').style.display = 'none';
   document.body.style.overflow = '';
@@ -2778,16 +3199,17 @@ function closePrint(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 20: التصدير والاستيراد
+   القسم 26: التصدير والاستيراد
    ═══════════════════════════════════════════════════════ */
 function exportJSON(){
   const data = {
-    version: 2,
+    version: 3,
     exportedAt: new Date().toISOString(),
     tasks: state.tasks,
     materials: state.materials,
     schools: state.schools,
     technicians: state.technicians,
+    supervisors: state.supervisors,
     settings: state.settings,
     counter: state.counter
   };
@@ -2813,11 +3235,14 @@ function importJSON(event){
       state.materials = data.materials || DEFAULT_MATERIALS;
       state.schools = data.schools || SCHOOLS_DEFAULT;
       state.technicians = data.technicians || DEFAULT_TECHNICIANS;
+      state.supervisors = data.supervisors || DEFAULT_SUPERVISORS;
       state.settings = Object.assign({}, DEFAULT_SETTINGS, data.settings || {});
       state.counter = data.counter || 1;
-      saveTasks(); saveMaterials(); saveSchools(); saveTechnicians(); saveSettings(); saveCounter();
+      migrateTasks();
+      saveTasks(); saveMaterials(); saveSchools(); saveTechnicians(); saveSupervisors(); saveSettings(); saveCounter();
       renderTasks(); updateStats(); updateFilterCounts(); renderAlerts();
-      renderMaterials(); renderSchoolsList(); updateSchoolsStats(); renderTechniciansList();
+      renderMaterials(); renderSchoolsList(); updateSchoolsStats(); renderTechniciansList(); renderSupervisorsList();
+      fillAreaFilters(); fillSupervisorFilters(); fillSupervisorSelects();
       applyNightMode();
       showToast('✅ تم الاستيراد', 'success');
     }catch(err){ showToast('❌ ملف غير صالح', 'error'); }
@@ -2828,14 +3253,14 @@ function importJSON(event){
 
 function exportTasksCSV(){
   if(state.tasks.length === 0){ showToast('لا توجد مهام', 'warn'); return; }
-  const headers = ['الرقم','المصدر','المدرسة','الاسم الجديد','المنطقة','المشرف','النوع','الأولوية','الحالة','الفني','عدد المواد','ملاحظات','تاريخ الإنشاء','تاريخ الإنجاز'];
-  const statusMap = { new:'جديدة', inspecting:'قيد الكشف', awaiting:'موافقة', materials:'تأمين مواد', working:'قيد التنفيذ', done:'منجزة', suspended:'معلقة' };
+  const headers = ['الرقم','المصدر','المدرسة','الاسم الجديد','المنطقة','المشرف','جوال المشرف','النوع','الأولوية','الحالة','الفني','عدد المواد','عدد المرفقات','ملاحظات','تاريخ الإنشاء','تاريخ الإنجاز'];
+  const statusMap = { new:'جديدة', inspecting:'قيد الكشف', awaiting:'موافقة', materials:'تأمين مواد', working:'قيد التنفيذ', done:'منجزة', suspended:'معلقة', canceled:'ملغاة', transferred:'محوّلة' };
   let csv = '\uFEFF' + headers.map(escapeCSV).join(',') + '\n';
   state.tasks.forEach(t => {
     csv += [
-      t.number, SOURCE_LABELS[t.source]||'', t.name, t.newName||'', t.area||'', t.contact||'',
+      t.number, SOURCE_LABELS[t.source]||'', t.name, t.newName||'', t.area||'', t.contact||'', t.contactPhone||'',
       t.type||'', PRIORITY_LABELS[t.priority]||'', statusMap[t.status]||'',
-      t.technician||'', (t.materials||[]).length, t.notes||'', t.createdAt, t.doneAt||''
+      t.technician||'', (t.materials||[]).length, (t.attachments||[]).length, t.notes||'', t.createdAt, t.doneAt||''
     ].map(escapeCSV).join(',') + '\n';
   });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -2848,10 +3273,10 @@ function exportTasksCSV(){
 
 function exportSchoolsCSV(){
   if(state.schools.length === 0){ showToast('لا توجد مدارس', 'warn'); return; }
-  const headers = ['الاسم','الاسم_القديم','المشرف','المنطقة','الحي','العنوان','المرحلة','الهاتف','المدير','جوال_المدير','أمين_السر','جوال_أمين_السر'];
+  const headers = ['الاسم','الاسم_القديم','المشرف','المنطقة','الحي','العنوان','المرحلة','الهاتف','عدد_القاعات','المدير','جوال_المدير','أمين_السر','جوال_أمين_السر'];
   let csv = '\uFEFF' + headers.map(escapeCSV).join(',') + '\n';
   state.schools.forEach(s => {
-    csv += [s.n||'', s.oldName||'', s.s||'', s.a||'', s.d||'', s.ad||'', s.g||'', s.p||'', s.principal||'', s.principalPhone||'', s.secretary||'', s.secretaryPhone||''].map(escapeCSV).join(',') + '\n';
+    csv += [s.n||'', s.oldName||'', s.s||'', s.a||'', s.d||'', s.ad||'', s.g||'', s.p||'', s.halls||'', s.principal||'', s.principalPhone||'', s.secretary||'', s.secretaryPhone||''].map(escapeCSV).join(',') + '\n';
   });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
@@ -2876,9 +3301,9 @@ function importSchoolsCSV(event){
         if(!parts[0]) continue;
         imported.push({
           n: parts[0]||'', oldName: parts[1]||'', s: parts[2]||'', a: parts[3]||'', d: parts[4]||'',
-          ad: parts[5]||'', g: parts[6]||'', p: parts[7]||'',
-          principal: parts[8]||'', principalPhone: parts[9]||'',
-          secretary: parts[10]||'', secretaryPhone: parts[11]||''
+          ad: parts[5]||'', g: parts[6]||'', p: parts[7]||'', halls: parts[8]||'',
+          principal: parts[9]||'', principalPhone: parts[10]||'',
+          secretary: parts[11]||'', secretaryPhone: parts[12]||''
         });
       }
       if(imported.length === 0){ showToast('❌ لا توجد بيانات', 'error'); return; }
@@ -2886,7 +3311,7 @@ function importSchoolsCSV(event){
       if(mode) state.schools = state.schools.concat(imported);
       else { if(!confirm('استبدال كامل؟')) return; state.schools = imported; }
       saveSchools();
-      renderSchoolsList(); updateSchoolsStats();
+      renderSchoolsList(); updateSchoolsStats(); fillAreaFilters();
       showToast('✅ ' + imported.length + ' مدرسة', 'success');
     }catch(err){ showToast('❌ خطأ', 'error'); }
   };
@@ -2924,7 +3349,7 @@ function clearDone(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 21: التهيئة
+   القسم 27: التهيئة
    ═══════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
@@ -2940,7 +3365,12 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTechniciansList();
   renderSchoolsList();
   updateSchoolsStats();
+  renderSupervisorsList();
+  renderMaterials();
   fillTechnicianSelects();
+  fillSupervisorSelects();
+  fillAreaFilters();
+  fillSupervisorFilters();
 
   const saved = localStorage.getItem('wk_current_page');
   if(saved && document.getElementById(saved)){ switchPage(saved); }
@@ -2957,14 +3387,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.addEventListener('click', (e) => {
-    const results = document.getElementById('schoolResults');
-    const search = document.getElementById('fSchoolSearch');
-    if(!results || !search) return;
-    if(!results.contains(e.target) && e.target !== search){ results.classList.remove('show'); }
-  });
-
-  // تحديث الوضع الليلي كل ساعة
   setInterval(applyNightMode, 3600000);
 
   showToast('مرحباً بك ⚡', 'success');
