@@ -1,0 +1,27 @@
+{
+  "name": "ورشة الكهرباء",
+  "short_name": "الورشة",
+  "description": "نظام إدارة مهام ورشة الكهرباء",
+  "start_url": "/jam3iyati/maintenance.html",
+  "scope": "/jam3iyati/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d5c46",
+  "theme_color": "#0d5c46",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "eagle.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "eagle.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
