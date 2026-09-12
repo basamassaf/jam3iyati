@@ -9,9 +9,8 @@
 <meta name="apple-mobile-web-app-title" content="ورشة الكهرباء">
 <title>ورشة الكهرباء</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="eagle.png">
 <style>
+/* ═══════════════ المتغيرات ═══════════════ */
 :root{
   --emerald-900:#0d3d2e;--emerald-800:#0d5c46;--emerald-700:#127a5d;--emerald-600:#1a9b76;
   --emerald-500:#22b88d;--emerald-200:#a7e8d0;--emerald-100:#d4f4e8;--emerald-50:#eefaf5;
@@ -22,8 +21,8 @@
   --yellow-700:#a16207;--yellow-600:#ca8a04;--yellow-100:#fef9c3;--yellow-50:#fefce8;
   --cyan-700:#0e7490;--cyan-600:#0891b2;--cyan-100:#cffafe;--cyan-50:#ecfeff;
   --green-700:#15803d;--green-600:#16a34a;--green-100:#dcfce7;--green-50:#f0fdf4;
-  --gray-700:#334155;--gray-600:#475569;--gray-500:#64748b;--gray-400:#94a3b8;
-  --gray-300:#cbd5e1;--gray-200:#e2e8f0;--gray-100:#f1f5f9;--gray-50:#f8fafc;
+  --gray-900:#0f172a;--gray-800:#1e293b;--gray-700:#334155;--gray-600:#475569;--gray-500:#64748b;
+  --gray-400:#94a3b8;--gray-300:#cbd5e1;--gray-200:#e2e8f0;--gray-100:#f1f5f9;--gray-50:#f8fafc;
   --white:#fff;
   --danger:#c0392b;--danger-light:#fdecea;
   --shadow-sm:0 1px 3px rgba(13,92,70,.08);
@@ -36,11 +35,38 @@ html,body{height:100%}
 body{
   font-family:'Segoe UI',Tahoma,Arial,sans-serif;
   background:linear-gradient(160deg,#f0f7f4 0%,#f8fafc 100%);
-  color:var(--gray-700);min-height:100vh;padding-bottom:90px;
+  color:var(--gray-700);min-height:100vh;
+  padding-bottom:170px;
   overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  transition:background .3s,color .3s;
 }
 
-/* ═══════ الرأس ═══════ */
+/* ═══════════════ الوضع الليلي ═══════════════ */
+body.night-mode{
+  background:linear-gradient(160deg,#0f172a 0%,#1e293b 100%);
+  color:#e2e8f0;
+}
+body.night-mode .app-header{background:linear-gradient(135deg,#0a2922,#0d3d2e)}
+body.night-mode .search-box{background:#1e293b;border-color:#334155}
+body.night-mode .search-box input{color:#e2e8f0}
+body.night-mode .chip{background:#1e293b;border-color:#334155;color:#cbd5e1}
+body.night-mode .chip.active{background:var(--emerald-700);color:#fff}
+body.night-mode .task-card{background:#1e293b;color:#e2e8f0}
+body.night-mode .task-name{color:#e2e8f0}
+body.night-mode .task-note{background:#0f172a;color:#cbd5e1}
+body.night-mode .section{background:#1e293b;border-color:#334155;color:#e2e8f0}
+body.night-mode .section-title{color:#a7e8d0;border-color:#0d5c46}
+body.night-mode .field input,
+body.night-mode .field select,
+body.night-mode .field textarea{background:#0f172a;border-color:#334155;color:#e2e8f0}
+body.night-mode .sheet{background:#1e293b}
+body.night-mode .sheet-title{color:#a7e8d0}
+body.night-mode .material-row{background:#0f172a;border-color:#334155}
+body.night-mode .bottom-nav{background:#1e293b;border-color:#334155}
+body.night-mode .nav-item{color:#94a3b8}
+body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
+
+/* ═══════════════ الرأس ═══════════════ */
 .app-header{
   background:linear-gradient(135deg,var(--emerald-800),var(--emerald-700));
   color:#fff;padding:18px 16px 22px;border-radius:0 0 24px 24px;
@@ -66,12 +92,20 @@ body{
 }
 .header-title h1{font-size:17px;font-weight:700}
 .header-title p{font-size:11px;opacity:.85;margin-top:2px}
+.header-actions{display:flex;gap:6px;align-items:center}
 .header-date{
   background:rgba(255,255,255,.15);padding:6px 12px;border-radius:20px;
   font-size:11px;font-weight:600;backdrop-filter:blur(10px);white-space:nowrap;
 }
+.night-toggle{
+  background:rgba(255,255,255,.15);border:none;color:#fff;
+  width:36px;height:36px;border-radius:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  backdrop-filter:blur(10px);transition:.2s;
+}
+.night-toggle:active{transform:scale(.92)}
 
-/* ═══════ بطاقات الإحصائيات ═══════ */
+/* ═══════════════ بطاقات الإحصائيات ═══════════════ */
 .stats-grid{
   display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
   position:relative;z-index:1;
@@ -90,9 +124,9 @@ body{
 .stat-card.c-materials .stat-num{color:#fde047}
 .stat-card.c-working .stat-num{color:#67e8f9}
 .stat-card.c-done .stat-num{color:#86efac}
-.stat-card.c-urgent .stat-num{color:#fca5a5}
+.stat-card.c-overdue .stat-num{color:#fca5a5}
 
-/* ═══════ البحث ═══════ */
+/* ═══════════════ البحث ═══════════════ */
 .search-wrap{padding:14px 16px 8px}
 .search-box{
   display:flex;align-items:center;gap:10px;background:var(--white);
@@ -104,10 +138,10 @@ body{
 }
 .search-box svg{width:18px;height:18px;color:var(--gray-500);flex-shrink:0}
 .search-box input{
-  flex:1;border:none;outline:none;font-size:14px;background:transparent;font-family:inherit;
+  flex:1;border:none;outline:none;font-size:14px;background:transparent;font-family:inherit;color:inherit;
 }
 
-/* ═══════ الفلاتر ═══════ */
+/* ═══════════════ الفلاتر ═══════════════ */
 .filters{
   padding:0 16px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
 }
@@ -128,8 +162,26 @@ body{
 }
 .chip:not(.active) .count{background:var(--gray-100);color:var(--gray-500)}
 
-/* ═══════ قائمة المهام ═══════ */
-.tasks-list{padding:0 16px 20px;display:flex;flex-direction:column;gap:10px}
+/* ═══════════════ التنبيهات ═══════════════ */
+.alerts-container{padding:0 16px 12px;display:flex;flex-direction:column;gap:8px}
+.alert-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--orange-50);border-right:4px solid var(--orange-600);
+  border-radius:10px;font-size:12.5px;
+  animation:fadeUp .3s ease;
+}
+.alert-row.danger{background:var(--danger-light);border-color:var(--danger)}
+.alert-row.info{background:var(--blue-50);border-color:var(--blue-600)}
+.alert-row.warn{background:var(--yellow-50);border-color:var(--yellow-600)}
+.alert-icon{font-size:20px;flex-shrink:0}
+.alert-text{flex:1;color:var(--gray-700);font-weight:600}
+.alert-close{
+  background:transparent;border:none;color:var(--gray-500);cursor:pointer;
+  font-size:16px;padding:4px;
+}
+
+/* ═══════════════ قائمة المهام ═══════════════ */
+.tasks-list{padding:0 16px 40px;display:flex;flex-direction:column;gap:10px}
 .task-card{
   background:var(--white);border-radius:var(--radius);padding:14px;
   box-shadow:var(--shadow-sm);border-right:5px solid var(--gray-300);
@@ -146,6 +198,8 @@ body{
 .task-card.st-done{border-right-color:var(--green-600);background:var(--green-50);opacity:.75}
 .task-card.st-suspended{border-right-color:var(--gray-400);opacity:.7}
 .task-card.st-done .task-name{text-decoration:line-through;color:var(--gray-500)}
+.task-card.overdue{border-right-width:6px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:var(--shadow-sm)}50%{box-shadow:0 0 0 4px rgba(192,57,43,.15)}}
 
 .task-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
 .task-name{font-size:15px;font-weight:700;color:var(--gray-700);line-height:1.3;flex:1}
@@ -159,9 +213,8 @@ body{
 .mb-done{background:var(--green-100);color:var(--green-700)}
 .mb-suspended{background:var(--gray-100);color:var(--gray-600)}
 .mb-urgent{background:var(--danger);color:#fff}
-.mb-high{background:var(--danger-light);color:var(--danger)}
-.mb-med{background:var(--orange-100);color:var(--orange-700)}
-.mb-low{background:var(--green-100);color:var(--green-700)}
+.mb-overdue{background:var(--danger);color:#fff;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.6}}
 
 .task-meta{
   display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11.5px;
@@ -174,9 +227,8 @@ body{
   border-right:3px solid var(--copper-500);line-height:1.5;
 }
 .task-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.task-actions .btn{flex:0 0 auto}
 
-/* ═══════ الأزرار ═══════ */
+/* ═══════════════ الأزرار ═══════════════ */
 .btn{
   border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;
   cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;
@@ -188,6 +240,7 @@ body{
 .btn-note{background:var(--copper-600);color:#fff}
 .btn-print{background:var(--emerald-700);color:#fff}
 .btn-whats{background:#25d366;color:#fff}
+.btn-call{background:var(--blue-600);color:#fff}
 .btn-del{background:var(--gray-100);color:var(--danger)}
 .btn-map{background:linear-gradient(135deg,#1a73e8,#4285f4);color:#fff;text-decoration:none}
 .btn-stage{background:var(--emerald-600);color:#fff}
@@ -201,13 +254,14 @@ body{
 .btn-primary{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600));color:#fff;box-shadow:0 6px 16px rgba(13,92,70,.25)}
 .btn-copper{background:linear-gradient(135deg,var(--copper-700),var(--copper-500));color:#fff;box-shadow:0 6px 16px rgba(184,115,51,.25)}
 .btn-ghost{background:var(--gray-100);color:var(--gray-700)}
+.btn-sm{padding:6px 10px;font-size:11px;border-radius:8px}
 
-/* ═══════ الحالة الفارغة ═══════ */
+/* ═══════════════ الحالة الفارغة ═══════════════ */
 .empty{text-align:center;padding:50px 20px;color:var(--gray-500)}
 .empty-icon{font-size:50px;margin-bottom:12px;opacity:.4}
 .empty p{font-size:14px}
 
-/* ═══════ الشريط السفلي ═══════ */
+/* ═══════════════ الشريط السفلي ═══════════════ */
 .bottom-nav{
   position:fixed;bottom:0;left:0;right:0;background:var(--white);
   box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;
@@ -222,9 +276,9 @@ body{
 .nav-item svg{width:22px;height:22px;display:block;margin:0 auto 3px}
 .nav-item span{font-size:10.5px;font-weight:700}
 
-/* ═══════ الزر العائم ═══════ */
+/* ═══════════════ الزر العائم ═══════════════ */
 .fab{
-  position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;
+  position:fixed;bottom:calc(85px + env(safe-area-inset-bottom));left:50%;
   transform:translateX(-50%);width:60px;height:60px;border-radius:50%;
   background:linear-gradient(135deg,var(--copper-600),var(--copper-500));
   color:#fff;border:none;box-shadow:0 8px 24px rgba(184,115,51,.4);
@@ -235,7 +289,7 @@ body{
 .fab:active{transform:translateX(-50%) scale(.92)}
 .fab svg{width:30px;height:30px}
 
-/* ═══════ النوافذ المنبثقة ═══════ */
+/* ═══════════════ النوافذ المنبثقة ═══════════════ */
 .sheet-bg{
   position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);
   z-index:100;display:none;align-items:flex-end;justify-content:center;
@@ -257,7 +311,7 @@ body{
 }
 .sheet-title svg{width:20px;height:20px}
 
-/* ═══════ الحقول ═══════ */
+/* ═══════════════ الحقول ═══════════════ */
 .field{margin-bottom:14px}
 .field label{
   display:block;font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:6px;
@@ -274,7 +328,7 @@ body{
 .field textarea{resize:vertical;min-height:70px}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-/* ═══════ الصفحات ═══════ */
+/* ═══════════════ الصفحات ═══════════════ */
 .page{display:none;padding:16px;animation:fadeUp .3s}
 .page.active{display:block}
 .section{
@@ -291,7 +345,7 @@ body{
   border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;
 }
 
-/* ═══════ المواد ═══════ */
+/* ═══════════════ المواد ═══════════════ */
 .material-row{
   display:flex;align-items:center;gap:8px;background:var(--gray-50);
   border-radius:11px;padding:10px;margin-bottom:8px;border:1px solid var(--gray-200);
@@ -311,7 +365,7 @@ body{
   font-weight:700;display:flex;align-items:center;justify-content:center;
 }
 
-/* ═══════ نتائج البحث عن المدارس ═══════ */
+/* ═══════════════ نتائج البحث عن المدارس ═══════════════ */
 .school-results{
   display:none;max-height:240px;overflow-y:auto;margin-top:6px;
   border:1.5px solid var(--emerald-200);border-radius:10px;background:#fff;
@@ -338,30 +392,93 @@ body{
 .selected-school .s-name{font-weight:800;color:var(--emerald-800);font-size:13px;margin-bottom:4px}
 .selected-school .s-info{color:var(--gray-600);line-height:1.6}
 
-/* ═══════ Toast ═══════ */
-.toast{
-  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
-  background:var(--emerald-800);color:#fff;padding:12px 20px;border-radius:12px;
-  font-size:13px;font-weight:700;z-index:200;box-shadow:var(--shadow-lg);
-  transition:.35s cubic-bezier(.16,1,.3,1);max-width:90%;text-align:center;
+/* ═══════════════ الاقتراحات الذكية ═══════════════ */
+.suggestions{
+  margin-top:10px;padding:10px;background:var(--copper-100);
+  border-radius:10px;border-right:4px solid var(--copper-500);
 }
-.toast.show{transform:translateX(-50%) translateY(0)}
-.toast.success{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600))}
-.toast.error{background:linear-gradient(135deg,#991b1b,var(--danger))}
-.toast.warn{background:linear-gradient(135deg,#92400e,var(--orange-700))}
+.suggestions-title{
+  font-size:12px;font-weight:800;color:var(--copper-700);margin-bottom:8px;
+}
+.suggestion-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;font-size:12px;border-bottom:1px dashed var(--copper-300);
+}
+.suggestion-item:last-child{border-bottom:none}
+.suggestion-name{flex:1;color:var(--copper-700);font-weight:600}
+.suggestion-dist{font-size:10.5px;color:var(--copper-600);font-weight:700}
 
-/* ═══════ التنبيهات ═══════ */
-.alert-row{
+/* ═══════════════ تتبع الموافقات ═══════════════ */
+.timeline{
+  position:relative;padding-right:20px;margin:10px 0;
+}
+.timeline::before{
+  content:'';position:absolute;right:6px;top:6px;bottom:6px;
+  width:2px;background:var(--gray-200);
+}
+.timeline-item{
+  position:relative;padding:6px 0 6px 0;font-size:12.5px;
+}
+.timeline-item::before{
+  content:'';position:absolute;right:-18px;top:12px;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--gray-300);border:2px solid var(--white);
+}
+.timeline-item.done::before{background:var(--green-600)}
+.timeline-item.pending::before{background:var(--orange-500)}
+.timeline-item.pending{color:var(--orange-700);font-weight:700}
+.timeline-item.done{color:var(--green-700)}
+.timeline-item-label{font-weight:700}
+.timeline-item-date{font-size:10.5px;color:var(--gray-500);margin-top:2px}
+
+/* ═══════════════ سجل الزيارات ═══════════════ */
+.visit-row{
+  display:flex;gap:8px;padding:8px 10px;
+  background:var(--gray-50);border-radius:8px;margin-bottom:6px;
+  border-right:3px solid var(--cyan-600);font-size:12px;
+}
+.visit-icon{font-size:16px}
+.visit-info{flex:1}
+.visit-type{font-weight:700;color:var(--gray-700)}
+.visit-date{color:var(--gray-500);font-size:10.5px;margin-top:2px}
+.visit-note{color:var(--gray-600);font-size:11.5px;margin-top:3px;font-style:italic}
+
+/* ═══════════════ الإجراءات السريعة ═══════════════ */
+.quick-actions{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;
+  padding:10px;background:var(--gray-50);border-radius:10px;margin-bottom:10px;
+}
+.quick-action-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:8px 4px;background:var(--white);border:1px solid var(--gray-200);
+  border-radius:10px;cursor:pointer;font-family:inherit;transition:.2s;
+}
+.quick-action-btn:active{transform:scale(.95);background:var(--emerald-50)}
+.quick-action-btn .qa-icon{font-size:20px}
+.quick-action-btn .qa-label{font-size:9.5px;font-weight:700;color:var(--gray-600);text-align:center}
+
+/* ═══════════════ الإحصائيات حسب المنطقة ═══════════════ */
+.area-stat-row{
   display:flex;align-items:center;gap:10px;padding:10px 12px;
-  background:var(--orange-50);border-right:4px solid var(--orange-600);
-  border-radius:10px;margin-bottom:8px;font-size:12.5px;
+  background:var(--white);border:1px solid var(--gray-200);
+  border-radius:10px;margin-bottom:8px;font-size:13px;
 }
-.alert-row.danger{background:var(--danger-light);border-color:var(--danger)}
-.alert-row.info{background:var(--blue-50);border-color:var(--blue-600)}
-.alert-row .alert-icon{font-size:20px;flex-shrink:0}
-.alert-row .alert-text{flex:1;color:var(--gray-700);font-weight:600}
+.area-stat-name{flex:1;font-weight:700;color:var(--gray-700)}
+.area-stat-bar{
+  height:8px;border-radius:4px;background:var(--gray-200);
+  width:100px;overflow:hidden;
+}
+.area-stat-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--emerald-600),var(--emerald-500));
+  border-radius:4px;transition:width .5s;
+}
+.area-stat-count{font-weight:800;color:var(--emerald-700);min-width:30px;text-align:center}
 
-/* ═══════ جولة اليوم ═══════ */
+/* ═══════════════ جولة اليوم ═══════════════ */
+.trip-summary{
+  background:var(--emerald-50);border-radius:10px;padding:12px;margin-bottom:12px;
+  font-size:12.5px;color:var(--emerald-800);
+}
 .trip-stop{
   display:flex;align-items:center;gap:10px;padding:10px 12px;
   background:var(--white);border-radius:10px;margin-bottom:8px;
@@ -379,7 +496,19 @@ body{
 .trip-stop .stop-meta{font-size:11px;color:var(--gray-500);margin-top:2px}
 .trip-stop .stop-type{font-size:16px}
 
-/* ═══════ الطباعة ═══════ */
+/* ═══════════════ Toast ═══════════════ */
+.toast{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
+  background:var(--emerald-800);color:#fff;padding:12px 20px;border-radius:12px;
+  font-size:13px;font-weight:700;z-index:200;box-shadow:var(--shadow-lg);
+  transition:.35s cubic-bezier(.16,1,.3,1);max-width:90%;text-align:center;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600))}
+.toast.error{background:linear-gradient(135deg,#991b1b,var(--danger))}
+.toast.warn{background:linear-gradient(135deg,#92400e,var(--orange-700))}
+
+/* ═══════════════ الطباعة ═══════════════ */
 .print-page{padding:20px;background:var(--gray-100);min-height:100vh}
 .print-toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .print-toolbar .btn{flex:1;min-width:130px;padding:12px}
@@ -421,7 +550,6 @@ body{
 .gov-table th{background:#f3f3f3;font-weight:800;font-size:12px}
 .gov-table td.mat-name{text-align:right;padding-right:8px}
 .gov-table td.mat-qty{width:55px;font-weight:800}
-
 .gov-signatures{
   display:flex;justify-content:space-between;margin-top:14px;
   padding:0 15px;font-size:13px;font-weight:700;text-align:center;line-height:1.6;
@@ -429,7 +557,6 @@ body{
 .gov-sign-box{flex:1;max-width:45%}
 .gov-sign-box .role{display:block;margin-bottom:2px}
 .gov-sign-box .name{font-weight:800;font-size:13.5px}
-
 .gov-divider{border:none;border-top:1.5px solid #000;margin:12px 0 8px}
 .gov-sub{font-size:13px;font-weight:800;margin:8px 0 4px}
 
@@ -449,7 +576,14 @@ body{
   .header-title h1{font-size:15px}
   .gov-header-right,.gov-header-left{font-size:11px}
   .gov-eagle{width:75px}
+  .quick-actions{grid-template-columns:repeat(4,1fr)}
 }
+
+/* ═══════════════ Scrollbar مخصص ═══════════════ */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--gray-400)}
 </style>
 </head>
 <body>
@@ -466,7 +600,10 @@ body{
           <p>نظام إدارة المهام</p>
         </div>
       </div>
-      <div class="header-date" id="headerDate"></div>
+      <div class="header-actions">
+        <button class="night-toggle" onclick="toggleNightMode()" id="nightToggle" title="الوضع الليلي">🌙</button>
+        <div class="header-date" id="headerDate"></div>
+      </div>
     </div>
     <div class="stats-grid">
       <div class="stat-card c-new" onclick="quickFilter('new')">
@@ -495,6 +632,9 @@ body{
       </div>
     </div>
   </header>
+
+  <!-- التنبيهات -->
+  <div class="alerts-container" id="alertsContainer"></div>
 
   <div class="search-wrap">
     <div class="search-box">
@@ -529,6 +669,22 @@ body{
     </div>
     <div id="tripSummary"></div>
     <div id="tripStops"></div>
+  </div>
+</div>
+
+<!-- ═══════════ صفحة الإحصائيات ═══════════ -->
+<div id="pageStats" class="page">
+  <div class="section">
+    <div class="section-title">📊 الإحصائيات العامة</div>
+    <div id="generalStats"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">📍 المهام حسب المنطقة</div>
+    <div id="areaStats"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">👤 المهام حسب المشرف</div>
+    <div id="supervisorStats"></div>
   </div>
 </div>
 
@@ -585,6 +741,21 @@ body{
     <button class="btn-lg btn-copper" style="margin-top:10px" onclick="openTechnicianSheet()">+ إضافة فني</button>
   </div>
   <div class="section">
+    <div class="section-title">⚙️ إعدادات إضافية</div>
+    <div class="field">
+      <label>🌙 الوضع الليلي</label>
+      <select id="setNightMode">
+        <option value="auto">تلقائي (حسب الوقت)</option>
+        <option value="on">مفعّل دائماً</option>
+        <option value="off">معطّل</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>⏰ تنبيه للمهام المتأخرة (بالأيام)</label>
+      <input type="number" id="setOverdueDays" value="7" min="1" max="30">
+    </div>
+  </div>
+  <div class="section">
     <div class="section-title">💾 النسخ الاحتياطي</div>
     <button class="btn-lg btn-primary" style="margin-bottom:8px" onclick="exportJSON()">📤 تصدير نسخة احتياطية (JSON)</button>
     <button class="btn-lg btn-copper" style="margin-bottom:8px" onclick="document.getElementById('importFile').click()">📥 استيراد نسخة احتياطية</button>
@@ -606,6 +777,10 @@ body{
   <div class="nav-item" data-page="pageTrip" onclick="switchPage('pageTrip')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
     <span>الجولة</span>
+  </div>
+  <div class="nav-item" data-page="pageStats" onclick="switchPage('pageStats')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+    <span>إحصائيات</span>
   </div>
   <div class="nav-item" data-page="pageSchools" onclick="switchPage('pageSchools')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -646,6 +821,7 @@ body{
         <div class="s-name" id="selName"></div>
         <div class="s-info" id="selInfo"></div>
       </div>
+      <div class="suggestions" id="suggestions" style="display:none"></div>
     </div>
 
     <div class="field">
@@ -771,6 +947,53 @@ body{
   </div>
 </div>
 
+<!-- ═══════════ نافذة سجل الزيارات ═══════════ -->
+<div class="sheet-bg" id="visitSheetBg" onclick="if(event.target===this)closeSheet('visitSheetBg')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">📅 تسجيل زيارة</div>
+    <div class="field">
+      <label>نوع الزيارة</label>
+      <select id="visitType">
+        <option value="inspection">🔍 كشف مبدئي</option>
+        <option value="execution">🔧 تنفيذ عمل</option>
+        <option value="maintenance">🛠️ صيانة دورية</option>
+        <option value="followup">📋 متابعة</option>
+        <option value="emergency">🚨 طارئ</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>ملاحظات الزيارة</label>
+      <textarea id="visitNotes" placeholder="ما تم في الزيارة..."></textarea>
+    </div>
+    <button class="btn-lg btn-primary" onclick="saveVisit()">💾 حفظ الزيارة</button>
+    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('visitSheetBg')">إلغاء</button>
+  </div>
+</div>
+
+<!-- ═══════════ نافذة تتبع الموافقات ═══════════ -->
+<div class="sheet-bg" id="approvalSheetBg" onclick="if(event===this.target)closeSheet('approvalSheetBg')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">📄 تتبع الموافقات</div>
+    <div class="field">
+      <label>📌 الحالة الحالية</label>
+      <select id="approvalStage">
+        <option value="raised">📤 رُفع الكشف</option>
+        <option value="delivered">📬 وصل للجهة</option>
+        <option value="approved">✅ وصلت الموافقة</option>
+        <option value="rejected">❌ رُفض الطلب</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>ملاحظات</label>
+      <textarea id="approvalNotes" placeholder="تفاصيل إضافية..."></textarea>
+    </div>
+    <button class="btn-lg btn-primary" onclick="saveApproval()">💾 حفظ التحديث</button>
+    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('approvalSheetBg')">إلغاء</button>
+  </div>
+</div>
+
 <!-- ═══════════ نافذة إضافة/تعديل مادة ═══════════ -->
 <div class="sheet-bg" id="masterMatSheetBg" onclick="if(event.target===this)closeSheet('masterMatSheetBg')">
   <div class="sheet">
@@ -837,7 +1060,7 @@ body{
     </div>
     <div class="field">
       <label>الرسالة الجاهزة</label>
-      <textarea id="whatsMessage" rows="10" style="font-size:12.5px;line-height:1.6"></textarea>
+      <textarea id="whatsMessage" rows="12" style="font-size:12.5px;line-height:1.6"></textarea>
     </div>
     <button class="btn-lg" style="background:#25d366;color:#fff" onclick="sendWhatsApp()">📱 إرسال على واتساب</button>
     <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="copyWhatsMessage()">📋 نسخ الرسالة</button>
@@ -861,15 +1084,16 @@ body{
 
 <script>
 /* ═══════════════════════════════════════════════════════
-   القسم 1: الثوابت والإعدادات
+   القسم 1: الثوابت
    ═══════════════════════════════════════════════════════ */
 const STORAGE_KEYS = {
-  TASKS: 'wk_tasks_v1',
-  MATERIALS: 'wk_materials_v1',
-  SCHOOLS: 'wk_schools_v1',
-  TECHNICIANS: 'wk_technicians_v1',
-  SETTINGS: 'wk_settings_v1',
-  COUNTER: 'wk_counter_v1'
+  TASKS: 'wk_tasks_v2',
+  MATERIALS: 'wk_materials_v2',
+  SCHOOLS: 'wk_schools_v2',
+  TECHNICIANS: 'wk_technicians_v2',
+  SETTINGS: 'wk_settings_v2',
+  COUNTER: 'wk_counter_v2',
+  NIGHT: 'wk_night_mode'
 };
 
 let state = {
@@ -885,15 +1109,16 @@ let state = {
   editingSchoolIdx: null,
   editingTechIdx: null,
   editingMasterMatId: null,
-  selectedSchool: null
+  selectedSchool: null,
+  searchQuery: ''
 };
 
 const STATUS_LABELS = {
   new: { label: '📩 جديدة', cls: 'mb-new' },
-  inspecting: { label: '🔍 قيد الكشف', cls: 'mb-inspecting' },
-  awaiting: { label: '📄 بانتظار موافقة', cls: 'mb-awaiting' },
-  materials: { label: '📦 تأمين مواد', cls: 'mb-materials' },
-  working: { label: '🔧 قيد التنفيذ', cls: 'mb-working' },
+  inspecting: { label: '🔍 كشف', cls: 'mb-inspecting' },
+  awaiting: { label: '📄 موافقة', cls: 'mb-awaiting' },
+  materials: { label: '📦 مواد', cls: 'mb-materials' },
+  working: { label: '🔧 تنفيذ', cls: 'mb-working' },
   done: { label: '✅ منجزة', cls: 'mb-done' },
   suspended: { label: '⏸️ معلقة', cls: 'mb-suspended' }
 };
@@ -901,6 +1126,19 @@ const STATUS_LABELS = {
 const SOURCE_ICONS = { call:'📞', urgent:'🚨', letter:'📄', routine:'🔄' };
 const SOURCE_LABELS = { call:'طلب', urgent:'طارئ', letter:'كتاب', routine:'دورية' };
 const PRIORITY_LABELS = { high:'🔴 عالية', med:'🟡 متوسطة', low:'🟢 منخفضة' };
+const VISIT_TYPES = {
+  inspection: { icon:'🔍', label:'كشف مبدئي' },
+  execution: { icon:'🔧', label:'تنفيذ عمل' },
+  maintenance: { icon:'🛠️', label:'صيانة دورية' },
+  followup: { icon:'📋', label:'متابعة' },
+  emergency: { icon:'🚨', label:'طارئ' }
+};
+const APPROVAL_STAGES = {
+  raised: { icon:'📤', label:'رُفع الكشف', color:'blue' },
+  delivered: { icon:'📬', label:'وصل للجهة', color:'purple' },
+  approved: { icon:'✅', label:'وصلت الموافقة', color:'green' },
+  rejected: { icon:'❌', label:'رُفض الطلب', color:'red' }
+};
 
 const DEFAULT_MATERIALS = [
   { id: 1, name: 'منظم جهد', unit: 'عدد' },
@@ -950,7 +1188,9 @@ const DEFAULT_SETTINGS = {
   header2: 'دائرة المعلوماتية',
   header3: 'شعبة الصيانة (ورشة الكهرباء)',
   sign2: 'فراس صالح',
-  sign3: 'علي العباس'
+  sign3: 'علي العباس',
+  nightMode: 'auto',
+  overdueDays: 7
 };
 
 const DEFAULT_TECHNICIANS = [
@@ -1011,7 +1251,6 @@ const SCHOOLS_DEFAULT = [
   {n:'الامام الغزالي',s:'باسم العباس',a:'القنوات',d:'باب سريجة',ad:'مقابل فروج الشام',g:'1 _ 6',p:'2224779'},
   {n:'الفقهاء الصالحين',s:'باسم العباس',a:'يرموك',d:'',ad:'',g:'ثانوي عام',p:''},
   {n:'حسن الحكيم',s:'تمام الصالح',a:'الميدان',d:'الدقاق',ad:'ميدان-دقاق-تحت الجسر-جانب مخفر الميدان',g:'7 _ 9',p:'8819587'},
-  {n:'روضة ياسمين الشام',s:'تمام الصالح',a:'الميدان',d:'الحقلة',ad:'ميدان حقلة تحت الجسر',g:'رياض أطفال',p:'8834337'},
   {n:'السيدة حفصة',s:'تمام الصالح',a:'الميدان',d:'',ad:'السيدة عائشة جانب وزارة النقل الجديدة',g:'1 _4',p:'8880134'},
   {n:'عمر أبو ريشة',s:'تمام الصالح',a:'الميدان',d:'باب مصر',ad:'الميدان كواكبي قرب مقسم الهاتف',g:'رياض أطفال',p:'8810008'},
   {n:'محمد بن حسن الشيباني',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان وسطاني دخلة فرن حمامي',g:'1 _ 6',p:'8819270'},
@@ -1050,437 +1289,48 @@ const SCHOOLS_DEFAULT = [
   {n:'ياقوت الحموي',s:'تمام الصالح',a:'الميدان',d:'الحقلة',ad:'ميدان حقلة جانب جامع الشيخ يعقوب',g:'7 _ 9',p:'8881461'},
   {n:'عدنان أبو دبوسة',s:'تمام الصالح',a:'الميدان',d:'الحقلة',ad:'ميدان حقلة مقابل مي زيادة',g:'7 _ 9',p:'8837365'},
   {n:'روضة البيلسان',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان زقاق موصلي دخلة مطعم زمان',g:'رياض أطفال',p:'8880783'},
-  {n:'روضة رواد المعرفة',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'كفرسوسة معصرة جانب مدرسة عبد القادر المغربي',g:'رياض أطفال',p:'2139775'},
-  {n:'روضة حدائق الطفولة',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان جزماتية زقاق العسكري',g:'رياض أطفال',p:'8837086'},
-  {n:'روضة أنوار تشرين',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'كفرسوسة المعصرة جانب جامع العمري',g:'رياض أطفال',p:'2112864'},
   {n:'نعيم معصراني',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'دخلة الاحسان',g:'1 _ 6',p:'2111412'},
   {n:'الامام الشافعي',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'مزراب الشارع العام',g:'1 _ 6',p:'2111812'},
   {n:'أنس بن مالك',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'خلف مجمع الخدمات',g:'1 _ 6',p:'2114324'},
   {n:'أبو أيوب الأنصاري',s:'تمام الصالح',a:'كفرسوسة',d:'',ad:'كفرسوسة موقف المدارس',g:'1 _ 6',p:'2114686'},
   {n:'محمد بديع الكسم',s:'تمام الصالح',a:'كفرسوسة',d:'اللوان',ad:'المبارة -جامع بلال الحبشي',g:'رياض أطفال',p:'2110614'},
   {n:'مؤيد جبر',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'كفرسوسة - جمالة',g:'7 _ 9',p:'2138073'},
-  {n:'فادي خربوطلي',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'كفر سوسة الجمالة خلف البلدية القديمة دخلة صيدلية هدى سرايجي',g:'1_6',p:'2137939'},
-  {n:'عباس محمود العقاد',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'معصرة',g:'',p:'2113017'},
-  {n:'ثا/محمود حماد المهنية/العامة',s:'تمام الصالح',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان غواص دخلة شوكولا الزنبركجي',g:'ثانوي عام',p:'8816786'},
+  {n:'فادي خربوطلي',s:'تمام الصالح',a:'كفرسوسة',d:'كفرسوسة البلد',ad:'كفر سوسة الجمالة خلف البلدية القديمة',g:'1_6',p:'2137939'},
   {n:'كفر سوسة المحدثة',s:'تمام الصالح',a:'',d:'',ad:'',g:'1 _ 6',p:''},
   {n:'مصطفى شمايط',s:'تمام الصالح',a:'',d:'',ad:'',g:'1 _ 6',p:''},
   {n:'سعد بن معاذ',s:'تمام الصالح',a:'',d:'',ad:'',g:'1 _ 6',p:''},
-  {n:'مركز تدريب كفر سوسة',s:'تمام الصالح',a:'',d:'',ad:'',g:'',p:''},
-  {n:'عمرة البخارية',s:'حسن خرما',a:'القنوات',d:'باب سريجة',ad:'خلف المؤسسة',g:'رياض أطفال',p:''},
-  {n:'عائشة التيمورية الأولى',s:'حسن خرما',a:'دمشق القديمة',d:'',ad:'عمارة-جانب مقام السيدة رقية-زقاق النقيب',g:'1 _ 6',p:'2210038'},
-  {n:'الفاطمية المحدثة الثانية',s:'حسن خرما',a:'دمشق القديمة',d:'',ad:'عمارة جوانية-جانب مقام السيدة رقية-زقاق صلح',g:'1 _ 6',p:'5418901'},
-  {n:'أم الفضل',s:'حسن خرما',a:'دمشق القديمة',d:'مأذنة الشحم',ad:'شاغور جواني دقاقين-بزورية',g:'1 _ 6',p:'2243941'},
-  {n:'العمارة المحدثة',s:'حسن خرما',a:'دمشق القديمة',d:'',ad:'عمارة جوانية زقاق النقب-جانب مقام السيدة رقية',g:'1 _ 6',p:'2219363'},
-  {n:'محمد عدنان ناصر',s:'حسن خرما',a:'دمشق القديمة',d:'مأذنة الشحم',ad:'البزورية حارة مشمس',g:'1 _ 6',p:'2218203'},
-  {n:'غزالة الحرورية',s:'حسن خرما',a:'دمشق القديمة',d:'الجورة',ad:'باب توما-جانب مطعم الياسمين',g:'1 _ 6',p:'5417690'},
-  {n:'الفاطمية الأولى',s:'حسن خرما',a:'دمشق القديمة',d:'',ad:'باب السلام-جانب صيدلية باب السلام',g:'1 _ 6',p:'2217001'},
-  {n:'السكينية',s:'حسن خرما',a:'دمشق القديمة',d:'القيمرية',ad:'قيمرية-مقابل مطعم باب الحارة',g:'1 _ 6',p:'5418645'},
-  {n:'المنصور الرسمية',s:'حسن خرما',a:'دمشق القديمة',d:'باب توما',ad:'دمشق-باب توما-العازرية',g:'7 _ 9',p:'5440783'},
-  {n:'إلياس قدسي',s:'حسن خرما',a:'دمشق القديمة',d:'القيمرية',ad:'قيمرية-جادة غزال',g:'7 _ 9',p:'5416026'},
-  {n:'ابن هانئ الأندلسي',s:'حسن خرما',a:'ساروجا',d:'العمارة البرانية',ad:'الشرف الأعلى-تجمع المدارس',g:'7 _ 9',p:'2221058'},
-  {n:'ذات النطاقين',s:'حسن خرما',a:'ساروجا',d:'العمارة البرانية',ad:'العمارة البرانية-حارة الشرف الأعلى',g:'7 _ 9',p:'22342915'},
-  {n:'عائشة التيمورية الثانية',s:'حسن خرما',a:'ساروجا',d:'العمارة البرانية',ad:'مناخلية- سوق النحاسين',g:'1 _ 6',p:'2331554'},
-  {n:'ابن النديم',s:'حسن خرما',a:'ساروجا',d:'العقيبية',ad:'عمارة-العقيبية-حارة الداقور',g:'1 _ 6',p:'2315437'},
-  {n:'المثنى بن حارثة',s:'حسن خرما',a:'ساروجا',d:'العقيبية',ad:'عقيبية-جامع التوبة',g:'1 _ 6',p:'2315868'},
-  {n:'ثا/نزار قباني',s:'حسن خرما',a:'دمشق القديمة',d:'القيمرية',ad:'قوس السيدة رابعة الشامية',g:'ثانوي عام',p:'5411424'},
-  {n:'رياض قصار',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'صناعة بستان الدور خلف مقسم باب شرقي',g:'1 _ 6',p:'5413196'},
-  {n:'معن بن زائدة',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'ابن عساكر مجمع مدارس أحمد شوقي',g:'1 _ 6',p:'5426396'},
-  {n:'أحمد شوقي',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'ابن عساكر تجمع المدارس',g:'1 _ 6',p:'2216352'},
-  {n:'عبد الكريم الخطابي',s:'حسن خرما',a:'الشاغور',d:'بلال',ad:'المنطقة الصناعية خلف مقسم باب شرقي',g:'1 _ 6',p:'5413214'},
-  {n:'المناضل',s:'حسن خرما',a:'الشاغور',d:'بلال',ad:'خلف مقسم هاتف باب شرقي',g:'1 _ 6',p:'5443499'},
-  {n:'رسلان الدمشقي',s:'حسن خرما',a:'الشاغور',d:'',ad:'شاغور',g:'7 _ 9',p:'5413229'},
-  {n:'بدر الدين محمد الغزال',s:'حسن خرما',a:'شاغور',d:'',ad:'شاغور جادة آل البيت',g:'7 _ 9',p:'2220377'},
-  {n:'جلال فاروق الشريف',s:'حسن خرما',a:'شاغور',d:'',ad:'ابن عساكر تجمع المدارس',g:'7 _ 9',p:'2257336'},
-  {n:'الثانوية الصناعية الأولى',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'طريق المطار جانب كلية الهمك',g:'ثانوي صناعي',p:'5426932'},
-  {n:'المعهد التقاني الصناعي الأول',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'طريق المطار جانب كلية الهمك',g:'معهد صناعي',p:'5426932'},
-  {n:'المعهد التقاني الصناعي الثاني',s:'حسن خرما',a:'الشاغور',d:'بلال',ad:'دمشق طريق المطار جانب كلية الهندسة',g:'معهد صناعي',p:'34225033'},
-  {n:'روضة الطيور المغردة',s:'حسن خرما',a:'الشاغور',d:'ابن عساكر',ad:'شاغور جراح جانب مدرسة جمانة الهلالية',g:'رياض أطفال',p:'2264015'},
-  {n:'روضة نجوم الشام',s:'حسن خرما',a:'الشاغور',d:'بلال',ad:'الشاغور حي بلال تجمع المدارس جانب رياض قصار',g:'رياض أطفال',p:'5428921'},
-  {n:'محمد طلال المفتي',s:'حسن خرما',a:'الميدان',d:'القاعة',ad:'ميدان قاعة خلف جامع سفيان الثوري',g:'رياض أطفال',p:'8820831'},
-  {n:'وجيه أمين قادري',s:'حسن خرما',a:'الميدان',d:'القاعة',ad:'ميدان-قاعة-جانب صيدليةالقاعة',g:'7 _ 9',p:'8884080'},
-  {n:'أحمد عرابي',s:'حسن خرما',a:'الميدان',d:'القاعة',ad:'ميدان-قاعة-جانب جامع الماجد',g:'1 _ 4',p:'8882318'},
-  {n:'شجرة الدر',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'تجمع المدارس',g:'1 _ 6',p:'2239684'},
-  {n:'سماهر الدره',s:'حسن خرما',a:'الشاغور',d:'شاغور براني',ad:'الزاهرة سكن أساتذة الجامعة',g:'1 _ 4',p:'5428984'},
-  {n:'سعد الدين قواص',s:'حسن خرما',a:'الميدان',d:'القاعة',ad:'ميدان قاعة وحدات سكنية',g:'رياض أطفال',p:'8822038'},
-  {n:'سعد بن أبي وقاص',s:'حسن خرما',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان جزماتية زقاق المحمص',g:'1 _ 4',p:'8881173'},
-  {n:'رابعة العدوية المهنية',s:'حسن خرما',a:'دمشق القديمة',d:'العمارة الجوانية',ad:'عمارة السبع طوالع جانب مقام السيدة رقية',g:'ثانوي صناعي',p:'2215962'},
-  {n:'المحبة الرسمية',s:'حسن خرما',a:'دمشق القديمة',d:'باب توما',ad:'دمشق القديمة-باب توما-دخلة العازرية',g:'1 _ 6',p:'5441561'},
-  {n:'المنصور الخاصة المستولى عليها',s:'حسن خرما',a:'دمشق القديمة',d:'باب توما',ad:'باب توما -حي العازرية',g:'1 _ 6',p:'5441535'},
-  {n:'القدس الرسمية',s:'حسن خرما',a:'دمشق القديمة',d:'',ad:'باب توما حارة البولاد جانب فندق بيت الوالي',g:'ثانوي عام',p:'5418009'},
-  {n:'المحبة الخاصة',s:'حسن خرما',a:'دمشق القديمة',d:'',ad:'باب توما حارة العازارية',g:'رياض أطفال',p:''},
-  {n:'الثانوية الصناعية الثانية',s:'حسن خرما',a:'دمشق القديمة',d:'باب توما',ad:'باب شرقي طريق المطار جانب كلية الهمك',g:'ثانوي صناعي',p:'5425033'},
-  {n:'روضة رواد الغد',s:'حسن خرما',a:'دمشق القديمة',d:'باب توما',ad:'باب توما دخلة حمام بكري القيمرية',g:'رياض أطفال',p:'5422426'},
-  {n:'مركز تدريب باب شرقي',s:'حسن خرما',a:'',d:'',ad:'',g:'',p:''},
-  {n:'سمية المخزومية',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل موقف فتح شارع أنس بن مالك شارع المدارس',g:'1 _ 6',p:'6612353'},
-  {n:'فيصل ديب',s:'رياض محمد',a:'المزة',d:'السومرية',ad:'مزة أوتستراد مساكن الفرقة الرابعة ضاحية الفرسان',g:'1 _ 6',p:'6620327'},
-  {n:'محمد خير حبال',s:'رياض محمد',a:'كفرسوسة',d:'اللوان',ad:'المتحلق الجنوبي بنايات الرئاسة',g:'1 _ 6',p:'6113359'},
-  {n:'سعيد العاص',s:'رياض محمد',a:'المزة',d:'السومرية',ad:'مزة -استراد السومرية',g:'1 _ 6',p:'613844'},
-  {n:'محمد ياسين النشار',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'مزة فيلات غربية-بجانب مدرسة دوحة الرحاب الخاصة',g:'1 _ 6',p:'6117698'},
-  {n:'محمد علي الجزائري',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة فيلات شرقية جانب المعهد الرياضي',g:'1 _ 6',p:'6122016'},
-  {n:'بكري قدورة',s:'رياض محمد',a:'المزة',d:'المزة القديمة',ad:'مزة استراد-مقابل مشفى الرازي',g:'1 _ 6',p:'6618478'},
-  {n:'هواري بو مدين',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة فيلات شرقية-شارع الفارابي',g:'1 _ 6',p:'6116081'},
-  {n:'محمود عبد الكريم',s:'رياض محمد',a:'المزة',d:'مزة86',ad:'مزة جبل86 جانب مدرسة حافظ ابراهيم',g:'1 _ 6',p:'6610172'},
-  {n:'الشريف الرضي',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل خلف المؤسسة العسكرية',g:'1 _ 6',p:'6666504'},
-  {n:'قتيبة بن مسلم الباهلي',s:'رياض محمد',a:'المزة',d:'المزة القديمة',ad:'مزة الشيخ سعد خلف المشفى العسكري',g:'1 _ 6',p:'6615144'},
-  {n:'هند الأنصارية',s:'رياض محمد',a:'المزة',d:'الربوة',ad:'الربوة طريق المشاتل-خلف جامع الربوة',g:'1 _ 6',p:'3745252'},
-  {n:'سليمان حسن شبيب',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'مزة فيلات غربية خلف السفارة الكويتية',g:'1 _ 6',p:'6113198'},
-  {n:'السيدة نفيسة',s:'رياض محمد',a:'المزة',d:'',ad:'مزة استراد-خلف مشفى الرازي',g:'1 _ 4',p:'2128784'},
-  {n:'الشهيدة نهلة زيدان',s:'رياض محمد',a:'المزة',d:'',ad:'مزة استراد طلعة الاسكان',g:'1 _ 6',p:'6624328'},
-  {n:'تيسير صوان',s:'رياض محمد',a:'المزة',d:'',ad:'مزة جبل شارع المدارس',g:'1 _ 6',p:'6612732'},
-  {n:'زيد بن حارثة',s:'رياض محمد',a:'المزة',d:'',ad:'سومرية-طريق بيروت',g:'1 _ 6',p:'6115010'},
-  {n:'أبو اليسر عابدين',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'فيلات شرقية-شارع الفارابي-خلف بنك بركة',g:'1 _ 6',p:'6117208'},
-  {n:'ابن زهر الأندلسي',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'المزة-خلف السفارة الكويتية',g:'1 _ 6',p:'6121459'},
-  {n:'ابراهيم ناعمة',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'مزة فيلات غربية خلف معهد السكرتارية',g:'1 _ 6',p:'6110981'},
-  {n:'النيربين',s:'رياض محمد',a:'المزة',d:'الربوة',ad:'مزة-فتالة-مقابل المدينة الجامعية',g:'1 _ 6',p:'2129993'},
-  {n:'يامي محمد فياض',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل-مقابل مدارس أبناء الشهداء',g:'1 _ 6',p:'6613412'},
-  {n:'حافظ ابراهيم',s:'رياض محمد',a:'المزة',d:'مزة86',ad:'مزة 86-طريق السجن',g:'1 _ 6',p:'6623770'},
-  {n:'السيدة ناعسة',s:'رياض محمد',a:'المزة',d:'',ad:'المزة-كراج السومرية',g:'1 _ 6',p:'6131214'},
-  {n:'ابن كثير الدمشقي',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'المزة فيلات غربية-جانب السفارة الكويتية',g:'1 _ 6',p:'6121464'},
+  {n:'سمير حنا سلوم',s:'وسيم سعيد',a:'شاغور',d:'',ad:'باب شرقي دويلعة تجمع مدارس',g:'ثانوي عام',p:'4713416'},
+  {n:'مروان مرشه',s:'وسيم سعيد',a:'ساروجا',d:'القصاع',ad:'قصاع ساحة جورج خوري جانب ثانوية المعونة',g:'7 _ 9',p:'4445710',oldName:'مروان مرشة'},
+  {n:'محي الدين داوود',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'قصور خطيب جادة سادسة',g:'7 _ 9',p:'4447877'},
+  {n:'أمية',s:'وسيم سعيد',a:'ساروجا',d:'',ad:'قصاع جانب ساحة التحرير',g:'ثانوي عام',p:'4445745'},
+  {n:'عبد الجليل النحاس',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر -نزلة ثالثة -جامع التقوى',g:'ثانوي عام',p:'3117864'},
+  {n:'مدحت تقي الدين',s:'محمود يوسف',a:'دمر',d:'',ad:'مشروع دمر ج16 خلف جامع البوطي',g:'7 _ 9',p:''},
+  {n:'راجح محمود',s:'محمود يوسف',a:'دمر',d:'',ad:'دمر مساكن العرين',g:'ثانوي عام',p:'3216877'},
+  {n:'وسيم جاموس',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'مساكن الحرس الجمهوري العرين',g:'7 _ 9',p:'3230316'},
+  {n:'ثا غالب أصلان',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر الجزيرة 16 جانب جامع البوطي',g:'ثانوي صناعي',p:'3110432',oldName:'غالب أصلان'},
+  {n:'ربيعة الايوبية',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة خلف جامع إبراهيم الخليل',g:'1 _ 6',p:'5113397'},
+  {n:'عبد القادر المازني',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة مقابل جامع إبراهيم الخليل',g:'1 _ 6',p:'5122956'},
+  {n:'محمد عدنان كولكي',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد-جادة خليل رجب',g:'7 _ 9',p:'5120927',oldName:'كولكلي برزة'},
+  {n:'المعهد التفاني التجاري الثاني',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'برزة مسبق الصنع بل مشفى حاميش',g:'معهد تجاري',p:'5140851'},
+  {n:'ثا/بسام حمشو المهنية',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'حي التجارة مقابل الحديقة',g:'ثانوي نسوي',p:''},
+  {n:'بسام حمشو المهنية النسوية',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'القصور - حي التجارة',g:'ثانوي نسوي',p:''},
   {n:'محمد النجدي البغدادي',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل-شارع المدارس-شارع أنس بن مالك',g:'7 _ 9',p:'6617324',oldName:'نجدي البغدادي'},
-  {n:'سليم حسن شعيب',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل-موقف الفتح-شارع المدارس',g:'7 _ 9',p:'6612412'},
   {n:'معاذ بن جبل',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة-خلف الهلال الأحمر',g:'7 _ 9',p:'6110500'},
-  {n:'ذات الصواري',s:'رياض محمد',a:'المزة',d:'السومرية',ad:'دمشق-سومرية شهداء-جانب الكراج',g:'7 _ 9',p:'6131216'},
-  {n:'عزالدين التنوخي',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'مزة-فيلات غربية-جانب معهد السكرتاريا سابقا',g:'7 _ 9',p:'631099'},
-  {n:'عبد الرحمن السفرجلاني',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'مزة-فيلات غربية-جانب السفارة الأرمنية',g:'7 _ 9',p:'6624478'},
-  {n:'سجيع هيفا',s:'رياض محمد',a:'المزة',d:'',ad:'السومرية مقابل مطار المزة',g:'ثانوي عام',p:'6131218'},
-  {n:'عمر بن عبد العزيز',s:'رياض محمد',a:'المزة',d:'',ad:'مزة فيلات شرقية خلف جامع الشافعي',g:'ثانوي عام',p:'6114639'},
-  {n:'عبد القادر المبارك',s:'رياض محمد',a:'المزة',d:'',ad:'مزة فيلات شرقية القنصلية السعودية',g:'ثانوي عام',p:'6113068'},
-  {n:'بسام بكورة',s:'رياض محمد',a:'المزة',d:'',ad:'مزة جبل جانب المخفر الغربي',g:'ثانوي عام',p:'6623829'},
-  {n:'أحمد اسكندر أحمد',s:'رياض محمد',a:'المزة',d:'',ad:'مزة فيلات غربية جانب برج تالة',g:'ثانوي عام',p:'6119714'},
-  {n:'ابن رشد',s:'رياض محمد',a:'المزة',d:'',ad:'مزة قديمة خلف مشفى الاطفال',g:'7 _ 9',p:'6665987'},
   {n:'محمد صلاح الدين الهبج',s:'رياض محمد',a:'المزة',d:'',ad:'مزة شيخ سعد جانب جامع المزة الكبير',g:'7 _ 9',p:'6615282',oldName:'الهبج'},
-  {n:'عثمان بن عفان',s:'رياض محمد',a:'المزة',d:'',ad:'مزة طلعة الاسكان خلف فرع الحزب',g:'7 _ 9',p:'6616649'},
-  {n:'المعهد التقاني للاقتصاد المنزلي الأول',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة أتوستراد شرقية مقابل جامع الشافعي',g:'معهد نسوي',p:'6124588'},
-  {n:'مصطفى صادق الرافعي',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل شارع المدارس',g:'ثانوي صناعي',p:'6663541'},
-  {n:'مطيع المعلم المهنية النسوية',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل جانب بنات الشهداء',g:'ثانوي نسوي',p:'66622793'},
-  {n:'السومرية المهنية',s:'رياض محمد',a:'المزة',d:'السومرية',ad:'مزة السومرية خلف الكراجات جانب مدرسة مقداد فيصل علي',g:'ثانوي صناعي',p:'6110398'},
-  {n:'محمد عيد كحلوس الصناعية',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'فيلات غربية مقابل مدرسة بناة الأجيال',g:'ثانوي صناعي',p:'6133150'},
-  {n:'معهد التربية الرياضية للمعلمات',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة فيلات شرقية جانب السفارة الأردنية',g:'معهد رياضي',p:'6112951'},
-  {n:'معهد التربية الموسيقية',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة فيلات خلف غولدن مزة',g:'معهد إعداد المدرسين',p:'6115576'},
-  {n:'محمد أحمد محمود المهنية',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة اتوستراد طلعة جامع الأكرم',g:'ثانوي تجاري',p:'6124508'},
   {n:'معهد إعداد المدرسين',s:'رياض محمد',a:'المزة',d:'المزة القديمة',ad:'مزة شيخ سعد جانب موقف الإسكان',g:'معهد إعداد المدرسين',p:'6611094',oldName:'إعداد مدرسين المزة'},
   {n:'عدنان مردم المهنية',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة فيلات شرقية مقابل السفارة السودانية',g:'ثانوي صناعي',p:'6118125'},
-  {n:'ثا محمود جلال التجارية',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'مزة فيلات شرقية خلف جامع الأكرم',g:'ثانوي تجاري',p:''},
-  {n:'معهد تربية الفنية التشكيلية التطبيقية يوشع منصور',s:'رياض محمد',a:'المزة',d:'المزة القديمة',ad:'الشيخ سعد طلعة الاسكان',g:'معهد إعداد المدرسين',p:''},
-  {n:'شراع الطفولة',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل مقابل حديقة الطلائع',g:'رياض أطفال',p:'6612561'},
-  {n:'روضة السومرية',s:'رياض محمد',a:'المزة',d:'السومرية',ad:'مزة سومرية جانب المستوصف',g:'رياض أطفال',p:'6110753'},
-  {n:'ثانوية محمود شحادة خليل',s:'رياض محمد',a:'المزة',d:'السومرية',ad:'',g:'7 _ 9',p:'6118305'},
-  {n:'ثا/يائيل الكنج للمتفوقين',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'جانب جامع الامام الشافعي',g:'7 _ 9',p:'6118091'},
-  {n:'ثا/نذير نبعة للمتفوقين',s:'رياض محمد',a:'المزة',d:'المزة القديمة',ad:'ش الفارابي - جامع عمر بن عبد العزيز',g:'7 _ 9',p:'6114807'},
-  {n:'عين جالوت',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'جانب جامع الاكرم- مقابل مدينة الشباب',g:'7 _ 9',p:'6124014'},
-  {n:'مركز التدريب الإلكتروني',s:'رياض محمد',a:'',d:'',ad:'',g:'',p:''},
-  {n:'مركز التدريب على الحاسب',s:'رياض محمد',a:'',d:'',ad:'',g:'',p:''},
-  {n:'دائرة البحوث',s:'رياض محمد',a:'',d:'',ad:'',g:'',p:''},
-  {n:'الدائرة القانونية',s:'رياض محمد',a:'',d:'',ad:'',g:'',p:''},
-  {n:'دائرة الإمتحانات',s:'رياض محمد',a:'',d:'',ad:'',g:'',p:''},
-  {n:'ربيعة الايوبية',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة خلف جامع إبراهيم الخليل',g:'1 _ 6',p:'5113397'},
-  {n:'6 تشرين',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'جانب الشرطة العسكرية',g:'1 _ 6',p:'4542236'},
-  {n:'أم عمار',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'حاميش حي العائدون',g:'1 _ 6',p:'5117108'},
-  {n:'عدنان المدني',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد جادة المزرعة',g:'1 _ 6',p:'5128980'},
-  {n:'تقي الدين الدمشقي',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد مقابل مجمع الخدمات',g:'1 _ 6',p:'5127197'},
-  {n:'حسن الخير',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة موقف الرحبة خلف جامع الحكيم',g:'1 _ 6',p:'5124883'},
-  {n:'أحمد شفيق السادات',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة مسبق الصنع جانب الفرن الآلي',g:'1 _ 6',p:'5135499'},
-  {n:'عبد القادر المازني',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة مقابل جامع إبراهيم الخليل',g:'1 _ 6',p:'5122956'},
-  {n:'زين العابدين نعمان',s:'علاء وهيبي',a:'برزة',d:'الحرية/عش الورور',ad:'برزة البلد عش الورور',g:'1 _ 6',p:'5129453'},
-  {n:'عش الورور المحدثة',s:'علاء وهيبي',a:'برزة',d:'الحرية/عش الورور',ad:'برزة ضهر المسطاح',g:'1 _ 6',p:'5110365'},
-  {n:'غالية فرحات',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة مقابل السكن الجامعي',g:'1 _ 6',p:'5114731'},
-  {n:'محمد ضامن',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد جانب ثا/ مسلم عابدين',g:'1 _ 6',p:'5142837'},
-  {n:'موسى بن نصير',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة جنوب جامع إبراهيم الخليل',g:'1 _ 6',p:'5132570'},
-  {n:'7 نيسان',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'برزة خلف قصر الحفيلي',g:'رياض أطفال',p:'4548224'},
-  {n:'رشاد قصيباتي',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة خلف أمية كلاس',g:'1 _ 6',p:'5125398'},
-  {n:'آمنة الزهرية',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'خلف جامع الحسنين',g:'رياض أطفال',p:'5129048'},
-  {n:'الخليل بن أحمد الفراهيدي',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد آخر عش الورور',g:'1 _ 6',p:'5135720'},
-  {n:'ليلى الاخيلية',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'خلف جامع السلام',g:'1 _ 6',p:'5128013'},
-  {n:'8 اذار',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد عش الورور',g:'رياض أطفال',p:'5117316'},
-  {n:'مصعب بن عمير',s:'علاء وهيبي',a:'القابون',d:'القابون',ad:'قابون جنوب مدارس الشرطة مقابل الحديقة',g:'رياض أطفال',p:'4528889'},
-  {n:'أحمد حامد جنيد',s:'علاء وهيبي',a:'القابون',d:'القابون',ad:'القابون -أبو جرش-جانب كلية الشرطة',g:'7 _ 9',p:'4525814'},
-  {n:'فايز غباري',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة-جانب الشرطة العسكرية',g:'7 _ 9',p:'4542870'},
-  {n:'ابتسام حرب',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة-شارع الحكيم',g:'7 _ 9',p:'5122905'},
-  {n:'محمد عدنان كولكي',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد-جادة خليل رجب',g:'7 _ 9',p:'5120927',oldName:'كولكلي برزة'},
-  {n:'عمر بن الخطاب',s:'علاء وهيبي',a:'برزة',d:'',ad:'برزة مسبق الصنع حي المنارة',g:'7 _ 9',p:'5118508'},
-  {n:'هاشم الفصيح',s:'علاء وهيبي',a:'برزة',d:'',ad:'برزة البلد مقابل الكلية السياسية',g:'7 _ 9',p:'4542439'},
-  {n:'ممدوح قره جولي',s:'علاء وهيبي',a:'مساكن برزة',d:'',ad:'مساكن برزة خلف جامع الخليل',g:'7 _ 9',p:'5132388'},
-  {n:'عبد الرؤوف سعيد',s:'علاء وهيبي',a:'مساكن برزة',d:'',ad:'مساكن برزة موقف البدوي جانب أفران تفاحة',g:'ثانوي عام',p:'5122972'},
-  {n:'مروان علي البارودي',s:'علاء وهيبي',a:'مساكن برزة',d:'',ad:'مساكن برزة خلف جامع الحسنين',g:'7 _ 9',p:'5137250'},
-  {n:'بسام كيكي المهنية',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'برزة مسبق الصنع خلف جامع القزاز',g:'ثانوي صناعي',p:'5117353'},
-  {n:'ثانوية أبو بكر الرازي المهنية المختلطة',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مسبق الصنع خلف جامع القزاز',g:'ثانوي صناعي',p:'5135574'},
-  {n:'المعهد التفاني التجاري الثاني',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'برزة مسبق الصنع بل مشفى حاميش',g:'معهد تجاري',p:'5140851',oldName:'المعهد التقاني التجاري الثاني'},
-  {n:'المعهد التقاني للاقتصاد المنزلي الثاني',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة حاميش طلعة مول قاسيون',g:'معهد نسوي',p:'5117364'},
-  {n:'سعد الله ونوس المهنية',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة حاميش مسبق الصنع المرحلة الرابعة',g:'ثانوي صناعي',p:'5111443'},
-  {n:'أحمد منيف العائدي',s:'علاء وهيبي',a:'القابون',d:'القابون',ad:'القابون دوار الوحدات',g:'7 _ 9',p:'4526837'},
-  {n:'مايا العلي',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة البلد جامع السلام حي العائدون',g:'7 _ 9',p:'5124110'},
-  {n:'الفارابي',s:'علاء وهيبي',a:'برزة',d:'المنارة',ad:'برزة مسبق الصنع جامع الرحمة',g:'7 _ 9',p:'5114992'},
-  {n:'روضة الأطفال المرحة',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة خلف جامع ابراهيم الخليل',g:'رياض أطفال',p:'5132890'},
-  {n:'روضة أفنان المعرفة',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة جانب فرع مكافحة المخدرات بعد البلدية',g:'رياض أطفال',p:'5136042'},
-  {n:'روضة سنابل الخير',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'مساكن برزة البناء الخلفي لابتدائية غالية فرحات',g:'رياض أطفال',p:'5140197'},
-  {n:'محمد مسلم عابدين',s:'علاء وهيبي',a:'برزة',d:'',ad:'جادة خليل رجب',g:'7 _ 9',p:'5119277'},
-  {n:'محمد غالب الرفاعي',s:'علاء وهيبي',a:'القابون',d:'المصنع',ad:'قابون',g:'رياض أطفال',p:'4524233'},
-  {n:'عاتكة بنت عبدالمطلب',s:'علاء وهيبي',a:'القابون',d:'',ad:'دوار الوحدات الخاصة',g:'1 _ 6',p:'4523800'},
-  {n:'برزة المحدثة',s:'علاء وهيبي',a:'برزة',d:'برزة البلد',ad:'برزة الشارع العام جادة العائدون',g:'ثانوي عام',p:'5135671'},
-  {n:'خليل مردم بك',s:'علاء وهيبي',a:'برزة',d:'مساكن برزة',ad:'حاميش طلعة مول قاسيون',g:'ثانوي نسوي',p:'5119089'},
-  {n:'مركز تدريب القيادات التربوية',s:'علاء وهيبي',a:'',d:'',ad:'',g:'',p:''},
-  {n:'رشدي الشمعة',s:'علي بيكو',a:'المهاجرين',d:'المصطبة',ad:'مهاجرين مصطبة جادة رابعة',g:'7 _ 9',p:'3730136'},
-  {n:'ابراهيم هنانو',s:'علي بيكو',a:'المهاجرين',d:'الروضة',ad:'الجسر الابيض-شارع نوري باشا',g:'1 _ 6',p:'3337540'},
-  {n:'خولة بنت الأزور',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'مهاجرين-شورى-جادة ابن عياد',g:'1 _ 6',p:'3736214'},
-  {n:'فاطمة المخزومية',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين-شمسية جادة ثالثة',g:'1 _ 6',p:'3715714'},
-  {n:'الشهيد عادل أبو قرعة',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'مهاجرين-الجادة التاسعة جنب جامع الرضوان',g:'1 _ 6',p:'3715936'},
-  {n:'عقبة بن نافع',s:'علي بيكو',a:'المهاجرين',d:'الروضة',ad:'طلعت نوري باشا-ساحة سعدي الشيرازي',g:'1 _ 6',p:'3334042'},
-  {n:'عبد الفتاح قطيط',s:'علي بيكو',a:'المهاجرين',d:'المرابط',ad:'مهاجرين-خورشيد أول-مقابل القصر القديم',g:'1 _ 6',p:'3715570'},
-  {n:'علية المهدية',s:'علي بيكو',a:'المهاجرين',d:'الروضة',ad:'روضة-دخلة المحاربين القدماء-مقابل نقابة المعلمين',g:'1 _ 6',p:'3336462'},
-  {n:'محمد نجيب حليمة',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين-جادة 6',g:'1 _ 6',p:'3712958'},
-  {n:'الشهيد عدنان دياب',s:'علي بيكو',a:'المهاجرين',d:'المصطبة',ad:'مهاجرين-مصطبة جادة رابعة',g:'1 _ 6',p:'3718920'},
-  {n:'محمد أسامة البيروتي',s:'علي بيكو',a:'المهاجرين',d:'المالكي',ad:'المالكي-شارع عبد المنعم رياض',g:'1 _ 6',p:'3710246'},
-  {n:'أحمد الططرى',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'شورى-زين العابدين',g:'1 _ 6',p:'3335434'},
-  {n:'جميلة العقسية',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'مهاجرين-شكاتب-جادة6',g:'1 _ 6',p:'3716624'},
-  {n:'نصوح بابيل',s:'علي بيكو',a:'المهاجرين',d:'أبو رمانة',ad:'ابو رمانة-شارع احمد شوقي',g:'1 _ 6',p:'3334654'},
-  {n:'الشهيد نضال عبود الطبري',s:'علي بيكو',a:'المهاجرين',d:'',ad:'المهاجرين-الشعلان-جادة ابو تمام',g:'1 _ 6',p:'3346156'},
-  {n:'عصام حسن',s:'علي بيكو',a:'المهاجرين',d:'الروضة',ad:'روضة-شارع نوري باشا -فرع الشبيبة',g:'1 _ 6',p:'3338880'},
-  {n:'هدى شعراوي',s:'علي بيكو',a:'المهاجرين',d:'المرابط',ad:'المهاجرين-خورشيد ثاني -مرابط',g:'1 _ 6',p:'3739950'},
-  {n:'طارق بن زياد',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين-شمسية-جادة رابعة',g:'1 _ 6',p:'3712722'},
-  {n:'لبنى الأندلسية',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين-باشكاتب-جادة 3',g:'1 _ 6',p:'3712401'},
-  {n:'الشهيد أحمد فائق الكردي',s:'علي بيكو',a:'المهاجرين',d:'',ad:'باشكابت-جامع نافذ أفندي',g:'1 _ 6',p:'3711103'},
-  {n:'الأخوة الابتدائية الخاصة المستولى عليها',s:'علي بيكو',a:'المهاجرين',d:'أبو رمانة',ad:'المالكي مقابل السفارة الامريكية',g:'1 _ 6',p:'3338484'},
-  {n:'ابن خلدون',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين-التجهيز-شارع الفردوس',g:'7 _ 9',p:''},
-  {n:'أحمد الصباغ',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين-جادة ثالثة-موقف الشمسية',g:'7 _ 9',p:'3732205'},
-  {n:'برهان الدين شمدين',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'شرقي ركن الدين-جانب طارق بن زياد',g:'7 _ 9',p:'2719960'},
-  {n:'محمد عدنان الصباغ',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'المهاجرين-حي العفيف',g:'7 _ 9',p:'3332717'},
-  {n:'لبانة المحدثة',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'مهاجرين-جادة سنبل-حارة المدارس',g:'7 _ 9',p:'3317043'},
-  {n:'ساطع الحصري',s:'علي بيكو',a:'المهاجرين',d:'أبو رمانة',ad:'أبو رمانة-جانب المكتب الاحصائي',g:'7 _ 9',p:'3335850'},
-  {n:'عمر الأبرش',s:'علي بيكو',a:'المهاجرين',d:'',ad:'دمشق-ساحة الميسات-جانب مشفى أمية',g:'7 _ 9',p:'2741260'},
-  {n:'ابن النفيس',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-مفرق أبو النور-مقابل حديقة شكو',g:'7 _ 9',p:'2778119'},
-  {n:'خولة الكندية',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'مهاجرين-شورى-مقابل مستودع الكتب',g:'7 _ 9',p:'3731724'},
-  {n:'سامر الأعرج',s:'علي بيكو',a:'الصالحية',d:'الشيخ محيي الدين',ad:'شيخ محي الدين-حارة الشعارة',g:'7 _ 9',p:'2741466'},
-  {n:'سليم البخاري',s:'علي بيكو',a:'الصالحية',d:'المزرعة',ad:'سبع بحرات-مقابل هيئة الاستثمار',g:'7 _ 9',p:'4441713'},
-  {n:'محمد بن قاسم الثقفي',s:'علي بيكو',a:'المهاجرين',d:'المالكي',ad:'مالكي-جانب السفارة الألمانية',g:'7 _ 9',p:'3715455'},
-  {n:'السفيرة المحدثة',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-مجمع مدارس-خلف مشفى ابن النفيس',g:'7 _ 9',p:'2710850'},
-  {n:'سناء محيدلي',s:'علي بيكو',a:'ركن الدين',d:'',ad:'ركن الدين-برنية-خلف مشفى هشام سنان',g:'7 _ 9',p:'2761655'},
-  {n:'محمد أحمد ناصيف',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'المزرعة-الهجرة والجوازات-خلف امتحانات الريف',g:'7 _ 9',p:'2713075'},
-  {n:'عباس ابن فرناس',s:'علي بيكو',a:'ركن الدين',d:'الأيوبية',ad:'ركن الدين جادة الأربعين',g:'1 _ 6',p:'2778411'},
-  {n:'العصماء',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'الجسر الأبيض-جادة الرئيس',g:'1 _ 6',p:'3324512'},
-  {n:'ست الشام',s:'علي بيكو',a:'',d:'',ad:'',g:'1 _ 6',p:'2771133'},
-  {n:'عثمان ذي النورين',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين ساحة شمدين',g:'1 _ 6',p:'2771517'},
-  {n:'إبراهيم الزرفالي',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-خلف جامع كردان',g:'1 _ 6',p:'2773002'},
-  {n:'محمد البزم',s:'علي بيكو',a:'المهاجرين',d:'شورى',ad:'العفيف- دخلة سوق الجمعة',g:'1 _ 6',p:'3343718'},
-  {n:'الشهيد حسين جمعة',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-خلف ابن النفيس',g:'1 _ 6',p:'2713727'},
-  {n:'أم البنين',s:'علي بيكو',a:'الصالحية',d:'الشيخ محيي الدين',ad:'الجسر الأبيض-فوق جامع الدلامية',g:'1 _ 6',p:'3317145'},
-  {n:'صلاح الدين الأيوبي',s:'علي بيكو',a:'المهاجرين',d:'أبو رمانة',ad:'مهاجرين-زين العابدين-موقف الحارس',g:'1 _ 6',p:'3338865'},
-  {n:'بسام بربور',s:'علي بيكو',a:'الصالحية',d:'الشيخ محيي الدين',ad:'الشيخ محي الدين-مقابل جامع عبد الغني النابلسي',g:'1 _ 6',p:'2777321'},
-  {n:'محمد رشدي بركات',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-أسد الدين-مقهى الخوالي',g:'1 _ 6',p:'2772142'},
-  {n:'أبي عبيدة بن الجراح',s:'علي بيكو',a:'ركن الدين',d:'النقشبندي',ad:'ركن الدين-النقشبندي',g:'1 _ 6',p:'2762586'},
-  {n:'تماضر العربية',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-جادة الأرمن',g:'1 _ 6',p:'2773600'},
-  {n:'مروان خليل',s:'علي بيكو',a:'ركن الدين',d:'النقشبندي',ad:'ركن الدين-مقابل جامع النقشبندي',g:'1 _ 6',p:'2761869'},
-  {n:'فاطمة جريدة',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-خلف ابن النفيس',g:'1 _ 6',p:'2713723'},
-  {n:'أميمة الغفارية',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-وائلي أول-جبل',g:'1 _ 4',p:'2712713'},
-  {n:'محي الدين بن عربي',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'ركن الدين-الشارع العام-مقاومة',g:'1 _ 6',p:'2773169'},
-  {n:'أم هانئ القرشية',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'ركن الدين-شرقي-شارع الهجرة والجوازات',g:'1 _ 6',p:'2712125'},
-  {n:'مهند الملا',s:'علي بيكو',a:'ركن الدين',d:'الأيوبية',ad:'ركن الدين-كيكية-ساحة لورين',g:'1 _ 4',p:'2716613'},
-  {n:'الشهيدة رؤى الصاري',s:'علي بيكو',a:'الصالحية',d:'الشهداء',ad:'دمشق-ساحة عرنوس-تمثال السيد الرئيس',g:'1 _ 6',p:'3346104'},
-  {n:'المجاهد أحمد الملا',s:'علي بيكو',a:'ركن الدين',d:'الأيوبية',ad:'ركن الدين-الأيوبية',g:'1 _ 4',p:'2712634'},
-  {n:'ابن المعتز',s:'علي بيكو',a:'ركن الدين',d:'الأيوبية',ad:'ركن الدين-أسد الدين',g:'1 _ 4',p:'2772612'},
-  {n:'هالة بنت خويلد',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-أسد الدين-مقابل قسم الشرطة',g:'1 _ 6',p:'2712957'},
-  {n:'أحمد بن حنبل',s:'علي بيكو',a:'الصالحية',d:'قاسيون',ad:'الشيخ إبراهيم-ساحة الدانة',g:'1 _ 4',p:'2773448'},
-  {n:'أحمد أومري',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-أسد الدين-جانب جامع يونس آغا',g:'1 _ 6',p:'2764945'},
-  {n:'بنت الشاطئ',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-أسد الدين-مقابل مطعم العافية',g:'1 _ 6',p:'2772183'},
-  {n:'داليا زنود',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-ساحة شمدين-حارة الزبادنة',g:'1 _ 6',p:'2770078'},
-  {n:'وائل ريا',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'أسد الدين-طلعة المتينية',g:'1 _ 6',p:'2772324'},
-  {n:'الصاحبة',s:'علي بيكو',a:'الصالحية',d:'أبو جرش',ad:'صالحية-أبو جرش-جانب جامع النور',g:'1 _ 4',p:'2771972'},
-  {n:'نسيبة المازنية',s:'علي بيكو',a:'ركن الدين',d:'النقشبندي',ad:'',g:'1 _ 4',p:'2774396'},
-  {n:'محمد غازي الخالدي',s:'علي بيكو',a:'المهاجرين',d:'',ad:'شورى جادة أبي حنيفة النعمان',g:'ثانوي عام',p:'3346961'},
-  {n:'ابن العميد',s:'علي بيكو',a:'ركن الدين',d:'',ad:'ركن الدين مقابل أفران ابن العميد',g:'ثانوي عام',p:'2726354'},
-  {n:'17 نيسان',s:'علي بيكو',a:'مهاجرين',d:'',ad:'مهاجرين مصطبة',g:'ثانوي عام',p:'3715101'},
-  {n:'عادلة بيهم الجزائري',s:'علي بيكو',a:'مهاجرين',d:'',ad:'مهاجرين سكة جامع المرابط',g:'ثانوي عام',p:'3712512'},
-  {n:'بورسعيد',s:'علي بيكو',a:'مهاجرين',d:'',ad:'الجسر الابيض خلف جامع الدلامية',g:'ثانوي عام',p:'3317144'},
-  {n:'نبيل يونس',s:'علي بيكو',a:'ركن الدين',d:'',ad:'ركن الدين برنية خلف مشفى سنان',g:'ثانوي عام',p:'2760013'},
-  {n:'جودة الهاشمي',s:'علي بيكو',a:'ساروجا',d:'',ad:'تجهيز جانب الفورسيزون',g:'ثانوي عام',p:'2215718'},
-  {n:'زكي الارسوزي',s:'علي بيكو',a:'ركن الدين',d:'',ad:'ميسات مقابل مجمع العثمان',g:'ثانوي عام',p:'4424600'},
-  {n:'سوا',s:'علي بيكو',a:'المهاجرين',d:'',ad:'مهاجرين نزلة المرابط جادة قرطبة',g:'1 _ 6',p:'3712328',oldName:'المالكي سوا'},
-  {n:'محمد حسن الملا',s:'علي بيكو',a:'ركن الدين',d:'',ad:'ركن الدين ساحة شمدين',g:'7 _ 9',p:'2771536'},
-  {n:'عبد الرحمن الشهبندر',s:'علي بيكو',a:'المهاجرين',d:'',ad:'ساحة الشهبندر جانب مديرية صحة ريف دمشق',g:'7 _ 9',p:'4455179'},
-  {n:'الاخوة الخاصة',s:'علي بيكو',a:'مهاجرين',d:'',ad:'مهاجرين مرابط',g:'7 _ 9',p:'3710987'},
-  {n:'دار السلام',s:'علي بيكو',a:'مهاجرين',d:'',ad:'الشعلان ساحة النجمة',g:'رياض أطفال',p:''},
-  {n:'ثانوية أروى القريشية المهنية',s:'علي بيكو',a:'الصالحية',d:'المدارس',ad:'الجسر الأبيض جادة البسام جانب نادي الصحفين',g:'ثانوي نسوي',p:'3331258'},
-  {n:'ثا/عبدالوهاب أبو السعود المهنية',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'شرقي ركن الدين جانب الهجرة والجوازات',g:'ثانوي تجاري',p:'2710812'},
-  {n:'الصناعة الخامسة',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين هجرة والجوزات',g:'ثانوي صناعي',p:'2718501'},
-  {n:'ثا/جول جمال التجارية',s:'علي بيكو',a:'الصالحية',d:'الشهداء',ad:'الصالحية الشهداء',g:'ثانوي تجاري',p:'2315690'},
-  {n:'صالح الشاطر',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين مقاومة الشارع العام مقابل جامع صلاح الدين',g:'7 _ 9',p:'2772100'},
-  {n:'روضة المنى',s:'علي بيكو',a:'المهاجرين',d:'المرابط',ad:'مهاجرين مرابط مقابل ثانوية عادلة بيهم الجزائري',g:'رياض أطفال',p:'3711984'},
-  {n:'روضة ركن الدين المحدثة',s:'علي بيكو',a:'ركن الدين',d:'الأيوبية',ad:'ركن الدين شارع صلاح الدين',g:'رياض أطفال',p:'2712512'},
-  {n:'روضة أزهار نيسان',s:'علي بيكو',a:'الصالحية',d:'المزرعة',ad:'شهبندر مقابل وزارة التربية',g:'رياض أطفال',p:'3324880'},
-  {n:'روضة بسمة الطفولة',s:'علي بيكو',a:'ركن الدين',d:'النقشبندي',ad:'ركن الدين الشيخ خالد',g:'رياض أطفال',p:'2760102'},
-  {n:'روضة أزهار المستقبل',s:'علي بيكو',a:'المهاجرين',d:'أبو رمانة',ad:'عفيف مقابل السفارة الفرنسية جادة سنبل',g:'رياض أطفال',p:'3340516'},
-  {n:'روضة تيسير الحموي',s:'علي بيكو',a:'الصالحية',d:'الشيخ محيي الدين',ad:'سوق الجمعة مقابل مستوصف أبو جرش خلف جامع النور',g:'رياض أطفال',p:'2773347'},
-  {n:'روضة المستقبل المشرق',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين موقف المقاومة',g:'رياض أطفال',p:'2750129'},
-  {n:'روضة أبناء العاملين في وزارة التربية',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين ساحة شمدين جامع أبو النور',g:'رياض أطفال',p:'2753134'},
-  {n:'الرشيد',s:'علي بيكو',a:'الصالحية',d:'الشيخ محيي الدين',ad:'شيخ محي الدين-مقابل جامع النابلسي',g:'1 _ 6',p:'2752635'},
-  {n:'الشهيد محمد علي فرح',s:'علي بيكو',a:'الصالحية',d:'الشهداء',ad:'مقابل مدخل مشفى الطلياني',g:'1 _ 6',p:'3325493'},
-  {n:'معروف الرصافي',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'أسد الدين-زقاق فلاحة',g:'1 _ 6',p:'2772243'},
-  {n:'الكهف المحدثة',s:'علي بيكو',a:'المهاجرين',d:'أبو رمانة',ad:'مهاجرين-نبعة-جامع الكهف',g:'1 _ 6',p:'3340699'},
-  {n:'محمد آلان جنكيز ديري',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'ركن الدين-جانب جامع صلاح الدين',g:'1 _ 4',p:'2771798'},
-  {n:'التطبيقات المسلكية',s:'علي بيكو',a:'الصالحية',d:'المزرعة',ad:'الجسر الأبيض-خلف مبنى وزارة التربية',g:'رياض أطفال',p:'3315266'},
-  {n:'النضال العربي',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'ركن الدين-ابن العميد-جانب ثانوية ابن العميد',g:'1 _ 6',p:'2716163'},
-  {n:'محمد جميل سلطان',s:'علي بيكو',a:'ركن الدين',d:'أسد الدين',ad:'ركن الدين-شرقي ركن الدين-مقابل جامع طارق بن زياد',g:'1 _ 6',p:'2720371'},
-  {n:'نايف تللو',s:'علي بيكو',a:'الصالحية',d:'المزرعة',ad:'ركن الدين-وادي سفيرا-دخلة المختار',g:'1 _ 4',p:'2715964'},
-  {n:'درويش الزوني',s:'علي بيكو',a:'ركن الدين',d:'الفيحاء',ad:'ركن الدين الشرقي',g:'7 _ 9',p:'2714982'},
-  {n:'سامي الدروبي',s:'علي بيكو',a:'المهاجرين',d:'المالكي',ad:'حواكير نزلة الشامي -مقابل مول المالكي',g:'ثانوي عام',p:'3713140'},
-  {n:'مركز تدريب ركن الدين',s:'علي بيكو',a:'',d:'',ad:'',g:'',p:''},
-  {n:'عائشة الصديقة',s:'علي شاليش',a:'الميدان',d:'الحقلة',ad:'ميدان حقلة جانب مشفى الفيحاء',g:'1 _ 6',p:'8880897'},
-  {n:'ابن زيدون',s:'علي شاليش',a:'الميدان',d:'ميدان وسطاني',ad:'ميدان وسطاني مجتهد مقابل مشفى المجتهد',g:'7 _ 9',p:'8881157'},
-  {n:'خالد بن الوليد',s:'علي شاليش',a:'الميدان',d:'ميدان وسطاني',ad:'جزماتية-جانب قسم شرطة الميدان',g:'1 _ 6',p:'8882517'},
-  {n:'مروان بن الحكم',s:'علي شاليش',a:'القنوات',d:'المجتهد',ad:'ساحة الدروز',g:'1 _ 4',p:'2222410'},
-  {n:'محمد مصطفى جويد',s:'علي شاليش',a:'الميدان',d:'ميدان وسطاني',ad:'مجتهد خلف مدرسة ابن زيدون',g:'1 _ 6',p:'8882107'},
-  {n:'عماد الدين الزنكي',s:'علي شاليش',a:'الميدان',d:'الدقاق',ad:'ميدان-أبو حبل-جانب جامع الدقاق',g:'1 _ 4',p:'8880562'},
-  {n:'عبد الرحمن الغامعي',s:'علي شاليش',a:'الميدان',d:'',ad:'نهر عيشة الجويزانية - صيدلية التل',g:'1 _4',p:'8814209'},
-  {n:'المأمون',s:'علي شاليش',a:'القنوات',d:'قبر عاتكة',ad:'ميدان شويكة - جادة السلطان',g:'1 _ 4',p:'2258768'},
-  {n:'الملكة بلقيس',s:'علي شاليش',a:'القنوات',d:'الحجاز',ad:'الحلبوني جانب المؤسسة العسكرية',g:'1 _ 6',p:'2226462'},
-  {n:'آية حبيب',s:'علي شاليش',a:'القنوات',d:'البرامكة',ad:'برامكة-بختيار-مقابل ملعب تشرين',g:'7 _ 9',p:'2211347'},
-  {n:'عباس الحامض',s:'علي شاليش',a:'القنوات',d:'البرامكة',ad:'برامكة-مقابل مجمع الأمويين',g:'7 _ 9',p:'2120279'},
-  {n:'فايز منصور',s:'علي شاليش',a:'القنوات',d:'',ad:'برامكة حلبوني غرب أسعد عبد الله',g:'ثانوي عام',p:'2224906'},
-  {n:'علي خلوف',s:'علي شاليش',a:'البرامكة',d:'',ad:'برامكة مقابل مجمع الامويين',g:'ثانوي عام',p:'2124979'},
-  {n:'أسعد عبد الله',s:'علي شاليش',a:'قنوات',d:'',ad:'حلبوني جانب ثا/فايز منصور',g:'7 _ 9',p:'2215729'},
-  {n:'عمر شخاشيرو',s:'علي شاليش',a:'البرامكة',d:'',ad:'البرامكة مقابل مؤسسة المطبوعات',g:'ثانوي تجاري',p:''},
-  {n:'ثا/س نور فاطر حراير الصناعية',s:'علي شاليش',a:'القنوات',d:'البرامكة',ad:'برامكة مقابل سانا جامب وزارة الزراعة',g:'ثانوي صناعي',p:'2122592'},
-  {n:'المعهد التقاني التجاري الأول',s:'علي شاليش',a:'القنوات',d:'البرامكة',ad:'شارع علي بن أبي طالب مقابل مجمع الأمويين',g:'معهد تجاري',p:'2119766'},
-  {n:'ثا/الباسل للمتفوقين المختلطة',s:'علي شاليش',a:'القنوات',d:'البرامكة',ad:'بختيار جانب نادي المعلمين',g:'7 _ 9',p:'2254206'},
-  {n:'جمال الدين القاسمي',s:'علي شاليش',a:'القنوات',d:'الأنصاري',ad:'فحامة -خلف جامع زيد بن حارث',g:'1 _ 6',p:'2258199'},
-  {n:'عبدالرحمن الخازن',s:'علي شاليش',a:'القنوات',d:'البرامكة',ad:'مقابل ملعب تشرين',g:'رياض أطفال',p:'2260133'},
-  {n:'الدداحيل المحدثة',s:'علي شاليش',a:'القدم',d:'الدداحيل',ad:'مقابل مؤسسة عين الفيجة',g:'1 _ 6',p:'8127336'},
-  {n:'جلال الدين السيوطي',s:'علي شاليش',a:'القدم',d:'السيدة عائشة',ad:'أول سوق عاصم',g:'1 _ 6',p:'8880810'},
-  {n:'الشهيد مراد خزام',s:'علي شاليش',a:'القدم',d:'القدم',ad:'اتستراد درعا الجديد - بستان شاحوطة',g:'رياض أطفال',p:'81261606'},
-  {n:'الملك الناصر',s:'علي شاليش',a:'القدم',d:'القدم',ad:'حي الذهبا',g:'1 _ 6',p:'8121871'},
-  {n:'شمس الجلاء',s:'علي شاليش',a:'القدم',d:'الدداحيل',ad:'اتستراد دحاديل - مقابل جامع انس',g:'1 _ 6',p:'8111765'},
-  {n:'شكري القوتلي',s:'علي شاليش',a:'القدم',d:'القدم',ad:'محطة القطار- الباب الثاني',g:'رياض أطفال',p:'8122640'},
-  {n:'أبي حنيفة النعمان',s:'علي شاليش',a:'القدم',d:'السيدة عائشة',ad:'السيدة عائشة - دخلة مخبر بندق',g:'1 _ 6',p:'8883188'},
-  {n:'الشهيد جعفر خزام',s:'علي شاليش',a:'القدم',d:'',ad:'خلف قسم الشرطة',g:'رياض أطفال',p:'8121437'},
-  {n:'رشيد الخطيب',s:'علي شاليش',a:'القدم',d:'القدم',ad:'دمشق-القدم-حي الإعلام',g:'7 _ 9',p:''},
-  {n:'القعقاع بن عمرو التميمي',s:'علي شاليش',a:'القدم',d:'القدم',ad:'القدم-جانب بناء الإعلام',g:'7 _ 9',p:''},
-  {n:'معروف الارناؤوط',s:'علي شاليش',a:'القدم',d:'',ad:'القدم خلف قسم شرطة القدم',g:'7 _ 9',p:'8112959'},
-  {n:'روضة نرجس الشام',s:'علي شاليش',a:'القدم',d:'جورة الشريباتي',ad:'القدم حارة الشريباتي بين مدرستي حطين ورقية القرشية',g:'رياض أطفال',p:'8141144'},
-  {n:'الرزاي',s:'علي شاليش',a:'القدم',d:'القدم',ad:'دحاديل القدم جانب مكتبة وسيم',g:'1 _ 6',p:'8113364'},
-  {n:'امجد الطرابلسي',s:'علي شاليش',a:'القدم',d:'القدم',ad:'بناء المحاربين القدماء -جانب مدرسة شكري القوتلي',g:'رياض أطفال',p:'8119969'},
-  {n:'حطين',s:'علي شاليش',a:'القدم',d:'القدم',ad:'شرق جامع خديجة كبرى',g:'1 _ 6',p:'8113367'},
-  {n:'رقية القرشية',s:'علي شاليش',a:'القدم',d:'الدداحيل',ad:'حارة شريباتي',g:'1 _ 6',p:'8123362'},
-  {n:'ابن الرومي',s:'علي شاليش',a:'القدم',d:'الدداحيل',ad:'كرم نوح- عين الفيجة',g:'1 _ 6',p:'8113372'},
-  {n:'ابي يوسف الكندي',s:'علي شاليش',a:'القدم',d:'السيدة عائشة',ad:'أول سوق غاصم',g:'1 _ 6',p:'8885038'},
-  {n:'مي زيادة',s:'علي شاليش',a:'القدم',d:'الدداحيل',ad:'قرب فرن السعدي',g:'1 _4',p:'8121743'},
-  {n:'عمار بن ياسر',s:'علي شاليش',a:'القدم',d:'',ad:'نهر بلاط حي الزهبا',g:'1 _ 6',p:'8127878'},
-  {n:'عمر المختار',s:'علي شاليش',a:'القدم',d:'',ad:'دوار الضبع',g:'1 _ 6',p:'8113358'},
-  {n:'رضا سعيد',s:'علي شاليش',a:'القدم',d:'الدداحيل',ad:'إشارة سوق الخضرة',g:'رياض أطفال',p:'8131876'},
-  {n:'مجاهد العامري الدمشقي',s:'علي شاليش',a:'القدم',d:'القدم',ad:'القدم حي الجلاء مقابل مدرسة ديب الرفاعي',g:'1-6',p:'8112056'},
-  {n:'ثا محمد كرد علي',s:'علي شاليش',a:'القدم',d:'القدم',ad:'مشتل - مقسم هاتف',g:'7 _ 9',p:'8129317'},
-  {n:'إيليا أبو ماضي',s:'علي شاليش',a:'دمشق القديمة',d:'باب توما',ad:'صوفانية خلف النادي العائلي',g:'7 _ 9',p:'5422181'},
-  {n:'ثا/جميل صليبا',s:'علي شاليش',a:'جوبر',d:'',ad:'شيخ ارسلان',g:'7 _ 9',p:'4722769'},
-  {n:'عبد الجليل النحاس',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر -نزلة ثالثة -جامع التقوى',g:'ثانوي عام',p:'3117864'},
-  {n:'الشهيد محمد عبد الله',s:'محمود يوسف',a:'دمر',d:'دمر الغربية',ad:'مساكن الحرس الجديدة - جانب الفرن',g:'1 _ 6',p:'3216926'},
-  {n:'سعد بن عبادة',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر جزيرة 6 خلف طوارئ الكهرباء',g:'1 _ 6',p:'3110748'},
-  {n:'عبد الله بن جبير',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر الجزيرة 10 جانب فوج الإطفاء',g:'1 _ 6',p:'3142236'},
-  {n:'محمد أديب قلاجو',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر الجزيرة 19 خلف الشركة السورية للنفط',g:'1 _ 6',p:'3131294'},
-  {n:'دمر المحدثة',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'دمر البلد- ساحة المدارس',g:'1 _ 6',p:'3113587'},
-  {n:'سمير النحاس',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر الجزيرة 5 مقابل بنك بيمو السعودي الفرنسي',g:'1 _ 6',p:'3117340'},
-  {n:'ش/نرفت صقر',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'مشروع دمر حي العرين',g:'1 _ 6',p:'3211898'},
-  {n:'الشهيد صالح صالح',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر ج3',g:'1 _ 6',p:'3117944'},
-  {n:'باسل الأسد الأولى',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'مساكن الحرس جانب ثانوية راجح محمود',g:'1 _ 6',p:'3211375'},
-  {n:'عبد الرحمن الداخل',s:'محمود يوسف',a:'دمر',d:'دمر الغربية',ad:'دمر الحارة الجديدة جانب فرن العيطة',g:'1 _ 4',p:'3110139'},
-  {n:'محمد أمير الخطيب',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر ج11 دوار الكنيسة',g:'1 _ 6',p:'3113648'},
-  {n:'حكمت هاشم',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'دمر البلد-طلعة قاسيون',g:'7 _ 9',p:'3113586'},
-  {n:'ممدوح حمدي أباظة',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر',g:'7 _ 9',p:'3117004'},
-  {n:'محمد علي خضر',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر-مساكن الحرس',g:'7 _ 9',p:'3211048'},
-  {n:'شذى قدور',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'دمر البلد-ساحة المدارس',g:'7 _ 9',p:'3111839'},
-  {n:'غسان حمود',s:'محمود يوسف',a:'دمر',d:'الورود',ad:'مشروع دمر-حي الورود-نزلة الصفصاف',g:'1 _ 6',p:'3117042'},
-  {n:'محمد المقداد',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'دمر العرين-حي العرين',g:'1 _ 6',p:'3211049'},
-  {n:'الشهيد باسل الأسد الثانية',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'مساكن الحرس-جانب اعدادية وسيم الجاموس',g:'1 _ 6',p:'3211378'},
-  {n:'البحتري',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'دمر البلد الشرقية-جانب التربة',g:'1 _ 6',p:'3110451'},
-  {n:'راجح محمود',s:'محمود يوسف',a:'دمر',d:'',ad:'دمر مساكن العرين',g:'ثانوي عام',p:'3216877'},
-  {n:'مدحت تقي الدين',s:'محمود يوسف',a:'دمر',d:'',ad:'مشروع دمر ج16 خلف جامع البوطي',g:'7 _ 9',p:''},
-  {n:'الباسل ح1',s:'محمود يوسف',a:'قاسيون',d:'',ad:'مشروع دمر حي العرين',g:'7 _ 9',p:'3214020'},
-  {n:'علي يوسف صبح',s:'محمود يوسف',a:'قاسيون',d:'',ad:'دمر الغربية حي الورود',g:'7 _ 9',p:'3131675'},
-  {n:'عدنان الطباع',s:'محمود يوسف',a:'دمر',d:'',ad:'دمر الشرقية خلف مستودع الكتب المدرسية',g:'7 _ 9',p:'3116561'},
-  {n:'جنود الاسد',s:'محمود يوسف',a:'قاسيون',d:'',ad:'دمر طريق البحوث العلمية',g:'7 _ 9',p:'3114708'},
-  {n:'ياسين الشيخ نعيم',s:'محمود يوسف',a:'دمر',d:'دمر الغربية',ad:'مشروع دمر جزيرة عاشرة جانب فوج الاطفاء',g:'ثانوي تجاري',p:'3111058'},
-  {n:'ثا غالب أصلان',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر الجزيرة 16 جانب جامع البوطي',g:'ثانوي صناعي',p:'3110432',oldName:'غالب أصلان'},
-  {n:'عدنان اللحفي',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'مشروع دمر الجزيرة 11',g:'ثانوي صناعي',p:'3113060'},
-  {n:'الشهيدة نوال اسمندر',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'مشروع دمر حي العرين جانب الفرن',g:'ثانوي عام',p:'3210413'},
-  {n:'كنان محمد يوسف للتلمذة',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر الجيرة العاشرة مقابل سوق السابعة',g:'ثانوي صناعي',p:'3131250'},
-  {n:'وسيم جاموس',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'مساكن الحرس الجمهوري العرين',g:'7 _ 9',p:'3230316'},
-  {n:'روضة المروج',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'دمر شرقية جنود الأسد جانب المؤسسة الاجتماعية العسكرية',g:'رياض أطفال',p:'3132144'},
-  {n:'روضة عبير الطفولة',s:'محمود يوسف',a:'دمر',d:'دمر الغربية',ad:'توسع مشروع دمر خلف الشركة السورية للنفط',g:'رياض أطفال',p:'3134970'},
-  {n:'روضة الكواكب المنيرة',s:'محمود يوسف',a:'دمر',d:'الورود',ad:'حي الورود نزلة الصفصاف جانب مدرسة غسان حمود',g:'رياض أطفال',p:'3117076'},
-  {n:'روضة الشهيد أوس صالح',s:'محمود يوسف',a:'دمر',d:'دمر الغربية',ad:'مساكن الحرس مقابل ثانوية راجح محمود',g:'رياض أطفال',p:'3230817'},
-  {n:'المتنبي',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'دمر البلد ساحة المدارس',g:'1 _ 6',p:'3113603'},
-  {n:'جنود الأسد',s:'محمود يوسف',a:'دمر',d:'دمر الشرقية',ad:'دمر شرقية جنود الأسد طريق البحوث العلمية',g:'1 _ 6',p:'3112023'},
-  {n:'ثانوية يعقوب الكندي',s:'محمود يوسف',a:'دمر',d:'ضاحية دمر',ad:'مشروع دمر التعمير',g:'7 _ 9',p:'3114314'},
-  {n:'جعفر صالح',s:'محمود يوسف',a:'دمر',d:'العرين',ad:'مساكن الحرس حي العرين مقابل مركز القيصر',g:'1 _ 6',p:'3228789'},
-  {n:'الهدى',s:'وسيم سعيد',a:'ساروجا',d:'مسجد أقصاب',ad:'شارع بغداد-قزازين',g:'1 _ 4',p:'4447759'},
-  {n:'معاوية بن أبي سفيان',s:'وسيم سعيد',a:'ساروجا',d:'ساروجا',ad:'ساروجا-خلف البرج الفضي',g:'1 _ 6',p:'2314216'},
-  {n:'أمية',s:'وسيم سعيد',a:'ساروجا',d:'',ad:'قصاع جانب ساحة التحرير',g:'ثانوي عام',p:'4445745'},
-  {n:'سمير حنا سلوم',s:'وسيم سعيد',a:'شاغور',d:'',ad:'باب شرقي دويلعة تجمع مدارس',g:'ثانوي عام',p:'4713416'},
-  {n:'ضرار بن الأزور',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة كشكول',g:'1 _ 4',p:'4730228'},
-  {n:'أبو زيد الأنصاري',s:'وسيم سعيد',a:'الشاغور',d:'الوحدة',ad:'الطبالة الشارع العام قرب كازية زغلول مقابل محلات حلاوة',g:'1 _ 6',p:'4714905'},
-  {n:'الياس فرحات',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة تجمع المدارس',g:'1 _ 6',p:'4714249'},
-  {n:'الياس الريس',s:'وسيم سعيد',a:'الشاغور',d:'النضال',ad:'كباس جانب صيدلية دعد المصلح',g:'1 _ 4',p:'4724121'},
-  {n:'الزبير بن العوام',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة طبالة كازية زغلول مستوصف حي بلال',g:'1 _ 6',p:'4726103'},
-  {n:'أسامة بن منقذ',s:'وسيم سعيد',a:'الشاغور',d:'النضال',ad:'دويلعة صيدلية منى بركيل ط2',g:'1 _ 4',p:'4721901'},
-  {n:'عبد القادر الخرساء',s:'وسيم سعيد',a:'الشاغور',d:'شاغور براني',ad:'باب شرقي جانب دار الكرامة',g:'1 _ 6',p:'4717422'},
-  {n:'زينب فواز',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة تجمع المدارس',g:'1 _ 6',p:'4714248'},
-  {n:'هند القرشية',s:'وسيم سعيد',a:'الشاغور',d:'الوحدة',ad:'طبالة طريق جرمانا خافية كازية زغلول',g:'1 _ 4',p:'4715179'},
-  {n:'بلال الحبشي',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة مقابل جامع الهدى',g:'1 _ 4',p:'4731107'},
-  {n:'ماريا القبطية',s:'وسيم سعيد',a:'الشاغور',d:'النضال',ad:'دويلعة كباس مقابل فروج السلطان',g:'1 _ 4',p:'430100'},
-  {n:'أبي بن كعب الانصاري',s:'وسيم سعيد',a:'الشاغور',d:'الوحدة',ad:'طبالة مقابل كازية زغلول',g:'1 _ 6',p:'4717109'},
-  {n:'سامر منصور البشارة',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة تجمع المدارس',g:'1 _ 6',p:'4714247'},
-  {n:'الأحنف بن قيس',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'طريق جرمانا',g:'1 _ 4',p:'4731112'},
-  {n:'حمزة بن عبد المطلب',s:'وسيم سعيد',a:'الشاغور',d:'النضال',ad:'دويلعة جانب جامع إبراهيم الخليل',g:'1 _ 4',p:'4722767'},
-  {n:'رابعة الشامية',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'جسر الكباس شارع الحسن',g:'1 _ 4',p:'4728036'},
-  {n:'ابن الجوزي',s:'وسيم سعيد',a:'الشاغور',d:'الوحدة',ad:'طبالة كازية زغلول',g:'1 _ 4',p:'4710655'},
-  {n:'وسام جرجي الجط',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'دويلعة تجمع المدارس',g:'1 _ 6',p:'4710141'},
-  {n:'عامر مجيد السمارة',s:'وسيم سعيد',a:'الشاغور',d:'باب شرقي',ad:'كباس مقابل صيدلية دعد المصلح',g:'1 _ 4',p:'4715129'},
-  {n:'مصطفى الترك',s:'وسيم سعيد',a:'الشاغور',d:'',ad:'دويلعة-مجمع المدارس',g:'7 _ 9',p:'4714250'},
-  {n:'روضة ورد الربيع',s:'وسيم سعيد',a:'الشاغور',d:'شاغور براني',ad:'دويلعة تجمع المدارس',g:'رياض أطفال',p:'4711589'},
-  {n:'جمانة الهلالية',s:'وسيم سعيد',a:'الشاغور',d:'شاغور براني',ad:'شاغور جراح',g:'1 _ 6',p:'2215913'},
-  {n:'جميلة الأنصارية',s:'وسيم سعيد',a:'دمشق القديمة',d:'باب توما',ad:'حي الدوامنة جانب اسرة الاخاء خلف المخفر',g:'1 _ 6',p:'5419203'},
-  {n:'س/فريز مالك',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'عدوي-جادة الخطيب الخامسة',g:'7 _ 9',p:'4449939'},
-  {n:'أبي العلاء المعري',s:'وسيم سعيد',a:'ساروجا',d:'القصاع',ad:'شرقي التجارة',g:'1 _ 6',p:'4474410'},
-  {n:'الوليد بن عبد الملك',s:'وسيم سعيد',a:'ساروجا',d:'العقيبية',ad:'شارع بغداد-مقابل تربة الدحداح',g:'1 _ 6',p:'2312008'},
-  {n:'شكيب أرسلان',s:'وسيم سعيد',a:'ساروجا',d:'ساروجا',ad:'ساحة التحرير-ساحة الغدير-جادة عاصم',g:'1 _ 6',p:'4456398'},
-  {n:'عصام صافية',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'عدوي-دخلة المعهد الصحي',g:'1 _ 6',p:'4464282'},
-  {n:'نبيل نقرور',s:'وسيم سعيد',a:'ساروجا',d:'ساروجا',ad:'ساحة التحرير-جانب ثانوية أمية',g:'1 _ 6',p:'4457760'},
-  {n:'الجاحظ',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'شارع بغداد-القزازين',g:'1 _ 6',p:'4444904'},
-  {n:'البيروني',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'قصور-جانب بسام حمشو',g:'1 _ 6',p:'4460085'},
-  {n:'ماري العجمي',s:'وسيم سعيد',a:'ساروجا',d:'القصاع',ad:'قصاع-ساحة جورج خوري',g:'رياض أطفال',p:'4462868'},
-  {n:'أم الخير',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'قصور-جادة الجادة الخامسة',g:'1 _ 6',p:'4440157'},
-  {n:'أحمد المناديلي',s:'وسيم سعيد',a:'ساروجا',d:'العمارة البرانية',ad:'عمارة-الشرف الأعلى',g:'رياض أطفال',p:'2224496'},
-  {n:'المنفلوطي',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'ساروجا-عين الكرش-دخلة مشفى العربي',g:'1 _ 6',p:'23250298'},
-  {n:'ياسر محمد سلمان',s:'وسيم سعيد',a:'',d:'',ad:'عباسيين شرق كازية ديوانة',g:'7 _ 9',p:'4445360'},
-  {n:'الفاروق',s:'وسيم سعيد',a:'ساروجا',d:'',ad:'عدوي جانب المعهد الصحي',g:'ثانوي عام',p:'4451573'},
-  {n:'ابن الاثير',s:'وسيم سعيد',a:'ساروجا',d:'',ad:'العدوي',g:'7 _ 9',p:'4444906'},
-  {n:'الواقدي للمتفوقين',s:'وسيم سعيد',a:'العدوي',d:'',ad:'شرقي التجارة خلف كراج العباسيين',g:'7 _ 9',p:'4429906'},
-  {n:'معهد الحرية',s:'وسيم سعيد',a:'ساروجا',d:'',ad:'مزرعة شارع بغداد',g:'رياض أطفال',p:'4427316'},
-  {n:'المعونة الخاصة',s:'وسيم سعيد',a:'ساروجا',d:'',ad:'القصاع',g:'رياض أطفال',p:'4443344'},
-  {n:'ثا/بسام حمشو المهنية',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'حي التجارة مقابل الحديقة',g:'ثانوي نسوي',p:''},
-  {n:'علي حسن علي',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'القصور مقابل كازية القصور',g:'ثانوي تجاري',p:'4416791'},
-  {n:'معهد تقنيات الحاسوب الأول',s:'وسيم سعيد',a:'',d:'',ad:'شرقي التجارة بناء المعهد الصناعي الثالث',g:'معهد صناعي',p:''},
-  {n:'عبد الفتاح عبد الفتاح',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'العدوي',g:'ثانوي تجاري',p:'4445612'},
-  {n:'ثانوية جميل الشطي المهنية',s:'وسيم سعيد',a:'دمشق القديمة',d:'باب توما',ad:'باب توما قيمرية جانب مطعم باب الحارة',g:'ثانوي نسوي',p:'5445476'},
-  {n:'المعهد التقاني الصناعي الثالث',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'شرقي التجارة جانب ثا الوفدة للمتفوقين',g:'معهد صناعي',p:'4419988'},
-  {n:'أنيس سلوم التجارية',s:'وسيم سعيد',a:'دمشق القديمة',d:'باب توما',ad:'باب توما شارع الحجر مقابل دير اللاتين',g:'ثانوي تجاري',p:'5441003'},
-  {n:'معهد التربية الرياضية للمعلمين',s:'وسيم سعيد',a:'برزة',d:'العباسيين',ad:'خلف ملعب العباسين',g:'معهد رياضي',p:'4415875'},
-  {n:'جورج حداد',s:'وسيم سعيد',a:'جوبر',d:'جوبر الشرقي',ad:'جوبر شرقي جانب دار الكرامة',g:'7 _ 9',p:'4729879'},
-  {n:'مروان مرشه',s:'وسيم سعيد',a:'ساروجا',d:'القصاع',ad:'قصاع ساحة جورج خوري جانب ثانوية المعونة',g:'7 _ 9',p:'4445710',oldName:'مروان مرشة'},
-  {n:'غسان عبود',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'عدوي خلف مشفى دار الشفاء',g:'7 _ 9',p:'4453317'},
-  {n:'أنور العطار',s:'وسيم سعيد',a:'ساروجا',d:'القصاع',ad:'قصور شارع الكندي',g:'7 _ 9',p:'4450849'},
-  {n:'محي الدين داوود',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'قصور خطيب جادة سادسة',g:'7 _ 9',p:'4447877'},
-  {n:'روضة براعم آذار',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'القصور الخطيب مقابل مدرسة محي الدين داود',g:'رياض أطفال',p:'4447574'},
-  {n:'عائشة الباعونية',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'شارع بغداد-موقف القزازين-مقابل جامع الفاروق',g:'1 _ 6',p:'4440624'},
-  {n:'زين العرب',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'شارع بغداد-دخلة مشفى الغزالي',g:'1 _ 6',p:'4448584'},
-  {n:'الزهراء',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'شارع بغداد-خلف ساحة القزازين',g:'1 _ 6',p:'4459608'},
-  {n:'عبد القادر أرناؤوط',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'القصور- جانب متحف العلوم',g:'1 _ 6',p:'4449608'},
-  {n:'زيد بن الخطاب',s:'وسيم سعيد',a:'جوبر',d:'جوبر الشرقي',ad:'ساحة العباسين خلف المخفر',g:'1 _ 6',p:'4416789'},
-  {n:'حسن سالم محمد',s:'وسيم سعيد',a:'جوبر',d:'جوبر الشرقي',ad:'ساحة العباسيين خلف محضر العباسيين',g:'7_9',p:'4416781'},
-  {n:'ثا/يوسف العظمة',s:'وسيم سعيد',a:'ساروجا',d:'القصور',ad:'جادة الخطيب -كازية القصور',g:'ثانوي عام',p:'4441781'},
-  {n:'لورا دغلاوي',s:'وسيم سعيد',a:'ساروجا',d:'العدوي',ad:'جانب معهد صحي',g:'ثانوي عام',p:'4444881'},
-  {n:'عبد الله بن الزبير',s:'وسيم سعيد',a:'الصالحية',d:'المزرعة',ad:'مزرعة-مقابل السفارة الروسية',g:'1 _ 6',p:'4441382'}
+  {n:'أبو اليسر عابدين',s:'رياض محمد',a:'المزة',d:'فيلات شرقية',ad:'فيلات شرقية-شارع الفارابي-خلف بنك بركة',g:'1 _ 6',p:'6117208'},
+  {n:'مطيع المعلم المهنية النسوية',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل جانب بنات الشهداء',g:'ثانوي نسوي',p:'66622793',oldName:'مطيع المعلم'},
+  {n:'عدنان بغجاتي',s:'باسم العباس',a:'الشاغور',d:'روضة الميدان',ad:'زاهرة جديدة مقابل جامع الرضا',g:'1 _ 6',p:'5423886'},
+  {n:'الشيماء السعدية',s:'باسم العباس',a:'زاهرة',d:'',ad:'زاهرة جديدة خلف تربية دمشق',g:'ثانوي عام',p:'5417546'},
+  {n:'الفقهاء الصالحين',s:'باسم العباس',a:'يرموك',d:'',ad:'',g:'ثانوي عام',p:''},
+  {n:'ثا/ عبد الحميد الزهراوي',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة خلف مدرسة عصام كعور',g:'ثانوي نسوي',p:'5428992'},
+  {n:'الشريف الرضي',s:'رياض محمد',a:'المزة',d:'مزة جبل',ad:'مزة جبل خلف المؤسسة العسكرية',g:'1 _ 6',p:'6666504'},
+  {n:'ابن كثير الدمشقي',s:'رياض محمد',a:'المزة',d:'فيلات غربية',ad:'المزة فيلات غربية-جانب السفارة الكويتية',g:'1 _ 6',p:'6121464'}
 ];
 
 /* ═══════════════════════════════════════════════════════
-   القسم 2: التخزين والتحميل
+   القسم 2: التخزين
    ═══════════════════════════════════════════════════════ */
 function loadState(){
   try{
@@ -1542,6 +1392,20 @@ function updateHeaderDate(){
   const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
   document.getElementById('headerDate').textContent = days[d.getDay()] + ' ' + d.toLocaleDateString('ar-SY');
 }
+function getDaysDiff(dateStr){
+  if(!dateStr) return 0;
+  const parts = dateStr.split('/');
+  if(parts.length !== 3) return 0;
+  const d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  const now = new Date();
+  return Math.floor((now - d) / (1000*60*60*24));
+}
+function isOverdue(t){
+  if(t.status === 'done') return false;
+  const days = getDaysDiff(t.createdAt);
+  const threshold = state.settings.overdueDays || 7;
+  return days >= threshold;
+}
 function switchPage(pageId){
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const page = document.getElementById(pageId);
@@ -1553,6 +1417,7 @@ function switchPage(pageId){
   if(pageId === 'pageSettings'){ loadSettingsToForm(); renderTechniciansList(); }
   if(pageId === 'pageSchools'){ renderSchoolsList(); updateSchoolsStats(); }
   if(pageId === 'pageTrip') buildTodayTrip();
+  if(pageId === 'pageStats') renderStats();
   localStorage.setItem('wk_current_page', pageId);
   window.scrollTo(0, 0);
 }
@@ -1585,7 +1450,32 @@ function fillTechnicianSelects(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 4: البحث عن المدارس
+   القسم 4: الوضع الليلي
+   ═══════════════════════════════════════════════════════ */
+function toggleNightMode(){
+  const body = document.body;
+  const isNight = body.classList.contains('night-mode');
+  body.classList.toggle('night-mode');
+  document.getElementById('nightToggle').textContent = isNight ? '🌙' : '☀️';
+  localStorage.setItem(STORAGE_KEYS.NIGHT, isNight ? 'off' : 'on');
+  state.settings.nightMode = isNight ? 'off' : 'on';
+  saveSettings();
+  showToast(isNight ? '☀️ الوضع النهاري' : '🌙 الوضع الليلي', 'success');
+}
+function applyNightMode(){
+  const mode = state.settings.nightMode || 'auto';
+  const hour = new Date().getHours();
+  let shouldBeNight = false;
+  if(mode === 'on') shouldBeNight = true;
+  else if(mode === 'off') shouldBeNight = false;
+  else shouldBeNight = (hour >= 18 || hour < 6);
+  document.body.classList.toggle('night-mode', shouldBeNight);
+  const btn = document.getElementById('nightToggle');
+  if(btn) btn.textContent = shouldBeNight ? '☀️' : '🌙';
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 5: البحث عن المدارس + الاقتراحات
    ═══════════════════════════════════════════════════════ */
 function searchSchools(query){
   const results = document.getElementById('schoolResults');
@@ -1631,8 +1521,6 @@ function pickSchool(idx){
   if(s.g) info += '<br>📚 ' + escapeHtml(s.g);
   if(s.p) info += ' • 📞 ' + escapeHtml(s.p);
   if(s.ad) info += '<br>📌 ' + escapeHtml(s.ad);
-  if(s.principal) info += '<br>👤 المدير: ' + escapeHtml(s.principal) + (s.principalPhone ? ' - ' + escapeHtml(s.principalPhone) : '');
-  if(s.secretary) info += '<br>💻 أمين السر: ' + escapeHtml(s.secretary) + (s.secretaryPhone ? ' - ' + escapeHtml(s.secretaryPhone) : '');
   document.getElementById('selInfo').innerHTML = info;
   document.getElementById('selectedSchool').style.display = 'block';
   document.getElementById('fName').value = s.n;
@@ -1648,6 +1536,30 @@ function pickSchool(idx){
     }
   }
   if(s.d) document.getElementById('fBuilding').value = s.d;
+  // اقتراح المدارس المجاورة
+  showSuggestions(s);
+}
+
+function showSuggestions(selectedSchool){
+  const box = document.getElementById('suggestions');
+  if(!selectedSchool.a){ box.style.display = 'none'; return; }
+  // مدارس نفس المنطقة والحي
+  const near = state.schools.filter(s => 
+    s !== selectedSchool && 
+    s.a === selectedSchool.a && 
+    (s.d === selectedSchool.d || s.d === selectedSchool.a)
+  ).slice(0, 5);
+  if(near.length === 0){ box.style.display = 'none'; return; }
+  let html = '<div class="suggestions-title">💡 مدارس قريبة (نفس المنطقة):</div>';
+  near.forEach(s => {
+    const idx = state.schools.indexOf(s);
+    html += '<div class="suggestion-item">';
+    html += '<span class="suggestion-name">' + escapeHtml(s.n) + '</span>';
+    html += '<button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); pickSchool(' + idx + ')" style="font-size:10px;padding:4px 8px">اختيار</button>';
+    html += '</div>';
+  });
+  box.innerHTML = html;
+  box.style.display = 'block';
 }
 
 function clearSelectedSchool(){
@@ -1655,10 +1567,11 @@ function clearSelectedSchool(){
   document.getElementById('fSchoolSearch').value = '';
   document.getElementById('selectedSchool').style.display = 'none';
   document.getElementById('schoolResults').classList.remove('show');
+  document.getElementById('suggestions').style.display = 'none';
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 5: إدارة المهام
+   القسم 6: إدارة المهام
    ═══════════════════════════════════════════════════════ */
 function openTaskSheet(taskId){
   state.editingTaskId = taskId || null;
@@ -1666,12 +1579,13 @@ function openTaskSheet(taskId){
   document.getElementById('fSchoolSearch').value = '';
   document.getElementById('schoolResults').classList.remove('show');
   document.getElementById('selectedSchool').style.display = 'none';
+  document.getElementById('suggestions').style.display = 'none';
   state.selectedSchool = null;
 
   if(taskId){
     const t = state.tasks.find(x => x.id === taskId);
-    if(!t) return;
-    title.textContent = '✏️ تعديل المهمة';
+    if(!t){ showToast('❌ المهمة غير موجودة', 'error'); return; }
+    title.textContent = '✏️ تعديل المهمة #' + t.number;
     document.getElementById('fSource').value = t.source || 'call';
     document.getElementById('fName').value = t.name || '';
     document.getElementById('fNewName').value = t.newName || '';
@@ -1686,6 +1600,16 @@ function openTaskSheet(taskId){
     document.getElementById('fSecretary').value = t.secretary || '';
     document.getElementById('fSecretaryPhone').value = t.secretaryPhone || '';
     document.getElementById('fNotes').value = t.notes || '';
+    // استرجاع المدرسة المختارة
+    const foundSchool = state.schools.find(s => s.n === t.name);
+    if(foundSchool){
+      state.selectedSchool = foundSchool;
+      document.getElementById('fSchoolSearch').value = foundSchool.n;
+      document.getElementById('selName').textContent = foundSchool.n + (foundSchool.oldName ? ' (سابقاً: ' + foundSchool.oldName + ')' : '');
+      let info = '👤 ' + escapeHtml(foundSchool.s || '') + ' • 📍 ' + escapeHtml(foundSchool.a || '');
+      document.getElementById('selInfo').innerHTML = info;
+      document.getElementById('selectedSchool').style.display = 'block';
+    }
   }else{
     title.textContent = '➕ مهمة جديدة';
     document.getElementById('fSource').value = 'call';
@@ -1736,8 +1660,18 @@ function saveTask(){
   }
 
   if(state.editingTaskId){
-    const t = state.tasks.find(x => x.id === state.editingTaskId);
-    if(t){ Object.assign(t, data); showToast('✅ تم تحديث المهمة', 'success'); }
+    const idx = state.tasks.findIndex(x => x.id === state.editingTaskId);
+    if(idx !== -1){
+      const oldTask = state.tasks[idx];
+      if(oldTask.name !== data.name && !data.oldName){
+        data.oldName = oldTask.name;
+      }
+      state.tasks[idx] = Object.assign({}, oldTask, data);
+      showToast('✅ تم تحديث المهمة', 'success');
+    } else {
+      showToast('❌ المهمة غير موجودة', 'error');
+      return;
+    }
   }else{
     const task = Object.assign({
       id: Date.now(),
@@ -1760,22 +1694,20 @@ function saveTask(){
   renderTasks();
   updateStats();
   updateFilterCounts();
+  renderAlerts();
 }
 
 function changeTaskStatus(id, newStatus){
   const t = state.tasks.find(x => x.id === id);
   if(!t) return;
   t.status = newStatus;
-  if(newStatus === 'done'){
-    t.doneAt = todayISO();
-  }
-  if(newStatus !== 'done' && t.doneAt){
-    t.doneAt = '';
-  }
+  if(newStatus === 'done') t.doneAt = todayISO();
+  else t.doneAt = '';
   saveTasks();
   renderTasks();
   updateStats();
   updateFilterCounts();
+  renderAlerts();
   if(document.getElementById('detailSheetBg').classList.contains('open')){
     openDetail(id);
   }
@@ -1785,13 +1717,19 @@ function changeTaskStatus(id, newStatus){
 function deleteTask(id){
   if(!confirm('هل تريد حذف هذه المهمة نهائياً؟')) return;
   state.tasks = state.tasks.filter(x => x.id !== id);
-  saveTasks(); renderTasks(); updateStats(); updateFilterCounts();
+  saveTasks(); renderTasks(); updateStats(); updateFilterCounts(); renderAlerts();
   closeSheet('detailSheetBg');
   showToast('🗑️ تم حذف المهمة', 'warn');
 }
 
+function editTaskFromDetail(taskId){
+  closeSheet('detailSheetBg');
+  document.body.style.overflow = '';
+  setTimeout(() => { openTaskSheet(taskId); }, 300);
+}
+
 /* ═══════════════════════════════════════════════════════
-   القسم 6: المواد
+   القسم 7: المواد
    ═══════════════════════════════════════════════════════ */
 function renderMaterials(){
   const container = document.getElementById('materialsList');
@@ -1849,7 +1787,7 @@ function saveMasterMaterial(){
   renderMaterials();
 }
 function deleteMasterMaterial(id){
-  if(!confirm('حذف هذه المادة من القائمة؟')) return;
+  if(!confirm('حذف هذه المادة؟')) return;
   state.materials = state.materials.filter(m => m.id !== id);
   saveMaterials(); renderMaterials();
   showToast('🗑️ تم الحذف', 'warn');
@@ -1877,7 +1815,7 @@ function renderTaskMaterials(){
   if(!t) return;
   const container = document.getElementById('taskMaterialsList');
   if(!t.materials || t.materials.length === 0){
-    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد مواد مضافة بعد</div>';
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد مواد</div>';
     return;
   }
   let html = '';
@@ -1902,11 +1840,11 @@ function addMaterialToTask(){
   if(!t) return;
   if(!t.materials) t.materials = [];
   const exists = t.materials.find(m => m.name === mat.name);
-  if(exists){ showToast('⚠️ المادة موجودة مسبقاً', 'warn'); sel.value = ''; return; }
+  if(exists){ showToast('⚠️ المادة موجودة', 'warn'); sel.value = ''; return; }
   t.materials.push({ name: mat.name, unit: mat.unit, qty: 1 });
   renderTaskMaterials();
   sel.value = '';
-  showToast('✅ أُضيفت: ' + mat.name, 'success');
+  showToast('✅ ' + mat.name, 'success');
 }
 
 function updateMatQty(idx, val){
@@ -1921,7 +1859,7 @@ function removeTaskMaterial(idx){
   if(!t) return;
   t.materials.splice(idx, 1);
   renderTaskMaterials();
-  showToast('🗑️ حُذفت المادة', 'warn');
+  showToast('🗑️ حُذفت', 'warn');
 }
 
 function addNewMaterialInline(){
@@ -1939,7 +1877,7 @@ function addNewMaterialInline(){
   sel.innerHTML = opts;
   document.getElementById('matNewName').value = '';
   document.getElementById('matNewUnit').value = 'عدد';
-  showToast('✅ أُضيفت مادة جديدة', 'success');
+  showToast('✅ أُضيفت', 'success');
 }
 
 function saveTaskMaterials(){
@@ -1954,7 +1892,76 @@ function saveTaskMaterials(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 7: إدارة المدارس
+   القسم 8: سجل الزيارات
+   ═══════════════════════════════════════════════════════ */
+function openVisitSheet(taskId){
+  state.currentTaskId = taskId;
+  document.getElementById('visitType').value = 'inspection';
+  document.getElementById('visitNotes').value = '';
+  closeSheet('detailSheetBg');
+  setTimeout(() => openSheet('visitSheetBg'), 200);
+}
+
+function saveVisit(){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  if(!t.visitLog) t.visitLog = [];
+  t.visitLog.unshift({
+    type: document.getElementById('visitType').value,
+    notes: document.getElementById('visitNotes').value.trim(),
+    date: todayISO()
+  });
+  saveTasks();
+  showToast('✅ تم تسجيل الزيارة', 'success');
+  closeSheet('visitSheetBg');
+  setTimeout(() => openDetail(t.id), 200);
+}
+
+function deleteVisit(taskId, visitIdx){
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t || !t.visitLog) return;
+  if(!confirm('حذف هذه الزيارة؟')) return;
+  t.visitLog.splice(visitIdx, 1);
+  saveTasks();
+  openDetail(taskId);
+  showToast('🗑️ حُذفت', 'warn');
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 9: تتبع الموافقات
+   ═══════════════════════════════════════════════════════ */
+function openApprovalSheet(taskId){
+  state.currentTaskId = taskId;
+  document.getElementById('approvalStage').value = 'raised';
+  document.getElementById('approvalNotes').value = '';
+  closeSheet('detailSheetBg');
+  setTimeout(() => openSheet('approvalSheetBg'), 200);
+}
+
+function saveApproval(){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  if(!t.approvalLog) t.approvalLog = [];
+  t.approvalLog.unshift({
+    stage: document.getElementById('approvalStage').value,
+    notes: document.getElementById('approvalNotes').value.trim(),
+    date: todayISO()
+  });
+  // تحديث الحالة تلقائياً
+  const stage = document.getElementById('approvalStage').value;
+  if(stage === 'raised' || stage === 'delivered') t.status = 'awaiting';
+  else if(stage === 'approved') t.status = 'materials';
+  saveTasks();
+  renderTasks();
+  updateStats();
+  updateFilterCounts();
+  showToast('✅ تم تحديث الموافقة', 'success');
+  closeSheet('approvalSheetBg');
+  setTimeout(() => openDetail(t.id), 200);
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 10: إدارة المدارس
    ═══════════════════════════════════════════════════════ */
 function renderSchoolsList(query){
   const container = document.getElementById('schoolsList');
@@ -1986,7 +1993,6 @@ function renderSchoolsList(query){
     let meta = '';
     if(s.s) meta += '👤 ' + escapeHtml(s.s);
     if(s.a) meta += (meta ? ' • ' : '') + '📍 ' + escapeHtml(s.a);
-    if(s.d) meta += ' - ' + escapeHtml(s.d);
     if(s.p) meta += (meta ? ' • ' : '') + '📞 ' + escapeHtml(s.p);
     html += '<div style="font-size:11px;color:var(--gray-500)">' + meta + '</div>';
     html += '</div>';
@@ -2052,7 +2058,7 @@ function saveSchoolMaster(){
     showToast('✅ تم تحديث المدرسة', 'success');
   }else{
     state.schools.push(data);
-    showToast('✅ أُضيفت مدرسة جديدة', 'success');
+    showToast('✅ أُضيفت مدرسة', 'success');
   }
   saveSchools();
   closeSheet('schoolSheetBg');
@@ -2063,7 +2069,7 @@ function saveSchoolMaster(){
 function deleteSchool(idx){
   const s = state.schools[idx];
   if(!s) return;
-  if(!confirm('حذف المدرسة "' + s.n + '" من القاعدة؟')) return;
+  if(!confirm('حذف "' + s.n + '"؟')) return;
   state.schools.splice(idx, 1);
   saveSchools();
   renderSchoolsList(document.getElementById('schoolListSearch').value);
@@ -2072,7 +2078,7 @@ function deleteSchool(idx){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 8: الفنيون
+   القسم 11: الفنيون
    ═══════════════════════════════════════════════════════ */
 function renderTechniciansList(){
   const container = document.getElementById('techniciansList');
@@ -2129,7 +2135,7 @@ function saveTechnician(){
   }else{
     data.id = Math.max.apply(null, state.technicians.map(t => t.id || 0).concat([0])) + 1;
     state.technicians.push(data);
-    showToast('✅ أُضيف فني جديد', 'success');
+    showToast('✅ أُضيف فني', 'success');
   }
   saveTechnicians();
   closeSheet('techSheetBg');
@@ -2139,7 +2145,7 @@ function saveTechnician(){
 function deleteTechnician(idx){
   const t = state.technicians[idx];
   if(!t) return;
-  if(!confirm('حذف الفني "' + t.name + '"؟')) return;
+  if(!confirm('حذف "' + t.name + '"؟')) return;
   state.technicians.splice(idx, 1);
   saveTechnicians();
   renderTechniciansList();
@@ -2147,7 +2153,7 @@ function deleteTechnician(idx){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 9: الإعدادات
+   القسم 12: الإعدادات
    ═══════════════════════════════════════════════════════ */
 function loadSettingsToForm(){
   document.getElementById('setHeader1').value = state.settings.header1 || '';
@@ -2155,6 +2161,8 @@ function loadSettingsToForm(){
   document.getElementById('setHeader3').value = state.settings.header3 || '';
   document.getElementById('setSign2').value = state.settings.sign2 || '';
   document.getElementById('setSign3').value = state.settings.sign3 || '';
+  document.getElementById('setNightMode').value = state.settings.nightMode || 'auto';
+  document.getElementById('setOverdueDays').value = state.settings.overdueDays || 7;
 }
 
 function setupSettingsListeners(){
@@ -2163,6 +2171,19 @@ function setupSettingsListeners(){
     const el = document.getElementById(elId);
     if(!el) return;
     el.addEventListener('input', () => { state.settings[map[elId]] = el.value; saveSettings(); });
+  });
+  const night = document.getElementById('setNightMode');
+  if(night) night.addEventListener('change', () => {
+    state.settings.nightMode = night.value;
+    saveSettings();
+    applyNightMode();
+  });
+  const overdue = document.getElementById('setOverdueDays');
+  if(overdue) overdue.addEventListener('change', () => {
+    state.settings.overdueDays = parseInt(overdue.value) || 7;
+    saveSettings();
+    renderAlerts();
+    renderTasks();
   });
 }
 
@@ -2179,7 +2200,7 @@ function setupFilters(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 10: عرض المهام والإحصائيات
+   القسم 13: عرض المهام
    ═══════════════════════════════════════════════════════ */
 function renderTasks(){
   const container = document.getElementById('tasksList');
@@ -2217,10 +2238,14 @@ function renderTasks(){
     const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
     const matCount = (t.materials || []).length;
     const displayName = t.newName || t.name;
-    html += '<div class="task-card st-' + t.status + '" onclick="openDetail(' + t.id + ')">';
+    const overdue = isOverdue(t);
+    const days = getDaysDiff(t.createdAt);
+
+    html += '<div class="task-card st-' + t.status + (overdue ? ' overdue' : '') + '" onclick="openDetail(' + t.id + ')">';
     html += '<div class="task-head">';
     html += '<div class="task-name">' + (t.status === 'done' ? '✅ ' : '') + escapeHtml(displayName) + '</div>';
     html += '<div class="task-badges">';
+    if(overdue) html += '<span class="mini-badge mb-overdue">⚠️ متأخرة</span>';
     if(t.source) html += '<span class="mini-badge ' + (t.source === 'urgent' ? 'mb-urgent' : 'mb-high') + '">' + (srcIcon[t.source]||'') + ' ' + (SOURCE_LABELS[t.source]||'') + '</span>';
     html += '<span class="mini-badge ' + st.cls + '">' + st.label + '</span>';
     html += '</div></div>';
@@ -2230,6 +2255,7 @@ function renderTasks(){
     if(t.contact) html += '<span>👤 ' + escapeHtml(t.contact) + '</span>';
     if(matCount > 0) html += '<span>📦 ' + matCount + ' مادة</span>';
     html += '<span>📅 ' + t.createdAt + '</span>';
+    if(overdue) html += '<span style="color:var(--danger);font-weight:700">⏱️ ' + days + ' يوم</span>';
     html += '</div>';
     if(t.notes) html += '<div class="task-note">' + escapeHtml(t.notes) + '</div>';
     html += '<div class="task-actions" onclick="event.stopPropagation()">';
@@ -2270,7 +2296,49 @@ function updateFilterCounts(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 11: تفاصيل المهمة (مع الحالات السبعة)
+   القسم 14: التنبيهات الذكية
+   ═══════════════════════════════════════════════════════ */
+function renderAlerts(){
+  const container = document.getElementById('alertsContainer');
+  if(!container) return;
+  const overdueTasks = state.tasks.filter(t => isOverdue(t));
+  const awaitingTasks = state.tasks.filter(t => t.status === 'awaiting' && getDaysDiff(t.createdAt) >= 3);
+  const approvedTasks = state.tasks.filter(t => t.status === 'materials');
+  const oldDone = state.tasks.filter(t => t.status === 'done' && getDaysDiff(t.doneAt) === 0);
+
+  let html = '';
+  if(overdueTasks.length > 0){
+    html += '<div class="alert-row danger">';
+    html += '<div class="alert-icon">⚠️</div>';
+    html += '<div class="alert-text">' + overdueTasks.length + ' مهمة متأخرة (أكثر من ' + (state.settings.overdueDays || 7) + ' أيام)</div>';
+    html += '<button class="alert-close" onclick="quickFilter(\'all\')">›</button>';
+    html += '</div>';
+  }
+  if(awaitingTasks.length > 0){
+    html += '<div class="alert-row warn">';
+    html += '<div class="alert-icon">📄</div>';
+    html += '<div class="alert-text">' + awaitingTasks.length + ' كشف بانتظار الموافقة منذ 3 أيام</div>';
+    html += '<button class="alert-close" onclick="quickFilter(\'awaiting\')">›</button>';
+    html += '</div>';
+  }
+  if(approvedTasks.length > 0){
+    html += '<div class="alert-row info">';
+    html += '<div class="alert-icon">📦</div>';
+    html += '<div class="alert-text">' + approvedTasks.length + ' مهمة جاهزة لصرف المواد والتنفيذ</div>';
+    html += '<button class="alert-close" onclick="quickFilter(\'materials\')">›</button>';
+    html += '</div>';
+  }
+  if(oldDone.length > 0){
+    html += '<div class="alert-row info">';
+    html += '<div class="alert-icon">🎉</div>';
+    html += '<div class="alert-text">أنجزت ' + oldDone.length + ' مهمة اليوم!</div>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 15: تفاصيل المهمة
    ═══════════════════════════════════════════════════════ */
 function openDetail(id){
   const t = state.tasks.find(x => x.id === id);
@@ -2279,13 +2347,25 @@ function openDetail(id){
   const displayName = t.newName || t.name;
   const matCount = (t.materials || []).length;
   const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
+  const overdue = isOverdue(t);
+  const days = getDaysDiff(t.createdAt);
 
   let html = '';
+  // الرأس
   html += '<div style="background:var(--gray-50);border-radius:12px;padding:14px;margin-bottom:12px">';
   html += '<div style="font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:6px">' + escapeHtml(displayName) + '</div>';
   if(t.newName && t.name !== t.newName) html += '<div style="font-size:12px;color:var(--copper-600);margin-bottom:4px">📛 الأصلي: ' + escapeHtml(t.name) + '</div>';
   if(t.oldName) html += '<div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">📜 القديم: ' + escapeHtml(t.oldName) + '</div>';
   html += '<div style="font-size:11.5px;color:var(--gray-500)"># ' + t.number + ' • ' + escapeHtml(t.area) + ' • ' + t.createdAt + '</div>';
+  if(overdue) html += '<div style="margin-top:8px;background:var(--danger-light);color:var(--danger);padding:6px 10px;border-radius:6px;font-size:11.5px;font-weight:700">⚠️ متأخرة — منذ ' + days + ' يوم</div>';
+  html += '</div>';
+
+  // الإجراءات السريعة
+  html += '<div class="quick-actions">';
+  html += '<button class="quick-action-btn" onclick="openMaterialsForTask(' + t.id + ')"><span class="qa-icon">📦</span><span class="qa-label">المواد</span></button>';
+  html += '<button class="quick-action-btn" onclick="openVisitSheet(' + t.id + ')"><span class="qa-icon">📅</span><span class="qa-label">زيارة</span></button>';
+  html += '<button class="quick-action-btn" onclick="openApprovalSheet(' + t.id + ')"><span class="qa-icon">📄</span><span class="qa-label">موافقة</span></button>';
+  html += '<button class="quick-action-btn" onclick="printTask(' + t.id + ')"><span class="qa-icon">🖨️</span><span class="qa-label">طباعة</span></button>';
   html += '</div>';
 
   // شريط تغيير الحالة
@@ -2300,28 +2380,32 @@ function openDetail(id){
   html += '</div></div>';
 
   // جهات الاتصال
-  if(t.principal || t.principalPhone || t.secretary || t.secretaryPhone){
+  if(t.principal || t.principalPhone || t.secretary || t.secretaryPhone || t.contact){
     html += '<div style="background:var(--emerald-50);border:1px solid var(--emerald-200);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12.5px">';
     html += '<div style="font-weight:700;color:var(--emerald-800);margin-bottom:6px">📞 جهات الاتصال</div>';
+    if(t.contact){
+      html += '<div style="padding:4px 0">👨‍💼 <b>المشرف:</b> ' + escapeHtml(t.contact) + '</div>';
+    }
     if(t.principal){
       html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span>👤 مدير: <b>' + escapeHtml(t.principal) + '</b></span>';
-      if(t.principalPhone) html += '<a href="tel:' + t.principalPhone + '" style="background:var(--emerald-700);color:#fff;padding:4px 10px;border-radius:6px;text-decoration:none;font-size:11px">📞 ' + escapeHtml(t.principalPhone) + '</a>';
+      if(t.principalPhone) html += '<a href="tel:' + t.principalPhone + '" class="btn btn-call btn-sm">📞 ' + escapeHtml(t.principalPhone) + '</a>';
       html += '</div>';
     }
     if(t.secretary){
       html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span>💻 أمين سر: <b>' + escapeHtml(t.secretary) + '</b></span>';
-      if(t.secretaryPhone) html += '<a href="tel:' + t.secretaryPhone + '" style="background:var(--emerald-700);color:#fff;padding:4px 10px;border-radius:6px;text-decoration:none;font-size:11px">📞 ' + escapeHtml(t.secretaryPhone) + '</a>';
+      if(t.secretaryPhone) html += '<a href="tel:' + t.secretaryPhone + '" class="btn btn-call btn-sm">📞 ' + escapeHtml(t.secretaryPhone) + '</a>';
       html += '</div>';
     }
     html += '</div>';
   }
 
   // معلومات المدرسة
-  if(t.schoolAddress || t.schoolGrade || t.schoolPhone){
+  if(t.schoolAddress || t.schoolGrade || t.schoolPhone || t.building || t.room){
     html += '<div style="background:var(--copper-100);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--copper-700);line-height:1.7">';
     if(t.schoolAddress) html += '📍 ' + escapeHtml(t.schoolAddress) + '<br>';
-    if(t.schoolGrade) html += '📚 ' + escapeHtml(t.schoolGrade) + '<br>';
-    if(t.schoolPhone) html += '📞 ' + escapeHtml(t.schoolPhone);
+    if(t.building) html += '🏢 ' + escapeHtml(t.building) + '<br>';
+    if(t.room) html += '🚪 قاعة: ' + escapeHtml(t.room) + '<br>';
+    if(t.schoolGrade) html += '📚 ' + escapeHtml(t.schoolGrade);
     html += '</div>';
   }
 
@@ -2334,18 +2418,48 @@ function openDetail(id){
 
   if(t.notes) html += '<div class="task-note" style="margin-bottom:10px">📝 ' + escapeHtml(t.notes) + '</div>';
 
+  // تتبع الموافقات (Timeline)
+  if(t.approvalLog && t.approvalLog.length > 0){
+    html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px">';
+    html += '<div style="font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📄 تتبع الموافقات:</div>';
+    html += '<div class="timeline">';
+    t.approvalLog.forEach(a => {
+      const stg = APPROVAL_STAGES[a.stage] || { icon:'📌', label:a.stage };
+      html += '<div class="timeline-item done">';
+      html += '<div class="timeline-item-label">' + stg.icon + ' ' + stg.label + '</div>';
+      html += '<div class="timeline-item-date">📅 ' + a.date + (a.notes ? ' — ' + escapeHtml(a.notes) : '') + '</div>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  }
+
+  // سجل الزيارات
+  if(t.visitLog && t.visitLog.length > 0){
+    html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px">';
+    html += '<div style="font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📅 سجل الزيارات (' + t.visitLog.length + '):</div>';
+    t.visitLog.forEach((v, idx) => {
+      const vt = VISIT_TYPES[v.type] || { icon:'📌', label:v.type };
+      html += '<div class="visit-row">';
+      html += '<div class="visit-icon">' + vt.icon + '</div>';
+      html += '<div class="visit-info">';
+      html += '<div class="visit-type">' + vt.label + '</div>';
+      html += '<div class="visit-date">' + v.date + '</div>';
+      if(v.notes) html += '<div class="visit-note">' + escapeHtml(v.notes) + '</div>';
+      html += '</div>';
+      html += '<button class="mat-del" style="width:24px;height:24px;font-size:12px" onclick="deleteVisit(' + t.id + ',' + idx + ')">✕</button>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
   // زر الخريطة
   const mapQuery = encodeURIComponent(displayName + ' ' + (t.schoolAddress || '') + ' دمشق');
   html += '<a href="https://www.google.com/maps/search/?api=1&query=' + mapQuery + '" target="_blank" class="btn-lg btn-map" style="margin-bottom:8px;font-size:13px;padding:11px;text-decoration:none">📍 فتح الخريطة</a>';
 
   // أزرار العمليات
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
-  html += '<button class="btn-lg btn-copper" onclick="openMaterialsForTask(' + t.id + ')" style="font-size:13px;padding:11px">📦 المواد</button>';
-  html += '<button class="btn-lg btn-primary" onclick="printTask(' + t.id + ')" style="font-size:13px;padding:11px">🖨️ طباعة</button>';
-  html += '</div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
   html += '<button class="btn-lg" style="background:#25d366;color:#fff;font-size:13px;padding:11px" onclick="openWhatsForTask(' + t.id + ')">📱 واتس الفني</button>';
-  html += '<button class="btn-lg btn-ghost" onclick="openTaskSheet(' + t.id + ')" style="font-size:13px;padding:11px">✏️ تعديل</button>';
+  html += '<button class="btn-lg btn-ghost" onclick="editTaskFromDetail(' + t.id + ')" style="font-size:13px;padding:11px">✏️ تعديل</button>';
   html += '</div>';
   html += '<button class="btn-lg btn-ghost" style="color:var(--danger);font-size:13px;padding:11px" onclick="deleteTask(' + t.id + ')">🗑️ حذف</button>';
 
@@ -2355,7 +2469,7 @@ function openDetail(id){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 12: WhatsApp للفني
+   القسم 16: WhatsApp للفني
    ═══════════════════════════════════════════════════════ */
 function openWhatsForTask(taskId){
   const t = state.tasks.find(x => x.id === taskId);
@@ -2372,7 +2486,7 @@ function openWhatsForTask(taskId){
     '⚡ *الأولوية:* ' + (PRIORITY_LABELS[t.priority] || '') + '\n' +
     (t.notes ? '📝 *الملاحظات:* ' + t.notes + '\n' : '') +
     (t.contact ? '👤 *المشرف:* ' + t.contact + '\n' : '') +
-    '\n🗺️ *الموقع على الخريطة:*\n' + mapLink;
+    '\n🗺️ *الموقع:*\n' + mapLink;
   document.getElementById('whatsMessage').value = msg;
   closeSheet('detailSheetBg');
   setTimeout(() => openSheet('whatsSheetBg'), 200);
@@ -2381,16 +2495,15 @@ function openWhatsForTask(taskId){
 function sendWhatsApp(){
   const techName = document.getElementById('whatsTech').value;
   const tech = state.technicians.find(t => t.name === techName);
+  const msg = encodeURIComponent(document.getElementById('whatsMessage').value);
   if(!tech || !tech.phone){
     const num = prompt('أدخل رقم جوال الفني (مع رمز الدولة، مثال: 963...)');
     if(!num) return;
-    const msg = encodeURIComponent(document.getElementById('whatsMessage').value);
     window.open('https://wa.me/' + num.replace(/[^0-9]/g,'') + '?text=' + msg, '_blank');
     return;
   }
   const phone = tech.phone.replace(/[^0-9]/g, '');
   const intl = phone.startsWith('963') ? phone : (phone.startsWith('0') ? '963' + phone.substring(1) : '963' + phone);
-  const msg = encodeURIComponent(document.getElementById('whatsMessage').value);
   window.open('https://wa.me/' + intl + '?text=' + msg, '_blank');
   closeSheet('whatsSheetBg');
 }
@@ -2404,7 +2517,7 @@ function copyWhatsMessage(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 13: جولة اليوم
+   القسم 17: جولة اليوم
    ═══════════════════════════════════════════════════════ */
 function buildTodayTrip(){
   const tripSummary = document.getElementById('tripSummary');
@@ -2424,7 +2537,7 @@ function buildTodayTrip(){
     byArea[a].push(t);
   });
 
-  let html = '<div style="background:var(--emerald-50);border-radius:10px;padding:12px;margin-bottom:12px;font-size:12.5px;color:var(--emerald-800)">';
+  let html = '<div class="trip-summary">';
   html += '📊 <b>' + pending.length + '</b> مهمة معلقة في <b>' + Object.keys(byArea).length + '</b> منطقة';
   html += '</div>';
 
@@ -2456,7 +2569,75 @@ function buildTodayTrip(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 14: الطباعة (القالب الحكومي)
+   القسم 18: الإحصائيات
+   ═══════════════════════════════════════════════════════ */
+function renderStats(){
+  const generalStats = document.getElementById('generalStats');
+  const areaStats = document.getElementById('areaStats');
+  const supervisorStats = document.getElementById('supervisorStats');
+
+  const total = state.tasks.length;
+  const done = state.tasks.filter(t => t.status === 'done').length;
+  const pending = total - done;
+  const overdue = state.tasks.filter(t => isOverdue(t)).length;
+  const completion = total > 0 ? Math.round((done/total)*100) : 0;
+
+  let html = '';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  html += '<div style="background:var(--emerald-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--emerald-700)">' + total + '</div><div style="font-size:11px;color:var(--gray-600)">📋 إجمالي</div></div>';
+  html += '<div style="background:var(--green-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--green-700)">' + done + '</div><div style="font-size:11px;color:var(--gray-600)">✅ منجزة</div></div>';
+  html += '<div style="background:var(--orange-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--orange-700)">' + pending + '</div><div style="font-size:11px;color:var(--gray-600)">⏳ معلقة</div></div>';
+  html += '<div style="background:var(--danger-light);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--danger)">' + overdue + '</div><div style="font-size:11px;color:var(--gray-600)">⚠️ متأخرة</div></div>';
+  html += '</div>';
+  html += '<div style="margin-top:12px"><div style="font-size:12px;color:var(--gray-600);margin-bottom:6px">نسبة الإنجاز: <b>' + completion + '%</b></div>';
+  html += '<div style="height:12px;background:var(--gray-200);border-radius:6px;overflow:hidden"><div style="height:100%;width:' + completion + '%;background:linear-gradient(90deg,var(--emerald-600),var(--emerald-500))"></div></div></div>';
+  generalStats.innerHTML = html;
+
+  // إحصائيات المناطق
+  const byArea = {};
+  state.tasks.forEach(t => {
+    const a = t.area || 'غير محدد';
+    if(!byArea[a]) byArea[a] = { total: 0, done: 0 };
+    byArea[a].total++;
+    if(t.status === 'done') byArea[a].done++;
+  });
+  const maxArea = Math.max.apply(null, Object.values(byArea).map(v => v.total).concat([1]));
+  let areaHtml = '';
+  Object.keys(byArea).sort((a,b) => byArea[b].total - byArea[a].total).forEach(a => {
+    const v = byArea[a];
+    const perc = Math.round((v.total / maxArea) * 100);
+    areaHtml += '<div class="area-stat-row">';
+    areaHtml += '<span class="area-stat-name">' + escapeHtml(a) + '</span>';
+    areaHtml += '<div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + perc + '%"></div></div>';
+    areaHtml += '<span class="area-stat-count">' + v.total + '</span>';
+    areaHtml += '</div>';
+  });
+  areaStats.innerHTML = areaHtml || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
+
+  // إحصائيات المشرفين
+  const bySup = {};
+  state.tasks.forEach(t => {
+    const s = t.contact || 'غير محدد';
+    if(!bySup[s]) bySup[s] = { total: 0, done: 0 };
+    bySup[s].total++;
+    if(t.status === 'done') bySup[s].done++;
+  });
+  const maxSup = Math.max.apply(null, Object.values(bySup).map(v => v.total).concat([1]));
+  let supHtml = '';
+  Object.keys(bySup).sort((a,b) => bySup[b].total - bySup[a].total).forEach(s => {
+    const v = bySup[s];
+    const perc = Math.round((v.total / maxSup) * 100);
+    supHtml += '<div class="area-stat-row">';
+    supHtml += '<span class="area-stat-name">👤 ' + escapeHtml(s) + '</span>';
+    supHtml += '<div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + perc + '%"></div></div>';
+    supHtml += '<span class="area-stat-count">' + v.total + '</span>';
+    supHtml += '</div>';
+  });
+  supervisorStats.innerHTML = supHtml || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 19: الطباعة
    ═══════════════════════════════════════════════════════ */
 const EAGLE_SVG = '<img src="eagle.png" alt="شعار" style="width:100%;height:auto;display:block">';
 
@@ -2528,6 +2709,63 @@ function printTask(taskId){
   if(fab) fab.style.display = 'none';
 }
 
+function printVisitReport(taskId){
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t){ showToast('❌ المهمة غير موجودة', 'error'); return; }
+  const settings = state.settings;
+  const displayName = t.newName || t.name;
+
+  let html = '';
+  html += '<div class="gov-header">';
+  html += '<div class="gov-eagle">' + EAGLE_SVG + '</div>';
+  html += '<div class="gov-header-top">';
+  html += '<div class="gov-header-right">';
+  html += '<div>' + escapeHtml(settings.header1 || '') + '</div>';
+  html += '<div>' + escapeHtml(settings.header2 || '') + '</div>';
+  html += '<div>' + escapeHtml(settings.header3 || '') + '</div>';
+  html += '<div style="margin-top:4px">التاريخ ' + todayISO() + '</div>';
+  html += '</div>';
+  html += '<div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div>';
+  html += '</div>';
+  html += '</div>';
+
+  html += '<div class="gov-salutation" style="font-size:16px;font-weight:800">تقرير زيارة ميدانية</div>';
+
+  html += '<table class="gov-table">';
+  html += '<tbody>';
+  html += '<tr><td style="width:130px;text-align:right;font-weight:800;background:#f3f3f3">المدرسة</td><td style="text-align:right;padding-right:10px">' + escapeHtml(displayName) + '</td></tr>';
+  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">المنطقة</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.area || '') + (t.building ? ' — ' + escapeHtml(t.building) : '') + '</td></tr>';
+  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">نوع العمل</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.type || '') + '</td></tr>';
+  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">الحالة</td><td style="text-align:right;padding-right:10px">' + (STATUS_LABELS[t.status] ? STATUS_LABELS[t.status].label : '') + '</td></tr>';
+  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">المشرف</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.contact || '') + '</td></tr>';
+  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">مدير المدرسة</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.principal || '') + (t.principalPhone ? ' — ' + escapeHtml(t.principalPhone) : '') + '</td></tr>';
+  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">أمين السر</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.secretary || '') + (t.secretaryPhone ? ' — ' + escapeHtml(t.secretaryPhone) : '') + '</td></tr>';
+  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">الفني المنفذ</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.technician || '') + '</td></tr>';
+  html += '</tbody></table>';
+
+  if(t.notes){
+    html += '<div style="font-size:13px;font-weight:800;margin:12px 0 6px">ملاحظات العطل:</div>';
+    html += '<div style="border:1px solid #000;padding:8px;font-size:12.5px;line-height:1.7;min-height:50px">' + escapeHtml(t.notes) + '</div>';
+  }
+
+  if(t.executionNotes){
+    html += '<div style="font-size:13px;font-weight:800;margin:12px 0 6px">ما تم تنفيذه:</div>';
+    html += '<div style="border:1px solid #000;padding:8px;font-size:12.5px;line-height:1.7;min-height:50px">' + escapeHtml(t.executionNotes) + '</div>';
+  }
+
+  html += '<div class="gov-signatures" style="margin-top:30px">';
+  html += '<div class="gov-sign-box"><span class="role">القائم بالزيارة</span><span class="name">' + escapeHtml(t.technician || '.....................') + '</span></div>';
+  html += '<div class="gov-sign-box"><span class="role">مدير المدرسة</span><span class="name">' + escapeHtml(t.principal || '.....................') + '</span></div>';
+  html += '</div>';
+
+  document.getElementById('govPaper').innerHTML = html;
+  document.getElementById('printPage').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  document.querySelector('.bottom-nav').style.display = 'none';
+  const fab = document.querySelector('.fab');
+  if(fab) fab.style.display = 'none';
+}
+
 function closePrint(){
   document.getElementById('printPage').style.display = 'none';
   document.body.style.overflow = '';
@@ -2540,11 +2778,11 @@ function closePrint(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 15: التصدير والاستيراد
+   القسم 20: التصدير والاستيراد
    ═══════════════════════════════════════════════════════ */
 function exportJSON(){
   const data = {
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     tasks: state.tasks,
     materials: state.materials,
@@ -2575,10 +2813,12 @@ function importJSON(event){
       state.materials = data.materials || DEFAULT_MATERIALS;
       state.schools = data.schools || SCHOOLS_DEFAULT;
       state.technicians = data.technicians || DEFAULT_TECHNICIANS;
-      state.settings = data.settings || DEFAULT_SETTINGS;
+      state.settings = Object.assign({}, DEFAULT_SETTINGS, data.settings || {});
       state.counter = data.counter || 1;
       saveTasks(); saveMaterials(); saveSchools(); saveTechnicians(); saveSettings(); saveCounter();
-      renderTasks(); updateStats(); updateFilterCounts(); renderMaterials(); renderSchoolsList(); updateSchoolsStats(); renderTechniciansList();
+      renderTasks(); updateStats(); updateFilterCounts(); renderAlerts();
+      renderMaterials(); renderSchoolsList(); updateSchoolsStats(); renderTechniciansList();
+      applyNightMode();
       showToast('✅ تم الاستيراد', 'success');
     }catch(err){ showToast('❌ ملف غير صالح', 'error'); }
   };
@@ -2642,7 +2882,7 @@ function importSchoolsCSV(event){
         });
       }
       if(imported.length === 0){ showToast('❌ لا توجد بيانات', 'error'); return; }
-      const mode = confirm('موافق = إضافة\nإلغاء = استبدال');
+      const mode = confirm('موافق = إضافة\nإلغاء = استبدال كامل');
       if(mode) state.schools = state.schools.concat(imported);
       else { if(!confirm('استبدال كامل؟')) return; state.schools = imported; }
       saveSchools();
@@ -2679,19 +2919,21 @@ function clearDone(){
   if(count === 0){ showToast('لا توجد مهام منجزة', 'warn'); return; }
   if(!confirm('حذف ' + count + ' مهمة منجزة؟')) return;
   state.tasks = state.tasks.filter(t => t.status !== 'done');
-  saveTasks(); renderTasks(); updateStats(); updateFilterCounts();
+  saveTasks(); renderTasks(); updateStats(); updateFilterCounts(); renderAlerts();
   showToast('🗑️ تم الحذف', 'warn');
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 16: التهيئة
+   القسم 21: التهيئة
    ═══════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
   updateHeaderDate();
+  applyNightMode();
   renderTasks();
   updateStats();
   updateFilterCounts();
+  renderAlerts();
   setupFilters();
   setupSettingsListeners();
   loadSettingsToForm();
@@ -2722,17 +2964,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!results.contains(e.target) && e.target !== search){ results.classList.remove('show'); }
   });
 
+  // تحديث الوضع الليلي كل ساعة
+  setInterval(applyNightMode, 3600000);
+
   showToast('مرحباً بك ⚡', 'success');
 });
-
-/* ═══════════════════════════════════════════════════════
-   PWA: تسجيل Service Worker
-   ═══════════════════════════════════════════════════════ */
-if('serviceWorker' in navigator){
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed:', err));
-  });
-}
 </script>
 
 </body>
