@@ -6,19 +6,24 @@
 <meta name="theme-color" content="#0d5c46">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="مهام الصيانة">
-<title>مهام الصيانة - jam3iyati</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+<meta name="apple-mobile-web-app-title" content="ورشة الكهرباء">
+<title>ورشة الكهرباء</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 <style>
 :root{
   --emerald-900:#0d3d2e;--emerald-800:#0d5c46;--emerald-700:#127a5d;--emerald-600:#1a9b76;
   --emerald-500:#22b88d;--emerald-200:#a7e8d0;--emerald-100:#d4f4e8;--emerald-50:#eefaf5;
   --copper-700:#8b5a2b;--copper-600:#b87333;--copper-500:#d49249;--copper-300:#e8b878;--copper-100:#f5e6d3;
-  --danger:#c0392b;--danger-light:#fdecea;--warn:#d97706;--warn-light:#fef3e2;
-  --ok:#15803d;--ok-light:#dcfce7;
-  --gray-900:#0f172a;--gray-800:#1e293b;--gray-700:#334155;--gray-600:#475569;--gray-500:#64748b;
-  --gray-400:#94a3b8;--gray-300:#cbd5e1;--gray-200:#e2e8f0;--gray-100:#f1f5f9;
-  --gray-50:#f8fafc;--white:#fff;
+  --blue-700:#1e40af;--blue-600:#2563eb;--blue-100:#dbeafe;--blue-50:#eff6ff;
+  --purple-700:#6d28d9;--purple-600:#7c3aed;--purple-100:#ede9fe;--purple-50:#f5f3ff;
+  --orange-700:#c2410c;--orange-600:#ea580c;--orange-100:#ffedd5;--orange-50:#fff7ed;
+  --yellow-700:#a16207;--yellow-600:#ca8a04;--yellow-100:#fef9c3;--yellow-50:#fefce8;
+  --cyan-700:#0e7490;--cyan-600:#0891b2;--cyan-100:#cffafe;--cyan-50:#ecfeff;
+  --green-700:#15803d;--green-600:#16a34a;--green-100:#dcfce7;--green-50:#f0fdf4;
+  --gray-700:#334155;--gray-600:#475569;--gray-500:#64748b;--gray-400:#94a3b8;
+  --gray-300:#cbd5e1;--gray-200:#e2e8f0;--gray-100:#f1f5f9;--gray-50:#f8fafc;
+  --white:#fff;
+  --danger:#c0392b;--danger-light:#fdecea;
   --shadow-sm:0 1px 3px rgba(13,92,70,.08);
   --shadow-md:0 4px 14px rgba(13,92,70,.12);
   --shadow-lg:0 10px 30px rgba(13,92,70,.18);
@@ -29,11 +34,11 @@ html,body{height:100%}
 body{
   font-family:'Segoe UI',Tahoma,Arial,sans-serif;
   background:linear-gradient(160deg,#f0f7f4 0%,#f8fafc 100%);
-  color:var(--gray-900);min-height:100vh;padding-bottom:90px;overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
+  color:var(--gray-700);min-height:100vh;padding-bottom:90px;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
 }
 
-/* ═══════════ الرأس ═══════════ */
+/* ═══════ الرأس ═══════ */
 .app-header{
   background:linear-gradient(135deg,var(--emerald-800),var(--emerald-700));
   color:#fff;padding:18px 16px 22px;border-radius:0 0 24px 24px;
@@ -53,35 +58,39 @@ body{
 }
 .header-title{display:flex;align-items:center;gap:10px}
 .header-icon{
-  font-size:26px;background:rgba(255,255,255,.15);width:42px;height:42px;
+  font-size:26px;background:rgba(255,255,255,.15);width:44px;height:44px;
   border-radius:12px;display:flex;align-items:center;justify-content:center;
   backdrop-filter:blur(10px);
 }
-.header-title h1{font-size:17px;font-weight:700;letter-spacing:.2px}
+.header-title h1{font-size:17px;font-weight:700}
 .header-title p{font-size:11px;opacity:.85;margin-top:2px}
 .header-date{
   background:rgba(255,255,255,.15);padding:6px 12px;border-radius:20px;
   font-size:11px;font-weight:600;backdrop-filter:blur(10px);white-space:nowrap;
 }
 
-/* ═══════════ الإحصائيات ═══════════ */
-.stats-row{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+/* ═══════ بطاقات الإحصائيات ═══════ */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
   position:relative;z-index:1;
 }
-.stat{
+.stat-card{
   background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);
   border-radius:12px;padding:10px 6px;text-align:center;
-  backdrop-filter:blur(10px);transition:.2s;
+  backdrop-filter:blur(10px);transition:.2s;cursor:pointer;
 }
-.stat:active{transform:scale(.96)}
+.stat-card:active{transform:scale(.96)}
 .stat-num{font-size:20px;font-weight:800;line-height:1}
 .stat-lbl{font-size:10px;opacity:.9;margin-top:4px;font-weight:500}
-.stat.high .stat-num{color:#ffb3a7}
-.stat.med .stat-num{color:#ffe08a}
-.stat.done .stat-num{color:#a7f3c9}
+.stat-card.c-new .stat-num{color:#93c5fd}
+.stat-card.c-inspecting .stat-num{color:#c4b5fd}
+.stat-card.c-awaiting .stat-num{color:#fdba74}
+.stat-card.c-materials .stat-num{color:#fde047}
+.stat-card.c-working .stat-num{color:#67e8f9}
+.stat-card.c-done .stat-num{color:#86efac}
+.stat-card.c-urgent .stat-num{color:#fca5a5}
 
-/* ═══════════ البحث ═══════════ */
+/* ═══════ البحث ═══════ */
 .search-wrap{padding:14px 16px 8px}
 .search-box{
   display:flex;align-items:center;gap:10px;background:var(--white);
@@ -96,44 +105,62 @@ body{
   flex:1;border:none;outline:none;font-size:14px;background:transparent;font-family:inherit;
 }
 
-/* ═══════════ الفلاتر ═══════════ */
+/* ═══════ الفلاتر ═══════ */
 .filters{
   padding:0 16px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
 }
 .filters::-webkit-scrollbar{display:none}
 .chip{
   padding:7px 14px;border-radius:20px;border:1px solid var(--gray-200);
-  background:var(--white);font-size:12px;font-weight:600;color:var(--gray-700);
+  background:var(--white);font-size:12px;font-weight:600;color:var(--gray-600);
   cursor:pointer;white-space:nowrap;transition:.2s;font-family:inherit;
+  display:inline-flex;align-items:center;gap:5px;
 }
 .chip.active{
   background:var(--emerald-700);color:#fff;border-color:var(--emerald-700);
   box-shadow:0 4px 10px rgba(13,92,70,.25);
 }
+.chip .count{
+  background:rgba(255,255,255,.25);padding:1px 6px;border-radius:10px;
+  font-size:10px;font-weight:700;
+}
+.chip:not(.active) .count{background:var(--gray-100);color:var(--gray-500)}
 
-/* ═══════════ قائمة المهام ═══════════ */
+/* ═══════ قائمة المهام ═══════ */
 .tasks-list{padding:0 16px 20px;display:flex;flex-direction:column;gap:10px}
 .task-card{
   background:var(--white);border-radius:var(--radius);padding:14px;
   box-shadow:var(--shadow-sm);border-right:5px solid var(--gray-300);
   position:relative;transition:.25s;animation:fadeUp .3s ease;
+  cursor:pointer;
 }
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .task-card:active{transform:scale(.99)}
-.task-card.p-high{border-right-color:var(--danger);background:linear-gradient(90deg,var(--white) 60%,var(--danger-light) 100%)}
-.task-card.p-med{border-right-color:var(--warn);background:linear-gradient(90deg,var(--white) 60%,var(--warn-light) 100%)}
-.task-card.p-low{border-right-color:var(--ok);background:linear-gradient(90deg,var(--white) 60%,var(--ok-light) 100%)}
-.task-card.is-done{opacity:.65;border-right-color:var(--emerald-500);background:var(--emerald-50)}
-.task-card.is-done .task-name{text-decoration:line-through;color:var(--gray-500)}
+.task-card.st-new{border-right-color:var(--blue-600)}
+.task-card.st-inspecting{border-right-color:var(--purple-600)}
+.task-card.st-awaiting{border-right-color:var(--orange-600)}
+.task-card.st-materials{border-right-color:var(--yellow-600)}
+.task-card.st-working{border-right-color:var(--cyan-600)}
+.task-card.st-done{border-right-color:var(--green-600);background:var(--green-50);opacity:.75}
+.task-card.st-suspended{border-right-color:var(--gray-400);opacity:.7}
+.task-card.st-done .task-name{text-decoration:line-through;color:var(--gray-500)}
 
 .task-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
-.task-name{font-size:15px;font-weight:700;color:var(--gray-900);line-height:1.3;flex:1}
-.task-badges{display:flex;gap:4px;flex-shrink:0}
-.mini-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap}
-.mb-high{background:var(--danger);color:#fff}
-.mb-med{background:var(--warn);color:#fff}
-.mb-low{background:var(--ok);color:#fff}
-.mb-done{background:var(--emerald-600);color:#fff}
+.task-name{font-size:15px;font-weight:700;color:var(--gray-700);line-height:1.3;flex:1}
+.task-badges{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.mini-badge{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap}
+.mb-new{background:var(--blue-100);color:var(--blue-700)}
+.mb-inspecting{background:var(--purple-100);color:var(--purple-700)}
+.mb-awaiting{background:var(--orange-100);color:var(--orange-700)}
+.mb-materials{background:var(--yellow-100);color:var(--yellow-700)}
+.mb-working{background:var(--cyan-100);color:var(--cyan-700)}
+.mb-done{background:var(--green-100);color:var(--green-700)}
+.mb-suspended{background:var(--gray-100);color:var(--gray-600)}
+.mb-urgent{background:var(--danger);color:#fff}
+.mb-high{background:var(--danger-light);color:var(--danger)}
+.mb-med{background:var(--orange-100);color:var(--orange-700)}
+.mb-low{background:var(--green-100);color:var(--green-700)}
+
 .task-meta{
   display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11.5px;
   color:var(--gray-500);margin-bottom:10px;
@@ -141,23 +168,27 @@ body{
 .task-meta span{display:inline-flex;align-items:center;gap:4px}
 .task-note{
   background:var(--gray-50);border-radius:8px;padding:8px 10px;
-  font-size:12px;color:var(--gray-700);margin-bottom:10px;
+  font-size:12px;color:var(--gray-600);margin-bottom:10px;
   border-right:3px solid var(--copper-500);line-height:1.5;
 }
-.task-actions{display:flex;gap:6px;flex-wrap:wrap}
+.task-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.task-actions .btn{flex:0 0 auto}
 
-/* ═══════════ الأزرار ═══════════ */
+/* ═══════ الأزرار ═══════ */
 .btn{
   border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;
   cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;
-  justify-content:center;gap:4px;transition:.2s;flex:1;min-width:auto;
+  justify-content:center;gap:4px;transition:.2s;
 }
 .btn:active{transform:scale(.96)}
-.btn-done{background:var(--ok);color:#fff}
-.btn-undo{background:var(--warn);color:#fff}
+.btn-done{background:var(--green-600);color:#fff}
+.btn-undo{background:var(--orange-600);color:#fff}
 .btn-note{background:var(--copper-600);color:#fff}
 .btn-print{background:var(--emerald-700);color:#fff}
-.btn-del{background:var(--gray-100);color:var(--danger);flex:0 0 auto;padding:8px 10px}
+.btn-whats{background:#25d366;color:#fff}
+.btn-del{background:var(--gray-100);color:var(--danger)}
+.btn-map{background:linear-gradient(135deg,#1a73e8,#4285f4);color:#fff;text-decoration:none}
+.btn-stage{background:var(--emerald-600);color:#fff}
 
 .btn-lg{
   width:100%;padding:14px;border-radius:13px;border:none;font-size:15px;
@@ -168,14 +199,13 @@ body{
 .btn-primary{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600));color:#fff;box-shadow:0 6px 16px rgba(13,92,70,.25)}
 .btn-copper{background:linear-gradient(135deg,var(--copper-700),var(--copper-500));color:#fff;box-shadow:0 6px 16px rgba(184,115,51,.25)}
 .btn-ghost{background:var(--gray-100);color:var(--gray-700)}
-.btn-map{background:linear-gradient(135deg,#1a73e8,#4285f4);color:#fff;text-decoration:none}
 
-/* ═══════════ الحالة الفارغة ═══════════ */
+/* ═══════ الحالة الفارغة ═══════ */
 .empty{text-align:center;padding:50px 20px;color:var(--gray-500)}
 .empty-icon{font-size:50px;margin-bottom:12px;opacity:.4}
 .empty p{font-size:14px}
 
-/* ═══════════ الشريط السفلي ═══════════ */
+/* ═══════ الشريط السفلي ═══════ */
 .bottom-nav{
   position:fixed;bottom:0;left:0;right:0;background:var(--white);
   box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;
@@ -190,10 +220,10 @@ body{
 .nav-item svg{width:22px;height:22px;display:block;margin:0 auto 3px}
 .nav-item span{font-size:10.5px;font-weight:700}
 
-/* ═══════════ الزر العائم ═══════════ */
+/* ═══════ الزر العائم ═══════ */
 .fab{
   position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;
-  transform:translateX(-50%);width:58px;height:58px;border-radius:50%;
+  transform:translateX(-50%);width:60px;height:60px;border-radius:50%;
   background:linear-gradient(135deg,var(--copper-600),var(--copper-500));
   color:#fff;border:none;box-shadow:0 8px 24px rgba(184,115,51,.4);
   cursor:pointer;display:none;align-items:center;justify-content:center;
@@ -201,9 +231,9 @@ body{
 }
 .fab.show{display:flex}
 .fab:active{transform:translateX(-50%) scale(.92)}
-.fab svg{width:28px;height:28px}
+.fab svg{width:30px;height:30px}
 
-/* ═══════════ النوافذ المنبثقة ═══════════ */
+/* ═══════ النوافذ المنبثقة ═══════ */
 .sheet-bg{
   position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);
   z-index:100;display:none;align-items:flex-end;justify-content:center;
@@ -225,7 +255,7 @@ body{
 }
 .sheet-title svg{width:20px;height:20px}
 
-/* ═══════════ الحقول ═══════════ */
+/* ═══════ الحقول ═══════ */
 .field{margin-bottom:14px}
 .field label{
   display:block;font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:6px;
@@ -234,7 +264,7 @@ body{
 .field input,.field select,.field textarea{
   width:100%;padding:11px 13px;border:1.5px solid var(--gray-200);
   border-radius:11px;font-size:14px;font-family:inherit;background:var(--white);
-  color:var(--gray-900);transition:.2s;outline:none;
+  color:var(--gray-700);transition:.2s;outline:none;
 }
 .field input:focus,.field select:focus,.field textarea:focus{
   border-color:var(--emerald-600);box-shadow:0 0 0 3px rgba(26,155,118,.1);
@@ -242,7 +272,7 @@ body{
 .field textarea{resize:vertical;min-height:70px}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-/* ═══════════ الصفحات ═══════════ */
+/* ═══════ الصفحات ═══════ */
 .page{display:none;padding:16px;animation:fadeUp .3s}
 .page.active{display:block}
 .section{
@@ -259,12 +289,12 @@ body{
   border-radius:8px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;
 }
 
-/* ═══════════ المواد ═══════════ */
+/* ═══════ المواد ═══════ */
 .material-row{
   display:flex;align-items:center;gap:8px;background:var(--gray-50);
   border-radius:11px;padding:10px;margin-bottom:8px;border:1px solid var(--gray-200);
 }
-.material-row .mat-name{flex:1;font-size:13px;font-weight:600;color:var(--gray-900)}
+.material-row .mat-name{flex:1;font-size:13px;font-weight:600;color:var(--gray-700)}
 .material-row .mat-unit{
   font-size:11px;color:var(--gray-500);background:var(--white);
   padding:3px 8px;border-radius:6px;border:1px solid var(--gray-200);
@@ -279,7 +309,7 @@ body{
   font-weight:700;display:flex;align-items:center;justify-content:center;
 }
 
-/* ═══════════ Schools Search ═══════════ */
+/* ═══════ نتائج البحث عن المدارس ═══════ */
 .school-results{
   display:none;max-height:240px;overflow-y:auto;margin-top:6px;
   border:1.5px solid var(--emerald-200);border-radius:10px;background:#fff;
@@ -291,15 +321,12 @@ body{
 .school-item:last-child{border-bottom:none}
 .school-item:active{background:var(--emerald-50)}
 .school-item-name{font-weight:700;color:var(--emerald-800);margin-bottom:2px}
-.school-item-name .old-tag{
-  color:var(--copper-600);font-size:10px;font-weight:600;
-}
+.school-item-name .old-tag{color:var(--copper-600);font-size:10px;font-weight:600}
 .school-item-meta{color:var(--gray-500);font-size:11px}
 
 .selected-school{
   background:var(--emerald-50);border:1.5px solid var(--emerald-500);
-  border-radius:10px;padding:12px;margin-top:8px;font-size:12px;
-  position:relative;
+  border-radius:10px;padding:12px;margin-top:8px;font-size:12px;position:relative;
 }
 .selected-school .close-btn{
   position:absolute;top:6px;left:6px;background:var(--danger-light);
@@ -309,110 +336,109 @@ body{
 .selected-school .s-name{font-weight:800;color:var(--emerald-800);font-size:13px;margin-bottom:4px}
 .selected-school .s-info{color:var(--gray-600);line-height:1.6}
 
-/* ═══════════ Toast ═══════════ */
+/* ═══════ Toast ═══════ */
 .toast{
-  position:fixed;top:20px;left:50%;
-  transform:translateX(-50%) translateY(-100px);
-  background:var(--emerald-800);color:#fff;padding:12px 20px;
-  border-radius:12px;font-size:13px;font-weight:700;z-index:200;
-  box-shadow:var(--shadow-lg);
+  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);
+  background:var(--emerald-800);color:#fff;padding:12px 20px;border-radius:12px;
+  font-size:13px;font-weight:700;z-index:200;box-shadow:var(--shadow-lg);
   transition:.35s cubic-bezier(.16,1,.3,1);max-width:90%;text-align:center;
 }
 .toast.show{transform:translateX(-50%) translateY(0)}
 .toast.success{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600))}
 .toast.error{background:linear-gradient(135deg,#991b1b,var(--danger))}
-.toast.warn{background:linear-gradient(135deg,#92400e,var(--warn))}
+.toast.warn{background:linear-gradient(135deg,#92400e,var(--orange-700))}
 
-/* ═══════════ الطباعة ═══════════ */
+/* ═══════ التنبيهات ═══════ */
+.alert-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--orange-50);border-right:4px solid var(--orange-600);
+  border-radius:10px;margin-bottom:8px;font-size:12.5px;
+}
+.alert-row.danger{background:var(--danger-light);border-color:var(--danger)}
+.alert-row.info{background:var(--blue-50);border-color:var(--blue-600)}
+.alert-row .alert-icon{font-size:20px;flex-shrink:0}
+.alert-row .alert-text{flex:1;color:var(--gray-700);font-weight:600}
+
+/* ═══════ جولة اليوم ═══════ */
+.trip-stop{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--white);border-radius:10px;margin-bottom:8px;
+  border:1px solid var(--gray-200);font-size:13px;
+  cursor:pointer;transition:.2s;
+}
+.trip-stop:active{background:var(--emerald-50)}
+.trip-stop .stop-num{
+  background:var(--emerald-700);color:#fff;width:26px;height:26px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;flex-shrink:0;
+}
+.trip-stop .stop-info{flex:1}
+.trip-stop .stop-name{font-weight:700;color:var(--gray-700)}
+.trip-stop .stop-meta{font-size:11px;color:var(--gray-500);margin-top:2px}
+.trip-stop .stop-type{font-size:16px}
+
+/* ═══════ الطباعة ═══════ */
 .print-page{padding:20px;background:var(--gray-100);min-height:100vh}
 .print-toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .print-toolbar .btn{flex:1;min-width:130px;padding:12px}
 
 .gov-paper{
   background:#fff;width:100%;max-width:800px;margin:0 auto;
-  padding:22mm 18mm 18mm;box-shadow:0 4px 20px rgba(0,0,0,.12);
-  direction:rtl;
-  font-family:'Traditional Arabic','Sakkal Majalla','Amiri','Segoe UI',Tahoma,serif;
-  color:#000;line-height:1.7;position:relative;
+  padding:15mm 15mm 12mm;box-shadow:0 4px 20px rgba(0,0,0,.12);
+  direction:rtl;font-family:'Traditional Arabic','Sakkal Majalla','Amiri','Segoe UI',Tahoma,serif;
+  color:#000;line-height:1.5;position:relative;
 }
-.gov-header{
-  position:relative;
-  margin-bottom:20px;
-  min-height:145px;
-}
+.gov-header{position:relative;margin-bottom:15px;min-height:130px}
 .gov-eagle{
-  position:absolute;
-  left:50%;
-  top:0;
-  transform:translateX(-50%);
-  width:95px;
-  height:auto;
-  z-index:2;
+  position:absolute;left:50%;top:0;transform:translateX(-50%);
+  width:85px;height:auto;z-index:2;
 }
-.gov-eagle-svg{
-  width:100%;
-  height:auto;
-  display:block;
-}
+.gov-eagle img,.gov-eagle-svg{width:100%;height:auto;display:block}
 .gov-header-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  padding-top:8px;
-  direction:rtl;
-}
-.gov-header-left{
-  text-align:left;
-  font-size:13px;
-  font-weight:700;
-  padding-top:16px;
-  padding-left:4px;
-  flex:0 0 auto;
-  direction:ltr;
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding-top:6px;direction:rtl;
 }
 .gov-header-right{
-  text-align:right;
-  font-size:13px;
-  font-weight:700;
-  line-height:1.7;
-  padding-right:4px;
-  flex:1;
+  text-align:right;font-size:12.5px;font-weight:700;line-height:1.5;
+  padding-right:4px;flex:1;
 }
-.gov-salutation{text-align:center;font-size:16px;font-weight:800;margin:8px 0 14px}
+.gov-header-left{
+  text-align:left;font-size:12.5px;font-weight:700;
+  padding-top:14px;padding-left:4px;flex:0 0 auto;
+}
+.gov-salutation{text-align:center;font-size:15px;font-weight:800;margin:6px 0 10px}
 .gov-body{
-  font-size:14.5px;font-weight:600;text-align:justify;
-  margin-bottom:18px;padding:0 6px;line-height:1.9;
+  font-size:13.5px;font-weight:600;text-align:justify;
+  margin-bottom:12px;padding:0 6px;line-height:1.7;
 }
-.gov-table{width:100%;border-collapse:collapse;margin-bottom:22px;font-size:13px}
+.gov-table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:12.5px}
 .gov-table th,.gov-table td{
-  border:1px solid #000;padding:5px 8px;text-align:center;
+  border:1px solid #000;padding:4px 6px;text-align:center;
   font-weight:700;vertical-align:middle;
 }
-.gov-table th{background:#f3f3f3;font-weight:800;font-size:12.5px}
-.gov-table td.mat-name{text-align:right;padding-right:10px}
-.gov-table td.mat-qty{width:60px;font-weight:800}
+.gov-table th{background:#f3f3f3;font-weight:800;font-size:12px}
+.gov-table td.mat-name{text-align:right;padding-right:8px}
+.gov-table td.mat-qty{width:55px;font-weight:800}
+
 .gov-signatures{
-  display:flex;justify-content:space-between;margin-top:28px;
-  padding:0 20px;font-size:13.5px;font-weight:700;text-align:center;line-height:1.8;
+  display:flex;justify-content:space-between;margin-top:14px;
+  padding:0 15px;font-size:13px;font-weight:700;text-align:center;line-height:1.6;
 }
 .gov-sign-box{flex:1;max-width:45%}
 .gov-sign-box .role{display:block;margin-bottom:2px}
-.gov-sign-box .name{font-weight:800;font-size:14px}
-.gov-divider{border:none;border-top:1.5px solid #000;margin:22px 0 14px}
-.gov-sub{font-size:13.5px;font-weight:800;margin:14px 0 6px}
-.gov-end{
-  text-align:center;font-size:12px;font-weight:700;margin-top:35px;
-  color:#666;border-top:1px dashed #999;padding-top:10px;
-}
+.gov-sign-box .name{font-weight:800;font-size:13.5px}
+
+.gov-divider{border:none;border-top:1.5px solid #000;margin:12px 0 8px}
+.gov-sub{font-size:13px;font-weight:800;margin:8px 0 4px}
 
 @media print{
-  @page{size:A4;margin:15mm}
+  @page{size:A4;margin:12mm}
   body{background:#fff;padding:0}
   .no-print{display:none!important}
   .print-page{background:#fff;padding:0;min-height:auto}
   .gov-paper{box-shadow:none;padding:0;max-width:100%;width:100%}
-.gov-eagle{width:80px}
-.gov-header{min-height:130px}
+  .gov-eagle{width:75px}
+  .gov-header{min-height:115px}
 }
 
 @media (max-width:400px){
@@ -420,48 +446,69 @@ body{
   .stat-lbl{font-size:9px}
   .header-title h1{font-size:15px}
   .gov-header-right,.gov-header-left{font-size:11px}
-  .gov-eagle{width:58px}
+  .gov-eagle{width:75px}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══════════ صفحة المهام ═══════════ -->
+<!-- ═══════════ صفحة المهام (الرئيسية) ═══════════ -->
 <div id="pageHome" class="page active">
 
   <header class="app-header">
     <div class="header-top">
       <div class="header-title">
-        <div class="header-icon">🔧</div>
+        <div class="header-icon">⚡</div>
         <div>
-          <h1>مهام الصيانة</h1>
-          <p>نظام الميدان السريع</p>
+          <h1>ورشة الكهرباء</h1>
+          <p>نظام إدارة المهام</p>
         </div>
       </div>
       <div class="header-date" id="headerDate"></div>
     </div>
-    <div class="stats-row">
-      <div class="stat high"><div class="stat-num" id="statHigh">0</div><div class="stat-lbl">🔴 عالية</div></div>
-      <div class="stat med"><div class="stat-num" id="statMed">0</div><div class="stat-lbl">🟡 متوسطة</div></div>
-      <div class="stat"><div class="stat-num" id="statTotal">0</div><div class="stat-lbl">📋 الكل</div></div>
-      <div class="stat done"><div class="stat-num" id="statDone">0</div><div class="stat-lbl">✅ منجزة</div></div>
+    <div class="stats-grid">
+      <div class="stat-card c-new" onclick="quickFilter('new')">
+        <div class="stat-num" id="statNew">0</div>
+        <div class="stat-lbl">📩 جديدة</div>
+      </div>
+      <div class="stat-card c-inspecting" onclick="quickFilter('inspecting')">
+        <div class="stat-num" id="statInspecting">0</div>
+        <div class="stat-lbl">🔍 كشف</div>
+      </div>
+      <div class="stat-card c-awaiting" onclick="quickFilter('awaiting')">
+        <div class="stat-num" id="statAwaiting">0</div>
+        <div class="stat-lbl">📄 موافقة</div>
+      </div>
+      <div class="stat-card c-materials" onclick="quickFilter('materials')">
+        <div class="stat-num" id="statMaterials">0</div>
+        <div class="stat-lbl">📦 مواد</div>
+      </div>
+      <div class="stat-card c-working" onclick="quickFilter('working')">
+        <div class="stat-num" id="statWorking">0</div>
+        <div class="stat-lbl">🔧 تنفيذ</div>
+      </div>
+      <div class="stat-card c-done" onclick="quickFilter('done')">
+        <div class="stat-num" id="statDone">0</div>
+        <div class="stat-lbl">✅ منجزة</div>
+      </div>
     </div>
   </header>
 
   <div class="search-wrap">
     <div class="search-box">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
-      <input type="text" id="searchInput" placeholder="ابحث باسم المدرسة أو المشرف...">
+      <input type="text" id="searchInput" placeholder="ابحث باسم المدرسة أو المنطقة...">
     </div>
   </div>
 
   <div class="filters" id="filters">
-    <button class="chip active" data-filter="all">الكل</button>
-    <button class="chip" data-filter="pending">⏳ معلقة</button>
-    <button class="chip" data-filter="done">✅ منجزة</button>
-    <button class="chip" data-filter="high">🔴 عالية</button>
-    <button class="chip" data-filter="med">🟡 متوسطة</button>
-    <button class="chip" data-filter="low">🟢 منخفضة</button>
+    <button class="chip active" data-filter="all">الكل <span class="count" id="cntAll">0</span></button>
+    <button class="chip" data-filter="new">📩 جديدة <span class="count" id="cntNew">0</span></button>
+    <button class="chip" data-filter="inspecting">🔍 كشف <span class="count" id="cntInspecting">0</span></button>
+    <button class="chip" data-filter="awaiting">📄 موافقة <span class="count" id="cntAwaiting">0</span></button>
+    <button class="chip" data-filter="materials">📦 مواد <span class="count" id="cntMaterials">0</span></button>
+    <button class="chip" data-filter="working">🔧 تنفيذ <span class="count" id="cntWorking">0</span></button>
+    <button class="chip" data-filter="done">✅ منجزة <span class="count" id="cntDone">0</span></button>
   </div>
 
   <div class="tasks-list" id="tasksList"></div>
@@ -471,12 +518,24 @@ body{
   </button>
 </div>
 
+<!-- ═══════════ صفحة الجولة ═══════════ -->
+<div id="pageTrip" class="page">
+  <div class="section">
+    <div class="section-title">
+      <span>🚗 جولة اليوم</span>
+      <button onclick="buildTodayTrip()">🔄 تحديث</button>
+    </div>
+    <div id="tripSummary"></div>
+    <div id="tripStops"></div>
+  </div>
+</div>
+
 <!-- ═══════════ صفحة المدارس ═══════════ -->
 <div id="pageSchools" class="page">
   <div class="section">
     <div class="section-title">
       <span>🏫 قاعدة بيانات المدارس</span>
-      <button onclick="openSchoolSheet()">+ إضافة مدرسة</button>
+      <button onclick="openSchoolSheet()">+ إضافة</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
       <button class="btn-lg btn-primary" onclick="document.getElementById('importSchoolFile').click()" style="font-size:12px;padding:10px">📥 استيراد CSV</button>
@@ -496,8 +555,8 @@ body{
 <div id="pageMaterials" class="page">
   <div class="section">
     <div class="section-title">
-      <span>📦 قائمة المواد الجاهزة</span>
-      <button onclick="openMaterialSheet()">+ إضافة مادة</button>
+      <span>📦 قائمة المواد الكهربائية</span>
+      <button onclick="openMaterialSheet()">+ إضافة</button>
     </div>
     <div id="materialsList"></div>
   </div>
@@ -514,17 +573,21 @@ body{
   <div class="section">
     <div class="section-title">✍️ التواقيع الثابتة</div>
     <div class="field-row">
-      <div class="field"><label>رئيس ورشة الكهرباء</label><input type="text" id="setSign1" value="بسام عساف"></div>
       <div class="field"><label>رئيس شعبة الصيانة</label><input type="text" id="setSign2" value="فراس صالح"></div>
+      <div class="field"><label>رئيس دائرة المعلوماتية</label><input type="text" id="setSign3" value="علي العباس"></div>
     </div>
-    <div class="field"><label>رئيس دائرة المعلوماتية</label><input type="text" id="setSign3" value="علي العباس"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">👷 الفنيون</div>
+    <div id="techniciansList"></div>
+    <button class="btn-lg btn-copper" style="margin-top:10px" onclick="openTechnicianSheet()">+ إضافة فني</button>
   </div>
   <div class="section">
     <div class="section-title">💾 النسخ الاحتياطي</div>
     <button class="btn-lg btn-primary" style="margin-bottom:8px" onclick="exportJSON()">📤 تصدير نسخة احتياطية (JSON)</button>
     <button class="btn-lg btn-copper" style="margin-bottom:8px" onclick="document.getElementById('importFile').click()">📥 استيراد نسخة احتياطية</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
-    <button class="btn-lg btn-ghost" onclick="exportTasksCSV()">📊 تصدير المهام (CSV)</button>
+    <button class="btn-lg btn-ghost" onclick="exportTasksCSV()">📊 تصدير المهام (Excel)</button>
   </div>
   <div class="section">
     <div class="section-title">🗑️ منطقة الخطر</div>
@@ -535,8 +598,12 @@ body{
 <!-- ═══════════ الشريط السفلي ═══════════ -->
 <nav class="bottom-nav no-print">
   <div class="nav-item active" data-page="pageHome" onclick="switchPage('pageHome')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
     <span>المهام</span>
+  </div>
+  <div class="nav-item" data-page="pageTrip" onclick="switchPage('pageTrip')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+    <span>الجولة</span>
   </div>
   <div class="nav-item" data-page="pageSchools" onclick="switchPage('pageSchools')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -552,14 +619,24 @@ body{
   </div>
 </nav>
 
-<!-- ═══════════ نافذة المهمة ═══════════ -->
+<!-- ═══════════ نافذة إضافة/تعديل مهمة ═══════════ -->
 <div class="sheet-bg" id="taskSheetBg" onclick="if(event.target===this)closeSheet('taskSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title" id="taskSheetTitle">➕ مهمة جديدة</div>
 
     <div class="field">
-      <label>🔍 ابحث عن المدرسة (اختياري)</label>
+      <label>📌 مصدر المهمة <span class="req">*</span></label>
+      <select id="fSource">
+        <option value="call">📞 طلب عادي</option>
+        <option value="urgent">🚨 طارئ (اتصال)</option>
+        <option value="letter">📄 كتاب رسمي</option>
+        <option value="routine">🔄 زيارة دورية</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>🔍 ابحث عن المدرسة</label>
       <input type="text" id="fSchoolSearch" placeholder="اكتب 2 حروف على الأقل..." autocomplete="off" oninput="searchSchools(this.value)">
       <div class="school-results" id="schoolResults"></div>
       <div class="selected-school" id="selectedSchool" style="display:none">
@@ -569,9 +646,9 @@ body{
       </div>
     </div>
 
-    <div class="field" id="fNameField">
+    <div class="field">
       <label>اسم المدرسة / الموقع <span class="req">*</span></label>
-      <input type="text" id="fName" placeholder="مثال: مدرسة الشاهين">
+      <input type="text" id="fName" placeholder="اكتب أو اختر من القاعدة">
     </div>
 
     <div class="field">
@@ -580,21 +657,30 @@ body{
     </div>
 
     <div class="field-row">
-      <div class="field"><label>المبنى / القاعة</label><input type="text" id="fBuilding" placeholder="مبنى ح2 - قاعة الحاسوب"></div>
+      <div class="field"><label>المبنى</label><input type="text" id="fBuilding" placeholder="مبنى ح2"></div>
       <div class="field"><label>رقم القاعة</label><input type="text" id="fRoom" placeholder="1"></div>
     </div>
 
     <div class="field-row">
-      <div class="field"><label>نوع المهمة</label>
+      <div class="field"><label>نوع العمل</label>
         <select id="fType">
-          <option>كشف عطل</option><option>إصلاح عطل</option><option>كشف وطباعة مواد</option>
-          <option>تمديد قاعة جديدة</option><option>نقل قاعة</option><option>صيانة دورية</option>
-          <option>تركيب أجهزة</option><option>استلام مواد</option><option>متابعة إدارية</option>
+          <option>🔌 إصلاح عطل</option>
+          <option>🔧 صيانة دورية</option>
+          <option>🏗️ تمديد قاعة</option>
+          <option>🚚 نقل قاعة</option>
+          <option>💡 تركيب إنارة</option>
+          <option>🔌 توصيل أجهزة</option>
+          <option>📦 تأمين مواد</option>
+          <option>📝 كشف فني</option>
+          <option>🖨️ صيانة حواسب</option>
+          <option>أخرى</option>
         </select>
       </div>
       <div class="field"><label>الأولوية</label>
         <select id="fPriority">
-          <option value="high">🔴 عالية</option><option value="med" selected>🟡 متوسطة</option><option value="low">🟢 منخفضة</option>
+          <option value="high">🔴 عالية</option>
+          <option value="med" selected>🟡 متوسطة</option>
+          <option value="low">🟢 منخفضة</option>
         </select>
       </div>
     </div>
@@ -602,21 +688,29 @@ body{
     <div class="field-row">
       <div class="field"><label>المنطقة</label>
         <select id="fArea">
-          <option>المزة - أبو زهير</option><option>المزة</option><option>برزة</option><option>الزاهرة</option>
-          <option>كفرسوسة</option><option>الميدان</option><option>القنوات</option><option>الشاغور</option>
-          <option>دمشق القديمة</option><option>ساروجا</option><option>ركن الدين</option><option>الصالحية</option>
-          <option>المهاجرين</option><option>القدم</option><option>دمر</option><option>القابون</option>
-          <option>جوبر</option><option>المخيم</option><option>أخرى</option>
+          <option>المزة</option><option>المزة - أبو زهير</option>
+          <option>برزة</option><option>الزاهرة</option>
+          <option>كفرسوسة</option><option>الميدان</option>
+          <option>القنوات</option><option>الشاغور</option>
+          <option>دمشق القديمة</option><option>ساروجا</option>
+          <option>ركن الدين</option><option>الصالحية</option>
+          <option>المهاجرين</option><option>القدم</option>
+          <option>دمر</option><option>القابون</option>
+          <option>جوبر</option><option>المخيم</option>
+          <option>أخرى</option>
         </select>
       </div>
       <div class="field"><label>المشرف</label><input type="text" id="fContact" placeholder="اسم المشرف"></div>
     </div>
 
-    <div class="field">
-      <label>🔄 تعديل بيانات المدرسة (اختياري)</label>
-      <input type="text" id="fEditPhone" placeholder="الهاتف الجديد (إن تغير)" style="margin-bottom:8px">
-      <input type="text" id="fEditAddress" placeholder="العنوان الجديد (إن تغير)" style="margin-bottom:8px">
-      <input type="text" id="fEditExtra" placeholder="حقل إضافي: رقم/معلومة خاصة">
+    <div class="field-row">
+      <div class="field"><label>👤 مدير المدرسة</label><input type="text" id="fPrincipal" placeholder="اسم المدير"></div>
+      <div class="field"><label>📞 جوال المدير</label><input type="tel" id="fPrincipalPhone" placeholder="09xxxxxxxx"></div>
+    </div>
+
+    <div class="field-row">
+      <div class="field"><label>💻 أمين سر الحاسب</label><input type="text" id="fSecretary" placeholder="اسم أمين السر"></div>
+      <div class="field"><label>📞 جواله</label><input type="tel" id="fSecretaryPhone" placeholder="09xxxxxxxx"></div>
     </div>
 
     <div class="field">
@@ -645,34 +739,32 @@ body{
 <div class="sheet-bg" id="matSheetBg" onclick="if(event.target===this)closeSheet('matSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-      <span>كشف المواد المطلوبة</span>
-    </div>
-
+    <div class="sheet-title">📦 كشف المواد</div>
     <div class="field">
-      <label>اختر مادة من القائمة</label>
+      <label>اختر مادة</label>
       <select id="matSelect" onchange="addMaterialToTask()"><option value="">-- اختر مادة --</option></select>
     </div>
-
     <div class="field">
       <label>أو أضف مادة جديدة</label>
       <div style="display:flex;gap:8px">
         <input type="text" id="matNewName" placeholder="اسم المادة" style="flex:1">
-        <input type="text" id="matNewUnit" placeholder="الوحدة" style="width:90px">
-        <button class="btn btn-done" style="flex:0 0 auto;padding:8px 12px" onclick="addNewMaterialInline()">+</button>
+        <input type="text" id="matNewUnit" placeholder="الوحدة" style="width:80px">
+        <button class="btn btn-done" onclick="addNewMaterialInline()">+</button>
       </div>
     </div>
-
-    <div style="margin:16px 0 10px;font-size:13px;font-weight:800;color:var(--emerald-800)">📋 المواد في هذه المهمة:</div>
+    <div style="margin:16px 0 10px;font-size:13px;font-weight:800;color:var(--emerald-800)">📋 المواد في المهمة:</div>
     <div id="taskMaterialsList"></div>
-
     <div class="field">
-      <label>اسم الفني (القائم بالكشف)</label>
-      <input type="text" id="fTechnician" placeholder="اسم الفني الذي قام بالكشف">
+      <label>👷 الفني المنفذ</label>
+      <select id="fTechnician">
+        <option value="">-- اختر فني --</option>
+      </select>
     </div>
-
-    <button class="btn-lg btn-copper" style="margin-top:12px" onclick="saveTaskMaterials()">💾 حفظ المواد</button>
+    <div class="field">
+      <label>📝 ملاحظات التنفيذ</label>
+      <textarea id="fExecutionNotes" placeholder="ما تم فعله..."></textarea>
+    </div>
+    <button class="btn-lg btn-copper" style="margin-top:12px" onclick="saveTaskMaterials()">💾 حفظ</button>
     <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('matSheetBg')">إلغاء</button>
   </div>
 </div>
@@ -681,9 +773,9 @@ body{
 <div class="sheet-bg" id="masterMatSheetBg" onclick="if(event.target===this)closeSheet('masterMatSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title" id="masterMatTitle">➕ إضافة مادة للقائمة</div>
+    <div class="sheet-title" id="masterMatTitle">➕ إضافة مادة</div>
     <div class="field"><label>اسم المادة <span class="req">*</span></label><input type="text" id="masterMatName" placeholder="مثال: منظم جهد"></div>
-    <div class="field"><label>الوحدة</label><input type="text" id="masterMatUnit" placeholder="عدد / متر / كيلو" value="عدد"></div>
+    <div class="field"><label>الوحدة</label><input type="text" id="masterMatUnit" value="عدد"></div>
     <button class="btn-lg btn-primary" onclick="saveMasterMaterial()">💾 حفظ</button>
     <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('masterMatSheetBg')">إلغاء</button>
   </div>
@@ -693,21 +785,61 @@ body{
 <div class="sheet-bg" id="schoolSheetBg" onclick="if(event.target===this)closeSheet('schoolSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title" id="schoolSheetTitle">➕ إضافة مدرسة للقاعدة</div>
-    <div class="field"><label>اسم المدرسة <span class="req">*</span></label><input type="text" id="schName" placeholder="مثال: مدرسة الشاهين"></div>
-    <div class="field"><label>الاسم القديم (اختياري)</label><input type="text" id="schOldName" placeholder="الاسم السابق"></div>
-    <div class="field"><label>المشرف</label><input type="text" id="schSupervisor" placeholder="اسم المشرف"></div>
+    <div class="sheet-title" id="schoolSheetTitle">➕ إضافة مدرسة</div>
+    <div class="field"><label>اسم المدرسة <span class="req">*</span></label><input type="text" id="schName"></div>
+    <div class="field"><label>الاسم القديم (اختياري)</label><input type="text" id="schOldName"></div>
+    <div class="field"><label>المشرف</label><input type="text" id="schSupervisor"></div>
     <div class="field-row">
-      <div class="field"><label>المنطقة</label><input type="text" id="schArea" placeholder="الميدان"></div>
-      <div class="field"><label>الحي</label><input type="text" id="schDistrict" placeholder="ميدان وسطاني"></div>
+      <div class="field"><label>المنطقة</label><input type="text" id="schArea"></div>
+      <div class="field"><label>الحي</label><input type="text" id="schDistrict"></div>
     </div>
-    <div class="field"><label>العنوان التفصيلي</label><input type="text" id="schAddress" placeholder="ميدان وسطاني-جانب مستوصف..."></div>
+    <div class="field"><label>العنوان</label><input type="text" id="schAddress"></div>
     <div class="field-row">
-      <div class="field"><label>المرحلة</label><input type="text" id="schGrade" placeholder="1 _ 6"></div>
-      <div class="field"><label>الهاتف</label><input type="text" id="schPhone" placeholder="09xxxxxxxx"></div>
+      <div class="field"><label>المرحلة</label><input type="text" id="schGrade"></div>
+      <div class="field"><label>الهاتف</label><input type="text" id="schPhone"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>👤 مدير المدرسة</label><input type="text" id="schPrincipal"></div>
+      <div class="field"><label>📞 جوال المدير</label><input type="tel" id="schPrincipalPhone"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>💻 أمين سر الحاسب</label><input type="text" id="schSecretary"></div>
+      <div class="field"><label>📞 جواله</label><input type="tel" id="schSecretaryPhone"></div>
     </div>
     <button class="btn-lg btn-primary" onclick="saveSchoolMaster()">💾 حفظ</button>
     <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('schoolSheetBg')">إلغاء</button>
+  </div>
+</div>
+
+<!-- ═══════════ نافذة إضافة فني ═══════════ -->
+<div class="sheet-bg" id="techSheetBg" onclick="if(event.target===this)closeSheet('techSheetBg')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="techSheetTitle">➕ إضافة فني</div>
+    <div class="field"><label>اسم الفني <span class="req">*</span></label><input type="text" id="techName"></div>
+    <div class="field"><label>📞 الجوال</label><input type="tel" id="techPhone" placeholder="09xxxxxxxx"></div>
+    <div class="field"><label>ملاحظات</label><input type="text" id="techNotes" placeholder="مثال: يعمل جزئياً"></div>
+    <button class="btn-lg btn-primary" onclick="saveTechnician()">💾 حفظ</button>
+    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('techSheetBg')">إلغاء</button>
+  </div>
+</div>
+
+<!-- ═══════════ نافذة WhatsApp ═══════════ -->
+<div class="sheet-bg" id="whatsSheetBg" onclick="if(event.target===this)closeSheet('whatsSheetBg')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">📱 إرسال للفني</div>
+    <div class="field">
+      <label>الفني المستلم</label>
+      <select id="whatsTech"></select>
+    </div>
+    <div class="field">
+      <label>الرسالة الجاهزة</label>
+      <textarea id="whatsMessage" rows="10" style="font-size:12.5px;line-height:1.6"></textarea>
+    </div>
+    <button class="btn-lg" style="background:#25d366;color:#fff" onclick="sendWhatsApp()">📱 إرسال على واتساب</button>
+    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="copyWhatsMessage()">📋 نسخ الرسالة</button>
+    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('whatsSheetBg')">إلغاء</button>
   </div>
 </div>
 
@@ -718,7 +850,7 @@ body{
 <div id="printPage" style="display:none;position:fixed;inset:0;background:#f1f5f9;z-index:500;overflow-y:auto">
   <div class="print-toolbar no-print" style="position:sticky;top:0;background:#fff;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);z-index:10">
     <button class="btn btn-ghost" style="flex:0 0 auto" onclick="closePrint()">← رجوع</button>
-    <button class="btn btn-primary" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+    <button class="btn btn-primary" onclick="window.print()">🖨️ طباعة / PDF</button>
   </div>
   <div class="print-page">
     <div class="gov-paper" id="govPaper"></div>
@@ -727,65 +859,82 @@ body{
 
 <script>
 /* ═══════════════════════════════════════════════════════
-   القسم 1: التخزين والثوابت
+   القسم 1: الثوابت والإعدادات
    ═══════════════════════════════════════════════════════ */
 const STORAGE_KEYS = {
-  TASKS: 'mt_tasks_v1',
-  MATERIALS: 'mt_materials_v1',
-  SCHOOLS: 'mt_schools_v1',
-  SETTINGS: 'mt_settings_v1',
-  COUNTER: 'mt_counter_v1'
+  TASKS: 'wk_tasks_v1',
+  MATERIALS: 'wk_materials_v1',
+  SCHOOLS: 'wk_schools_v1',
+  TECHNICIANS: 'wk_technicians_v1',
+  SETTINGS: 'wk_settings_v1',
+  COUNTER: 'wk_counter_v1'
 };
 
 let state = {
   tasks: [],
   materials: [],
   schools: [],
+  technicians: [],
   settings: {},
   counter: 1,
   currentFilter: 'all',
   editingTaskId: null,
   currentTaskId: null,
-  editingSchoolId: null,
+  editingSchoolIdx: null,
+  editingTechIdx: null,
+  editingMasterMatId: null,
   selectedSchool: null
 };
 
-/* ═══ المواد الافتراضية ═══ */
+const STATUS_LABELS = {
+  new: { label: '📩 جديدة', cls: 'mb-new' },
+  inspecting: { label: '🔍 قيد الكشف', cls: 'mb-inspecting' },
+  awaiting: { label: '📄 بانتظار موافقة', cls: 'mb-awaiting' },
+  materials: { label: '📦 تأمين مواد', cls: 'mb-materials' },
+  working: { label: '🔧 قيد التنفيذ', cls: 'mb-working' },
+  done: { label: '✅ منجزة', cls: 'mb-done' },
+  suspended: { label: '⏸️ معلقة', cls: 'mb-suspended' }
+};
+
+const SOURCE_ICONS = { call:'📞', urgent:'🚨', letter:'📄', routine:'🔄' };
+const SOURCE_LABELS = { call:'طلب', urgent:'طارئ', letter:'كتاب', routine:'دورية' };
+const PRIORITY_LABELS = { high:'🔴 عالية', med:'🟡 متوسطة', low:'🟢 منخفضة' };
+
 const DEFAULT_MATERIALS = [
   { id: 1, name: 'منظم جهد', unit: 'عدد' },
   { id: 2, name: 'UPS', unit: 'عدد' },
-  { id: 3, name: 'بروجكتور', unit: 'عدد' },
-  { id: 4, name: 'قاعدة بروجكتور', unit: 'عدد' },
-  { id: 5, name: 'شاشة لمس', unit: 'عدد' },
-  { id: 6, name: 'شاشة عادية', unit: 'عدد' },
-  { id: 7, name: 'لوحة مفاتيح', unit: 'عدد' },
-  { id: 8, name: 'ماوس', unit: 'عدد' },
-  { id: 9, name: 'كابل شبكة RJ45', unit: 'عدد' },
-  { id: 10, name: 'كابل 4×4 ملم', unit: 'متر' },
-  { id: 11, name: 'كابل 2 ملم', unit: 'متر' },
-  { id: 12, name: 'شريط مفرد 2 ملم', unit: 'متر' },
-  { id: 13, name: 'شريط مفرد 4 ملم', unit: 'متر' },
-  { id: 14, name: 'شريط مفرد 2.5 ملم', unit: 'متر' },
-  { id: 15, name: 'مسطرة جدارية رباعية', unit: 'عدد' },
-  { id: 16, name: 'مسطرة جدارية متعددة', unit: 'عدد' },
-  { id: 17, name: 'شخاشيرو', unit: 'عدد' },
-  { id: 18, name: 'توال عازل كهرباء', unit: 'عدد' },
-  { id: 19, name: 'قاطع مفرد 16 أمبير', unit: 'عدد' },
-  { id: 20, name: 'قاطع مفرد 25 أمبير', unit: 'عدد' },
-  { id: 21, name: 'قاطع مفرد 32 أمبير', unit: 'عدد' },
-  { id: 22, name: 'قاطع ثلاثي 40 أمبير', unit: 'عدد' },
-  { id: 23, name: 'تابلو ظاهر 16 خط', unit: 'عدد' },
-  { id: 24, name: 'بريز مفرد ظاهر حراري', unit: 'عدد' },
-  { id: 25, name: 'علبة أناش 14 ملم', unit: 'عدد' },
-  { id: 26, name: 'مجاري بلاستيك 4 سم', unit: 'متر' },
-  { id: 27, name: 'مجاري بلاستيك 2 ملم', unit: 'عدد' },
-  { id: 28, name: 'براغي تلفون 6 ملم', unit: 'عدد' },
-  { id: 29, name: 'براغي سن صاج', unit: 'عدد' },
-  { id: 30, name: 'أسافين 6 ملم', unit: 'عدد' },
-  { id: 31, name: 'أسافين 8 ملم بلاستيك', unit: 'عدد' },
-  { id: 32, name: 'رنديلة صاج', unit: 'عدد' },
-  { id: 33, name: 'بار مفرد نحاس', unit: 'متر' },
-  { id: 34, name: 'أمبير 40', unit: 'عدد' },
+  { id: 3, name: 'كابل 4×4 ملم', unit: 'متر' },
+  { id: 4, name: 'كابل 2 ملم', unit: 'متر' },
+  { id: 5, name: 'شريط مفرد 2 ملم', unit: 'متر' },
+  { id: 6, name: 'شريط مفرد 4 ملم', unit: 'متر' },
+  { id: 7, name: 'شريط مفرد 2.5 ملم', unit: 'متر' },
+  { id: 8, name: 'مسطرة جدارية رباعية', unit: 'عدد' },
+  { id: 9, name: 'مسطرة جدارية متعددة', unit: 'عدد' },
+  { id: 10, name: 'شخاشيرو', unit: 'عدد' },
+  { id: 11, name: 'توال عازل كهرباء', unit: 'عدد' },
+  { id: 12, name: 'قاطع مفرد 16 أمبير', unit: 'عدد' },
+  { id: 13, name: 'قاطع مفرد 25 أمبير', unit: 'عدد' },
+  { id: 14, name: 'قاطع مفرد 32 أمبير', unit: 'عدد' },
+  { id: 15, name: 'قاطع ثلاثي 40 أمبير', unit: 'عدد' },
+  { id: 16, name: 'تابلو ظاهر 16 خط', unit: 'عدد' },
+  { id: 17, name: 'بريز مفرد ظاهر حراري', unit: 'عدد' },
+  { id: 18, name: 'علبة أناش 14 ملم', unit: 'عدد' },
+  { id: 19, name: 'مجاري بلاستيك 4 سم', unit: 'متر' },
+  { id: 20, name: 'مجاري بلاستيك 2 ملم', unit: 'عدد' },
+  { id: 21, name: 'براغي تلفون 6 ملم', unit: 'عدد' },
+  { id: 22, name: 'براغي سن صاج', unit: 'عدد' },
+  { id: 23, name: 'أسافين 6 ملم', unit: 'عدد' },
+  { id: 24, name: 'أسافين 8 ملم بلاستيك', unit: 'عدد' },
+  { id: 25, name: 'رنديلة صاج', unit: 'عدد' },
+  { id: 26, name: 'بار مفرد نحاس', unit: 'متر' },
+  { id: 27, name: 'أمبير 40', unit: 'عدد' },
+  { id: 28, name: 'كابل شبكة RJ45', unit: 'عدد' },
+  { id: 29, name: 'بروجكتور', unit: 'عدد' },
+  { id: 30, name: 'قاعدة بروجكتور', unit: 'عدد' },
+  { id: 31, name: 'شاشة لمس', unit: 'عدد' },
+  { id: 32, name: 'شاشة عادية', unit: 'عدد' },
+  { id: 33, name: 'لوحة مفاتيح', unit: 'عدد' },
+  { id: 34, name: 'ماوس', unit: 'عدد' },
   { id: 35, name: 'كرت شبكة', unit: 'عدد' },
   { id: 36, name: 'هارد ديسك', unit: 'عدد' },
   { id: 37, name: 'رام', unit: 'عدد' },
@@ -794,17 +943,18 @@ const DEFAULT_MATERIALS = [
   { id: 40, name: 'مواد أخرى', unit: 'عدد' }
 ];
 
-/* ═══ الإعدادات الافتراضية ═══ */
 const DEFAULT_SETTINGS = {
   header1: 'مديرية التربية في محافظة دمشق',
   header2: 'دائرة المعلوماتية',
   header3: 'شعبة الصيانة (ورشة الكهرباء)',
-  sign1: 'بسام عساف',
   sign2: 'فراس صالح',
   sign3: 'علي العباس'
 };
 
-/* ═══ قاعدة بيانات المدارس (519 مدرسة) ═══ */
+const DEFAULT_TECHNICIANS = [
+  { id: 1, name: 'أنا', phone: '', notes: 'رئيس الورشة' }
+];
+
 const SCHOOLS_DEFAULT = [
   {n:'الحسن بن الهيثم',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة خلف مشفى الزاهرة',g:'1 _ 6',p:'5423028'},
   {n:'قاسم أمين',s:'باسم العباس',a:'الميدان',d:'الزاهرة',ad:'زاهرة قديمة مقابل أزهار مارينا',g:'رياض أطفال',p:'8880784'},
@@ -1328,27 +1478,30 @@ const SCHOOLS_DEFAULT = [
 ];
 
 /* ═══════════════════════════════════════════════════════
-   القسم 2: التحميل والحفظ
+   القسم 2: التخزين والتحميل
    ═══════════════════════════════════════════════════════ */
 function loadState(){
   try{
     state.tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.TASKS) || '[]');
     state.materials = JSON.parse(localStorage.getItem(STORAGE_KEYS.MATERIALS) || 'null') || DEFAULT_MATERIALS;
     state.schools = JSON.parse(localStorage.getItem(STORAGE_KEYS.SCHOOLS) || 'null') || SCHOOLS_DEFAULT;
+    state.technicians = JSON.parse(localStorage.getItem(STORAGE_KEYS.TECHNICIANS) || 'null') || DEFAULT_TECHNICIANS;
     state.settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS) || 'null') || DEFAULT_SETTINGS;
     state.counter = parseInt(localStorage.getItem(STORAGE_KEYS.COUNTER) || '1');
   }catch(e){
-    console.error('خطأ تحميل:', e);
     state.tasks = [];
     state.materials = DEFAULT_MATERIALS;
     state.schools = SCHOOLS_DEFAULT;
+    state.technicians = DEFAULT_TECHNICIANS;
     state.settings = DEFAULT_SETTINGS;
     state.counter = 1;
   }
 }
+
 function saveTasks(){ localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(state.tasks)); }
 function saveMaterials(){ localStorage.setItem(STORAGE_KEYS.MATERIALS, JSON.stringify(state.materials)); }
 function saveSchools(){ localStorage.setItem(STORAGE_KEYS.SCHOOLS, JSON.stringify(state.schools)); }
+function saveTechnicians(){ localStorage.setItem(STORAGE_KEYS.TECHNICIANS, JSON.stringify(state.technicians)); }
 function saveSettings(){ localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(state.settings)); }
 function saveCounter(){ localStorage.setItem(STORAGE_KEYS.COUNTER, String(state.counter)); }
 
@@ -1395,9 +1548,10 @@ function switchPage(pageId){
   const nav = document.querySelector('.nav-item[data-page="' + pageId + '"]');
   if(nav) nav.classList.add('active');
   if(pageId === 'pageMaterials') renderMaterials();
-  if(pageId === 'pageSettings') loadSettingsToForm();
+  if(pageId === 'pageSettings'){ loadSettingsToForm(); renderTechniciansList(); }
   if(pageId === 'pageSchools'){ renderSchoolsList(); updateSchoolsStats(); }
-  localStorage.setItem('mt_current_page', pageId);
+  if(pageId === 'pageTrip') buildTodayTrip();
+  localStorage.setItem('wk_current_page', pageId);
   window.scrollTo(0, 0);
 }
 function openSheet(id){
@@ -1408,6 +1562,25 @@ function closeSheet(id){
   document.getElementById(id).classList.remove('open');
   document.body.style.overflow = '';
 }
+function quickFilter(filter){
+  state.currentFilter = filter;
+  document.querySelectorAll('#filters .chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.filter === filter);
+  });
+  renderTasks();
+  window.scrollTo(0, 300);
+}
+function fillTechnicianSelects(){
+  const opts = '<option value="">-- اختر فني --</option>' + state.technicians.map(t => '<option value="' + escapeHtml(t.name) + '">' + escapeHtml(t.name) + (t.phone ? ' — ' + escapeHtml(t.phone) : '') + '</option>').join('');
+  ['fTechnician','whatsTech'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el){
+      const cur = el.value;
+      el.innerHTML = opts;
+      if(cur) el.value = cur;
+    }
+  });
+}
 
 /* ═══════════════════════════════════════════════════════
    القسم 4: البحث عن المدارس
@@ -1416,20 +1589,20 @@ function searchSchools(query){
   const results = document.getElementById('schoolResults');
   const q = (query || '').trim().toLowerCase();
   if(q.length < 2){ results.classList.remove('show'); return; }
-  const matches = state.schools.filter(function(s){
-    return (s.n && s.n.toLowerCase().indexOf(q) !== -1)
-        || (s.oldName && s.oldName.toLowerCase().indexOf(q) !== -1)
-        || (s.a && s.a.toLowerCase().indexOf(q) !== -1)
-        || (s.s && s.s.toLowerCase().indexOf(q) !== -1)
-        || (s.ad && s.ad.toLowerCase().indexOf(q) !== -1);
-  }).slice(0, 30);
+  const matches = state.schools.filter(s =>
+    (s.n && s.n.toLowerCase().indexOf(q) !== -1) ||
+    (s.oldName && s.oldName.toLowerCase().indexOf(q) !== -1) ||
+    (s.a && s.a.toLowerCase().indexOf(q) !== -1) ||
+    (s.s && s.s.toLowerCase().indexOf(q) !== -1) ||
+    (s.ad && s.ad.toLowerCase().indexOf(q) !== -1)
+  ).slice(0, 30);
   if(matches.length === 0){
-    results.innerHTML = '<div style="padding:12px;text-align:center;color:var(--gray-500);font-size:12px">لا توجد نتائج في القاعدة</div>';
+    results.innerHTML = '<div style="padding:12px;text-align:center;color:var(--gray-500);font-size:12px">لا توجد نتائج</div>';
     results.classList.add('show');
     return;
   }
   let html = '';
-  matches.forEach(function(s){
+  matches.forEach(s => {
     const idx = state.schools.indexOf(s);
     html += '<div class="school-item" onclick="pickSchool(' + idx + ')">';
     html += '<div class="school-item-name">' + escapeHtml(s.n);
@@ -1456,10 +1629,16 @@ function pickSchool(idx){
   if(s.g) info += '<br>📚 ' + escapeHtml(s.g);
   if(s.p) info += ' • 📞 ' + escapeHtml(s.p);
   if(s.ad) info += '<br>📌 ' + escapeHtml(s.ad);
+  if(s.principal) info += '<br>👤 المدير: ' + escapeHtml(s.principal) + (s.principalPhone ? ' - ' + escapeHtml(s.principalPhone) : '');
+  if(s.secretary) info += '<br>💻 أمين السر: ' + escapeHtml(s.secretary) + (s.secretaryPhone ? ' - ' + escapeHtml(s.secretaryPhone) : '');
   document.getElementById('selInfo').innerHTML = info;
   document.getElementById('selectedSchool').style.display = 'block';
   document.getElementById('fName').value = s.n;
   if(s.s) document.getElementById('fContact').value = s.s;
+  if(s.principal) document.getElementById('fPrincipal').value = s.principal;
+  if(s.principalPhone) document.getElementById('fPrincipalPhone').value = s.principalPhone;
+  if(s.secretary) document.getElementById('fSecretary').value = s.secretary;
+  if(s.secretaryPhone) document.getElementById('fSecretaryPhone').value = s.secretaryPhone;
   const areaSel = document.getElementById('fArea');
   if(s.a){
     for(let i=0; i<areaSel.options.length; i++){
@@ -1474,17 +1653,14 @@ function clearSelectedSchool(){
   document.getElementById('fSchoolSearch').value = '';
   document.getElementById('selectedSchool').style.display = 'none';
   document.getElementById('schoolResults').classList.remove('show');
-  document.getElementById('fName').value = '';
-  document.getElementById('fContact').value = '';
-  document.getElementById('fBuilding').value = '';
 }
+
 /* ═══════════════════════════════════════════════════════
    القسم 5: إدارة المهام
    ═══════════════════════════════════════════════════════ */
 function openTaskSheet(taskId){
   state.editingTaskId = taskId || null;
   const title = document.getElementById('taskSheetTitle');
-  const fName = document.getElementById('fName');
   document.getElementById('fSchoolSearch').value = '';
   document.getElementById('schoolResults').classList.remove('show');
   document.getElementById('selectedSchool').style.display = 'none';
@@ -1494,32 +1670,36 @@ function openTaskSheet(taskId){
     const t = state.tasks.find(x => x.id === taskId);
     if(!t) return;
     title.textContent = '✏️ تعديل المهمة';
-    fName.value = t.name || '';
+    document.getElementById('fSource').value = t.source || 'call';
+    document.getElementById('fName').value = t.name || '';
     document.getElementById('fNewName').value = t.newName || '';
     document.getElementById('fBuilding').value = t.building || '';
     document.getElementById('fRoom').value = t.room || '';
-    document.getElementById('fType').value = t.type || 'كشف عطل';
+    document.getElementById('fType').value = t.type || '🔌 إصلاح عطل';
     document.getElementById('fPriority').value = t.priority || 'med';
-    document.getElementById('fArea').value = t.area || 'أخرى';
+    document.getElementById('fArea').value = t.area || 'المزة';
     document.getElementById('fContact').value = t.contact || '';
+    document.getElementById('fPrincipal').value = t.principal || '';
+    document.getElementById('fPrincipalPhone').value = t.principalPhone || '';
+    document.getElementById('fSecretary').value = t.secretary || '';
+    document.getElementById('fSecretaryPhone').value = t.secretaryPhone || '';
     document.getElementById('fNotes').value = t.notes || '';
-    document.getElementById('fEditPhone').value = t.editPhone || '';
-    document.getElementById('fEditAddress').value = t.editAddress || '';
-    document.getElementById('fEditExtra').value = t.editExtra || '';
   }else{
     title.textContent = '➕ مهمة جديدة';
-    fName.value = '';
+    document.getElementById('fSource').value = 'call';
+    document.getElementById('fName').value = '';
     document.getElementById('fNewName').value = '';
     document.getElementById('fBuilding').value = '';
     document.getElementById('fRoom').value = '';
-    document.getElementById('fType').value = 'كشف عطل';
+    document.getElementById('fType').value = '🔌 إصلاح عطل';
     document.getElementById('fPriority').value = 'med';
-    document.getElementById('fArea').value = 'المزة - أبو زهير';
+    document.getElementById('fArea').value = 'المزة';
     document.getElementById('fContact').value = '';
+    document.getElementById('fPrincipal').value = '';
+    document.getElementById('fPrincipalPhone').value = '';
+    document.getElementById('fSecretary').value = '';
+    document.getElementById('fSecretaryPhone').value = '';
     document.getElementById('fNotes').value = '';
-    document.getElementById('fEditPhone').value = '';
-    document.getElementById('fEditAddress').value = '';
-    document.getElementById('fEditExtra').value = '';
   }
   openSheet('taskSheetBg');
   setTimeout(() => document.getElementById('fSchoolSearch').focus(), 350);
@@ -1530,6 +1710,7 @@ function saveTask(){
   if(!name){ showToast('الرجاء إدخال اسم المدرسة', 'error'); return; }
 
   const data = {
+    source: document.getElementById('fSource').value,
     name: name,
     newName: document.getElementById('fNewName').value.trim(),
     building: document.getElementById('fBuilding').value.trim(),
@@ -1538,17 +1719,14 @@ function saveTask(){
     priority: document.getElementById('fPriority').value,
     area: document.getElementById('fArea').value,
     contact: document.getElementById('fContact').value.trim(),
-    notes: document.getElementById('fNotes').value.trim(),
-    editPhone: document.getElementById('fEditPhone').value.trim(),
-    editAddress: document.getElementById('fEditAddress').value.trim(),
-    editExtra: document.getElementById('fEditExtra').value.trim()
+    principal: document.getElementById('fPrincipal').value.trim(),
+    principalPhone: document.getElementById('fPrincipalPhone').value.trim(),
+    secretary: document.getElementById('fSecretary').value.trim(),
+    secretaryPhone: document.getElementById('fSecretaryPhone').value.trim(),
+    notes: document.getElementById('fNotes').value.trim()
   };
 
   if(state.selectedSchool){
-    data.schoolName = state.selectedSchool.n;
-    data.schoolSupervisor = state.selectedSchool.s || '';
-    data.schoolArea = state.selectedSchool.a || '';
-    data.schoolDistrict = state.selectedSchool.d || '';
     data.schoolAddress = state.selectedSchool.ad || '';
     data.schoolGrade = state.selectedSchool.g || '';
     data.schoolPhone = state.selectedSchool.p || '';
@@ -1562,9 +1740,12 @@ function saveTask(){
     const task = Object.assign({
       id: Date.now(),
       number: state.counter++,
+      status: 'new',
       materials: [],
       technician: '',
-      status: 'pending',
+      executionNotes: '',
+      approvalLog: [],
+      visitLog: [],
       createdAt: todayISO(),
       doneAt: ''
     }, data);
@@ -1576,116 +1757,110 @@ function saveTask(){
   closeSheet('taskSheetBg');
   renderTasks();
   updateStats();
+  updateFilterCounts();
 }
 
-function toggleTaskDone(id){
+function changeTaskStatus(id, newStatus){
   const t = state.tasks.find(x => x.id === id);
   if(!t) return;
-  if(t.status === 'done'){ t.status = 'pending'; t.doneAt = ''; showToast('↩️ تم إرجاع المهمة', 'warn'); }
-  else { t.status = 'done'; t.doneAt = todayISO(); showToast('✅ تم إنجاز المهمة', 'success'); }
-  saveTasks(); renderTasks(); updateStats();
-  if(document.getElementById('detailSheetBg').classList.contains('open')) openDetail(id);
+  t.status = newStatus;
+  if(newStatus === 'done'){
+    t.doneAt = todayISO();
+  }
+  if(newStatus !== 'done' && t.doneAt){
+    t.doneAt = '';
+  }
+  saveTasks();
+  renderTasks();
+  updateStats();
+  updateFilterCounts();
+  if(document.getElementById('detailSheetBg').classList.contains('open')){
+    openDetail(id);
+  }
+  showToast('✅ تم تحديث الحالة', 'success');
 }
 
 function deleteTask(id){
   if(!confirm('هل تريد حذف هذه المهمة نهائياً؟')) return;
   state.tasks = state.tasks.filter(x => x.id !== id);
-  saveTasks(); renderTasks(); updateStats();
+  saveTasks(); renderTasks(); updateStats(); updateFilterCounts();
   closeSheet('detailSheetBg');
   showToast('🗑️ تم حذف المهمة', 'warn');
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 6: تفاصيل المهمة
+   القسم 6: المواد
    ═══════════════════════════════════════════════════════ */
-function openDetail(id){
-  const t = state.tasks.find(x => x.id === id);
-  if(!t) return;
-  state.currentTaskId = id;
-  const prioMap = { high:'🔴 عالية', med:'🟡 متوسطة', low:'🟢 منخفضة' };
-  const statusMap = { pending:'⏳ معلقة', done:'✅ منجزة' };
-  const matCount = (t.materials || []).length;
-  const displayName = t.newName || t.name;
-
+function renderMaterials(){
+  const container = document.getElementById('materialsList');
+  if(!state.materials || state.materials.length === 0){
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد مواد</div>';
+    return;
+  }
   let html = '';
-  html += '<div style="background:var(--gray-50);border-radius:12px;padding:14px;margin-bottom:12px">';
-  html += '<div style="font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:8px">' + escapeHtml(displayName) + '</div>';
-  if(t.newName && t.name !== t.newName){
-    html += '<div style="font-size:12px;color:var(--copper-600);margin-bottom:4px">📛 الاسم الأصلي: ' + escapeHtml(t.name) + '</div>';
-  }
-  if(t.oldName){
-    html += '<div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">📜 الاسم القديم: ' + escapeHtml(t.oldName) + '</div>';
-  }
-  html += '<div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">رقم المهمة: #' + t.number + '</div>';
-  if(t.building) html += '<div style="font-size:12.5px;color:var(--gray-700)">🏢 ' + escapeHtml(t.building) + '</div>';
-  if(t.room) html += '<div style="font-size:12.5px;color:var(--gray-700)">🚪 قاعة رقم: ' + escapeHtml(t.room) + '</div>';
-  html += '</div>';
-
-  html += '<div class="field-row" style="margin-bottom:12px">';
-  html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px"><div style="font-size:11px;color:var(--gray-500)">الحالة</div><div style="font-size:13px;font-weight:700;margin-top:2px">' + statusMap[t.status] + '</div></div>';
-  html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px"><div style="font-size:11px;color:var(--gray-500)">الأولوية</div><div style="font-size:13px;font-weight:700;margin-top:2px">' + prioMap[t.priority] + '</div></div>';
-  html += '</div>';
-
-  html += '<div class="field-row" style="margin-bottom:12px">';
-  html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px"><div style="font-size:11px;color:var(--gray-500)">النوع</div><div style="font-size:13px;font-weight:700;margin-top:2px">' + escapeHtml(t.type) + '</div></div>';
-  html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px"><div style="font-size:11px;color:var(--gray-500)">المنطقة</div><div style="font-size:13px;font-weight:700;margin-top:2px">' + escapeHtml(t.area) + '</div></div>';
-  html += '</div>';
-
-  if(t.contact) html += '<div style="font-size:13px;margin-bottom:8px">👤 المشرف: <b>' + escapeHtml(t.contact) + '</b></div>';
-  if(t.notes) html += '<div class="task-note" style="margin-bottom:10px">📝 ' + escapeHtml(t.notes) + '</div>';
-  if(t.technician) html += '<div style="font-size:13px;margin-bottom:8px">👷 الفني: <b>' + escapeHtml(t.technician) + '</b></div>';
-
-  // بيانات المدرسة
-  const hasSchoolInfo = t.schoolAddress || t.schoolDistrict || t.schoolGrade || t.schoolPhone || t.editPhone || t.editAddress || t.editExtra;
-  if(hasSchoolInfo){
-    html += '<div style="background:var(--copper-100);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--copper-700);line-height:1.7">';
-    if(t.editAddress) html += '📍 <b>العنوان:</b> ' + escapeHtml(t.editAddress) + '<br>';
-    else if(t.schoolAddress) html += '📍 <b>العنوان:</b> ' + escapeHtml(t.schoolAddress) + '<br>';
-    if(t.schoolDistrict) html += '🏘️ <b>الحي:</b> ' + escapeHtml(t.schoolDistrict) + '<br>';
-    if(t.schoolGrade) html += '📚 <b>المرحلة:</b> ' + escapeHtml(t.schoolGrade) + '<br>';
-    if(t.editPhone) html += '📞 <b>الهاتف:</b> ' + escapeHtml(t.editPhone) + '<br>';
-    else if(t.schoolPhone) html += '📞 <b>الهاتف:</b> ' + escapeHtml(t.schoolPhone) + '<br>';
-    if(t.editExtra) html += '➕ ' + escapeHtml(t.editExtra);
+  state.materials.forEach(m => {
+    html += '<div class="material-row">';
+    html += '<span class="mat-name">' + escapeHtml(m.name) + '</span>';
+    html += '<span class="mat-unit">' + escapeHtml(m.unit) + '</span>';
+    html += '<button class="mat-del" onclick="editMasterMaterial(' + m.id + ')" style="background:var(--emerald-50);color:var(--emerald-700);font-size:11px">✏️</button>';
+    html += '<button class="mat-del" onclick="deleteMasterMaterial(' + m.id + ')">✕</button>';
     html += '</div>';
-  }
-
-  html += '<div style="background:var(--copper-100);border-radius:10px;padding:10px;margin-bottom:12px;font-size:12.5px;color:var(--copper-700)">';
-  html += '📦 المواد في الكشف: <b>' + matCount + '</b> مادة</div>';
-
-  // زر الخريطة
-  const mapQuery = encodeURIComponent(displayName + ' ' + (t.editAddress || t.schoolAddress || '') + ' دمشق');
-  html += '<a href="https://www.google.com/maps/search/?api=1&query=' + mapQuery + '" target="_blank" class="btn-lg btn-map" style="margin-bottom:8px;font-size:14px;padding:12px;text-decoration:none">';
-  html += '📍 فتح الموقع على الخريطة</a>';
-
-  html += '<div style="font-size:11px;color:var(--gray-500);text-align:center;margin-bottom:12px">';
-  html += '📅 أضيفت: ' + t.createdAt + (t.doneAt ? ' • ✅ أُنجزت: ' + t.doneAt : '') + '</div>';
-
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
-  html += '<button class="btn-lg ' + (t.status === 'done' ? 'btn-ghost' : 'btn-primary') + '" onclick="toggleTaskDone(' + t.id + ')" style="font-size:13px;padding:11px">' + (t.status === 'done' ? '↩️ إرجاع' : '✅ إنجاز') + '</button>';
-  html += '<button class="btn-lg btn-copper" onclick="openMaterialsForTask(' + t.id + ')" style="font-size:13px;padding:11px">📦 المواد</button>';
-  html += '</div>';
-
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
-  html += '<button class="btn-lg btn-primary" onclick="printTask(' + t.id + ')" style="font-size:13px;padding:11px">🖨️ طباعة</button>';
-  html += '<button class="btn-lg btn-ghost" onclick="openTaskSheet(' + t.id + ')" style="font-size:13px;padding:11px">✏️ تعديل</button>';
-  html += '</div>';
-
-  html += '<button class="btn-lg btn-ghost" style="color:var(--danger);font-size:13px;padding:11px" onclick="deleteTask(' + t.id + ')">🗑️ حذف المهمة</button>';
-
-  document.getElementById('detailTitle').textContent = '📋 تفاصيل المهمة #' + t.number;
-  document.getElementById('detailContent').innerHTML = html;
-  openSheet('detailSheetBg');
+  });
+  container.innerHTML = html;
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 7: المواد داخل المهمة
-   ═══════════════════════════════════════════════════════ */
+function openMaterialSheet(id){
+  state.editingMasterMatId = id || null;
+  const title = document.getElementById('masterMatTitle');
+  const nameInput = document.getElementById('masterMatName');
+  const unitInput = document.getElementById('masterMatUnit');
+  if(id){
+    const m = state.materials.find(x => x.id === id);
+    if(!m) return;
+    title.textContent = '✏️ تعديل مادة';
+    nameInput.value = m.name;
+    unitInput.value = m.unit;
+  }else{
+    title.textContent = '➕ إضافة مادة';
+    nameInput.value = '';
+    unitInput.value = 'عدد';
+  }
+  openSheet('masterMatSheetBg');
+  setTimeout(() => nameInput.focus(), 350);
+}
+function editMasterMaterial(id){ openMaterialSheet(id); }
+function saveMasterMaterial(){
+  const name = document.getElementById('masterMatName').value.trim();
+  const unit = document.getElementById('masterMatUnit').value.trim() || 'عدد';
+  if(!name){ showToast('أدخل اسم المادة', 'error'); return; }
+  if(state.editingMasterMatId){
+    const m = state.materials.find(x => x.id === state.editingMasterMatId);
+    if(m){ m.name = name; m.unit = unit; }
+    showToast('✅ تم تحديث المادة', 'success');
+  }else{
+    const newId = Math.max.apply(null, state.materials.map(m => m.id).concat([0])) + 1;
+    state.materials.push({ id: newId, name: name, unit: unit });
+    showToast('✅ أُضيفت مادة جديدة', 'success');
+  }
+  saveMaterials();
+  closeSheet('masterMatSheetBg');
+  renderMaterials();
+}
+function deleteMasterMaterial(id){
+  if(!confirm('حذف هذه المادة من القائمة؟')) return;
+  state.materials = state.materials.filter(m => m.id !== id);
+  saveMaterials(); renderMaterials();
+  showToast('🗑️ تم الحذف', 'warn');
+}
+
 function openMaterialsForTask(taskId){
   const t = state.tasks.find(x => x.id === taskId);
   if(!t) return;
   state.currentTaskId = taskId;
   if(!t.materials) t.materials = [];
+  fillTechnicianSelects();
   document.getElementById('fTechnician').value = t.technician || '';
+  document.getElementById('fExecutionNotes').value = t.executionNotes || '';
   const sel = document.getElementById('matSelect');
   let opts = '<option value="">-- اختر مادة --</option>';
   state.materials.forEach(m => { opts += '<option value="' + m.id + '">' + escapeHtml(m.name) + ' (' + escapeHtml(m.unit) + ')</option>'; });
@@ -1747,16 +1922,6 @@ function removeTaskMaterial(idx){
   showToast('🗑️ حُذفت المادة', 'warn');
 }
 
-function saveTaskMaterials(){
-  const t = state.tasks.find(x => x.id === state.currentTaskId);
-  if(!t) return;
-  t.technician = document.getElementById('fTechnician').value.trim();
-  saveTasks();
-  showToast('✅ تم حفظ المواد', 'success');
-  closeSheet('matSheetBg');
-  setTimeout(() => openDetail(t.id), 200);
-}
-
 function addNewMaterialInline(){
   const name = document.getElementById('matNewName').value.trim();
   const unit = document.getElementById('matNewUnit').value.trim() || 'عدد';
@@ -1775,75 +1940,19 @@ function addNewMaterialInline(){
   showToast('✅ أُضيفت مادة جديدة', 'success');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 8: إدارة قائمة المواد الرئيسية
-   ═══════════════════════════════════════════════════════ */
-function renderMaterials(){
-  const container = document.getElementById('materialsList');
-  if(!state.materials || state.materials.length === 0){
-    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا توجد مواد</div>';
-    return;
-  }
-  let html = '';
-  state.materials.forEach(m => {
-    html += '<div class="material-row">';
-    html += '<span class="mat-name">' + escapeHtml(m.name) + '</span>';
-    html += '<span class="mat-unit">' + escapeHtml(m.unit) + '</span>';
-    html += '<button class="mat-del" onclick="editMasterMaterial(' + m.id + ')" style="background:var(--emerald-50);color:var(--emerald-700);font-size:11px">✏️</button>';
-    html += '<button class="mat-del" onclick="deleteMasterMaterial(' + m.id + ')">✕</button>';
-    html += '</div>';
-  });
-  container.innerHTML = html;
-}
-
-let editingMasterMatId = null;
-function openMaterialSheet(id){
-  editingMasterMatId = id || null;
-  const title = document.getElementById('masterMatTitle');
-  const nameInput = document.getElementById('masterMatName');
-  const unitInput = document.getElementById('masterMatUnit');
-  if(id){
-    const m = state.materials.find(x => x.id === id);
-    if(!m) return;
-    title.textContent = '✏️ تعديل مادة';
-    nameInput.value = m.name;
-    unitInput.value = m.unit;
-  }else{
-    title.textContent = '➕ إضافة مادة للقائمة';
-    nameInput.value = '';
-    unitInput.value = 'عدد';
-  }
-  openSheet('masterMatSheetBg');
-  setTimeout(() => nameInput.focus(), 350);
-}
-function editMasterMaterial(id){ openMaterialSheet(id); }
-function saveMasterMaterial(){
-  const name = document.getElementById('masterMatName').value.trim();
-  const unit = document.getElementById('masterMatUnit').value.trim() || 'عدد';
-  if(!name){ showToast('أدخل اسم المادة', 'error'); return; }
-  if(editingMasterMatId){
-    const m = state.materials.find(x => x.id === editingMasterMatId);
-    if(m){ m.name = name; m.unit = unit; }
-    showToast('✅ تم تحديث المادة', 'success');
-  }else{
-    const newId = Math.max.apply(null, state.materials.map(m => m.id).concat([0])) + 1;
-    state.materials.push({ id: newId, name: name, unit: unit });
-    showToast('✅ أُضيفت مادة جديدة', 'success');
-  }
-  saveMaterials();
-  closeSheet('masterMatSheetBg');
-  renderMaterials();
-}
-function deleteMasterMaterial(id){
-  if(!confirm('حذف هذه المادة من القائمة؟')) return;
-  state.materials = state.materials.filter(m => m.id !== id);
-  saveMaterials();
-  renderMaterials();
-  showToast('🗑️ تم الحذف', 'warn');
+function saveTaskMaterials(){
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t) return;
+  t.technician = document.getElementById('fTechnician').value;
+  t.executionNotes = document.getElementById('fExecutionNotes').value.trim();
+  saveTasks();
+  showToast('✅ تم الحفظ', 'success');
+  closeSheet('matSheetBg');
+  setTimeout(() => openDetail(t.id), 200);
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 9: إدارة المدارس
+   القسم 7: إدارة المدارس
    ═══════════════════════════════════════════════════════ */
 function renderSchoolsList(query){
   const container = document.getElementById('schoolsList');
@@ -1891,11 +2000,10 @@ function updateSchoolsStats(){
     '📊 <b>' + total + '</b> مدرسة • 👤 <b>' + sups.size + '</b> مشرف • 📍 <b>' + areas.size + '</b> منطقة';
 }
 
-let editingSchoolIdx = null;
 function openSchoolSheet(){
-  editingSchoolIdx = null;
-  document.getElementById('schoolSheetTitle').textContent = '➕ إضافة مدرسة للقاعدة';
-  ['schName','schOldName','schSupervisor','schArea','schDistrict','schAddress','schGrade','schPhone'].forEach(id => document.getElementById(id).value = '');
+  state.editingSchoolIdx = null;
+  document.getElementById('schoolSheetTitle').textContent = '➕ إضافة مدرسة';
+  ['schName','schOldName','schSupervisor','schArea','schDistrict','schAddress','schGrade','schPhone','schPrincipal','schPrincipalPhone','schSecretary','schSecretaryPhone'].forEach(id => document.getElementById(id).value = '');
   openSheet('schoolSheetBg');
   setTimeout(() => document.getElementById('schName').focus(), 350);
 }
@@ -1903,7 +2011,7 @@ function openSchoolSheet(){
 function editSchool(idx){
   const s = state.schools[idx];
   if(!s) return;
-  editingSchoolIdx = idx;
+  state.editingSchoolIdx = idx;
   document.getElementById('schoolSheetTitle').textContent = '✏️ تعديل المدرسة';
   document.getElementById('schName').value = s.n || '';
   document.getElementById('schOldName').value = s.oldName || '';
@@ -1913,6 +2021,10 @@ function editSchool(idx){
   document.getElementById('schAddress').value = s.ad || '';
   document.getElementById('schGrade').value = s.g || '';
   document.getElementById('schPhone').value = s.p || '';
+  document.getElementById('schPrincipal').value = s.principal || '';
+  document.getElementById('schPrincipalPhone').value = s.principalPhone || '';
+  document.getElementById('schSecretary').value = s.secretary || '';
+  document.getElementById('schSecretaryPhone').value = s.secretaryPhone || '';
   openSheet('schoolSheetBg');
 }
 
@@ -1927,10 +2039,14 @@ function saveSchoolMaster(){
     d: document.getElementById('schDistrict').value.trim(),
     ad: document.getElementById('schAddress').value.trim(),
     g: document.getElementById('schGrade').value.trim(),
-    p: document.getElementById('schPhone').value.trim()
+    p: document.getElementById('schPhone').value.trim(),
+    principal: document.getElementById('schPrincipal').value.trim(),
+    principalPhone: document.getElementById('schPrincipalPhone').value.trim(),
+    secretary: document.getElementById('schSecretary').value.trim(),
+    secretaryPhone: document.getElementById('schSecretaryPhone').value.trim()
   };
-  if(editingSchoolIdx !== null){
-    state.schools[editingSchoolIdx] = data;
+  if(state.editingSchoolIdx !== null){
+    state.schools[state.editingSchoolIdx] = data;
     showToast('✅ تم تحديث المدرسة', 'success');
   }else{
     state.schools.push(data);
@@ -1954,58 +2070,176 @@ function deleteSchool(idx){
 }
 
 /* ═══════════════════════════════════════════════════════
+   القسم 8: الفنيون
+   ═══════════════════════════════════════════════════════ */
+function renderTechniciansList(){
+  const container = document.getElementById('techniciansList');
+  if(!state.technicians || state.technicians.length === 0){
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">لا يوجد فنيون</div>';
+    return;
+  }
+  let html = '';
+  state.technicians.forEach((t, idx) => {
+    html += '<div class="material-row">';
+    html += '<span class="mat-name">👷 ' + escapeHtml(t.name) + (t.notes ? ' <span style="color:var(--gray-500);font-size:11px">(' + escapeHtml(t.notes) + ')</span>' : '') + '</span>';
+    if(t.phone) html += '<span class="mat-unit">📞 ' + escapeHtml(t.phone) + '</span>';
+    html += '<button class="mat-del" onclick="editTechnician(' + idx + ')" style="background:var(--emerald-50);color:var(--emerald-700)">✏️</button>';
+    html += '<button class="mat-del" onclick="deleteTechnician(' + idx + ')">✕</button>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+  fillTechnicianSelects();
+}
+
+function openTechnicianSheet(){
+  state.editingTechIdx = null;
+  document.getElementById('techSheetTitle').textContent = '➕ إضافة فني';
+  document.getElementById('techName').value = '';
+  document.getElementById('techPhone').value = '';
+  document.getElementById('techNotes').value = '';
+  openSheet('techSheetBg');
+  setTimeout(() => document.getElementById('techName').focus(), 350);
+}
+
+function editTechnician(idx){
+  const t = state.technicians[idx];
+  if(!t) return;
+  state.editingTechIdx = idx;
+  document.getElementById('techSheetTitle').textContent = '✏️ تعديل الفني';
+  document.getElementById('techName').value = t.name || '';
+  document.getElementById('techPhone').value = t.phone || '';
+  document.getElementById('techNotes').value = t.notes || '';
+  openSheet('techSheetBg');
+}
+
+function saveTechnician(){
+  const name = document.getElementById('techName').value.trim();
+  if(!name){ showToast('أدخل اسم الفني', 'error'); return; }
+  const data = {
+    name: name,
+    phone: document.getElementById('techPhone').value.trim(),
+    notes: document.getElementById('techNotes').value.trim()
+  };
+  if(state.editingTechIdx !== null){
+    data.id = state.technicians[state.editingTechIdx].id;
+    state.technicians[state.editingTechIdx] = data;
+    showToast('✅ تم تحديث الفني', 'success');
+  }else{
+    data.id = Math.max.apply(null, state.technicians.map(t => t.id || 0).concat([0])) + 1;
+    state.technicians.push(data);
+    showToast('✅ أُضيف فني جديد', 'success');
+  }
+  saveTechnicians();
+  closeSheet('techSheetBg');
+  renderTechniciansList();
+}
+
+function deleteTechnician(idx){
+  const t = state.technicians[idx];
+  if(!t) return;
+  if(!confirm('حذف الفني "' + t.name + '"؟')) return;
+  state.technicians.splice(idx, 1);
+  saveTechnicians();
+  renderTechniciansList();
+  showToast('🗑️ تم الحذف', 'warn');
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 9: الإعدادات
+   ═══════════════════════════════════════════════════════ */
+function loadSettingsToForm(){
+  document.getElementById('setHeader1').value = state.settings.header1 || '';
+  document.getElementById('setHeader2').value = state.settings.header2 || '';
+  document.getElementById('setHeader3').value = state.settings.header3 || '';
+  document.getElementById('setSign2').value = state.settings.sign2 || '';
+  document.getElementById('setSign3').value = state.settings.sign3 || '';
+}
+
+function setupSettingsListeners(){
+  const map = { setHeader1: 'header1', setHeader2: 'header2', setHeader3: 'header3', setSign2: 'sign2', setSign3: 'sign3' };
+  Object.keys(map).forEach(elId => {
+    const el = document.getElementById(elId);
+    if(!el) return;
+    el.addEventListener('input', () => { state.settings[map[elId]] = el.value; saveSettings(); });
+  });
+}
+
+function setupFilters(){
+  document.querySelectorAll('#filters .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#filters .chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      state.currentFilter = chip.dataset.filter;
+      renderTasks();
+    });
+  });
+  document.getElementById('searchInput').addEventListener('input', renderTasks);
+}
+</script>
+
+/* ═══════════════════════════════════════════════════════
    القسم 10: عرض المهام والإحصائيات
    ═══════════════════════════════════════════════════════ */
 function renderTasks(){
   const container = document.getElementById('tasksList');
   const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
   const filter = state.currentFilter;
-  let list = state.tasks.filter(function(t){
-    if(filter === 'pending' && t.status !== 'pending') return false;
-    if(filter === 'done' && t.status !== 'done') return false;
-    if(filter === 'high' && t.priority !== 'high') return false;
-    if(filter === 'med' && t.priority !== 'med') return false;
-    if(filter === 'low' && t.priority !== 'low') return false;
+
+  let list = state.tasks.filter(t => {
+    if(filter !== 'all' && t.status !== filter) return false;
     if(search){
       const blob = ((t.name||'') + ' ' + (t.newName||'') + ' ' + (t.area||'') + ' ' + (t.contact||'') + ' ' + (t.notes||'') + ' ' + (t.schoolAddress||'')).toLowerCase();
       if(blob.indexOf(search) === -1) return false;
     }
     return true;
   });
-  const prioOrder = { high: 0, med: 1, low: 2 };
-  list.sort(function(a, b){
-    if(a.status !== b.status) return a.status === 'pending' ? -1 : 1;
+
+  const statusOrder = { new:0, inspecting:1, awaiting:2, materials:3, working:4, suspended:6, done:5 };
+  const prioOrder = { high:0, med:1, low:2 };
+  list.sort((a,b) => {
+    if(a.status !== b.status){
+      const so = (statusOrder[a.status]||0) - (statusOrder[b.status]||0);
+      if(so !== 0) return so;
+    }
     return prioOrder[a.priority] - prioOrder[b.priority];
   });
+
   if(list.length === 0){
-    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>لا توجد مهام مطابقة</p></div>';
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>لا توجد مهام</p></div>';
     return;
   }
-  const prioLabel = { high: '🔴 عالية', med: '🟡 متوسطة', low: '🟢 منخفضة' };
-  const prioClass = { high: 'mb-high', med: 'mb-med', low: 'mb-low' };
+
+  const srcIcon = { call:'📞', urgent:'🚨', letter:'📄', routine:'🔄' };
+
   let html = '';
-  list.forEach(function(t){
+  list.forEach(t => {
+    const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
     const matCount = (t.materials || []).length;
     const displayName = t.newName || t.name;
-    html += '<div class="task-card p-' + t.priority + (t.status === 'done' ? ' is-done' : '') + '">';
+    html += '<div class="task-card st-' + t.status + '" onclick="openDetail(' + t.id + ')">';
     html += '<div class="task-head">';
-    html += '<div class="task-name" onclick="openDetail(' + t.id + ')">' + (t.status === 'done' ? '✅ ' : '') + escapeHtml(displayName) + '</div>';
+    html += '<div class="task-name">' + (t.status === 'done' ? '✅ ' : '') + escapeHtml(displayName) + '</div>';
     html += '<div class="task-badges">';
-    if(t.status === 'done'){ html += '<span class="mini-badge mb-done">منجزة</span>'; }
-    else { html += '<span class="mini-badge ' + prioClass[t.priority] + '">' + prioLabel[t.priority] + '</span>'; }
+    if(t.source) html += '<span class="mini-badge ' + (t.source === 'urgent' ? 'mb-urgent' : 'mb-high') + '">' + (srcIcon[t.source]||'') + ' ' + (SOURCE_LABELS[t.source]||'') + '</span>';
+    html += '<span class="mini-badge ' + st.cls + '">' + st.label + '</span>';
     html += '</div></div>';
-    html += '<div class="task-meta" onclick="openDetail(' + t.id + ')">';
+    html += '<div class="task-meta">';
     html += '<span>📌 #' + t.number + '</span>';
-    html += '<span>📋 ' + escapeHtml(t.type) + '</span>';
     html += '<span>📍 ' + escapeHtml(t.area) + '</span>';
     if(t.contact) html += '<span>👤 ' + escapeHtml(t.contact) + '</span>';
     if(matCount > 0) html += '<span>📦 ' + matCount + ' مادة</span>';
+    html += '<span>📅 ' + t.createdAt + '</span>';
     html += '</div>';
-    if(t.notes){ html += '<div class="task-note" onclick="openDetail(' + t.id + ')">' + escapeHtml(t.notes) + '</div>'; }
-    html += '<div class="task-actions">';
-    html += '<button class="btn ' + (t.status === 'done' ? 'btn-undo' : 'btn-done') + '" onclick="toggleTaskDone(' + t.id + ')">' + (t.status === 'done' ? '↩️ إرجاع' : '✅ إنجاز') + '</button>';
+    if(t.notes) html += '<div class="task-note">' + escapeHtml(t.notes) + '</div>';
+    html += '<div class="task-actions" onclick="event.stopPropagation()">';
     html += '<button class="btn btn-note" onclick="openDetail(' + t.id + ')">📋 تفاصيل</button>';
+    if(t.status !== 'done'){
+      html += '<button class="btn btn-done" onclick="changeTaskStatus(' + t.id + ',\'done\')">✅ إنجاز</button>';
+    } else {
+      html += '<button class="btn btn-undo" onclick="changeTaskStatus(' + t.id + ',\'working\')">↩️ إرجاع</button>';
+    }
     html += '<button class="btn btn-print" onclick="printTask(' + t.id + ')">🖨️</button>';
+    html += '<button class="btn btn-whats" onclick="openWhatsForTask(' + t.id + ')">📱</button>';
     html += '<button class="btn btn-del" onclick="deleteTask(' + t.id + ')">🗑️</button>';
     html += '</div>';
     html += '</div>';
@@ -2014,74 +2248,337 @@ function renderTasks(){
 }
 
 function updateStats(){
-  document.getElementById('statTotal').textContent = state.tasks.length;
-  document.getElementById('statDone').textContent = state.tasks.filter(function(t){ return t.status === 'done'; }).length;
-  document.getElementById('statHigh').textContent = state.tasks.filter(function(t){ return t.priority === 'high' && t.status === 'pending'; }).length;
-  document.getElementById('statMed').textContent = state.tasks.filter(function(t){ return t.priority === 'med' && t.status === 'pending'; }).length;
+  const c = (s) => state.tasks.filter(t => t.status === s).length;
+  document.getElementById('statNew').textContent = c('new');
+  document.getElementById('statInspecting').textContent = c('inspecting');
+  document.getElementById('statAwaiting').textContent = c('awaiting');
+  document.getElementById('statMaterials').textContent = c('materials');
+  document.getElementById('statWorking').textContent = c('working');
+  document.getElementById('statDone').textContent = c('done');
+}
+
+function updateFilterCounts(){
+  const c = (s) => state.tasks.filter(t => t.status === s).length;
+  document.getElementById('cntAll').textContent = state.tasks.length;
+  document.getElementById('cntNew').textContent = c('new');
+  document.getElementById('cntInspecting').textContent = c('inspecting');
+  document.getElementById('cntAwaiting').textContent = c('awaiting');
+  document.getElementById('cntMaterials').textContent = c('materials');
+  document.getElementById('cntWorking').textContent = c('working');
+  document.getElementById('cntDone').textContent = c('done');
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 11: الإعدادات والفلاتر
+   القسم 11: تفاصيل المهمة (مع الحالات السبعة)
    ═══════════════════════════════════════════════════════ */
-function loadSettingsToForm(){
-  document.getElementById('setHeader1').value = state.settings.header1 || '';
-  document.getElementById('setHeader2').value = state.settings.header2 || '';
-  document.getElementById('setHeader3').value = state.settings.header3 || '';
-  document.getElementById('setSign1').value = state.settings.sign1 || '';
-  document.getElementById('setSign2').value = state.settings.sign2 || '';
-  document.getElementById('setSign3').value = state.settings.sign3 || '';
-}
-function setupSettingsListeners(){
-  const map = { setHeader1: 'header1', setHeader2: 'header2', setHeader3: 'header3', setSign1: 'sign1', setSign2: 'sign2', setSign3: 'sign3' };
-  Object.keys(map).forEach(function(elId){
-    const el = document.getElementById(elId);
-    if(!el) return;
-    el.addEventListener('input', function(){ state.settings[map[elId]] = el.value; saveSettings(); });
+function openDetail(id){
+  const t = state.tasks.find(x => x.id === id);
+  if(!t) return;
+  state.currentTaskId = id;
+  const displayName = t.newName || t.name;
+  const matCount = (t.materials || []).length;
+  const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
+
+  let html = '';
+  html += '<div style="background:var(--gray-50);border-radius:12px;padding:14px;margin-bottom:12px">';
+  html += '<div style="font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:6px">' + escapeHtml(displayName) + '</div>';
+  if(t.newName && t.name !== t.newName) html += '<div style="font-size:12px;color:var(--copper-600);margin-bottom:4px">📛 الأصلي: ' + escapeHtml(t.name) + '</div>';
+  if(t.oldName) html += '<div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">📜 القديم: ' + escapeHtml(t.oldName) + '</div>';
+  html += '<div style="font-size:11.5px;color:var(--gray-500)"># ' + t.number + ' • ' + escapeHtml(t.area) + ' • ' + t.createdAt + '</div>';
+  html += '</div>';
+
+  // شريط تغيير الحالة
+  html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:12px">';
+  html += '<div style="font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:8px">🔄 تغيير الحالة:</div>';
+  html += '<div style="display:flex;gap:5px;flex-wrap:wrap">';
+  Object.keys(STATUS_LABELS).forEach(k => {
+    const s = STATUS_LABELS[k];
+    const active = k === t.status;
+    html += '<button class="mini-badge ' + s.cls + '" style="cursor:pointer;border:' + (active?'2px solid var(--emerald-700)':'1px solid transparent') + ';opacity:' + (active?'1':'0.6') + ';font-size:11px;padding:5px 10px" onclick="changeTaskStatus(' + t.id + ',\'' + k + '\')">' + s.label + '</button>';
   });
+  html += '</div></div>';
+
+  // جهات الاتصال
+  if(t.principal || t.principalPhone || t.secretary || t.secretaryPhone){
+    html += '<div style="background:var(--emerald-50);border:1px solid var(--emerald-200);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12.5px">';
+    html += '<div style="font-weight:700;color:var(--emerald-800);margin-bottom:6px">📞 جهات الاتصال</div>';
+    if(t.principal){
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span>👤 مدير: <b>' + escapeHtml(t.principal) + '</b></span>';
+      if(t.principalPhone) html += '<a href="tel:' + t.principalPhone + '" style="background:var(--emerald-700);color:#fff;padding:4px 10px;border-radius:6px;text-decoration:none;font-size:11px">📞 ' + escapeHtml(t.principalPhone) + '</a>';
+      html += '</div>';
+    }
+    if(t.secretary){
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span>💻 أمين سر: <b>' + escapeHtml(t.secretary) + '</b></span>';
+      if(t.secretaryPhone) html += '<a href="tel:' + t.secretaryPhone + '" style="background:var(--emerald-700);color:#fff;padding:4px 10px;border-radius:6px;text-decoration:none;font-size:11px">📞 ' + escapeHtml(t.secretaryPhone) + '</a>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  // معلومات المدرسة
+  if(t.schoolAddress || t.schoolGrade || t.schoolPhone){
+    html += '<div style="background:var(--copper-100);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--copper-700);line-height:1.7">';
+    if(t.schoolAddress) html += '📍 ' + escapeHtml(t.schoolAddress) + '<br>';
+    if(t.schoolGrade) html += '📚 ' + escapeHtml(t.schoolGrade) + '<br>';
+    if(t.schoolPhone) html += '📞 ' + escapeHtml(t.schoolPhone);
+    html += '</div>';
+  }
+
+  // المواد والفني
+  html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12.5px">';
+  html += '<div style="display:flex;justify-content:space-between"><span>📦 المواد: <b>' + matCount + '</b></span>';
+  html += '<span>👷 الفني: <b>' + (t.technician ? escapeHtml(t.technician) : '—') + '</b></span></div>';
+  if(t.executionNotes) html += '<div style="margin-top:6px;color:var(--gray-600);font-size:12px">📝 ' + escapeHtml(t.executionNotes) + '</div>';
+  html += '</div>';
+
+  if(t.notes) html += '<div class="task-note" style="margin-bottom:10px">📝 ' + escapeHtml(t.notes) + '</div>';
+
+  // زر الخريطة
+  const mapQuery = encodeURIComponent(displayName + ' ' + (t.schoolAddress || '') + ' دمشق');
+  html += '<a href="https://www.google.com/maps/search/?api=1&query=' + mapQuery + '" target="_blank" class="btn-lg btn-map" style="margin-bottom:8px;font-size:13px;padding:11px;text-decoration:none">📍 فتح الخريطة</a>';
+
+  // أزرار العمليات
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
+  html += '<button class="btn-lg btn-copper" onclick="openMaterialsForTask(' + t.id + ')" style="font-size:13px;padding:11px">📦 المواد</button>';
+  html += '<button class="btn-lg btn-primary" onclick="printTask(' + t.id + ')" style="font-size:13px;padding:11px">🖨️ طباعة</button>';
+  html += '</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
+  html += '<button class="btn-lg" style="background:#25d366;color:#fff;font-size:13px;padding:11px" onclick="openWhatsForTask(' + t.id + ')">📱 واتس الفني</button>';
+  html += '<button class="btn-lg btn-ghost" onclick="openTaskSheet(' + t.id + ')" style="font-size:13px;padding:11px">✏️ تعديل</button>';
+  html += '</div>';
+  html += '<button class="btn-lg btn-ghost" style="color:var(--danger);font-size:13px;padding:11px" onclick="deleteTask(' + t.id + ')">🗑️ حذف</button>';
+
+  document.getElementById('detailTitle').textContent = '📋 تفاصيل المهمة #' + t.number;
+  document.getElementById('detailContent').innerHTML = html;
+  openSheet('detailSheetBg');
 }
-function setupFilters(){
-  document.querySelectorAll('#filters .chip').forEach(function(chip){
-    chip.addEventListener('click', function(){
-      document.querySelectorAll('#filters .chip').forEach(function(c){ c.classList.remove('active'); });
-      chip.classList.add('active');
-      state.currentFilter = chip.dataset.filter;
-      renderTasks();
+
+/* ═══════════════════════════════════════════════════════
+   القسم 12: WhatsApp للفني
+   ═══════════════════════════════════════════════════════ */
+function openWhatsForTask(taskId){
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t) return;
+  state.currentTaskId = taskId;
+  fillTechnicianSelects();
+  if(t.technician) document.getElementById('whatsTech').value = t.technician;
+  const displayName = t.newName || t.name;
+  const mapLink = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(displayName + ' ' + (t.schoolAddress || '') + ' دمشق');
+  const msg = '🔧 *مهمة صيانة*\n\n' +
+    '🏫 *المدرسة:* ' + displayName + '\n' +
+    '📍 *المنطقة:* ' + (t.area || '') + (t.building ? '\n🏢 *المبنى:* ' + t.building : '') + (t.room ? '\n🚪 *القاعة:* ' + t.room : '') + '\n' +
+    '📋 *نوع العمل:* ' + (t.type || '') + '\n' +
+    '⚡ *الأولوية:* ' + (PRIORITY_LABELS[t.priority] || '') + '\n' +
+    (t.notes ? '📝 *الملاحظات:* ' + t.notes + '\n' : '') +
+    (t.contact ? '👤 *المشرف:* ' + t.contact + '\n' : '') +
+    '\n🗺️ *الموقع على الخريطة:*\n' + mapLink;
+  document.getElementById('whatsMessage').value = msg;
+  closeSheet('detailSheetBg');
+  setTimeout(() => openSheet('whatsSheetBg'), 200);
+}
+
+function sendWhatsApp(){
+  const techName = document.getElementById('whatsTech').value;
+  const tech = state.technicians.find(t => t.name === techName);
+  if(!tech || !tech.phone){
+    const num = prompt('أدخل رقم جوال الفني (مع رمز الدولة، مثال: 963...)');
+    if(!num) return;
+    const msg = encodeURIComponent(document.getElementById('whatsMessage').value);
+    window.open('https://wa.me/' + num.replace(/[^0-9]/g,'') + '?text=' + msg, '_blank');
+    return;
+  }
+  const phone = tech.phone.replace(/[^0-9]/g, '');
+  const intl = phone.startsWith('963') ? phone : (phone.startsWith('0') ? '963' + phone.substring(1) : '963' + phone);
+  const msg = encodeURIComponent(document.getElementById('whatsMessage').value);
+  window.open('https://wa.me/' + intl + '?text=' + msg, '_blank');
+  closeSheet('whatsSheetBg');
+}
+
+function copyWhatsMessage(){
+  const msg = document.getElementById('whatsMessage');
+  msg.select();
+  msg.setSelectionRange(0, 99999);
+  document.execCommand('copy');
+  showToast('✅ تم النسخ', 'success');
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 13: جولة اليوم
+   ═══════════════════════════════════════════════════════ */
+function buildTodayTrip(){
+  const tripSummary = document.getElementById('tripSummary');
+  const tripStops = document.getElementById('tripStops');
+
+  const pending = state.tasks.filter(t => t.status !== 'done' && t.status !== 'suspended');
+  if(pending.length === 0){
+    tripSummary.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px">✅ لا توجد مهام معلقة</div>';
+    tripStops.innerHTML = '';
+    return;
+  }
+
+  const byArea = {};
+  pending.forEach(t => {
+    const a = t.area || 'غير محدد';
+    if(!byArea[a]) byArea[a] = [];
+    byArea[a].push(t);
+  });
+
+  let html = '<div style="background:var(--emerald-50);border-radius:10px;padding:12px;margin-bottom:12px;font-size:12.5px;color:var(--emerald-800)">';
+  html += '📊 <b>' + pending.length + '</b> مهمة معلقة في <b>' + Object.keys(byArea).length + '</b> منطقة';
+  html += '</div>';
+
+  const sortedAreas = Object.keys(byArea).sort((a,b) => byArea[b].length - byArea[a].length);
+
+  sortedAreas.forEach(area => {
+    const tasks = byArea[area];
+    html += '<div style="font-weight:800;font-size:13px;color:var(--emerald-700);margin:14px 0 6px;padding-right:4px">📍 ' + escapeHtml(area) + ' (' + tasks.length + ')</div>';
+    const prioOrder = { high:0, med:1, low:2 };
+    tasks.sort((a,b) => prioOrder[a.priority] - prioOrder[b.priority]);
+    let stopNum = 1;
+    tasks.forEach(t => {
+      const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
+      const displayName = t.newName || t.name;
+      html += '<div class="trip-stop" onclick="openDetail(' + t.id + ')">';
+      html += '<div class="stop-num">' + stopNum + '</div>';
+      html += '<div class="stop-info">';
+      html += '<div class="stop-name">' + escapeHtml(displayName) + '</div>';
+      html += '<div class="stop-meta">' + st.label + ' • ' + PRIORITY_LABELS[t.priority] + '</div>';
+      html += '</div>';
+      html += '<div class="stop-type">' + (SOURCE_ICONS[t.source] || '📞') + '</div>';
+      html += '</div>';
+      stopNum++;
     });
   });
-  document.getElementById('searchInput').addEventListener('input', renderTasks);
+
+  tripSummary.innerHTML = html;
+  tripStops.innerHTML = '';
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 12: التصدير والاستيراد
+   القسم 14: الطباعة (القالب الحكومي)
+   ═══════════════════════════════════════════════════════ */
+const EAGLE_SVG = '<img src="eagle.png" alt="شعار" style="width:100%;height:auto;display:block">';
+
+function printTask(taskId){
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t){ showToast('❌ المهمة غير موجودة', 'error'); return; }
+  const settings = state.settings;
+  const materials = t.materials || [];
+  const displayName = t.newName || t.name;
+  const perCol = Math.ceil(materials.length / 2) || 1;
+  const col1 = materials.slice(0, perCol);
+  const col2 = materials.slice(perCol);
+  const rowsCount = Math.max(col1.length, col2.length, 1);
+  let tableRows = '';
+  for(let i = 0; i < rowsCount; i++){
+    const m1 = col1[i]; const m2 = col2[i];
+    tableRows += '<tr>';
+    tableRows += '<td class="mat-name">' + (m1 ? escapeHtml(m1.name) : '') + '</td>';
+    tableRows += '<td class="mat-qty">' + (m1 ? escapeHtml(String(m1.qty || 1)) : '') + '</td>';
+    tableRows += '<td class="mat-name">' + (m2 ? escapeHtml(m2.name) : '') + '</td>';
+    tableRows += '<td class="mat-qty">' + (m2 ? escapeHtml(String(m2.qty || 1)) : '') + '</td>';
+    tableRows += '</tr>';
+  }
+  let schoolLine = 'مدرسة ' + escapeHtml(displayName);
+  if(t.building) schoolLine += ' / ' + escapeHtml(t.building);
+  const roomLine = t.room ? 'على قاعة ' + escapeHtml(t.room) : 'على قاعة ................';
+
+  let html = '';
+  html += '<div class="gov-header">';
+  html += '<div class="gov-eagle">' + EAGLE_SVG + '</div>';
+  html += '<div class="gov-header-top">';
+  html += '<div class="gov-header-right">';
+  html += '<div>' + escapeHtml(settings.header1 || '') + '</div>';
+  html += '<div>' + escapeHtml(settings.header2 || '') + '</div>';
+  html += '<div>' + escapeHtml(settings.header3 || '') + '</div>';
+  html += '<div style="margin-top:4px">التاريخ ' + escapeHtml(t.createdAt || todayISO()) + '</div>';
+  html += '</div>';
+  html += '<div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div>';
+  html += '</div>';
+  html += '</div>';
+
+  html += '<div class="gov-salutation">السيد مدير التربية المحترم</div>';
+  html += '<div class="gov-body">ــ بعد الكشف في ' + schoolLine + ' ' + roomLine + ' رقم ( ' + escapeHtml(t.room || '1') + ' ) تبين الحاجة للمواد التالية:</div>';
+  html += '<table class="gov-table">';
+  html += '<thead><tr><th>اسم المادة والقياس</th><th style="width:55px">العدد</th><th>اسم المادة والقياس</th><th style="width:55px">العدد</th></tr></thead>';
+  html += '<tbody>' + tableRows + '</tbody>';
+  html += '</table>';
+
+  html += '<div class="gov-signatures">';
+  html += '<div class="gov-sign-box"><span class="role">القائم بالكشف</span><span class="name">الفني ' + escapeHtml(t.technician || '.....................') + '</span></div>';
+  html += '<div class="gov-sign-box"><span class="role">رئيس شعبة الصيانة</span><span class="name">' + escapeHtml(settings.sign2 || '') + '</span></div>';
+  html += '</div>';
+
+  html += '<div style="text-align:center;font-size:13px;font-weight:700;margin:14px 0 6px">يرجى الاطلاع والتوجيه</div>';
+  html += '<hr class="gov-divider">';
+  html += '<div style="text-align:left;font-size:13px;font-weight:800;padding-left:8px">رئيس دائرة المعلوماتية<br>' + escapeHtml(settings.sign3 || '') + '</div>';
+  html += '<hr class="gov-divider" style="margin-top:12px">';
+  html += '<div class="gov-sub" style="text-align:right">أقترح السيد معاون مدير التربية لشؤون التعليم المهني والفني:</div>';
+  html += '<div style="height:30px"></div>';
+  html += '<hr class="gov-divider" style="margin-top:8px">';
+  html += '<div class="gov-sub" style="text-align:right">قرار السيد المدير</div>';
+  html += '<div style="height:25px"></div>';
+
+  document.getElementById('govPaper').innerHTML = html;
+  document.getElementById('printPage').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  document.querySelector('.bottom-nav').style.display = 'none';
+  const fab = document.querySelector('.fab');
+  if(fab) fab.style.display = 'none';
+}
+
+function closePrint(){
+  document.getElementById('printPage').style.display = 'none';
+  document.body.style.overflow = '';
+  document.querySelector('.bottom-nav').style.display = '';
+  const activePage = document.querySelector('.page.active');
+  if(activePage && activePage.id === 'pageHome'){
+    const fab = document.querySelector('.fab');
+    if(fab) fab.style.display = 'flex';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   القسم 15: التصدير والاستيراد
    ═══════════════════════════════════════════════════════ */
 function exportJSON(){
-  const data = { version: 1, exportedAt: new Date().toISOString(), tasks: state.tasks, materials: state.materials, schools: state.schools, settings: state.settings, counter: state.counter };
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    tasks: state.tasks,
+    materials: state.materials,
+    schools: state.schools,
+    technicians: state.technicians,
+    settings: state.settings,
+    counter: state.counter
+  };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'نسخة_احتياطية_' + todayISO().replace(/\//g, '-') + '.json';
+  a.download = 'ورشة_الكهرباء_نسخة_' + todayISO().replace(/\//g, '-') + '.json';
   a.click();
   URL.revokeObjectURL(url);
-  showToast('✅ تم تصدير النسخة', 'success');
+  showToast('✅ تم التصدير', 'success');
 }
 
 function importJSON(event){
   const file = event.target.files[0];
   if(!file) return;
   const reader = new FileReader();
-  reader.onload = function(e){
+  reader.onload = (e) => {
     try{
       const data = JSON.parse(e.target.result);
-      if(!confirm('سيتم استبدال جميع البيانات الحالية. متابعة؟')) return;
+      if(!confirm('سيتم استبدال جميع البيانات. متابعة؟')) return;
       state.tasks = data.tasks || [];
       state.materials = data.materials || DEFAULT_MATERIALS;
       state.schools = data.schools || SCHOOLS_DEFAULT;
+      state.technicians = data.technicians || DEFAULT_TECHNICIANS;
       state.settings = data.settings || DEFAULT_SETTINGS;
       state.counter = data.counter || 1;
-      saveTasks(); saveMaterials(); saveSchools(); saveSettings(); saveCounter();
-      renderTasks(); updateStats(); renderMaterials(); renderSchoolsList(); updateSchoolsStats();
-      showToast('✅ تم استيراد البيانات', 'success');
+      saveTasks(); saveMaterials(); saveSchools(); saveTechnicians(); saveSettings(); saveCounter();
+      renderTasks(); updateStats(); updateFilterCounts(); renderMaterials(); renderSchoolsList(); updateSchoolsStats(); renderTechniciansList();
+      showToast('✅ تم الاستيراد', 'success');
     }catch(err){ showToast('❌ ملف غير صالح', 'error'); }
   };
   reader.readAsText(file);
@@ -2089,79 +2586,68 @@ function importJSON(event){
 }
 
 function exportTasksCSV(){
-  if(state.tasks.length === 0){ showToast('لا توجد مهام للتصدير', 'warn'); return; }
-  const headers = ['الرقم','المدرسة','الاسم الجديد','المبنى','القاعة','النوع','الأولوية','المنطقة','المشرف','الحالة','الفني','عدد المواد','ملاحظات','تاريخ الإضافة','تاريخ الإنجاز'];
-  const prioMap = { high:'عالية', med:'متوسطة', low:'منخفضة' };
-  const statusMap = { pending:'معلقة', done:'منجزة' };
+  if(state.tasks.length === 0){ showToast('لا توجد مهام', 'warn'); return; }
+  const headers = ['الرقم','المصدر','المدرسة','الاسم الجديد','المنطقة','المشرف','النوع','الأولوية','الحالة','الفني','عدد المواد','ملاحظات','تاريخ الإنشاء','تاريخ الإنجاز'];
+  const statusMap = { new:'جديدة', inspecting:'قيد الكشف', awaiting:'موافقة', materials:'تأمين مواد', working:'قيد التنفيذ', done:'منجزة', suspended:'معلقة' };
   let csv = '\uFEFF' + headers.map(escapeCSV).join(',') + '\n';
   state.tasks.forEach(t => {
     csv += [
-      t.number, t.name, t.newName || '', t.building || '', t.room || '', t.type,
-      prioMap[t.priority], t.area, t.contact || '', statusMap[t.status],
-      t.technician || '', (t.materials || []).length, t.notes || '',
-      t.createdAt, t.doneAt || ''
+      t.number, SOURCE_LABELS[t.source]||'', t.name, t.newName||'', t.area||'', t.contact||'',
+      t.type||'', PRIORITY_LABELS[t.priority]||'', statusMap[t.status]||'',
+      t.technician||'', (t.materials||[]).length, t.notes||'', t.createdAt, t.doneAt||''
     ].map(escapeCSV).join(',') + '\n';
   });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'مهام_الصيانة_' + todayISO().replace(/\//g, '-') + '.csv';
+  a.download = 'مهام_الورشة_' + todayISO().replace(/\//g, '-') + '.csv';
   a.click();
   showToast('✅ تم التصدير', 'success');
 }
 
 function exportSchoolsCSV(){
-  if(state.schools.length === 0){ showToast('لا توجد مدارس للتصدير', 'warn'); return; }
-  const headers = ['الاسم','الاسم_القديم','المشرف','المنطقة','الحي','العنوان','المرحلة','الهاتف'];
+  if(state.schools.length === 0){ showToast('لا توجد مدارس', 'warn'); return; }
+  const headers = ['الاسم','الاسم_القديم','المشرف','المنطقة','الحي','العنوان','المرحلة','الهاتف','المدير','جوال_المدير','أمين_السر','جوال_أمين_السر'];
   let csv = '\uFEFF' + headers.map(escapeCSV).join(',') + '\n';
   state.schools.forEach(s => {
-    csv += [s.n||'', s.oldName||'', s.s||'', s.a||'', s.d||'', s.ad||'', s.g||'', s.p||''].map(escapeCSV).join(',') + '\n';
+    csv += [s.n||'', s.oldName||'', s.s||'', s.a||'', s.d||'', s.ad||'', s.g||'', s.p||'', s.principal||'', s.principalPhone||'', s.secretary||'', s.secretaryPhone||''].map(escapeCSV).join(',') + '\n';
   });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'المدارس_' + todayISO().replace(/\//g, '-') + '.csv';
   a.click();
-  showToast('✅ تم التصدير — افتحه في Excel', 'success');
+  showToast('✅ تم التصدير', 'success');
 }
 
 function importSchoolsCSV(event){
   const file = event.target.files[0];
   if(!file) return;
   const reader = new FileReader();
-  reader.onload = function(e){
+  reader.onload = (e) => {
     try{
       const text = e.target.result.replace(/^\uFEFF/, '');
       const lines = text.split(/\r?\n/).filter(l => l.trim());
       if(lines.length < 2){ showToast('❌ الملف فارغ', 'error'); return; }
-      // تخطي الرأس
       const imported = [];
       for(let i = 1; i < lines.length; i++){
         const parts = parseCSVLine(lines[i]);
         if(!parts[0]) continue;
         imported.push({
-          n: parts[0] || '',
-          oldName: parts[1] || '',
-          s: parts[2] || '',
-          a: parts[3] || '',
-          d: parts[4] || '',
-          ad: parts[5] || '',
-          g: parts[6] || '',
-          p: parts[7] || ''
+          n: parts[0]||'', oldName: parts[1]||'', s: parts[2]||'', a: parts[3]||'', d: parts[4]||'',
+          ad: parts[5]||'', g: parts[6]||'', p: parts[7]||'',
+          principal: parts[8]||'', principalPhone: parts[9]||'',
+          secretary: parts[10]||'', secretaryPhone: parts[11]||''
         });
       }
-      if(imported.length === 0){ showToast('❌ لم يتم العثور على بيانات', 'error'); return; }
-      const mode = confirm('اضغط "موافق" لإضافة ' + imported.length + ' مدرسة للقائمة\nاضغط "إلغاء" لاستبدال القائمة كاملة');
-      if(mode){
-        state.schools = state.schools.concat(imported);
-      }else{
-        if(!confirm('هل أنت متأكد من استبدال ' + state.schools.length + ' مدرسة بـ ' + imported.length + '؟')) return;
-        state.schools = imported;
-      }
+      if(imported.length === 0){ showToast('❌ لا توجد بيانات', 'error'); return; }
+      const mode = confirm('موافق = إضافة\nإلغاء = استبدال');
+      if(mode) state.schools = state.schools.concat(imported);
+      else { if(!confirm('استبدال كامل؟')) return; state.schools = imported; }
       saveSchools();
       renderSchoolsList(); updateSchoolsStats();
-      showToast('✅ تم استيراد ' + imported.length + ' مدرسة', 'success');
-    }catch(err){ showToast('❌ خطأ في الملف: ' + err.message, 'error'); }
+      showToast('✅ ' + imported.length + ' مدرسة', 'success');
+    }catch(err){ showToast('❌ خطأ', 'error'); }
   };
   reader.readAsText(file, 'UTF-8');
   event.target.value = '';
@@ -2192,155 +2678,33 @@ function clearDone(){
   if(count === 0){ showToast('لا توجد مهام منجزة', 'warn'); return; }
   if(!confirm('حذف ' + count + ' مهمة منجزة؟')) return;
   state.tasks = state.tasks.filter(t => t.status !== 'done');
-  saveTasks(); renderTasks(); updateStats();
+  saveTasks(); renderTasks(); updateStats(); updateFilterCounts();
   showToast('🗑️ تم الحذف', 'warn');
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 13: الطباعة — شعار العقاب
+   القسم 16: التهيئة
    ═══════════════════════════════════════════════════════ */
-const EAGLE_SVG = '<img src="https://basamassaf.github.io/jam3iyati/eagle.png" alt="شعار" style="width:100%;height:auto;display:block">';
-  // جسم النسر
-  + '<g fill="url(#goldGrad)" stroke="#6b4d0a" stroke-width="1.2">'
-  + '<path d="M150,58 C135,58 125,68 125,82 L125,118 C125,135 135,148 150,152 C165,148 175,135 175,118 L175,82 C175,68 165,58 150,58 Z"/>'
-  + '</g>'
-  // رأس النسر
-  + '<g fill="#d9b13a" stroke="#6b4d0a" stroke-width="1.2">'
-  + '<ellipse cx="150" cy="52" rx="16" ry="18"/>'
-  + '</g>'
-  // المنقار (معقوف كالنسر)
-  + '<path d="M150,38 L146,28 L150,32 L154,28 Z" fill="#c9a227" stroke="#6b4d0a" stroke-width="1"/>'
-  // العين
-  + '<circle cx="144" cy="50" r="2" fill="#2a1a00"/>'
-  + '<circle cx="144" cy="50" r="0.8" fill="#fff" opacity="0.6"/>'
-  // الدرع على الصدر
-  + '<g fill="#f8eec9" stroke="#6b4d0a" stroke-width="1.5">'
-  + '<path d="M150,82 L165,92 L165,115 L150,126 L135,115 L135,92 Z"/>'
-  + '</g>'
-  // 3 نجوم حمراء على الدرع (تمثل ثورات سوريا)
-  + '<g fill="#a01010">'
-  + '<polygon points="150,90 152,95 157,95 153,98 154,103 150,100 146,103 147,98 143,95 148,95"/>'
-  + '<polygon points="143,103 144.5,107 149,107 145.5,110 146.8,114.5 143,112 139.2,114.5 140.5,110 137,107 141.5,107"/>'
-  + '<polygon points="157,103 158.5,107 163,107 159.5,110 160.8,114.5 157,112 153.2,114.5 154.5,110 151,107 155.5,107"/>'
-  + '</g>'
-  // السيقان
-  + '<g stroke="#6b4d0a" stroke-width="2" fill="none" stroke-linecap="round">'
-  + '<line x1="140" y1="150" x2="137" y2="168"/>'
-  + '<line x1="160" y1="150" x2="163" y2="168"/>'
-  + '</g>'
-  // المخالب
-  + '<g fill="#8b6510" stroke="#6b4d0a" stroke-width="0.8">'
-  + '<path d="M133,168 L128,175 L134,173 L138,169 Z"/>'
-  + '<path d="M167,168 L172,175 L166,173 L162,169 Z"/>'
-  + '</g>'
-  + '</svg>';
-
-function printTask(taskId){
-  const t = state.tasks.find(x => x.id === taskId);
-  if(!t){ showToast('❌ المهمة غير موجودة', 'error'); return; }
-  const settings = state.settings;
-  const materials = t.materials || [];
-  const displayName = t.newName || t.name;
-  const perCol = Math.ceil(materials.length / 2) || 1;
-  const col1 = materials.slice(0, perCol);
-  const col2 = materials.slice(perCol);
-  const rowsCount = Math.max(col1.length, col2.length, 1);
-  let tableRows = '';
-  for(let i = 0; i < rowsCount; i++){
-    const m1 = col1[i]; const m2 = col2[i];
-    tableRows += '<tr>';
-    tableRows += '<td class="mat-name">' + (m1 ? escapeHtml(m1.name) : '') + '</td>';
-    tableRows += '<td class="mat-qty">' + (m1 ? escapeHtml(String(m1.qty || 1)) : '') + '</td>';
-    tableRows += '<td class="mat-name">' + (m2 ? escapeHtml(m2.name) : '') + '</td>';
-    tableRows += '<td class="mat-qty">' + (m2 ? escapeHtml(String(m2.qty || 1)) : '') + '</td>';
-    tableRows += '</tr>';
-  }
-  let schoolLine = 'مدرسة ' + escapeHtml(displayName);
-  if(t.building) schoolLine += ' / ' + escapeHtml(t.building);
-  const roomLine = t.room ? 'على قاعة ' + escapeHtml(t.room) : 'على قاعة ................';
-
-  let html = '';
-  // الرأس: الشعار في المنتصف + الترويسة على اليمين + رقم على اليسار
-  html += '<div class="gov-header">';
-  html += '<div class="gov-eagle">' + EAGLE_SVG + '</div>';
- html += '<div class="gov-header-top">';
-html += '<div class="gov-header-right">';
-html += '<div>' + escapeHtml(settings.header1 || '') + '</div>';
-html += '<div>' + escapeHtml(settings.header2 || '') + '</div>';
-html += '<div>' + escapeHtml(settings.header3 || '') + '</div>';
-html += '<div style="margin-top:4px">التاريخ ' + escapeHtml(t.createdAt || todayISO()) + '</div>';
-html += '</div>';
-html += '<div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div>';
-html += '</div>';
-
-  html += '<div class="gov-salutation">السيد مدير التربية المحترم</div>';
-  html += '<div class="gov-body">ــ بعد الكشف في ' + schoolLine + ' ' + roomLine + ' رقم ( ' + escapeHtml(t.room || '1') + ' ) تبين الحاجة للمواد التالية:</div>';
-  html += '<table class="gov-table">';
-  html += '<thead><tr><th>اسم المادة والقياس</th><th style="width:60px">العدد</th><th>اسم المادة والقياس</th><th style="width:60px">العدد</th></tr></thead>';
-  html += '<tbody>' + tableRows + '</tbody>';
-  html += '</table>';
-
-  // التواقيع: القائم بالكشف (يمين) + رئيس شعبة الصيانة (يسار)
-  html += '<div class="gov-signatures">';
-  html += '<div class="gov-sign-box"><span class="role">القائم بالكشف</span><span class="name">الفني ' + escapeHtml(t.technician || '.....................') + '</span></div>';
-  html += '<div class="gov-sign-box"><span class="role">رئيس شعبة الصيانة</span><span class="name">' + escapeHtml(settings.sign2 || '') + '</span></div>';
-  html += '</div>';
-
-  html += '<div style="text-align:center;font-size:13px;font-weight:700;margin:22px 0 6px">يرجى الاطلاع والتوجيه</div>';
-  html += '<hr class="gov-divider">';
-
-  // رئيس دائرة المعلوماتية على اليسار
-  html += '<div style="text-align:left;font-size:13.5px;font-weight:800;padding-left:8px">رئيس دائرة المعلوماتية<br>' + escapeHtml(settings.sign3 || '') + '</div>';
-  html += '<hr class="gov-divider" style="margin-top:24px">';
-
-  // اقتراح على اليمين
-  html += '<div class="gov-sub" style="text-align:right">أقترح السيد معاون مدير التربية لشؤون التعليم المهني والفني:</div>';
-  html += '<div style="height:50px"></div>';
-  html += '<hr class="gov-divider">';
-
-  // قرار السيد المدير على اليمين
-  html += '<div class="gov-sub" style="text-align:right">قرار السيد المدير</div>';
-  html += '<div style="height:40px"></div>';
-
-  document.getElementById('govPaper').innerHTML = html;
-  document.getElementById('printPage').style.display = 'block';
-  document.body.style.overflow = 'hidden';
-  document.querySelector('.bottom-nav').style.display = 'none';
-  const fab = document.querySelector('.fab');
-  if(fab) fab.style.display = 'none';
-}
-
-function closePrint(){
-  document.getElementById('printPage').style.display = 'none';
-  document.body.style.overflow = '';
-  document.querySelector('.bottom-nav').style.display = '';
-  const activePage = document.querySelector('.page.active');
-  if(activePage && activePage.id === 'pageHome'){
-    const fab = document.querySelector('.fab');
-    if(fab) fab.style.display = 'flex';
-  }
-}
-
-/* ═══════════════════════════════════════════════════════
-   القسم 14: التهيئة
-   ═══════════════════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', () => {
   loadState();
   updateHeaderDate();
   renderTasks();
   updateStats();
+  updateFilterCounts();
   setupFilters();
   setupSettingsListeners();
   loadSettingsToForm();
+  renderTechniciansList();
   renderSchoolsList();
   updateSchoolsStats();
+  fillTechnicianSelects();
 
-  const saved = localStorage.getItem('mt_current_page');
+  const saved = localStorage.getItem('wk_current_page');
   if(saved && document.getElementById(saved)){ switchPage(saved); }
 
-  document.addEventListener('keydown', function(e){
+  document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape'){
-      document.querySelectorAll('.sheet-bg.open').forEach(function(s){ s.classList.remove('open'); });
+      document.querySelectorAll('.sheet-bg.open').forEach(s => s.classList.remove('open'));
       document.body.style.overflow = '';
     }
     if((e.ctrlKey || e.metaKey) && e.key === 'k'){
@@ -2350,15 +2714,14 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   });
 
-  showToast('مرحباً بك 🌿', 'success');
-});
+  document.addEventListener('click', (e) => {
+    const results = document.getElementById('schoolResults');
+    const search = document.getElementById('fSchoolSearch');
+    if(!results || !search) return;
+    if(!results.contains(e.target) && e.target !== search){ results.classList.remove('show'); }
+  });
 
-// إغلاق النتائج عند النقر خارجها
-document.addEventListener('click', function(e){
-  const results = document.getElementById('schoolResults');
-  const search = document.getElementById('fSchoolSearch');
-  if(!results || !search) return;
-  if(!results.contains(e.target) && e.target !== search){ results.classList.remove('show'); }
+  showToast('مرحباً بك ⚡', 'success');
 });
 </script>
 
