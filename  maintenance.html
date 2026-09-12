@@ -9,6 +9,8 @@
 <meta name="apple-mobile-web-app-title" content="ورشة الكهرباء">
 <title>ورشة الكهرباء</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="eagle.png">
 <style>
 :root{
   --emerald-900:#0d3d2e;--emerald-800:#0d5c46;--emerald-700:#127a5d;--emerald-600:#1a9b76;
@@ -2722,6 +2724,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   showToast('مرحباً بك ⚡', 'success');
 });
+
+/* ═══════════════════════════════════════════════════════
+   PWA: تسجيل Service Worker
+   ═══════════════════════════════════════════════════════ */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed:', err));
+  });
+}
 </script>
 
 </body>
