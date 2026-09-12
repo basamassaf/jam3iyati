@@ -2199,35 +2199,7 @@ function clearDone(){
 /* ═══════════════════════════════════════════════════════
    القسم 13: الطباعة — شعار العقاب
    ═══════════════════════════════════════════════════════ */
-const EAGLE_SVG = '<svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" class="gov-eagle-svg">'
-  + '<defs>'
-  + '<linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">'
-  + '<stop offset="0%" stop-color="#f7e8b8"/>'
-  + '<stop offset="35%" stop-color="#d9b13a"/>'
-  + '<stop offset="70%" stop-color="#b8871f"/>'
-  + '<stop offset="100%" stop-color="#8b6510"/>'
-  + '</linearGradient>'
-  + '<linearGradient id="wingGrad" x1="0%" y1="0%" x2="0%" y2="100%">'
-  + '<stop offset="0%" stop-color="#e8c960"/>'
-  + '<stop offset="100%" stop-color="#a67c0a"/>'
-  + '</linearGradient>'
-  + '</defs>'
-  // النجمان - متباعدان وواضحان
-  + '<g fill="#d4a017" stroke="#8b6510" stroke-width="0.5">'
-  + '<polygon points="112,10 115,20 125,20 117,26 120,36 112,30 104,36 107,26 99,20 109,20"/>'
-  + '<polygon points="188,10 191,20 201,20 193,26 196,36 188,30 180,36 183,26 175,20 185,20"/>'
-  + '</g>'
-  // الجناح الأيمن (ناحية يمين الصورة) - ريش متعدد مفصول
-  + '<g fill="url(#wingGrad)" stroke="#6b4d0a" stroke-width="1">'
-  + '<path d="M150,70 C130,62 100,58 65,60 C40,62 20,72 15,88 C25,86 40,80 55,78 C50,84 48,92 52,98 C62,90 75,84 90,82 C86,88 84,94 88,100 C98,92 110,86 122,84 L150,78 Z"/>'
-  // الجناح الأيسر (ناحية يسار الصورة)
-  + '<path d="M150,70 C170,62 200,58 235,60 C260,62 280,72 285,88 C275,86 260,80 245,78 C250,84 252,92 248,98 C238,90 225,84 210,82 C214,88 216,94 212,100 C202,92 190,86 178,84 L150,78 Z"/>'
-  + '</g>'
-  // خطوط تفصيلية على الجنحان
-  + '<g stroke="#6b4d0a" stroke-width="0.7" fill="none" opacity="0.6">'
-  + '<path d="M40,68 L75,64 M45,76 L85,70 M50,84 L95,78 M58,92 L105,84"/>'
-  + '<path d="M260,68 L225,64 M255,76 L215,70 M250,84 L205,78 M242,92 L195,84"/>'
-  + '</g>'
+const EAGLE_SVG = '<img src="eagle.png" alt="شعار" style="width:100%;height:auto;display:block">';
   // جسم النسر
   + '<g fill="url(#goldGrad)" stroke="#6b4d0a" stroke-width="1.2">'
   + '<path d="M150,58 C135,58 125,68 125,82 L125,118 C125,135 135,148 150,152 C165,148 175,135 175,118 L175,82 C175,68 165,58 150,58 Z"/>'
