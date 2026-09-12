@@ -336,23 +336,44 @@ body{
   color:#000;line-height:1.7;position:relative;
 }
 .gov-header{
-  display:flex;align-items:flex-start;justify-content:space-between;
-  gap:10px;margin-bottom:8px;position:relative;min-height:80px;
+  position:relative;
+  margin-bottom:20px;
+  min-height:145px;
 }
 .gov-eagle{
-  position:absolute;left:50%;top:0;transform:translateX(-50%);
-  width:70px;height:auto;
+  position:absolute;
+  left:50%;
+  top:0;
+  transform:translateX(-50%);
+  width:95px;
+  height:auto;
+  z-index:2;
 }
-.gov-eagle-svg{width:100%;height:auto;display:block}
-.gov-header-right{
-  text-align:right;font-size:13px;font-weight:700;line-height:1.65;
-  margin-right:auto;padding-right:8px;padding-top:4px;
+.gov-eagle-svg{
+  width:100%;
+  height:auto;
+  display:block;
+}
+.gov-header-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  padding-top:8px;
 }
 .gov-header-left{
-  text-align:left;font-size:13px;font-weight:700;padding-left:8px;padding-top:8px;
+  text-align:left;
+  font-size:13px;
+  font-weight:700;
+  padding-top:16px;
+  padding-left:4px;
+  flex:0 0 auto;
 }
-.gov-date-line{
-  text-align:right;font-size:13px;font-weight:700;margin:6px 0 20px;padding-right:8px;
+.gov-header-right{
+  text-align:right;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.7;
+  padding-right:4px;
 }
 .gov-salutation{text-align:center;font-size:16px;font-weight:800;margin:8px 0 14px}
 .gov-body{
@@ -387,7 +408,8 @@ body{
   .no-print{display:none!important}
   .print-page{background:#fff;padding:0;min-height:auto}
   .gov-paper{box-shadow:none;padding:0;max-width:100%;width:100%}
-  .gov-eagle{width:56px}
+.gov-eagle{width:80px}
+.gov-header{min-height:130px}
 }
 
 @media (max-width:400px){
@@ -2174,7 +2196,49 @@ function clearDone(){
 /* ═══════════════════════════════════════════════════════
    القسم 13: الطباعة — شعار العقاب
    ═══════════════════════════════════════════════════════ */
-const EAGLE_SVG = '<svg viewBox="0 0 200 160" xmlns="http://www.w3.org/2000/svg" class="gov-eagle-svg">'
+const EAGLE_SVG = '<svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" class="gov-eagle-svg">'
+  + '<defs><linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">'
+  + '<stop offset="0%" stop-color="#f5dfa0"/>'
+  + '<stop offset="40%" stop-color="#d4a017"/>'
+  + '<stop offset="100%" stop-color="#8b6914"/>'
+  + '</linearGradient></defs>'
+  + '<g fill="#c9a227">'
+  + '<polygon points="90,14 93,22 101,22 95,27 97,35 90,30 83,35 85,27 79,22 87,22"/>'
+  + '<polygon points="150,14 153,22 161,22 155,27 157,35 150,30 143,35 145,27 139,22 147,22"/>'
+  + '</g>'
+  + '<g fill="url(#goldGrad)" stroke="#6b4d0a" stroke-width="1.2">'
+  + '<path d="M120,55 C95,50 60,58 25,75 C15,80 8,90 12,98 C18,94 30,86 45,80 C40,88 38,96 42,102 C50,96 60,88 72,82 C68,90 66,98 70,104 C80,96 92,86 105,80 L120,74 Z"/>'
+  + '<path d="M120,55 C145,50 180,58 215,75 C225,80 232,90 228,98 C222,94 210,86 195,80 C200,88 202,96 198,102 C190,96 180,88 168,82 C172,90 174,98 170,104 C160,96 148,86 135,80 L120,74 Z"/>'
+  + '</g>'
+  + '<g fill="none" stroke="#6b4d0a" stroke-width="0.8">'
+  + '<path d="M30,80 L60,72 M35,86 L68,78 M40,92 L75,84 M48,98 L82,88"/>'
+  + '<path d="M210,80 L180,72 M205,86 L172,78 M200,92 L165,84 M192,98 L158,88"/>'
+  + '</g>'
+  + '<g fill="url(#goldGrad)" stroke="#6b4d0a" stroke-width="1.2">'
+  + '<path d="M120,45 C107,45 97,55 97,68 L97,100 C97,118 105,130 120,135 C135,130 143,118 143,100 L143,68 C143,55 133,45 120,45 Z"/>'
+  + '</g>'
+  + '<g fill="#c9a227" stroke="#6b4d0a" stroke-width="1.2">'
+  + '<circle cx="120" cy="40" r="15"/>'
+  + '<path d="M120,26 L117,18 L120,20 L123,18 Z"/>'
+  + '</g>'
+  + '<circle cx="114" cy="38" r="1.5" fill="#3a2800"/>'
+  + '<g fill="#f5e6c0" stroke="#6b4d0a" stroke-width="1.5">'
+  + '<path d="M120,72 L133,80 L133,100 L120,110 L107,100 L107,80 Z"/>'
+  + '</g>'
+  + '<g fill="#8b0000">'
+  + '<polygon points="120,80 121.5,84 125.5,84 122.3,86.5 123.5,90.5 120,88 116.5,90.5 117.7,86.5 114.5,84 118.5,84"/>'
+  + '<polygon points="115,92 116,95 119,95 116.5,97 117.3,100 115,98 112.7,100 113.5,97 111,95 114,95"/>'
+  + '<polygon points="125,92 126,95 129,95 126.5,97 127.3,100 125,98 122.7,100 123.5,97 121,95 124,95"/>'
+  + '</g>'
+  + '<g stroke="#6b4d0a" stroke-width="1.5" fill="none">'
+  + '<line x1="110" y1="132" x2="108" y2="148"/>'
+  + '<line x1="130" y1="132" x2="132" y2="148"/>'
+  + '</g>'
+  + '<g fill="#8b6914">'
+  + '<path d="M104,148 L100,154 L105,153 L108,148 Z"/>'
+  + '<path d="M136,148 L140,154 L135,153 L132,148 Z"/>'
+  + '</g>'
+  + '</svg>';
   + '<defs><linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">'
   + '<stop offset="0%" stop-color="#f0d060"/><stop offset="50%" stop-color="#d4a017"/><stop offset="100%" stop-color="#a67c00"/>'
   + '</linearGradient></defs>'
@@ -2234,37 +2298,48 @@ function printTask(taskId){
   const roomLine = t.room ? 'على قاعة ' + escapeHtml(t.room) : 'على قاعة ................';
 
   let html = '';
+  // الرأس: الشعار في المنتصف + الترويسة على اليمين + رقم على اليسار
   html += '<div class="gov-header">';
   html += '<div class="gov-eagle">' + EAGLE_SVG + '</div>';
-  html += '<div class="gov-header-right">';
-  html += escapeHtml(settings.header1 || '') + '<br>';
-  html += escapeHtml(settings.header2 || '') + '<br>';
-  html += escapeHtml(settings.header3 || '');
-  html += '</div>';
+  html += '<div class="gov-header-top">';
   html += '<div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div>';
+  html += '<div class="gov-header-right">';
+  html += '<div>' + escapeHtml(settings.header1 || '') + '</div>';
+  html += '<div>' + escapeHtml(settings.header2 || '') + '</div>';
+  html += '<div>' + escapeHtml(settings.header3 || '') + '</div>';
+  html += '<div style="margin-top:4px">التاريخ ' + escapeHtml(t.createdAt || todayISO()) + '</div>';
   html += '</div>';
-  html += '<div class="gov-date-line">التاريخ: ' + escapeHtml(t.createdAt || todayISO()) + '</div>';
+  html += '</div>';
+  html += '</div>';
+
   html += '<div class="gov-salutation">السيد مدير التربية المحترم</div>';
   html += '<div class="gov-body">ــ بعد الكشف في ' + schoolLine + ' ' + roomLine + ' رقم ( ' + escapeHtml(t.room || '1') + ' ) تبين الحاجة للمواد التالية:</div>';
   html += '<table class="gov-table">';
   html += '<thead><tr><th>اسم المادة والقياس</th><th style="width:60px">العدد</th><th>اسم المادة والقياس</th><th style="width:60px">العدد</th></tr></thead>';
   html += '<tbody>' + tableRows + '</tbody>';
   html += '</table>';
+
+  // التواقيع: القائم بالكشف (يمين) + رئيس شعبة الصيانة (يسار)
   html += '<div class="gov-signatures">';
   html += '<div class="gov-sign-box"><span class="role">القائم بالكشف</span><span class="name">الفني ' + escapeHtml(t.technician || '.....................') + '</span></div>';
   html += '<div class="gov-sign-box"><span class="role">رئيس شعبة الصيانة</span><span class="name">' + escapeHtml(settings.sign2 || '') + '</span></div>';
   html += '</div>';
+
   html += '<div style="text-align:center;font-size:13px;font-weight:700;margin:22px 0 6px">يرجى الاطلاع والتوجيه</div>';
   html += '<hr class="gov-divider">';
-  html += '<div style="text-align:right;font-size:13.5px;font-weight:800;padding-right:8px">رئيس دائرة المعلوماتية<br>' + escapeHtml(settings.sign3 || '') + '</div>';
+
+  // رئيس دائرة المعلوماتية على اليسار
+  html += '<div style="text-align:left;font-size:13.5px;font-weight:800;padding-left:8px">رئيس دائرة المعلوماتية<br>' + escapeHtml(settings.sign3 || '') + '</div>';
   html += '<hr class="gov-divider" style="margin-top:24px">';
+
+  // اقتراح على اليمين
   html += '<div class="gov-sub" style="text-align:right">أقترح السيد معاون مدير التربية لشؤون التعليم المهني والفني:</div>';
-  html += '<div style="height:60px"></div>';
-  html += '<hr class="gov-divider">';
-  html += '<div class="gov-sub" style="text-align:right">قرار السيد المدير</div>';
   html += '<div style="height:50px"></div>';
-  html += '<div class="gov-end">إنهاء</div>';
-  html += '<div style="text-align:right;font-size:13px;font-weight:800;margin-top:18px;padding-right:8px">رئيس ورشة الكهرباء: ' + escapeHtml(settings.sign1 || '') + '</div>';
+  html += '<hr class="gov-divider">';
+
+  // قرار السيد المدير على اليمين
+  html += '<div class="gov-sub" style="text-align:right">قرار السيد المدير</div>';
+  html += '<div style="height:40px"></div>';
 
   document.getElementById('govPaper').innerHTML = html;
   document.getElementById('printPage').style.display = 'block';
