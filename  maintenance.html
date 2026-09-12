@@ -359,6 +359,7 @@ body{
   justify-content:space-between;
   align-items:flex-start;
   padding-top:8px;
+  direction:rtl;
 }
 .gov-header-left{
   text-align:left;
@@ -367,6 +368,7 @@ body{
   padding-top:16px;
   padding-left:4px;
   flex:0 0 auto;
+  direction:ltr;
 }
 .gov-header-right{
   text-align:right;
@@ -374,6 +376,7 @@ body{
   font-weight:700;
   line-height:1.7;
   padding-right:4px;
+  flex:1;
 }
 .gov-salutation{text-align:center;font-size:16px;font-weight:800;margin:8px 0 14px}
 .gov-body{
@@ -2196,80 +2199,67 @@ function clearDone(){
 /* ═══════════════════════════════════════════════════════
    القسم 13: الطباعة — شعار العقاب
    ═══════════════════════════════════════════════════════ */
-const EAGLE_SVG = '<svg viewBox="0 0 240 160" xmlns="http://www.w3.org/2000/svg" class="gov-eagle-svg">'
-  + '<defs><linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">'
-  + '<stop offset="0%" stop-color="#f5dfa0"/>'
-  + '<stop offset="40%" stop-color="#d4a017"/>'
-  + '<stop offset="100%" stop-color="#8b6914"/>'
-  + '</linearGradient></defs>'
-  + '<g fill="#c9a227">'
-  + '<polygon points="90,14 93,22 101,22 95,27 97,35 90,30 83,35 85,27 79,22 87,22"/>'
-  + '<polygon points="150,14 153,22 161,22 155,27 157,35 150,30 143,35 145,27 139,22 147,22"/>'
+const EAGLE_SVG = '<svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" class="gov-eagle-svg">'
+  + '<defs>'
+  + '<linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">'
+  + '<stop offset="0%" stop-color="#f7e8b8"/>'
+  + '<stop offset="35%" stop-color="#d9b13a"/>'
+  + '<stop offset="70%" stop-color="#b8871f"/>'
+  + '<stop offset="100%" stop-color="#8b6510"/>'
+  + '</linearGradient>'
+  + '<linearGradient id="wingGrad" x1="0%" y1="0%" x2="0%" y2="100%">'
+  + '<stop offset="0%" stop-color="#e8c960"/>'
+  + '<stop offset="100%" stop-color="#a67c0a"/>'
+  + '</linearGradient>'
+  + '</defs>'
+  // النجمان - متباعدان وواضحان
+  + '<g fill="#d4a017" stroke="#8b6510" stroke-width="0.5">'
+  + '<polygon points="112,10 115,20 125,20 117,26 120,36 112,30 104,36 107,26 99,20 109,20"/>'
+  + '<polygon points="188,10 191,20 201,20 193,26 196,36 188,30 180,36 183,26 175,20 185,20"/>'
   + '</g>'
+  // الجناح الأيمن (ناحية يمين الصورة) - ريش متعدد مفصول
+  + '<g fill="url(#wingGrad)" stroke="#6b4d0a" stroke-width="1">'
+  + '<path d="M150,70 C130,62 100,58 65,60 C40,62 20,72 15,88 C25,86 40,80 55,78 C50,84 48,92 52,98 C62,90 75,84 90,82 C86,88 84,94 88,100 C98,92 110,86 122,84 L150,78 Z"/>'
+  // الجناح الأيسر (ناحية يسار الصورة)
+  + '<path d="M150,70 C170,62 200,58 235,60 C260,62 280,72 285,88 C275,86 260,80 245,78 C250,84 252,92 248,98 C238,90 225,84 210,82 C214,88 216,94 212,100 C202,92 190,86 178,84 L150,78 Z"/>'
+  + '</g>'
+  // خطوط تفصيلية على الجنحان
+  + '<g stroke="#6b4d0a" stroke-width="0.7" fill="none" opacity="0.6">'
+  + '<path d="M40,68 L75,64 M45,76 L85,70 M50,84 L95,78 M58,92 L105,84"/>'
+  + '<path d="M260,68 L225,64 M255,76 L215,70 M250,84 L205,78 M242,92 L195,84"/>'
+  + '</g>'
+  // جسم النسر
   + '<g fill="url(#goldGrad)" stroke="#6b4d0a" stroke-width="1.2">'
-  + '<path d="M120,55 C95,50 60,58 25,75 C15,80 8,90 12,98 C18,94 30,86 45,80 C40,88 38,96 42,102 C50,96 60,88 72,82 C68,90 66,98 70,104 C80,96 92,86 105,80 L120,74 Z"/>'
-  + '<path d="M120,55 C145,50 180,58 215,75 C225,80 232,90 228,98 C222,94 210,86 195,80 C200,88 202,96 198,102 C190,96 180,88 168,82 C172,90 174,98 170,104 C160,96 148,86 135,80 L120,74 Z"/>'
+  + '<path d="M150,58 C135,58 125,68 125,82 L125,118 C125,135 135,148 150,152 C165,148 175,135 175,118 L175,82 C175,68 165,58 150,58 Z"/>'
   + '</g>'
-  + '<g fill="none" stroke="#6b4d0a" stroke-width="0.8">'
-  + '<path d="M30,80 L60,72 M35,86 L68,78 M40,92 L75,84 M48,98 L82,88"/>'
-  + '<path d="M210,80 L180,72 M205,86 L172,78 M200,92 L165,84 M192,98 L158,88"/>'
+  // رأس النسر
+  + '<g fill="#d9b13a" stroke="#6b4d0a" stroke-width="1.2">'
+  + '<ellipse cx="150" cy="52" rx="16" ry="18"/>'
   + '</g>'
-  + '<g fill="url(#goldGrad)" stroke="#6b4d0a" stroke-width="1.2">'
-  + '<path d="M120,45 C107,45 97,55 97,68 L97,100 C97,118 105,130 120,135 C135,130 143,118 143,100 L143,68 C143,55 133,45 120,45 Z"/>'
+  // المنقار (معقوف كالنسر)
+  + '<path d="M150,38 L146,28 L150,32 L154,28 Z" fill="#c9a227" stroke="#6b4d0a" stroke-width="1"/>'
+  // العين
+  + '<circle cx="144" cy="50" r="2" fill="#2a1a00"/>'
+  + '<circle cx="144" cy="50" r="0.8" fill="#fff" opacity="0.6"/>'
+  // الدرع على الصدر
+  + '<g fill="#f8eec9" stroke="#6b4d0a" stroke-width="1.5">'
+  + '<path d="M150,82 L165,92 L165,115 L150,126 L135,115 L135,92 Z"/>'
   + '</g>'
-  + '<g fill="#c9a227" stroke="#6b4d0a" stroke-width="1.2">'
-  + '<circle cx="120" cy="40" r="15"/>'
-  + '<path d="M120,26 L117,18 L120,20 L123,18 Z"/>'
+  // 3 نجوم حمراء على الدرع (تمثل ثورات سوريا)
+  + '<g fill="#a01010">'
+  + '<polygon points="150,90 152,95 157,95 153,98 154,103 150,100 146,103 147,98 143,95 148,95"/>'
+  + '<polygon points="143,103 144.5,107 149,107 145.5,110 146.8,114.5 143,112 139.2,114.5 140.5,110 137,107 141.5,107"/>'
+  + '<polygon points="157,103 158.5,107 163,107 159.5,110 160.8,114.5 157,112 153.2,114.5 154.5,110 151,107 155.5,107"/>'
   + '</g>'
-  + '<circle cx="114" cy="38" r="1.5" fill="#3a2800"/>'
-  + '<g fill="#f5e6c0" stroke="#6b4d0a" stroke-width="1.5">'
-  + '<path d="M120,72 L133,80 L133,100 L120,110 L107,100 L107,80 Z"/>'
+  // السيقان
+  + '<g stroke="#6b4d0a" stroke-width="2" fill="none" stroke-linecap="round">'
+  + '<line x1="140" y1="150" x2="137" y2="168"/>'
+  + '<line x1="160" y1="150" x2="163" y2="168"/>'
   + '</g>'
-  + '<g fill="#8b0000">'
-  + '<polygon points="120,80 121.5,84 125.5,84 122.3,86.5 123.5,90.5 120,88 116.5,90.5 117.7,86.5 114.5,84 118.5,84"/>'
-  + '<polygon points="115,92 116,95 119,95 116.5,97 117.3,100 115,98 112.7,100 113.5,97 111,95 114,95"/>'
-  + '<polygon points="125,92 126,95 129,95 126.5,97 127.3,100 125,98 122.7,100 123.5,97 121,95 124,95"/>'
-  + '</g>'
-  + '<g stroke="#6b4d0a" stroke-width="1.5" fill="none">'
-  + '<line x1="110" y1="132" x2="108" y2="148"/>'
-  + '<line x1="130" y1="132" x2="132" y2="148"/>'
-  + '</g>'
-  + '<g fill="#8b6914">'
-  + '<path d="M104,148 L100,154 L105,153 L108,148 Z"/>'
-  + '<path d="M136,148 L140,154 L135,153 L132,148 Z"/>'
-  + '</g>'
-  + '</svg>';
-  + '<defs><linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">'
-  + '<stop offset="0%" stop-color="#f0d060"/><stop offset="50%" stop-color="#d4a017"/><stop offset="100%" stop-color="#a67c00"/>'
-  + '</linearGradient></defs>'
-  + '<g fill="#c9a227">'
-  + '<polygon points="70,15 73,24 82,24 75,30 78,39 70,33 62,39 65,30 58,24 67,24"/>'
-  + '<polygon points="130,15 133,24 142,24 135,30 138,39 130,33 122,39 125,30 118,24 127,24"/>'
-  + '</g>'
-  + '<g fill="url(#goldGrad)" stroke="#7a5c00" stroke-width="1.2">'
-  + '<path d="M100,50 C80,45 55,50 30,70 C25,74 22,80 25,86 C30,84 40,78 50,72 C45,78 42,84 45,90 C50,86 58,80 68,74 C64,80 62,86 66,92 C72,86 80,78 88,72 L100,68 Z"/>'
-  + '<path d="M100,50 C120,45 145,50 170,70 C175,74 178,80 175,86 C170,84 160,78 150,72 C155,78 158,84 155,90 C150,86 142,80 132,74 C136,80 138,86 134,92 C128,86 120,78 112,72 L100,68 Z"/>'
-  + '</g>'
-  + '<g fill="url(#goldGrad)" stroke="#7a5c00" stroke-width="1.2">'
-  + '<path d="M100,42 C90,42 82,50 82,62 L82,95 C82,110 88,120 100,125 C112,120 118,110 118,95 L118,62 C118,50 110,42 100,42 Z"/>'
-  + '</g>'
-  + '<g fill="#c9a227" stroke="#7a5c00" stroke-width="1.2">'
-  + '<circle cx="100" cy="38" r="14"/><path d="M100,26 L98,20 L102,20 Z"/>'
-  + '</g>'
-  + '<g fill="#fff8e0" stroke="#7a5c00" stroke-width="1.5">'
-  + '<path d="M100,68 L110,74 L110,90 L100,98 L90,90 L90,74 Z"/>'
-  + '</g>'
-  + '<g fill="#8b0000"><polygon points="100,74 101.5,78 105.5,78 102.3,80.5 103.5,84.5 100,82 96.5,84.5 97.7,80.5 94.5,78 98.5,78"/></g>'
-  + '<g stroke="#a67c00" stroke-width="1" fill="none">'
-  + '<line x1="100" y1="125" x2="100" y2="145"/>'
-  + '<ellipse cx="96" cy="132" rx="3" ry="6" fill="#d4a017"/>'
-  + '<ellipse cx="104" cy="132" rx="3" ry="6" fill="#d4a017"/>'
-  + '<ellipse cx="96" cy="140" rx="3" ry="6" fill="#d4a017"/>'
-  + '<ellipse cx="104" cy="140" rx="3" ry="6" fill="#d4a017"/>'
-  + '</g>'
-  + '<g fill="#a67c00">'
-  + '<path d="M88,118 L82,128 L86,128 L90,122 Z"/>'
-  + '<path d="M112,118 L118,128 L114,128 L110,122 Z"/>'
+  // المخالب
+  + '<g fill="#8b6510" stroke="#6b4d0a" stroke-width="0.8">'
+  + '<path d="M133,168 L128,175 L134,173 L138,169 Z"/>'
+  + '<path d="M167,168 L172,175 L166,173 L162,169 Z"/>'
   + '</g>'
   + '</svg>';
 
@@ -2301,16 +2291,15 @@ function printTask(taskId){
   // الرأس: الشعار في المنتصف + الترويسة على اليمين + رقم على اليسار
   html += '<div class="gov-header">';
   html += '<div class="gov-eagle">' + EAGLE_SVG + '</div>';
-  html += '<div class="gov-header-top">';
-  html += '<div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div>';
-  html += '<div class="gov-header-right">';
-  html += '<div>' + escapeHtml(settings.header1 || '') + '</div>';
-  html += '<div>' + escapeHtml(settings.header2 || '') + '</div>';
-  html += '<div>' + escapeHtml(settings.header3 || '') + '</div>';
-  html += '<div style="margin-top:4px">التاريخ ' + escapeHtml(t.createdAt || todayISO()) + '</div>';
-  html += '</div>';
-  html += '</div>';
-  html += '</div>';
+ html += '<div class="gov-header-top">';
+html += '<div class="gov-header-right">';
+html += '<div>' + escapeHtml(settings.header1 || '') + '</div>';
+html += '<div>' + escapeHtml(settings.header2 || '') + '</div>';
+html += '<div>' + escapeHtml(settings.header3 || '') + '</div>';
+html += '<div style="margin-top:4px">التاريخ ' + escapeHtml(t.createdAt || todayISO()) + '</div>';
+html += '</div>';
+html += '<div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div>';
+html += '</div>';
 
   html += '<div class="gov-salutation">السيد مدير التربية المحترم</div>';
   html += '<div class="gov-body">ــ بعد الكشف في ' + schoolLine + ' ' + roomLine + ' رقم ( ' + escapeHtml(t.room || '1') + ' ) تبين الحاجة للمواد التالية:</div>';
