@@ -10,16 +10,19 @@
 <title>ورشة الكهرباء</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 <style>
+/* ═══════════════ المتغيرات ═══════════════ */
 :root{
   --emerald-900:#0d3d2e;--emerald-800:#0d5c46;--emerald-700:#127a5d;--emerald-600:#1a9b76;
   --emerald-500:#22b88d;--emerald-200:#a7e8d0;--emerald-100:#d4f4e8;--emerald-50:#eefaf5;
   --copper-700:#8b5a2b;--copper-600:#b87333;--copper-500:#d49249;--copper-300:#e8b878;--copper-100:#f5e6d3;
-  --blue-700:#1e40af;--blue-600:#2563eb;--blue-100:#dbeafe;--blue-50:#eff6ff;
-  --purple-700:#6d28d9;--purple-600:#7c3aed;--purple-100:#ede9fe;--purple-50:#f5f3ff;
-  --orange-700:#c2410c;--orange-600:#ea580c;--orange-100:#ffedd5;--orange-50:#fff7ed;
-  --yellow-700:#a16207;--yellow-600:#ca8a04;--yellow-100:#fef9c3;--yellow-50:#fefce8;
-  --cyan-700:#0e7490;--cyan-600:#0891b2;--cyan-100:#cffafe;--cyan-50:#ecfeff;
-  --green-700:#15803d;--green-600:#16a34a;--green-100:#dcfce7;--green-50:#f0fdf4;
+  --blue-700:#1e40af;--blue-600:#2563eb;--blue-500:#3b82f6;--blue-100:#dbeafe;--blue-50:#eff6ff;
+  --purple-700:#6d28d9;--purple-600:#7c3aed;--purple-500:#8b5cf6;--purple-100:#ede9fe;--purple-50:#f5f3ff;
+  --orange-700:#c2410c;--orange-600:#ea580c;--orange-500:#f97316;--orange-100:#ffedd5;--orange-50:#fff7ed;
+  --yellow-700:#a16207;--yellow-600:#ca8a04;--yellow-500:#eab308;--yellow-100:#fef9c3;--yellow-50:#fefce8;
+  --cyan-700:#0e7490;--cyan-600:#0891b2;--cyan-500:#06b6d4;--cyan-100:#cffafe;--cyan-50:#ecfeff;
+  --green-700:#15803d;--green-600:#16a34a;--green-500:#22c55e;--green-100:#dcfce7;--green-50:#f0fdf4;
+  --pink-700:#be185d;--pink-600:#db2777;--pink-500:#ec4899;--pink-100:#fce7f3;--pink-50:#fdf2f8;
+  --teal-700:#0f766e;--teal-600:#14b8a6;--teal-100:#ccfbf1;--teal-50:#f0fdfa;
   --brown-700:#78350f;--brown-600:#92400e;--brown-100:#fef3c7;--brown-50:#fffbeb;
   --gray-900:#0f172a;--gray-800:#1e293b;--gray-700:#334155;--gray-600:#475569;--gray-500:#64748b;
   --gray-400:#94a3b8;--gray-300:#cbd5e1;--gray-200:#e2e8f0;--gray-100:#f1f5f9;--gray-50:#f8fafc;
@@ -27,6 +30,7 @@
   --shadow-sm:0 1px 3px rgba(13,92,70,.08);
   --shadow-md:0 4px 14px rgba(13,92,70,.12);
   --shadow-lg:0 10px 30px rgba(13,92,70,.18);
+  --shadow-xl:0 20px 50px rgba(0,0,0,.35);
   --radius:14px;--radius-sm:10px;--radius-lg:20px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -35,14 +39,16 @@ body{
   font-family:'Segoe UI',Tahoma,Arial,sans-serif;
   background:linear-gradient(160deg,#f0f7f4 0%,#f8fafc 100%);
   color:var(--gray-700);min-height:100vh;
-  padding-bottom:180px;
+  padding-bottom:80px;padding-top:64px;
   overflow-x:hidden;-webkit-font-smoothing:antialiased;
   transition:background .3s,color .3s;
 }
 
 /* ═══════════════ الوضع الليلي ═══════════════ */
 body.night-mode{background:linear-gradient(160deg,#0f172a 0%,#1e293b 100%);color:#e2e8f0}
-body.night-mode .app-header{background:linear-gradient(135deg,#0a2922,#0d3d2e)}
+body.night-mode .top-tabs{background:#0a2922;border-color:#0d5c46}
+body.night-mode .top-tab{color:#94a3b8}
+body.night-mode .top-tab.active{background:#0d5c46;color:#a7e8d0}
 body.night-mode .search-box{background:#1e293b;border-color:#334155}
 body.night-mode .search-box input{color:#e2e8f0}
 body.night-mode .chip{background:#1e293b;border-color:#334155;color:#cbd5e1}
@@ -62,7 +68,30 @@ body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
 body.night-mode .selected-school{background:#0d3d2e;border-color:#22b88d}
 body.night-mode .school-results{background:#1e293b;border-color:#334155}
 body.night-mode .school-item{border-color:#334155}
-body.night-mode .school-item:active{background:#0d3d2e}
+body.night-mode .autocomplete-results{background:#1e293b;border-color:#334155}
+body.night-mode .autocomplete-item{border-color:#334155}
+body.night-mode .visit-row{background:#0f172a;border-color:#0e7490}
+body.night-mode .attachment-item{background:#0f172a;border-color:#334155}
+body.night-mode .stat-card{background:rgba(255,255,255,.08)}
+
+/* ═══════════════ التبويبات العلوية ═══════════════ */
+.top-tabs{
+  position:fixed;top:0;left:0;right:0;z-index:60;
+  background:linear-gradient(135deg,var(--emerald-800),var(--emerald-700));
+  padding:8px 8px;display:flex;gap:6px;overflow-x:auto;
+  scrollbar-width:none;
+  box-shadow:0 4px 12px rgba(13,92,70,.25);
+  padding-top:calc(8px + env(safe-area-inset-top));
+}
+.top-tabs::-webkit-scrollbar{display:none}
+.top-tab{
+  flex:0 0 auto;padding:8px 12px;border-radius:10px;border:none;
+  background:rgba(255,255,255,.15);color:#fff;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:.2s;
+  display:inline-flex;align-items:center;gap:5px;white-space:nowrap;
+}
+.top-tab.active{background:#fff;color:var(--emerald-800);box-shadow:0 4px 10px rgba(0,0,0,.15)}
+.top-tab .tab-icon{font-size:15px}
 
 /* ═══════════════ الرأس ═══════════════ */
 .app-header{
@@ -112,7 +141,7 @@ body.night-mode .school-item:active{background:#0d3d2e}
 .chip .count{background:rgba(255,255,255,.25);padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700}
 .chip:not(.active) .count{background:var(--gray-100);color:var(--gray-500)}
 .filters-advanced{padding:0 16px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.filters-advanced select{padding:8px 10px;border-radius:10px;border:1px solid var(--gray-200);background:var(--white);font-size:12px;font-family:inherit;color:var(--gray-700);outline:none}
+.filters-advanced select{padding:8px 10px;border-radius:10px;border:1px solid var(--gray-200);background:var(--white);font-size:12px;font-family:inherit;color:var(--gray-700);outline:none;width:100%}
 .filters-advanced select:focus{border-color:var(--emerald-600)}
 
 /* ═══════════════ التنبيهات ═══════════════ */
@@ -146,7 +175,7 @@ body.night-mode .school-item:active{background:#0d3d2e}
 .task-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
 .task-name{font-size:17px;font-weight:800;color:var(--gray-800);line-height:1.3;flex:1}
 .task-badges{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
-.mini-badge{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap}
+.mini-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;white-space:nowrap}
 .mb-new{background:var(--blue-100);color:var(--blue-700)}
 .mb-inspecting{background:var(--purple-100);color:var(--purple-700)}
 .mb-awaiting{background:var(--orange-100);color:var(--orange-700)}
@@ -163,30 +192,32 @@ body.night-mode .school-item:active{background:#0d3d2e}
 .mb-med{background:var(--orange-100);color:var(--orange-700)}
 .mb-low{background:var(--green-100);color:var(--green-700)}
 
-.task-meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:11.5px;color:var(--gray-500);margin-bottom:10px}
+.task-meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--gray-500);margin-bottom:10px}
 .task-meta span{display:inline-flex;align-items:center;gap:4px}
-.task-note{background:var(--gray-50);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--gray-600);margin-bottom:10px;border-right:3px solid var(--copper-500);line-height:1.5}
+.task-note{background:var(--gray-50);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--gray-600);margin-bottom:10px;border-right:3px solid var(--copper-500);line-height:1.5}
 .task-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
 
-/* ═══════════════ الأزرار ═══════════════ */
-.btn{border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:4px;transition:.2s}
+/* ═══════════════ الأزرار — كل زر بلون ═══════════════ */
+.btn{border:none;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:4px;transition:.2s;color:#fff}
 .btn:active{transform:scale(.96)}
-.btn-done{background:var(--green-600);color:#fff}
-.btn-undo{background:var(--orange-600);color:#fff}
-.btn-note{background:var(--copper-600);color:#fff}
-.btn-print{background:var(--emerald-700);color:#fff}
-.btn-whats{background:#25d366;color:#fff}
-.btn-call{background:var(--blue-600);color:#fff}
-.btn-del{background:var(--gray-100);color:var(--danger)}
-.btn-map{background:linear-gradient(135deg,#1a73e8,#4285f4);color:#fff;text-decoration:none}
-.btn-word{background:linear-gradient(135deg,#2b579a,#1e4073);color:#fff}
-.btn-file{background:var(--purple-600);color:#fff}
+.btn-details{background:linear-gradient(135deg,#1e40af,#3b82f6)}
+.btn-done{background:linear-gradient(135deg,#15803d,#22c55e)}
+.btn-undo{background:linear-gradient(135deg,#c2410c,#f97316)}
+.btn-note{background:linear-gradient(135deg,#6d28d9,#8b5cf6)}
+.btn-print{background:linear-gradient(135deg,#0e7490,#06b6d4)}
+.btn-whats{background:linear-gradient(135deg,#128C7E,#25D366)}
+.btn-call{background:linear-gradient(135deg,#0369a1,#0284c7)}
+.btn-del{background:linear-gradient(135deg,#991b1b,#dc2626)}
+.btn-map{background:linear-gradient(135deg,#1a73e8,#4285f4)}
+.btn-word{background:linear-gradient(135deg,#2b579a,#1e4073)}
+.btn-file{background:linear-gradient(135deg,#be185d,#db2777)}
+.btn-edit{background:linear-gradient(135deg,#c2410c,#f97316)}
 .btn-sm{padding:6px 10px;font-size:11px;border-radius:8px}
 
-.btn-lg{width:100%;padding:14px;border-radius:13px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-lg{width:100%;padding:14px;border-radius:13px;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;color:#fff}
 .btn-lg:active{transform:scale(.98)}
-.btn-primary{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600));color:#fff;box-shadow:0 6px 16px rgba(13,92,70,.25)}
-.btn-copper{background:linear-gradient(135deg,var(--copper-700),var(--copper-500));color:#fff;box-shadow:0 6px 16px rgba(184,115,51,.25)}
+.btn-primary{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600));box-shadow:0 6px 16px rgba(13,92,70,.25)}
+.btn-copper{background:linear-gradient(135deg,var(--copper-700),var(--copper-500));box-shadow:0 6px 16px rgba(184,115,51,.25)}
 .btn-ghost{background:var(--gray-100);color:var(--gray-700)}
 
 /* ═══════════════ الحالة الفارغة ═══════════════ */
@@ -195,27 +226,30 @@ body.night-mode .school-item:active{background:#0d3d2e}
 .empty p{font-size:14px}
 
 /* ═══════════════ الشريط السفلي ═══════════════ */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--white);box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:50;border-top:1px solid var(--gray-200);overflow-x:auto}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--white);box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:50;border-top:1px solid var(--gray-200);overflow-x:auto;scrollbar-width:none}
+.bottom-nav::-webkit-scrollbar{display:none}
 .nav-item{flex:0 0 auto;min-width:56px;text-align:center;padding:4px 2px;cursor:pointer;border-radius:10px;transition:.2s;color:var(--gray-500)}
 .nav-item.active{color:var(--emerald-700);background:var(--emerald-50)}
 .nav-item svg{width:20px;height:20px;display:block;margin:0 auto 2px}
 .nav-item span{font-size:9.5px;font-weight:700}
 
 /* ═══════════════ الزر العائم ═══════════════ */
-.fab{position:fixed;bottom:calc(85px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--copper-600),var(--copper-500));color:#fff;border:none;box-shadow:0 8px 24px rgba(184,115,51,.4);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:60;transition:.25s}
+.fab{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--copper-600),var(--copper-500));color:#fff;border:none;box-shadow:0 8px 24px rgba(184,115,51,.4);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:60;transition:.25s}
 .fab.show{display:flex}
 .fab:active{transform:translateX(-50%) scale(.92)}
 .fab svg{width:30px;height:30px}
 
 /* ═══════════════ النوافذ المنبثقة ═══════════════ */
-.sheet-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);z-index:100;display:none;align-items:flex-end;justify-content:center;animation:fadeIn .2s}
+.sheet-bg{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);z-index:100;display:none;align-items:flex-end;justify-content:center;animation:fadeIn .2s;padding-top:20vh}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .sheet-bg.open{display:flex}
-.sheet{background:var(--white);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.16,1,.3,1)}
+.sheet{background:var(--white);width:100%;max-width:520px;border-radius:24px 24px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:80vh;overflow-y:auto;animation:slideUp .3s cubic-bezier(.16,1,.3,1);position:relative;box-shadow:var(--shadow-xl)}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.sheet-handle{width:42px;height:5px;background:var(--gray-300);border-radius:3px;margin:0 auto 16px}
-.sheet-title{font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.sheet-handle{width:42px;height:5px;background:var(--gray-300);border-radius:3px;margin:0 auto 12px}
+.sheet-title{font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:16px;display:flex;align-items:center;gap:8px;position:sticky;top:0;background:inherit;padding:4px 0;z-index:5}
 .sheet-title svg{width:20px;height:20px}
+.sheet-title .sheet-close{margin-right:auto;background:var(--danger-light);color:var(--danger);border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s}
+.sheet-close:active{transform:scale(.92);background:var(--danger);color:#fff}
 
 /* ═══════════════ الحقول ═══════════════ */
 .field{margin-bottom:14px}
@@ -235,12 +269,12 @@ body.night-mode .school-item:active{background:#0d3d2e}
 
 /* ═══════════════ المواد ═══════════════ */
 .material-row{display:flex;align-items:center;gap:8px;background:var(--gray-50);border-radius:11px;padding:10px;margin-bottom:8px;border:1px solid var(--gray-200)}
-.material-row .mat-name{flex:1;font-size:13px;font-weight:600;color:var(--gray-700)}
-.material-row .mat-unit{font-size:11px;color:var(--gray-500);background:var(--white);padding:3px 8px;border-radius:6px;border:1px solid var(--gray-200)}
+.material-row .mat-name{flex:1;font-size:14px;font-weight:600;color:var(--gray-700)}
+.material-row .mat-unit{font-size:12px;color:var(--gray-500);background:var(--white);padding:3px 8px;border-radius:6px;border:1px solid var(--gray-200)}
 .material-row input.qty{width:60px;padding:7px;text-align:center;border:1.5px solid var(--gray-300);border-radius:8px;font-size:13px;font-weight:700;font-family:inherit}
 .mat-del{background:var(--danger-light);color:var(--danger);border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center}
 
-/* ═══════════════ البحث الذكي (Autocomplete) ═══════════════ */
+/* ═══════════════ البحث الذكي ═══════════════ */
 .autocomplete-wrap{position:relative}
 .autocomplete-input{width:100%;padding:11px 13px;border:1.5px solid var(--gray-200);border-radius:11px;font-size:14px;font-family:inherit;background:var(--white);color:var(--gray-700);outline:none;transition:.2s}
 .autocomplete-input:focus{border-color:var(--emerald-600);box-shadow:0 0 0 3px rgba(26,155,118,.1)}
@@ -249,32 +283,29 @@ body.night-mode .school-item:active{background:#0d3d2e}
 .autocomplete-item{padding:10px 12px;border-bottom:1px solid var(--gray-100);cursor:pointer;font-size:13px;transition:.15s}
 .autocomplete-item:last-child{border-bottom:none}
 .autocomplete-item:hover,.autocomplete-item:active{background:var(--emerald-50)}
-.autocomplete-item.selected{background:var(--emerald-100);font-weight:700}
 
-/* ═══════════════ نتائج البحث عن المدارس ═══════════════ */
+/* ═══════════════ Schools Search ═══════════════ */
 .school-results{display:none;max-height:240px;overflow-y:auto;margin-top:6px;border:1.5px solid var(--emerald-200);border-radius:10px;background:#fff}
 .school-results.show{display:block}
 .school-item{padding:10px;border-bottom:1px solid var(--gray-100);cursor:pointer;font-size:12px}
 .school-item:last-child{border-bottom:none}
 .school-item:active{background:var(--emerald-50)}
-.school-item-name{font-weight:700;color:var(--emerald-800);margin-bottom:2px}
+.school-item-name{font-weight:700;color:var(--emerald-800);margin-bottom:2px;font-size:13px}
 .school-item-name .old-tag{color:var(--copper-600);font-size:10px;font-weight:600}
 .school-item-meta{color:var(--gray-500);font-size:11px}
-
 .selected-school{background:var(--emerald-50);border:1.5px solid var(--emerald-500);border-radius:10px;padding:12px;margin-top:8px;font-size:12px;position:relative}
 .selected-school .close-btn{position:absolute;top:6px;left:6px;background:var(--danger-light);color:var(--danger);border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;font-weight:700}
-.selected-school .s-name{font-weight:800;color:var(--emerald-800);font-size:13px;margin-bottom:4px}
+.selected-school .s-name{font-weight:800;color:var(--emerald-800);font-size:14px;margin-bottom:4px}
 .selected-school .s-info{color:var(--gray-600);line-height:1.6}
 
 /* ═══════════════ المرفقات ═══════════════ */
 .attachments-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
-.attachment-item{display:flex;align-items:center;gap:8px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:8px 10px;font-size:12px}
-.attachment-icon{font-size:20px;flex-shrink:0}
+.attachment-item{display:flex;align-items:center;gap:8px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:8px 10px;font-size:13px}
+.attachment-icon{font-size:22px;flex-shrink:0}
 .attachment-info{flex:1;min-width:0}
-.attachment-name{font-weight:700;color:var(--gray-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.attachment-meta{font-size:10.5px;color:var(--gray-500);margin-top:2px}
+.attachment-name{font-weight:700;color:var(--gray-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+.attachment-meta{font-size:11px;color:var(--gray-500);margin-top:2px}
 .attachment-actions{display:flex;gap:4px}
-.attachment-thumb{width:50px;height:50px;border-radius:8px;object-fit:cover;border:1px solid var(--gray-300);cursor:pointer}
 
 .upload-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:var(--purple-50);border:2px dashed var(--purple-600);border-radius:10px;color:var(--purple-700);font-size:13px;font-weight:700;cursor:pointer;transition:.2s;font-family:inherit}
 .upload-btn:active{background:var(--purple-100)}
@@ -282,29 +313,29 @@ body.night-mode .school-item:active{background:#0d3d2e}
 /* ═══════════════ Timeline ═══════════════ */
 .timeline{position:relative;padding-right:20px;margin:10px 0}
 .timeline::before{content:'';position:absolute;right:6px;top:6px;bottom:6px;width:2px;background:var(--gray-200)}
-.timeline-item{position:relative;padding:6px 0 6px 0;font-size:12.5px}
+.timeline-item{position:relative;padding:6px 0;font-size:13px}
 .timeline-item::before{content:'';position:absolute;right:-18px;top:12px;width:10px;height:10px;border-radius:50%;background:var(--gray-300);border:2px solid var(--white)}
 .timeline-item.done::before{background:var(--green-600)}
 .timeline-item.pending::before{background:var(--orange-500)}
 .timeline-item.pending{color:var(--orange-700);font-weight:700}
 .timeline-item.done{color:var(--green-700)}
 .timeline-item-label{font-weight:700}
-.timeline-item-date{font-size:10.5px;color:var(--gray-500);margin-top:2px}
+.timeline-item-date{font-size:11px;color:var(--gray-500);margin-top:2px}
 
 /* ═══════════════ سجل الزيارات ═══════════════ */
-.visit-row{display:flex;gap:8px;padding:8px 10px;background:var(--gray-50);border-radius:8px;margin-bottom:6px;border-right:3px solid var(--cyan-600);font-size:12px}
-.visit-icon{font-size:16px}
+.visit-row{display:flex;gap:10px;padding:12px 14px;background:var(--gray-50);border-radius:10px;margin-bottom:8px;border-right:4px solid var(--cyan-600);font-size:14px}
+.visit-icon{font-size:22px;flex-shrink:0}
 .visit-info{flex:1}
-.visit-type{font-weight:700;color:var(--gray-700)}
-.visit-date{color:var(--gray-500);font-size:10.5px;margin-top:2px}
-.visit-note{color:var(--gray-600);font-size:11.5px;margin-top:3px;font-style:italic}
+.visit-type{font-weight:800;color:var(--gray-800);font-size:14px}
+.visit-date{color:var(--gray-500);font-size:12px;margin-top:4px}
+.visit-note{color:var(--gray-600);font-size:13px;margin-top:5px;font-style:italic;line-height:1.5}
 
 /* ═══════════════ الإجراءات السريعة ═══════════════ */
 .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px;background:var(--gray-50);border-radius:10px;margin-bottom:10px}
-.quick-action-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 4px;background:var(--white);border:1px solid var(--gray-200);border-radius:10px;cursor:pointer;font-family:inherit;transition:.2s}
+.quick-action-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px;background:var(--white);border:1px solid var(--gray-200);border-radius:10px;cursor:pointer;font-family:inherit;transition:.2s;color:var(--gray-700)}
 .quick-action-btn:active{transform:scale(.95);background:var(--emerald-50)}
-.quick-action-btn .qa-icon{font-size:20px}
-.quick-action-btn .qa-label{font-size:9.5px;font-weight:700;color:var(--gray-600);text-align:center}
+.quick-action-btn .qa-icon{font-size:22px}
+.quick-action-btn .qa-label{font-size:11px;font-weight:700;color:var(--gray-600);text-align:center}
 
 /* ═══════════════ الإحصائيات ═══════════════ */
 .area-stat-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--white);border:1px solid var(--gray-200);border-radius:10px;margin-bottom:8px;font-size:13px}
@@ -314,7 +345,7 @@ body.night-mode .school-item:active{background:#0d3d2e}
 .area-stat-count{font-weight:800;color:var(--emerald-700);min-width:30px;text-align:center}
 
 /* ═══════════════ جولة اليوم ═══════════════ */
-.trip-summary{background:var(--emerald-50);border-radius:10px;padding:12px;margin-bottom:12px;font-size:12.5px;color:var(--emerald-800)}
+.trip-summary{background:var(--emerald-50);border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--emerald-800)}
 .trip-stop{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--white);border-radius:10px;margin-bottom:8px;border:1px solid var(--gray-200);font-size:13px;cursor:pointer;transition:.2s}
 .trip-stop:active{background:var(--emerald-50)}
 .trip-stop .stop-num{background:var(--emerald-700);color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
@@ -324,7 +355,7 @@ body.night-mode .school-item:active{background:#0d3d2e}
 .trip-stop .stop-type{font-size:16px}
 
 /* ═══════════════ Toast ═══════════════ */
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--emerald-800);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:200;box-shadow:var(--shadow-lg);transition:.35s cubic-bezier(.16,1,.3,1);max-width:90%;text-align:center}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--emerald-800);color:#fff;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;z-index:200;box-shadow:var(--shadow-lg);transition:.35s cubic-bezier(.16,1,.3,1);max-width:90%;text-align:center}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .toast.success{background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600))}
 .toast.error{background:linear-gradient(135deg,#991b1b,var(--danger))}
@@ -337,7 +368,7 @@ body.night-mode .school-item:active{background:#0d3d2e}
 .gov-paper{background:#fff;width:100%;max-width:800px;margin:0 auto;padding:15mm 15mm 12mm;box-shadow:0 4px 20px rgba(0,0,0,.12);direction:rtl;font-family:'Traditional Arabic','Sakkal Majalla','Amiri','Segoe UI',Tahoma,serif;color:#000;line-height:1.5;position:relative}
 .gov-header{position:relative;margin-bottom:15px;min-height:130px}
 .gov-eagle{position:absolute;left:50%;top:0;transform:translateX(-50%);width:85px;height:auto;z-index:2}
-.gov-eagle img,.gov-eagle-svg{width:100%;height:auto;display:block}
+.gov-eagle img{width:100%;height:auto;display:block}
 .gov-header-top{display:flex;justify-content:space-between;align-items:flex-start;padding-top:6px;direction:rtl}
 .gov-header-right{text-align:right;font-size:12.5px;font-weight:700;line-height:1.5;padding-right:4px;flex:1}
 .gov-header-left{text-align:left;font-size:12.5px;font-weight:700;padding-top:14px;padding-left:4px;flex:0 0 auto}
@@ -382,9 +413,36 @@ body.night-mode .school-item:active{background:#0d3d2e}
 </head>
 <body>
 
-<!-- ═══════════ صفحة المهام (الرئيسية) ═══════════ -->
-<div id="pageHome" class="page active">
+<!-- ═══════════ التبويبات العلوية ═══════════ -->
+<nav class="top-tabs no-print" id="topTabs">
+  <button class="top-tab active" data-page="pageHome" onclick="switchPage('pageHome')">
+    <span class="tab-icon">📋</span><span>المهام</span>
+  </button>
+  <button class="top-tab" data-page="pageTrip" onclick="switchPage('pageTrip')">
+    <span class="tab-icon">🚗</span><span>الجولة</span>
+  </button>
+  <button class="top-tab" data-page="pageVisits" onclick="switchPage('pageVisits')">
+    <span class="tab-icon">📅</span><span>الزيارات</span>
+  </button>
+  <button class="top-tab" data-page="pageStats" onclick="switchPage('pageStats')">
+    <span class="tab-icon">📊</span><span>إحصائيات</span>
+  </button>
+  <button class="top-tab" data-page="pageSchools" onclick="switchPage('pageSchools')">
+    <span class="tab-icon">🏫</span><span>المدارس</span>
+  </button>
+  <button class="top-tab" data-page="pageMaterials" onclick="switchPage('pageMaterials')">
+    <span class="tab-icon">📦</span><span>المواد</span>
+  </button>
+  <button class="top-tab" data-page="pageSupervisors" onclick="switchPage('pageSupervisors')">
+    <span class="tab-icon">👤</span><span>المشرفون</span>
+  </button>
+  <button class="top-tab" data-page="pageSettings" onclick="switchPage('pageSettings')">
+    <span class="tab-icon">⚙️</span><span>الإعدادات</span>
+  </button>
+</nav>
 
+<!-- ═══════════ صفحة المهام ═══════════ -->
+<div id="pageHome" class="page active">
   <header class="app-header">
     <div class="header-top">
       <div class="header-title">
@@ -400,38 +458,14 @@ body.night-mode .school-item:active{background:#0d3d2e}
       </div>
     </div>
     <div class="stats-grid">
-      <div class="stat-card c-new" onclick="quickFilter('new')">
-        <div class="stat-num" id="statNew">0</div>
-        <div class="stat-lbl">📩 جديدة</div>
-      </div>
-      <div class="stat-card c-inspecting" onclick="quickFilter('inspecting')">
-        <div class="stat-num" id="statInspecting">0</div>
-        <div class="stat-lbl">🔍 كشف</div>
-      </div>
-      <div class="stat-card c-awaiting" onclick="quickFilter('awaiting')">
-        <div class="stat-num" id="statAwaiting">0</div>
-        <div class="stat-lbl">📄 موافقة</div>
-      </div>
-      <div class="stat-card c-materials" onclick="quickFilter('materials')">
-        <div class="stat-num" id="statMaterials">0</div>
-        <div class="stat-lbl">📦 مواد</div>
-      </div>
-      <div class="stat-card c-working" onclick="quickFilter('working')">
-        <div class="stat-num" id="statWorking">0</div>
-        <div class="stat-lbl">🔧 تنفيذ</div>
-      </div>
-      <div class="stat-card c-done" onclick="quickFilter('done')">
-        <div class="stat-num" id="statDone">0</div>
-        <div class="stat-lbl">✅ منجزة</div>
-      </div>
-      <div class="stat-card c-canceled" onclick="quickFilter('canceled')">
-        <div class="stat-num" id="statCanceled">0</div>
-        <div class="stat-lbl">🚫 ملغاة</div>
-      </div>
-      <div class="stat-card c-transferred" onclick="quickFilter('transferred')">
-        <div class="stat-num" id="statTransferred">0</div>
-        <div class="stat-lbl">↔️ محوّلة</div>
-      </div>
+      <div class="stat-card c-new" onclick="quickFilter('new')"><div class="stat-num" id="statNew">0</div><div class="stat-lbl">📩 جديدة</div></div>
+      <div class="stat-card c-inspecting" onclick="quickFilter('inspecting')"><div class="stat-num" id="statInspecting">0</div><div class="stat-lbl">🔍 كشف</div></div>
+      <div class="stat-card c-awaiting" onclick="quickFilter('awaiting')"><div class="stat-num" id="statAwaiting">0</div><div class="stat-lbl">📄 موافقة</div></div>
+      <div class="stat-card c-materials" onclick="quickFilter('materials')"><div class="stat-num" id="statMaterials">0</div><div class="stat-lbl">📦 مواد</div></div>
+      <div class="stat-card c-working" onclick="quickFilter('working')"><div class="stat-num" id="statWorking">0</div><div class="stat-lbl">🔧 تنفيذ</div></div>
+      <div class="stat-card c-done" onclick="quickFilter('done')"><div class="stat-num" id="statDone">0</div><div class="stat-lbl">✅ منجزة</div></div>
+      <div class="stat-card c-canceled" onclick="quickFilter('canceled')"><div class="stat-num" id="statCanceled">0</div><div class="stat-lbl">🚫 ملغاة</div></div>
+      <div class="stat-card c-transferred" onclick="quickFilter('transferred')"><div class="stat-num" id="statTransferred">0</div><div class="stat-lbl">↔️ محوّلة</div></div>
     </div>
   </header>
 
@@ -457,26 +491,14 @@ body.night-mode .school-item:active{background:#0d3d2e}
   </div>
 
   <div class="filters-advanced">
-    <select id="filterArea" onchange="renderTasks()">
-      <option value="">📍 كل المناطق</option>
-    </select>
-    <select id="filterSupervisor" onchange="renderTasks()">
-      <option value="">👤 كل المشرفين</option>
-    </select>
+    <select id="filterArea" onchange="renderTasks()"><option value="">📍 كل المناطق</option></select>
+    <select id="filterSupervisor" onchange="renderTasks()"><option value="">👤 كل المشرفين</option></select>
     <select id="filterType" onchange="renderTasks()">
       <option value="">📋 كل الأنواع</option>
-      <option>🔌 إصلاح عطل</option>
-      <option>🔧 صيانة دورية</option>
-      <option>🏗️ تمديد قاعة</option>
-      <option>🚚 نقل قاعة</option>
-      <option>🆕 إحداث قاعة</option>
-      <option>💡 تركيب إنارة</option>
-      <option>⚡ توصيل أجهزة</option>
-      <option>📦 تأمين مواد</option>
-      <option>📝 كشف فني</option>
-      <option>🖨️ صيانة حواسب</option>
-      <option>🔄 إعادة تأهيل</option>
-      <option>أخرى</option>
+      <option>🔌 إصلاح عطل</option><option>🔧 صيانة دورية</option><option>🏗️ تمديد قاعة</option>
+      <option>🚚 نقل قاعة</option><option>🆕 إحداث قاعة</option><option>💡 تركيب إنارة</option>
+      <option>⚡ توصيل أجهزة</option><option>📦 تأمين مواد</option><option>📝 كشف فني</option>
+      <option>🖨️ صيانة حواسب</option><option>🔄 إعادة تأهيل</option><option>أخرى</option>
     </select>
     <select id="filterDate" onchange="renderTasks()">
       <option value="">📅 كل التواريخ</option>
@@ -497,10 +519,7 @@ body.night-mode .school-item:active{background:#0d3d2e}
 <!-- ═══════════ صفحة الجولة ═══════════ -->
 <div id="pageTrip" class="page">
   <div class="section">
-    <div class="section-title">
-      <span>🚗 جولة اليوم</span>
-      <button onclick="buildTodayTrip()">🔄 تحديث</button>
-    </div>
+    <div class="section-title"><span>🚗 جولة اليوم</span><button onclick="buildTodayTrip()">🔄 تحديث</button></div>
     <div id="tripSummary"></div>
     <div id="tripStops"></div>
   </div>
@@ -526,55 +545,36 @@ body.night-mode .school-item:active{background:#0d3d2e}
         <option value="month">هذا الشهر</option>
       </select>
     </div>
-    <div id="visitsStats" style="font-size:12px;color:var(--gray-600);margin-bottom:10px"></div>
+    <div id="visitsStats" style="font-size:13px;color:var(--gray-600);margin-bottom:10px"></div>
     <div id="visitsList"></div>
   </div>
 </div>
 
 <!-- ═══════════ صفحة الإحصائيات ═══════════ -->
 <div id="pageStats" class="page">
-  <div class="section">
-    <div class="section-title">📊 الإحصائيات العامة</div>
-    <div id="generalStats"></div>
-  </div>
-  <div class="section">
-    <div class="section-title">📍 المهام حسب المنطقة</div>
-    <div id="areaStats"></div>
-  </div>
-  <div class="section">
-    <div class="section-title">👤 المهام حسب المشرف</div>
-    <div id="supervisorStats"></div>
-  </div>
-  <div class="section">
-    <div class="section-title">🎯 المهام حسب النوع</div>
-    <div id="typeStats"></div>
-  </div>
+  <div class="section"><div class="section-title">📊 الإحصائيات العامة</div><div id="generalStats"></div></div>
+  <div class="section"><div class="section-title">📍 المهام حسب المنطقة</div><div id="areaStats"></div></div>
+  <div class="section"><div class="section-title">👤 المهام حسب المشرف</div><div id="supervisorStats"></div></div>
+  <div class="section"><div class="section-title">🎯 المهام حسب النوع</div><div id="typeStats"></div></div>
 </div>
 
 <!-- ═══════════ صفحة المدارس ═══════════ -->
 <div id="pageSchools" class="page">
   <div class="section">
-    <div class="section-title">
-      <span>🏫 قاعدة بيانات المدارس</span>
-      <button onclick="openSchoolSheet()">+ إضافة</button>
-    </div>
+    <div class="section-title"><span>🏫 قاعدة بيانات المدارس</span><button onclick="openSchoolSheet()">+ إضافة</button></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
       <button class="btn-lg btn-primary" onclick="document.getElementById('importSchoolFile').click()" style="font-size:12px;padding:10px">📥 استيراد CSV</button>
       <button class="btn-lg btn-copper" onclick="exportSchoolsCSV()" style="font-size:12px;padding:10px">📤 تصدير CSV</button>
     </div>
     <input type="file" id="importSchoolFile" accept=".csv,.txt" style="display:none" onchange="importSchoolsCSV(event)">
-    <div id="schoolsStats" style="font-size:12px;color:var(--gray-600);margin-bottom:10px"></div>
+    <div id="schoolsStats" style="font-size:13px;color:var(--gray-600);margin-bottom:10px"></div>
     <div class="search-box" style="margin-bottom:8px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
       <input type="text" id="schoolListSearch" placeholder="ابحث في القائمة..." oninput="renderSchoolsList(this.value)">
     </div>
     <div class="filters-advanced" style="padding:0;margin-bottom:12px">
-      <select id="schoolFilterArea" onchange="renderSchoolsList(document.getElementById('schoolListSearch').value)">
-        <option value="">📍 كل المناطق</option>
-      </select>
-      <select id="schoolFilterSupervisor" onchange="renderSchoolsList(document.getElementById('schoolListSearch').value)">
-        <option value="">👤 كل المشرفين</option>
-      </select>
+      <select id="schoolFilterArea" onchange="renderSchoolsList(document.getElementById('schoolListSearch').value)"><option value="">📍 كل المناطق</option></select>
+      <select id="schoolFilterSupervisor" onchange="renderSchoolsList(document.getElementById('schoolListSearch').value)"><option value="">👤 كل المشرفين</option></select>
       <select id="schoolFilterGrade" onchange="renderSchoolsList(document.getElementById('schoolListSearch').value)">
         <option value="">🎓 كل المراحل</option>
         <option value="1 _ 6">ابتدائي (1-6)</option>
@@ -597,10 +597,7 @@ body.night-mode .school-item:active{background:#0d3d2e}
 <!-- ═══════════ صفحة المواد ═══════════ -->
 <div id="pageMaterials" class="page">
   <div class="section">
-    <div class="section-title">
-      <span>📦 قائمة المواد الكهربائية</span>
-      <button onclick="openMaterialSheet()">+ إضافة</button>
-    </div>
+    <div class="section-title"><span>📦 قائمة المواد الكهربائية</span><button onclick="openMaterialSheet()">+ إضافة</button></div>
     <div class="search-box" style="margin-bottom:12px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
       <input type="text" id="materialSearch" placeholder="ابحث في المواد..." oninput="renderMaterials(this.value)">
@@ -612,10 +609,7 @@ body.night-mode .school-item:active{background:#0d3d2e}
 <!-- ═══════════ صفحة المشرفين ═══════════ -->
 <div id="pageSupervisors" class="page">
   <div class="section">
-    <div class="section-title">
-      <span>👤 إدارة المشرفين</span>
-      <button onclick="openSupervisorSheet()">+ إضافة</button>
-    </div>
+    <div class="section-title"><span>👤 إدارة المشرفين</span><button onclick="openSupervisorSheet()">+ إضافة</button></div>
     <div id="supervisorsList"></div>
   </div>
 </div>
@@ -636,6 +630,11 @@ body.night-mode .school-item:active{background:#0d3d2e}
     </div>
   </div>
   <div class="section">
+    <div class="section-title">📞 أرقام الرؤساء (للواتس)</div>
+    <div class="field"><label>📱 جوال رئيس شعبة الصيانة</label><input type="tel" id="setSign2Phone" placeholder="09xxxxxxxx"></div>
+    <div class="field"><label>📱 جوال رئيس دائرة المعلوماتية</label><input type="tel" id="setSign3Phone" placeholder="09xxxxxxxx"></div>
+  </div>
+  <div class="section">
     <div class="section-title">👷 الفنيون</div>
     <div id="techniciansList"></div>
     <button class="btn-lg btn-copper" style="margin-top:10px" onclick="openTechnicianSheet()">+ إضافة فني</button>
@@ -650,17 +649,14 @@ body.night-mode .school-item:active{background:#0d3d2e}
         <option value="off">معطّل</option>
       </select>
     </div>
-    <div class="field">
-      <label>⏰ تنبيه للمهام المتأخرة (بالأيام)</label>
-      <input type="number" id="setOverdueDays" value="7" min="1" max="30">
-    </div>
+    <div class="field"><label>⏰ تنبيه للمهام المتأخرة (بالأيام)</label><input type="number" id="setOverdueDays" value="7" min="1" max="30"></div>
   </div>
   <div class="section">
     <div class="section-title">💾 النسخ الاحتياطي</div>
     <button class="btn-lg btn-primary" style="margin-bottom:8px" onclick="exportJSON()">📤 تصدير نسخة احتياطية (JSON)</button>
     <button class="btn-lg btn-copper" style="margin-bottom:8px" onclick="document.getElementById('importFile').click()">📥 استيراد نسخة احتياطية</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
-    <button class="btn-lg btn-ghost" onclick="exportTasksCSV()">📊 تصدير المهام (Excel)</button>
+    <button class="btn-lg btn-word" onclick="exportTasksCSV()">📊 تصدير المهام (Excel)</button>
   </div>
   <div class="section">
     <div class="section-title">🗑️ منطقة الخطر</div>
@@ -670,53 +666,27 @@ body.night-mode .school-item:active{background:#0d3d2e}
 
 <!-- ═══════════ الشريط السفلي ═══════════ -->
 <nav class="bottom-nav no-print">
-  <div class="nav-item active" data-page="pageHome" onclick="switchPage('pageHome')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-    <span>المهام</span>
-  </div>
-  <div class="nav-item" data-page="pageTrip" onclick="switchPage('pageTrip')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
-    <span>الجولة</span>
-  </div>
-  <div class="nav-item" data-page="pageVisits" onclick="switchPage('pageVisits')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    <span>الزيارات</span>
-  </div>
-  <div class="nav-item" data-page="pageStats" onclick="switchPage('pageStats')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-    <span>إحصائيات</span>
-  </div>
-  <div class="nav-item" data-page="pageSchools" onclick="switchPage('pageSchools')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    <span>المدارس</span>
-  </div>
-  <div class="nav-item" data-page="pageMaterials" onclick="switchPage('pageMaterials')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-    <span>المواد</span>
-  </div>
-  <div class="nav-item" data-page="pageSupervisors" onclick="switchPage('pageSupervisors')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-    <span>المشرفون</span>
-  </div>
-  <div class="nav-item" data-page="pageSettings" onclick="switchPage('pageSettings')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    <span>الإعدادات</span>
-  </div>
+  <div class="nav-item active" data-page="pageHome" onclick="switchPage('pageHome')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><span>المهام</span></div>
+  <div class="nav-item" data-page="pageTrip" onclick="switchPage('pageTrip')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg><span>الجولة</span></div>
+  <div class="nav-item" data-page="pageVisits" onclick="switchPage('pageVisits')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>الزيارات</span></div>
+  <div class="nav-item" data-page="pageStats" onclick="switchPage('pageStats')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>إحصائيات</span></div>
+  <div class="nav-item" data-page="pageSchools" onclick="switchPage('pageSchools')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>المدارس</span></div>
+  <div class="nav-item" data-page="pageMaterials" onclick="switchPage('pageMaterials')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg><span>المواد</span></div>
+  <div class="nav-item" data-page="pageSupervisors" onclick="switchPage('pageSupervisors')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span>المشرفون</span></div>
+  <div class="nav-item" data-page="pageSettings" onclick="switchPage('pageSettings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>الإعدادات</span></div>
 </nav>
 
-<!-- ═══════════ نافذة إضافة/تعديل مهمة ═══════════ -->
+<!-- ═══════════ نافذة المهمة ═══════════ -->
 <div class="sheet-bg" id="taskSheetBg" onclick="if(event.target===this)closeSheet('taskSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title" id="taskSheetTitle">➕ مهمة جديدة</div>
+    <div class="sheet-title"><span id="taskSheetTitle">➕ مهمة جديدة</span><button class="sheet-close" onclick="closeSheet('taskSheetBg')">✕</button></div>
 
     <div class="field">
       <label>📌 مصدر المهمة <span class="req">*</span></label>
       <select id="fSource">
-        <option value="call">📞 طلب عادي</option>
-        <option value="urgent">🚨 طارئ (اتصال)</option>
-        <option value="letter">📄 كتاب رسمي</option>
-        <option value="routine">🔄 زيارة دورية</option>
+        <option value="call">📞 طلب عادي</option><option value="urgent">🚨 طارئ (اتصال)</option>
+        <option value="letter">📄 كتاب رسمي</option><option value="routine">🔄 زيارة دورية</option>
       </select>
     </div>
 
@@ -731,15 +701,8 @@ body.night-mode .school-item:active{background:#0d3d2e}
       </div>
     </div>
 
-    <div class="field">
-      <label>اسم المدرسة / الموقع <span class="req">*</span></label>
-      <input type="text" id="fName" placeholder="اكتب أو اختر من القاعدة">
-    </div>
-
-    <div class="field">
-      <label>📛 الاسم الجديد (إن تغير)</label>
-      <input type="text" id="fNewName" placeholder="اتركه فارغاً إن لم يتغير">
-    </div>
+    <div class="field"><label>اسم المدرسة / الموقع <span class="req">*</span></label><input type="text" id="fName" placeholder="اكتب أو اختر من القاعدة"></div>
+    <div class="field"><label>📛 الاسم الجديد (إن تغير)</label><input type="text" id="fNewName" placeholder="اتركه فارغاً إن لم يتغير"></div>
 
     <div class="field-row">
       <div class="field"><label>المبنى</label><input type="text" id="fBuilding" placeholder="مبنى ح2"></div>
@@ -749,25 +712,15 @@ body.night-mode .school-item:active{background:#0d3d2e}
     <div class="field-row">
       <div class="field"><label>نوع العمل</label>
         <select id="fType">
-          <option>🔌 إصلاح عطل</option>
-          <option>🔧 صيانة دورية</option>
-          <option>🏗️ تمديد قاعة</option>
-          <option>🚚 نقل قاعة</option>
-          <option>🆕 إحداث قاعة</option>
-          <option>💡 تركيب إنارة</option>
-          <option>⚡ توصيل أجهزة</option>
-          <option>📦 تأمين مواد</option>
-          <option>📝 كشف فني</option>
-          <option>🖨️ صيانة حواسب</option>
-          <option>🔄 إعادة تأهيل</option>
-          <option>أخرى</option>
+          <option>🔌 إصلاح عطل</option><option>🔧 صيانة دورية</option><option>🏗️ تمديد قاعة</option>
+          <option>🚚 نقل قاعة</option><option>🆕 إحداث قاعة</option><option>💡 تركيب إنارة</option>
+          <option>⚡ توصيل أجهزة</option><option>📦 تأمين مواد</option><option>📝 كشف فني</option>
+          <option>🖨️ صيانة حواسب</option><option>🔄 إعادة تأهيل</option><option>أخرى</option>
         </select>
       </div>
       <div class="field"><label>الأولوية</label>
         <select id="fPriority">
-          <option value="high">🔴 عالية</option>
-          <option value="med" selected>🟡 متوسطة</option>
-          <option value="low">🟢 منخفضة</option>
+          <option value="high">🔴 عالية</option><option value="med" selected>🟡 متوسطة</option><option value="low">🟢 منخفضة</option>
         </select>
       </div>
     </div>
@@ -775,38 +728,17 @@ body.night-mode .school-item:active{background:#0d3d2e}
     <div class="field-row">
       <div class="field"><label>المنطقة</label>
         <select id="fArea">
-          <option>المزة</option>
-          <option>المزة - أبو زهير</option>
-          <option>برزة</option>
-          <option>الزاهرة</option>
-          <option>كفرسوسة</option>
-          <option>الميدان</option>
-          <option>القنوات</option>
-          <option>الشاغور</option>
-          <option>دمشق القديمة</option>
-          <option>ساروجا</option>
-          <option>ركن الدين</option>
-          <option>الصالحية</option>
-          <option>المهاجرين</option>
-          <option>القدم</option>
-          <option>دمر</option>
-          <option>القابون</option>
-          <option>جوبر</option>
-          <option>المخيم</option>
-          <option>أخرى</option>
+          <option>المزة</option><option>المزة - أبو زهير</option><option>برزة</option><option>الزاهرة</option>
+          <option>كفرسوسة</option><option>الميدان</option><option>القنوات</option><option>الشاغور</option>
+          <option>دمشق القديمة</option><option>ساروجا</option><option>ركن الدين</option><option>الصالحية</option>
+          <option>المهاجرين</option><option>القدم</option><option>دمر</option><option>القابون</option>
+          <option>جوبر</option><option>المخيم</option><option>أخرى</option>
         </select>
       </div>
-      <div class="field"><label>المشرف</label>
-        <select id="fContact">
-          <option value="">-- اختر مشرف --</option>
-        </select>
-      </div>
+      <div class="field"><label>المشرف</label><select id="fContact"><option value="">-- اختر مشرف --</option></select></div>
     </div>
 
-    <div class="field">
-      <label>📞 جوال المشرف (تلقائي)</label>
-      <input type="tel" id="fContactPhone" placeholder="يُعبّأ تلقائياً" readonly style="background:var(--gray-100)">
-    </div>
+    <div class="field"><label>📞 جوال المشرف (تلقائي)</label><input type="tel" id="fContactPhone" placeholder="يُعبّأ تلقائياً" readonly style="background:var(--gray-100)"></div>
 
     <div class="field-row">
       <div class="field"><label>👤 مدير المدرسة</label><input type="text" id="fPrincipal" placeholder="اسم المدير"></div>
@@ -818,13 +750,14 @@ body.night-mode .school-item:active{background:#0d3d2e}
       <div class="field"><label>📞 جواله</label><input type="tel" id="fSecretaryPhone" placeholder="09xxxxxxxx"></div>
     </div>
 
-    <div class="field">
-      <label>ملاحظات / وصف العطل</label>
-      <textarea id="fNotes" placeholder="تفاصيل إضافية..."></textarea>
+    <div class="field-row">
+      <div class="field"><label>📅 تاريخ الإنشاء</label><input type="date" id="fCreatedDate"></div>
+      <div class="field"><label>📅 تاريخ الإنجاز</label><input type="date" id="fDoneDate"></div>
     </div>
 
+    <div class="field"><label>ملاحظات / وصف العطل</label><textarea id="fNotes" placeholder="تفاصيل إضافية..."></textarea></div>
+
     <button class="btn-lg btn-primary" onclick="saveTask()">💾 حفظ المهمة</button>
-    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('taskSheetBg')">إلغاء</button>
   </div>
 </div>
 
@@ -832,19 +765,16 @@ body.night-mode .school-item:active{background:#0d3d2e}
 <div class="sheet-bg" id="detailSheetBg" onclick="if(event.target===this)closeSheet('detailSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      <span id="detailTitle">تفاصيل المهمة</span>
-    </div>
+    <div class="sheet-title"><span id="detailTitle">📋 تفاصيل المهمة</span><button class="sheet-close" onclick="closeSheet('detailSheetBg')">✕</button></div>
     <div id="detailContent"></div>
   </div>
 </div>
 
-<!-- ═══════════ نافذة المواد داخل المهمة ═══════════ -->
+<!-- ═══════════ نافذة المواد ═══════════ -->
 <div class="sheet-bg" id="matSheetBg" onclick="if(event.target===this)closeSheet('matSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">📦 كشف المواد</div>
+    <div class="sheet-title"><span>📦 كشف المواد</span><button class="sheet-close" onclick="closeSheet('matSheetBg')">✕</button></div>
     <div class="field">
       <label>🔍 ابحث عن مادة</label>
       <div class="autocomplete-wrap">
@@ -860,117 +790,86 @@ body.night-mode .school-item:active{background:#0d3d2e}
         <button class="btn btn-done" onclick="addNewMaterialInline()">+</button>
       </div>
     </div>
-    <div style="margin:16px 0 10px;font-size:13px;font-weight:800;color:var(--emerald-800)">📋 المواد في المهمة:</div>
+    <div style="margin:16px 0 10px;font-size:14px;font-weight:800;color:var(--emerald-800)">📋 المواد في المهمة:</div>
     <div id="taskMaterialsList"></div>
-    <div class="field">
-      <label>👷 الفني المنفذ</label>
-      <select id="fTechnician">
-        <option value="">-- اختر فني --</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>📝 ملاحظات التنفيذ</label>
-      <textarea id="fExecutionNotes" placeholder="ما تم فعله..."></textarea>
-    </div>
+    <div class="field"><label>👷 الفني المنفذ</label><select id="fTechnician"><option value="">-- اختر فني --</option></select></div>
+    <div class="field"><label>📝 ملاحظات التنفيذ</label><textarea id="fExecutionNotes" placeholder="ما تم فعله..."></textarea></div>
     <button class="btn-lg btn-copper" style="margin-top:12px" onclick="saveTaskMaterials()">💾 حفظ</button>
-    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('matSheetBg')">إلغاء</button>
   </div>
 </div>
 
-<!-- ═══════════ نافذة سجل الزيارات ═══════════ -->
+<!-- ═══════════ نافذة الزيارة ═══════════ -->
 <div class="sheet-bg" id="visitSheetBg" onclick="if(event.target===this)closeSheet('visitSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">📅 تسجيل زيارة</div>
-    <div class="field">
-      <label>نوع الزيارة</label>
+    <div class="sheet-title"><span>📅 تسجيل زيارة</span><button class="sheet-close" onclick="closeSheet('visitSheetBg')">✕</button></div>
+    <div class="field"><label>نوع الزيارة</label>
       <select id="visitType">
-        <option value="inspection">🔍 كشف مبدئي</option>
-        <option value="execution">🔧 تنفيذ عمل</option>
-        <option value="maintenance">🛠️ صيانة دورية</option>
-        <option value="followup">📋 متابعة</option>
+        <option value="inspection">🔍 كشف مبدئي</option><option value="execution">🔧 تنفيذ عمل</option>
+        <option value="maintenance">🛠️ صيانة دورية</option><option value="followup">📋 متابعة</option>
         <option value="emergency">🚨 طارئ</option>
       </select>
     </div>
-    <div class="field">
-      <label>ملاحظات الزيارة</label>
-      <textarea id="visitNotes" placeholder="ما تم في الزيارة..."></textarea>
-    </div>
+    <div class="field"><label>📅 تاريخ الزيارة</label><input type="date" id="visitDate"></div>
+    <div class="field"><label>ملاحظات الزيارة</label><textarea id="visitNotes" placeholder="ما تم في الزيارة..."></textarea></div>
     <button class="btn-lg btn-primary" onclick="saveVisit()">💾 حفظ الزيارة</button>
-    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('visitSheetBg')">إلغاء</button>
   </div>
 </div>
 
-<!-- ═══════════ نافذة تتبع الموافقات ═══════════ -->
+<!-- ═══════════ نافذة الموافقات ═══════════ -->
 <div class="sheet-bg" id="approvalSheetBg" onclick="if(event.target===this)closeSheet('approvalSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">📄 تتبع الموافقات</div>
-    <div class="field">
-      <label>📌 الحالة</label>
+    <div class="sheet-title"><span>📄 تتبع الموافقات</span><button class="sheet-close" onclick="closeSheet('approvalSheetBg')">✕</button></div>
+    <div class="field"><label>📌 الحالة</label>
       <select id="approvalStage">
-        <option value="raised">📤 رُفع الكشف</option>
-        <option value="delivered">📬 وصل للجهة</option>
-        <option value="approved">✅ وصلت الموافقة</option>
-        <option value="rejected">❌ رُفض الطلب</option>
+        <option value="raised">📤 رُفع الكشف</option><option value="delivered">📬 وصل للجهة</option>
+        <option value="approved">✅ وصلت الموافقة</option><option value="rejected">❌ رُفض الطلب</option>
       </select>
     </div>
-    <div class="field">
-      <label>ملاحظات</label>
-      <textarea id="approvalNotes" placeholder="تفاصيل إضافية..."></textarea>
-    </div>
+    <div class="field"><label>ملاحظات</label><textarea id="approvalNotes" placeholder="تفاصيل إضافية..."></textarea></div>
     <button class="btn-lg btn-primary" onclick="saveApproval()">💾 حفظ</button>
-    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('approvalSheetBg')">إلغاء</button>
   </div>
 </div>
 
-<!-- ═══════════ نافذة رفع المرفقات ═══════════ -->
+<!-- ═══════════ نافذة المرفقات ═══════════ -->
 <div class="sheet-bg" id="attachSheetBg" onclick="if(event.target===this)closeSheet('attachSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">📎 رفع مرفقات (صور / PDF)</div>
-    <div class="field">
-      <label>نوع المرفق</label>
+    <div class="sheet-title"><span>📎 رفع مرفقات</span><button class="sheet-close" onclick="closeSheet('attachSheetBg')">✕</button></div>
+    <div class="field"><label>نوع المرفق</label>
       <select id="attachType">
-        <option value="letter">📄 كتاب رسمي</option>
-        <option value="approval">✅ موافقة</option>
-        <option value="before">📷 صورة قبل العمل</option>
-        <option value="after">📸 صورة بعد العمل</option>
-        <option value="invoice">🧾 فاتورة</option>
-        <option value="other">📎 أخرى</option>
+        <option value="letter">📄 كتاب رسمي</option><option value="approval">✅ موافقة</option>
+        <option value="before">📷 صورة قبل</option><option value="after">📸 صورة بعد</option>
+        <option value="invoice">🧾 فاتورة</option><option value="other">📎 أخرى</option>
       </select>
     </div>
-    <div class="field">
-      <label>وصف المرفق (اختياري)</label>
-      <input type="text" id="attachDesc" placeholder="ملاحظة عن المرفق">
-    </div>
+    <div class="field"><label>وصف المرفق (اختياري)</label><input type="text" id="attachDesc" placeholder="ملاحظة عن المرفق"></div>
     <label class="upload-btn">
       📎 اختر ملفاً (صورة أو PDF)
       <input type="file" id="attachFileInput" accept="image/*,.pdf" style="display:none" onchange="handleAttachment(event)">
     </label>
     <div id="attachPreview" style="margin-top:12px"></div>
     <button class="btn-lg btn-primary" style="margin-top:12px" onclick="saveAttachment()">💾 حفظ المرفق</button>
-    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('attachSheetBg')">إلغاء</button>
   </div>
 </div>
 
-<!-- ═══════════ نافذة إضافة/تعديل مادة ═══════════ -->
+<!-- ═══════════ نافذة مادة جديدة ═══════════ -->
 <div class="sheet-bg" id="masterMatSheetBg" onclick="if(event.target===this)closeSheet('masterMatSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title" id="masterMatTitle">➕ إضافة مادة</div>
+    <div class="sheet-title"><span id="masterMatTitle">➕ إضافة مادة</span><button class="sheet-close" onclick="closeSheet('masterMatSheetBg')">✕</button></div>
     <div class="field"><label>اسم المادة <span class="req">*</span></label><input type="text" id="masterMatName" placeholder="مثال: منظم جهد"></div>
     <div class="field"><label>الوحدة</label><input type="text" id="masterMatUnit" value="عدد"></div>
     <button class="btn-lg btn-primary" onclick="saveMasterMaterial()">💾 حفظ</button>
-    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('masterMatSheetBg')">إلغاء</button>
   </div>
 </div>
 
-<!-- ═══════════ نافذة إضافة/تعديل مدرسة ═══════════ -->
+<!-- ═══════════ نافذة مدرسة ═══════════ -->
 <div class="sheet-bg" id="schoolSheetBg" onclick="if(event.target===this)closeSheet('schoolSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title" id="schoolSheetTitle">➕ إضافة مدرسة</div>
+    <div class="sheet-title"><span id="schoolSheetTitle">➕ إضافة مدرسة</span><button class="sheet-close" onclick="closeSheet('schoolSheetBg')">✕</button></div>
     <div class="field"><label>اسم المدرسة <span class="req">*</span></label><input type="text" id="schName"></div>
     <div class="field"><label>الاسم القديم (اختياري)</label><input type="text" id="schOldName"></div>
     <div class="field-row">
@@ -984,11 +883,7 @@ body.night-mode .school-item:active{background:#0d3d2e}
     </div>
     <div class="field-row">
       <div class="field"><label>🏫 عدد القاعات</label><input type="number" id="schHalls" placeholder="مثال: 3" min="0"></div>
-      <div class="field"><label>👤 المشرف</label>
-        <select id="schSupervisor">
-          <option value="">-- اختر مشرف --</option>
-        </select>
-      </div>
+      <div class="field"><label>👤 المشرف</label><select id="schSupervisor"><option value="">-- اختر مشرف --</option></select></div>
     </div>
     <div class="field-row">
       <div class="field"><label>👤 مدير المدرسة</label><input type="text" id="schPrincipal"></div>
@@ -999,33 +894,30 @@ body.night-mode .school-item:active{background:#0d3d2e}
       <div class="field"><label>📞 جواله</label><input type="tel" id="schSecretaryPhone"></div>
     </div>
     <button class="btn-lg btn-primary" onclick="saveSchoolMaster()">💾 حفظ</button>
-    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('schoolSheetBg')">إلغاء</button>
   </div>
 </div>
 
-<!-- ═══════════ نافذة إضافة فني ═══════════ -->
+<!-- ═══════════ نافذة فني ═══════════ -->
 <div class="sheet-bg" id="techSheetBg" onclick="if(event.target===this)closeSheet('techSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title" id="techSheetTitle">➕ إضافة فني</div>
+    <div class="sheet-title"><span id="techSheetTitle">➕ إضافة فني</span><button class="sheet-close" onclick="closeSheet('techSheetBg')">✕</button></div>
     <div class="field"><label>اسم الفني <span class="req">*</span></label><input type="text" id="techName"></div>
     <div class="field"><label>📞 الجوال</label><input type="tel" id="techPhone" placeholder="09xxxxxxxx"></div>
     <div class="field"><label>ملاحظات</label><input type="text" id="techNotes" placeholder="مثال: يعمل جزئياً"></div>
     <button class="btn-lg btn-primary" onclick="saveTechnician()">💾 حفظ</button>
-    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('techSheetBg')">إلغاء</button>
   </div>
 </div>
 
-<!-- ═══════════ نافذة إضافة مشرف ═══════════ -->
+<!-- ═══════════ نافذة مشرف ═══════════ -->
 <div class="sheet-bg" id="supervisorSheetBg" onclick="if(event.target===this)closeSheet('supervisorSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title" id="supervisorSheetTitle">➕ إضافة مشرف</div>
+    <div class="sheet-title"><span id="supervisorSheetTitle">➕ إضافة مشرف</span><button class="sheet-close" onclick="closeSheet('supervisorSheetBg')">✕</button></div>
     <div class="field"><label>اسم المشرف <span class="req">*</span></label><input type="text" id="supervisorName"></div>
     <div class="field"><label>📞 الجوال</label><input type="tel" id="supervisorPhone" placeholder="09xxxxxxxx"></div>
     <div class="field"><label>📍 المناطق المسؤول عنها (مفصولة بفاصلة)</label><textarea id="supervisorAreas" placeholder="المزة، كفرسوسة، برزة"></textarea></div>
     <button class="btn-lg btn-primary" onclick="saveSupervisor()">💾 حفظ</button>
-    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('supervisorSheetBg')">إلغاء</button>
   </div>
 </div>
 
@@ -1033,18 +925,30 @@ body.night-mode .school-item:active{background:#0d3d2e}
 <div class="sheet-bg" id="whatsSheetBg" onclick="if(event.target===this)closeSheet('whatsSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">📱 إرسال للفني</div>
+    <div class="sheet-title"><span>📱 إرسال عبر واتساب</span><button class="sheet-close" onclick="closeSheet('whatsSheetBg')">✕</button></div>
     <div class="field">
-      <label>الفني المستلم</label>
-      <select id="whatsTech"></select>
+      <label>المرسل إليه</label>
+      <select id="whatsRecipient">
+        <option value="">-- اختر --</option>
+        <optgroup label="👷 الفنيون" id="whatsTechGroup"></optgroup>
+        <optgroup label="👤 المشرفون" id="whatsSupGroup"></optgroup>
+        <optgroup label="🏛️ الرؤساء" id="whatsBossGroup">
+          <option value="__sign2__">📄 رئيس شعبة الصيانة</option>
+          <option value="__sign3__">🏛️ رئيس دائرة المعلوماتية</option>
+        </optgroup>
+        <optgroup label="📞 جهات المدرسة">
+          <option value="__principal__">👤 مدير المدرسة</option>
+          <option value="__secretary__">💻 أمين سر الحاسب</option>
+        </optgroup>
+        <option value="__custom__">📱 رقم آخر (يدوي)</option>
+      </select>
     </div>
     <div class="field">
-      <label>الرسالة الجاهزة</label>
-      <textarea id="whatsMessage" rows="12" style="font-size:12.5px;line-height:1.6"></textarea>
+      <label>📝 نص الرسالة (يمكن التعديل)</label>
+      <textarea id="whatsMessage" rows="12" style="font-size:13px;line-height:1.6"></textarea>
     </div>
-    <button class="btn-lg" style="background:#25d366;color:#fff" onclick="sendWhatsApp()">📱 إرسال على واتساب</button>
+    <button class="btn-lg btn-whats" onclick="sendWhatsApp()">📱 إرسال على واتساب</button>
     <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="copyWhatsMessage()">📋 نسخ الرسالة</button>
-    <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="closeSheet('whatsSheetBg')">إلغاء</button>
   </div>
 </div>
 
@@ -1068,13 +972,13 @@ body.night-mode .school-item:active{background:#0d3d2e}
    القسم 1: الثوابت
    ═══════════════════════════════════════════════════════ */
 const STORAGE_KEYS = {
-  TASKS: 'wk_tasks_v3',
-  MATERIALS: 'wk_materials_v3',
-  SCHOOLS: 'wk_schools_v3',
-  TECHNICIANS: 'wk_technicians_v3',
-  SUPERVISORS: 'wk_supervisors_v3',
-  SETTINGS: 'wk_settings_v3',
-  COUNTER: 'wk_counter_v3',
+  TASKS: 'wk_tasks_v4',
+  MATERIALS: 'wk_materials_v4',
+  SCHOOLS: 'wk_schools_v4',
+  TECHNICIANS: 'wk_technicians_v4',
+  SUPERVISORS: 'wk_supervisors_v4',
+  SETTINGS: 'wk_settings_v4',
+  COUNTER: 'wk_counter_v4',
   NIGHT: 'wk_night_mode'
 };
 
@@ -1094,7 +998,8 @@ let state = {
   editingSupervisorIdx: null,
   editingMasterMatId: null,
   selectedSchool: null,
-  currentAttachment: null
+  currentAttachment: null,
+  currentWhatsRecipient: null
 };
 
 const STATUS_LABELS = {
@@ -1110,13 +1015,7 @@ const STATUS_LABELS = {
 };
 
 const CANCEL_REASONS = [
-  'متعهد خارجي',
-  'مجتمع محلي',
-  'مشروع حكومي',
-  'تم الترميم',
-  'لا حاجة للمهمة',
-  'مكررة',
-  'سبب آخر'
+  'متعهد خارجي','مجتمع محلي','مشروع حكومي','تم الترميم','لا حاجة للمهمة','مكررة','سبب آخر'
 ];
 
 const SOURCE_ICONS = { call:'📞', urgent:'🚨', letter:'📄', routine:'🔄' };
@@ -1148,46 +1047,26 @@ const ATTACH_TYPES = {
 };
 
 const DEFAULT_MATERIALS = [
-  { id: 1, name: 'منظم جهد', unit: 'عدد' },
-  { id: 2, name: 'UPS', unit: 'عدد' },
-  { id: 3, name: 'كابل 4×4 ملم', unit: 'متر' },
-  { id: 4, name: 'كابل 2 ملم', unit: 'متر' },
-  { id: 5, name: 'شريط مفرد 2 ملم', unit: 'متر' },
-  { id: 6, name: 'شريط مفرد 4 ملم', unit: 'متر' },
-  { id: 7, name: 'شريط مفرد 2.5 ملم', unit: 'متر' },
-  { id: 8, name: 'مسطرة جدارية رباعية', unit: 'عدد' },
-  { id: 9, name: 'مسطرة جدارية متعددة', unit: 'عدد' },
-  { id: 10, name: 'شخاشيرو', unit: 'عدد' },
-  { id: 11, name: 'توال عازل كهرباء', unit: 'عدد' },
-  { id: 12, name: 'قاطع مفرد 16 أمبير', unit: 'عدد' },
-  { id: 13, name: 'قاطع مفرد 25 أمبير', unit: 'عدد' },
-  { id: 14, name: 'قاطع مفرد 32 أمبير', unit: 'عدد' },
-  { id: 15, name: 'قاطع ثلاثي 40 أمبير', unit: 'عدد' },
-  { id: 16, name: 'تابلو ظاهر 16 خط', unit: 'عدد' },
-  { id: 17, name: 'بريز مفرد ظاهر حراري', unit: 'عدد' },
-  { id: 18, name: 'علبة أناش 14 ملم', unit: 'عدد' },
-  { id: 19, name: 'مجاري بلاستيك 4 سم', unit: 'متر' },
-  { id: 20, name: 'مجاري بلاستيك 2 ملم', unit: 'عدد' },
-  { id: 21, name: 'براغي تلفون 6 ملم', unit: 'عدد' },
-  { id: 22, name: 'براغي سن صاج', unit: 'عدد' },
-  { id: 23, name: 'أسافين 6 ملم', unit: 'عدد' },
-  { id: 24, name: 'أسافين 8 ملم بلاستيك', unit: 'عدد' },
-  { id: 25, name: 'رنديلة صاج', unit: 'عدد' },
-  { id: 26, name: 'بار مفرد نحاس', unit: 'متر' },
-  { id: 27, name: 'أمبير 40', unit: 'عدد' },
-  { id: 28, name: 'كابل شبكة RJ45', unit: 'عدد' },
-  { id: 29, name: 'بروجكتور', unit: 'عدد' },
-  { id: 30, name: 'قاعدة بروجكتور', unit: 'عدد' },
-  { id: 31, name: 'شاشة لمس', unit: 'عدد' },
-  { id: 32, name: 'شاشة عادية', unit: 'عدد' },
-  { id: 33, name: 'لوحة مفاتيح', unit: 'عدد' },
-  { id: 34, name: 'ماوس', unit: 'عدد' },
-  { id: 35, name: 'كرت شبكة', unit: 'عدد' },
-  { id: 36, name: 'هارد ديسك', unit: 'عدد' },
-  { id: 37, name: 'رام', unit: 'عدد' },
-  { id: 38, name: 'Switch', unit: 'عدد' },
-  { id: 39, name: 'موصلات شبكة', unit: 'عدد' },
-  { id: 40, name: 'مواد أخرى', unit: 'عدد' }
+  { id: 1, name: 'منظم جهد', unit: 'عدد' },{ id: 2, name: 'UPS', unit: 'عدد' },
+  { id: 3, name: 'كابل 4×4 ملم', unit: 'متر' },{ id: 4, name: 'كابل 2 ملم', unit: 'متر' },
+  { id: 5, name: 'شريط مفرد 2 ملم', unit: 'متر' },{ id: 6, name: 'شريط مفرد 4 ملم', unit: 'متر' },
+  { id: 7, name: 'شريط مفرد 2.5 ملم', unit: 'متر' },{ id: 8, name: 'مسطرة جدارية رباعية', unit: 'عدد' },
+  { id: 9, name: 'مسطرة جدارية متعددة', unit: 'عدد' },{ id: 10, name: 'شخاشيرو', unit: 'عدد' },
+  { id: 11, name: 'توال عازل كهرباء', unit: 'عدد' },{ id: 12, name: 'قاطع مفرد 16 أمبير', unit: 'عدد' },
+  { id: 13, name: 'قاطع مفرد 25 أمبير', unit: 'عدد' },{ id: 14, name: 'قاطع مفرد 32 أمبير', unit: 'عدد' },
+  { id: 15, name: 'قاطع ثلاثي 40 أمبير', unit: 'عدد' },{ id: 16, name: 'تابلو ظاهر 16 خط', unit: 'عدد' },
+  { id: 17, name: 'بريز مفرد ظاهر حراري', unit: 'عدد' },{ id: 18, name: 'علبة أناش 14 ملم', unit: 'عدد' },
+  { id: 19, name: 'مجاري بلاستيك 4 سم', unit: 'متر' },{ id: 20, name: 'مجاري بلاستيك 2 ملم', unit: 'عدد' },
+  { id: 21, name: 'براغي تلفون 6 ملم', unit: 'عدد' },{ id: 22, name: 'براغي سن صاج', unit: 'عدد' },
+  { id: 23, name: 'أسافين 6 ملم', unit: 'عدد' },{ id: 24, name: 'أسافين 8 ملم بلاستيك', unit: 'عدد' },
+  { id: 25, name: 'رنديلة صاج', unit: 'عدد' },{ id: 26, name: 'بار مفرد نحاس', unit: 'متر' },
+  { id: 27, name: 'أمبير 40', unit: 'عدد' },{ id: 28, name: 'كابل شبكة RJ45', unit: 'عدد' },
+  { id: 29, name: 'بروجكتور', unit: 'عدد' },{ id: 30, name: 'قاعدة بروجكتور', unit: 'عدد' },
+  { id: 31, name: 'شاشة لمس', unit: 'عدد' },{ id: 32, name: 'شاشة عادية', unit: 'عدد' },
+  { id: 33, name: 'لوحة مفاتيح', unit: 'عدد' },{ id: 34, name: 'ماوس', unit: 'عدد' },
+  { id: 35, name: 'كرت شبكة', unit: 'عدد' },{ id: 36, name: 'هارد ديسك', unit: 'عدد' },
+  { id: 37, name: 'رام', unit: 'عدد' },{ id: 38, name: 'Switch', unit: 'عدد' },
+  { id: 39, name: 'موصلات شبكة', unit: 'عدد' },{ id: 40, name: 'مواد أخرى', unit: 'عدد' }
 ];
 
 const DEFAULT_SETTINGS = {
@@ -1195,14 +1074,14 @@ const DEFAULT_SETTINGS = {
   header2: 'دائرة المعلوماتية',
   header3: 'شعبة الصيانة (ورشة الكهرباء)',
   sign2: 'فراس صالح',
+  sign2Phone: '',
   sign3: 'علي العباس',
+  sign3Phone: '',
   nightMode: 'auto',
   overdueDays: 7
 };
 
-const DEFAULT_TECHNICIANS = [
-  { id: 1, name: 'أنا', phone: '', notes: 'رئيس الورشة' }
-];
+const DEFAULT_TECHNICIANS = [{ id: 1, name: 'أنا', phone: '', notes: 'رئيس الورشة' }];
 
 const DEFAULT_SUPERVISORS = [
   { id: 1, name: 'باسم العباس', phone: '', areas: 'الميدان، الزاهرة، القنوات، الشاغور' },
@@ -1348,7 +1227,7 @@ const SCHOOLS_DEFAULT = [
 ];
 
 /* ═══════════════════════════════════════════════════════
-   القسم 2: التخزين والتحميل
+   القسم 2: التخزين والترحيل
    ═══════════════════════════════════════════════════════ */
 function loadState(){
   try{
@@ -1357,7 +1236,7 @@ function loadState(){
     state.schools = JSON.parse(localStorage.getItem(STORAGE_KEYS.SCHOOLS) || 'null') || SCHOOLS_DEFAULT;
     state.technicians = JSON.parse(localStorage.getItem(STORAGE_KEYS.TECHNICIANS) || 'null') || DEFAULT_TECHNICIANS;
     state.supervisors = JSON.parse(localStorage.getItem(STORAGE_KEYS.SUPERVISORS) || 'null') || DEFAULT_SUPERVISORS;
-    state.settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS) || 'null') || DEFAULT_SETTINGS;
+    state.settings = Object.assign({}, DEFAULT_SETTINGS, JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS) || 'null') || {});
     state.counter = parseInt(localStorage.getItem(STORAGE_KEYS.COUNTER) || '1');
     migrateTasks();
   }catch(e){
@@ -1366,7 +1245,7 @@ function loadState(){
     state.schools = SCHOOLS_DEFAULT;
     state.technicians = DEFAULT_TECHNICIANS;
     state.supervisors = DEFAULT_SUPERVISORS;
-    state.settings = DEFAULT_SETTINGS;
+    state.settings = Object.assign({}, DEFAULT_SETTINGS);
     state.counter = 1;
   }
 }
@@ -1404,7 +1283,7 @@ function saveSettings(){ localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.string
 function saveCounter(){ localStorage.setItem(STORAGE_KEYS.COUNTER, String(state.counter)); }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 3: أدوات عامة
+   القسم 3: الأدوات
    ═══════════════════════════════════════════════════════ */
 function escapeHtml(s){
   if(s == null) return '';
@@ -1433,6 +1312,18 @@ function todayISO(){
   const day = String(d.getDate()).padStart(2,'0');
   return y + '/' + m + '/' + day;
 }
+function isoToAr(isoDate){
+  if(!isoDate) return '';
+  const parts = isoDate.split('-');
+  if(parts.length !== 3) return isoDate;
+  return parts[0] + '/' + parts[1] + '/' + parts[2];
+}
+function arToIso(arDate){
+  if(!arDate) return '';
+  const parts = arDate.split('/');
+  if(parts.length !== 3) return '';
+  return parts[0] + '-' + parts[1].padStart(2,'0') + '-' + parts[2].padStart(2,'0');
+}
 function updateHeaderDate(){
   const d = new Date();
   const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
@@ -1456,8 +1347,11 @@ function switchPage(pageId){
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const page = document.getElementById(pageId);
   if(page) page.classList.add('active');
+  document.querySelectorAll('.top-tab').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const topTab = document.querySelector('.top-tab[data-page="' + pageId + '"]');
   const nav = document.querySelector('.nav-item[data-page="' + pageId + '"]');
+  if(topTab) topTab.classList.add('active');
   if(nav) nav.classList.add('active');
   if(pageId === 'pageMaterials') renderMaterials();
   if(pageId === 'pageSettings'){ loadSettingsToForm(); renderTechniciansList(); }
@@ -1487,7 +1381,7 @@ function quickFilter(filter){
 }
 function fillTechnicianSelects(){
   const opts = '<option value="">-- اختر فني --</option>' + state.technicians.map(t => '<option value="' + escapeHtml(t.name) + '">' + escapeHtml(t.name) + (t.phone ? ' — ' + escapeHtml(t.phone) : '') + '</option>').join('');
-  ['fTechnician','whatsTech'].forEach(id => {
+  ['fTechnician'].forEach(id => {
     const el = document.getElementById(id);
     if(el){
       const cur = el.value;
@@ -1506,6 +1400,16 @@ function fillSupervisorSelects(){
       if(cur) el.value = cur;
     }
   });
+}
+function fillWhatsRecipients(){
+  const techGroup = document.getElementById('whatsTechGroup');
+  const supGroup = document.getElementById('whatsSupGroup');
+  if(techGroup){
+    techGroup.innerHTML = state.technicians.map(t => '<option value="__tech__' + escapeHtml(t.name) + '">' + escapeHtml(t.name) + (t.phone ? ' — ' + t.phone : '') + '</option>').join('') || '<option value="" disabled>لا يوجد</option>';
+  }
+  if(supGroup){
+    supGroup.innerHTML = state.supervisors.map(s => '<option value="__sup__' + escapeHtml(s.name) + '">' + escapeHtml(s.name) + (s.phone ? ' — ' + s.phone : '') + '</option>').join('') || '<option value="" disabled>لا يوجد</option>';
+  }
 }
 function fillAreaFilters(){
   const areas = [...new Set(state.schools.map(s => s.a).filter(Boolean))].sort();
@@ -1553,7 +1457,7 @@ function applyNightMode(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 5: البحث عن المدارس
+   القسم 5: البحث في المدارس
    ═══════════════════════════════════════════════════════ */
 function searchSchools(query){
   const results = document.getElementById('schoolResults');
@@ -1604,7 +1508,6 @@ function pickSchool(idx){
   document.getElementById('selectedSchool').style.display = 'block';
   document.getElementById('fName').value = s.n;
   if(s.s) document.getElementById('fContact').value = s.s;
-  // تعبئة جوال المشرف تلقائياً
   const sup = state.supervisors.find(x => x.name === s.s);
   if(sup && sup.phone) document.getElementById('fContactPhone').value = sup.phone;
   if(s.principal) document.getElementById('fPrincipal').value = s.principal;
@@ -1628,7 +1531,7 @@ function clearSelectedSchool(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 6: البحث الذكي في المواد (Autocomplete)
+   القسم 6: البحث في المواد
    ═══════════════════════════════════════════════════════ */
 function searchMaterialsForTask(query){
   const results = document.getElementById('matSearchResults');
@@ -1642,9 +1545,7 @@ function searchMaterialsForTask(query){
   }
   let html = '';
   matches.forEach(m => {
-    html += '<div class="autocomplete-item" onclick="pickMaterialToTask(' + m.id + ')">';
-    html += '📦 ' + escapeHtml(m.name) + ' <span style="color:var(--gray-500);font-size:11px">(' + escapeHtml(m.unit) + ')</span>';
-    html += '</div>';
+    html += '<div class="autocomplete-item" onclick="pickMaterialToTask(' + m.id + ')">📦 ' + escapeHtml(m.name) + ' <span style="color:var(--gray-500);font-size:12px">(' + escapeHtml(m.unit) + ')</span></div>';
   });
   results.innerHTML = html;
   results.classList.add('show');
@@ -1668,7 +1569,7 @@ function pickMaterialToTask(matId){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 7: إدارة المهام (إصلاح التعديل)
+   القسم 7: إدارة المهام
    ═══════════════════════════════════════════════════════ */
 function openTaskSheet(taskId){
   state.editingTaskId = taskId || null;
@@ -1697,6 +1598,9 @@ function openTaskSheet(taskId){
     document.getElementById('fSecretary').value = t.secretary || '';
     document.getElementById('fSecretaryPhone').value = t.secretaryPhone || '';
     document.getElementById('fNotes').value = t.notes || '';
+    // التواريخ
+    document.getElementById('fCreatedDate').value = arToIso(t.createdAt) || new Date().toISOString().slice(0,10);
+    document.getElementById('fDoneDate').value = arToIso(t.doneAt) || '';
     const foundSchool = state.schools.find(s => s.n === t.name);
     if(foundSchool){
       state.selectedSchool = foundSchool;
@@ -1722,6 +1626,8 @@ function openTaskSheet(taskId){
     document.getElementById('fSecretary').value = '';
     document.getElementById('fSecretaryPhone').value = '';
     document.getElementById('fNotes').value = '';
+    document.getElementById('fCreatedDate').value = new Date().toISOString().slice(0,10);
+    document.getElementById('fDoneDate').value = '';
   }
   openSheet('taskSheetBg');
   setTimeout(() => document.getElementById('fSchoolSearch').focus(), 350);
@@ -1730,6 +1636,9 @@ function openTaskSheet(taskId){
 function saveTask(){
   const name = document.getElementById('fName').value.trim();
   if(!name){ showToast('الرجاء إدخال اسم المدرسة', 'error'); return; }
+
+  const createdISO = document.getElementById('fCreatedDate').value;
+  const doneISO = document.getElementById('fDoneDate').value;
 
   const data = {
     source: document.getElementById('fSource').value,
@@ -1746,7 +1655,9 @@ function saveTask(){
     principalPhone: document.getElementById('fPrincipalPhone').value.trim(),
     secretary: document.getElementById('fSecretary').value.trim(),
     secretaryPhone: document.getElementById('fSecretaryPhone').value.trim(),
-    notes: document.getElementById('fNotes').value.trim()
+    notes: document.getElementById('fNotes').value.trim(),
+    createdAt: isoToAr(createdISO) || todayISO(),
+    doneAt: isoToAr(doneISO) || ''
   };
 
   if(state.selectedSchool){
@@ -1761,9 +1672,7 @@ function saveTask(){
     const idx = state.tasks.findIndex(x => x.id === state.editingTaskId);
     if(idx !== -1){
       const oldTask = state.tasks[idx];
-      if(oldTask.name !== data.name && !data.oldName){
-        data.oldName = oldTask.name;
-      }
+      if(oldTask.name !== data.name && !data.oldName) data.oldName = oldTask.name;
       state.tasks[idx] = Object.assign({}, oldTask, data);
       showToast('✅ تم تحديث المهمة', 'success');
     } else {
@@ -1780,9 +1689,7 @@ function saveTask(){
       executionNotes: '',
       approvalLog: [],
       visitLog: [],
-      attachments: [],
-      createdAt: todayISO(),
-      doneAt: ''
+      attachments: []
     }, data);
     state.tasks.unshift(task);
     saveCounter();
@@ -1799,7 +1706,6 @@ function saveTask(){
 function changeTaskStatus(id, newStatus){
   const t = state.tasks.find(x => x.id === id);
   if(!t) return;
-  // إذا كانت الحالة "ملغاة" أو "محوّلة" — نطلب السبب
   if(newStatus === 'canceled' || newStatus === 'transferred'){
     const reason = prompt('سبب ' + (newStatus === 'canceled' ? 'الإلغاء' : 'التحويل') + ':\n' + CANCEL_REASONS.map((r,i) => (i+1) + '. ' + r).join('\n') + '\n\nاكتب الرقم أو السبب:');
     if(reason === null) return;
@@ -1807,7 +1713,7 @@ function changeTaskStatus(id, newStatus){
   }
   t.status = newStatus;
   if(newStatus === 'done') t.doneAt = todayISO();
-  else t.doneAt = '';
+  else if(newStatus !== 'done') t.doneAt = '';
   saveTasks();
   renderTasks();
   updateStats();
@@ -1912,7 +1818,7 @@ function saveTaskMaterials(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 9: إدارة المدارس والمشرفين
+   القسم 9: إدارة المدارس
    ═══════════════════════════════════════════════════════ */
 function renderSchoolsList(query){
   const container = document.getElementById('schoolsList');
@@ -2119,6 +2025,7 @@ function saveSupervisor(){
   renderSupervisorsList();
   fillSupervisorSelects();
   fillSupervisorFilters();
+  fillWhatsRecipients();
 }
 
 function deleteSupervisor(idx){
@@ -2130,11 +2037,12 @@ function deleteSupervisor(idx){
   renderSupervisorsList();
   fillSupervisorSelects();
   fillSupervisorFilters();
+  fillWhatsRecipients();
   showToast('🗑️ تم الحذف', 'warn');
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 11: سجل الزيارات (تبويب مستقل)
+   القسم 11: تبويب الزيارات
    ═══════════════════════════════════════════════════════ */
 function renderVisits(){
   const container = document.getElementById('visitsList');
@@ -2159,7 +2067,6 @@ function renderVisits(){
     }
   });
 
-  // فلترة
   allVisits = allVisits.filter(v => {
     if(typeFilter && v.type !== typeFilter) return false;
     if(dateFilter){
@@ -2177,9 +2084,7 @@ function renderVisits(){
     return db.localeCompare(da);
   });
 
-  if(stats){
-    stats.innerHTML = '📅 إجمالي: <b>' + allVisits.length + '</b> زيارة';
-  }
+  if(stats) stats.innerHTML = '📅 إجمالي: <b>' + allVisits.length + '</b> زيارة';
 
   if(allVisits.length === 0){
     container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-500);font-size:13px">لا توجد زيارات</div>';
@@ -2204,6 +2109,7 @@ function openVisitSheet(taskId){
   state.currentTaskId = taskId;
   document.getElementById('visitType').value = 'inspection';
   document.getElementById('visitNotes').value = '';
+  document.getElementById('visitDate').value = new Date().toISOString().slice(0,10);
   closeSheet('detailSheetBg');
   setTimeout(() => openSheet('visitSheetBg'), 200);
 }
@@ -2212,10 +2118,11 @@ function saveVisit(){
   const t = state.tasks.find(x => x.id === state.currentTaskId);
   if(!t) return;
   if(!t.visitLog) t.visitLog = [];
+  const visitISO = document.getElementById('visitDate').value;
   t.visitLog.unshift({
     type: document.getElementById('visitType').value,
     notes: document.getElementById('visitNotes').value.trim(),
-    date: todayISO()
+    date: isoToAr(visitISO) || todayISO()
   });
   saveTasks();
   showToast('✅ تم تسجيل الزيارة', 'success');
@@ -2266,7 +2173,7 @@ function saveApproval(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 13: المرفقات (رفع + عرض)
+   القسم 13: المرفقات
    ═══════════════════════════════════════════════════════ */
 function openAttachSheet(taskId){
   state.currentTaskId = taskId;
@@ -2282,8 +2189,8 @@ function openAttachSheet(taskId){
 function handleAttachment(event){
   const file = event.target.files[0];
   if(!file){ state.currentAttachment = null; return; }
-  if(file.size > 2 * 1024 * 1024){
-    showToast('⚠️ الحجم كبير (>2MB) — حاول ضغط الصورة', 'warn');
+  if(file.size > 3 * 1024 * 1024){
+    showToast('⚠️ الحجم كبير (>3MB)', 'warn');
   }
   const reader = new FileReader();
   reader.onload = function(e){
@@ -2297,7 +2204,7 @@ function handleAttachment(event){
     if(file.type.indexOf('image/') === 0){
       preview.innerHTML = '<img src="' + e.target.result + '" style="max-width:100%;max-height:200px;border-radius:10px;border:1px solid var(--gray-200)">';
     }else{
-      preview.innerHTML = '<div style="padding:10px;background:var(--gray-50);border-radius:10px;font-size:12px">📄 ' + escapeHtml(file.name) + ' (' + Math.round(file.size/1024) + ' KB)</div>';
+      preview.innerHTML = '<div style="padding:10px;background:var(--gray-50);border-radius:10px;font-size:13px">📄 ' + escapeHtml(file.name) + ' (' + Math.round(file.size/1024) + ' KB)</div>';
     }
   };
   reader.readAsDataURL(file);
@@ -2339,6 +2246,18 @@ function viewAttachment(taskId, attachId){
   }
   w.document.write('</body></html>');
   w.document.close();
+}
+
+function downloadAttachment(taskId, attachId){
+  const t = state.tasks.find(x => x.id === taskId);
+  if(!t) return;
+  const a = t.attachments.find(x => x.id === attachId);
+  if(!a) return;
+  const link = document.createElement('a');
+  link.href = a.data;
+  link.download = a.name;
+  link.click();
+  showToast('✅ تم التحميل', 'success');
 }
 
 function deleteAttachment(taskId, attachId){
@@ -2427,7 +2346,7 @@ function renderTasks(){
     html += '</div>';
     if(t.notes) html += '<div class="task-note">' + escapeHtml(t.notes) + '</div>';
     html += '<div class="task-actions" onclick="event.stopPropagation()">';
-    html += '<button class="btn btn-note" onclick="openDetail(' + t.id + ')">📋 تفاصيل</button>';
+    html += '<button class="btn btn-details" onclick="openDetail(' + t.id + ')">📋 تفاصيل</button>';
     if(t.status !== 'done' && t.status !== 'canceled' && t.status !== 'transferred'){
       html += '<button class="btn btn-done" onclick="changeTaskStatus(' + t.id + ',\'done\')">✅ إنجاز</button>';
     } else if(t.status === 'done'){
@@ -2468,7 +2387,7 @@ function updateFilterCounts(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 15: التنبيهات الذكية
+   القسم 15: التنبيهات
    ═══════════════════════════════════════════════════════ */
 function renderAlerts(){
   const container = document.getElementById('alertsContainer');
@@ -2504,21 +2423,20 @@ function openDetail(id){
   const displayName = t.newName || t.name;
   const matCount = (t.materials || []).length;
   const attachCount = (t.attachments || []).length;
-  const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
   const overdue = isOverdue(t);
   const days = getDaysDiff(t.createdAt);
 
   let html = '';
   html += '<div style="background:var(--gray-50);border-radius:12px;padding:14px;margin-bottom:12px">';
-  html += '<div style="font-size:17px;font-weight:800;color:var(--emerald-800);margin-bottom:6px">' + escapeHtml(displayName) + '</div>';
-  if(t.newName && t.name !== t.newName) html += '<div style="font-size:12px;color:var(--copper-600);margin-bottom:4px">📛 الأصلي: ' + escapeHtml(t.name) + '</div>';
-  if(t.oldName) html += '<div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">📜 القديم: ' + escapeHtml(t.oldName) + '</div>';
-  html += '<div style="font-size:11.5px;color:var(--gray-500)"># ' + t.number + ' • ' + escapeHtml(t.area) + ' • ' + t.createdAt + '</div>';
-  if(overdue) html += '<div style="margin-top:8px;background:var(--danger-light);color:var(--danger);padding:6px 10px;border-radius:6px;font-size:11.5px;font-weight:700">⚠️ متأخرة — منذ ' + days + ' يوم</div>';
-  if(t.reason) html += '<div style="margin-top:8px;background:var(--gray-100);color:var(--gray-700);padding:6px 10px;border-radius:6px;font-size:11.5px">📌 السبب: ' + escapeHtml(t.reason) + '</div>';
+  html += '<div style="font-size:18px;font-weight:800;color:var(--emerald-800);margin-bottom:6px">' + escapeHtml(displayName) + '</div>';
+  if(t.newName && t.name !== t.newName) html += '<div style="font-size:13px;color:var(--copper-600);margin-bottom:4px">📛 الأصلي: ' + escapeHtml(t.name) + '</div>';
+  if(t.oldName) html += '<div style="font-size:13px;color:var(--gray-500);margin-bottom:4px">📜 القديم: ' + escapeHtml(t.oldName) + '</div>';
+  html += '<div style="font-size:12px;color:var(--gray-500)"># ' + t.number + ' • ' + escapeHtml(t.area) + ' • ' + t.createdAt + (t.doneAt ? ' • ✅ ' + t.doneAt : '') + '</div>';
+  if(overdue) html += '<div style="margin-top:8px;background:var(--danger-light);color:var(--danger);padding:6px 10px;border-radius:6px;font-size:12px;font-weight:700">⚠️ متأخرة — منذ ' + days + ' يوم</div>';
+  if(t.reason) html += '<div style="margin-top:8px;background:var(--gray-100);color:var(--gray-700);padding:6px 10px;border-radius:6px;font-size:12px">📌 السبب: ' + escapeHtml(t.reason) + '</div>';
   html += '</div>';
 
-  // إجراءات سريعة
+  // إجراءات سريعة بألوان مختلفة
   html += '<div class="quick-actions">';
   html += '<button class="quick-action-btn" onclick="openMaterialsForTask(' + t.id + ')"><span class="qa-icon">📦</span><span class="qa-label">المواد</span></button>';
   html += '<button class="quick-action-btn" onclick="openVisitSheet(' + t.id + ')"><span class="qa-icon">📅</span><span class="qa-label">زيارة</span></button>';
@@ -2526,42 +2444,42 @@ function openDetail(id){
   html += '<button class="quick-action-btn" onclick="openAttachSheet(' + t.id + ')"><span class="qa-icon">📎</span><span class="qa-label">مرفق</span></button>';
   html += '</div>';
 
-  // شريط الحالات
+  // الحالات
   html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:12px">';
-  html += '<div style="font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:8px">🔄 تغيير الحالة:</div>';
+  html += '<div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:8px">🔄 تغيير الحالة:</div>';
   html += '<div style="display:flex;gap:5px;flex-wrap:wrap">';
   Object.keys(STATUS_LABELS).forEach(k => {
     const s = STATUS_LABELS[k];
     const active = k === t.status;
-    html += '<button class="mini-badge ' + s.cls + '" style="cursor:pointer;border:' + (active?'2px solid var(--emerald-700)':'1px solid transparent') + ';opacity:' + (active?'1':'0.6') + ';font-size:11px;padding:5px 10px" onclick="changeTaskStatus(' + t.id + ',\'' + k + '\')">' + s.label + '</button>';
+    html += '<button class="mini-badge ' + s.cls + '" style="cursor:pointer;border:' + (active?'2px solid var(--emerald-700)':'1px solid transparent') + ';opacity:' + (active?'1':'0.6') + '" onclick="changeTaskStatus(' + t.id + ',\'' + k + '\')">' + s.label + '</button>';
   });
   html += '</div></div>';
 
   // جهات الاتصال
   if(t.contact || t.contactPhone || t.principal || t.principalPhone || t.secretary || t.secretaryPhone){
-    html += '<div style="background:var(--emerald-50);border:1px solid var(--emerald-200);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12.5px">';
+    html += '<div style="background:var(--emerald-50);border:1px solid var(--emerald-200);border-radius:10px;padding:10px;margin-bottom:10px;font-size:13px">';
     html += '<div style="font-weight:700;color:var(--emerald-800);margin-bottom:6px">📞 جهات الاتصال</div>';
     if(t.contact){
       html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span>👨‍💼 مشرف: <b>' + escapeHtml(t.contact) + '</b></span>';
-      if(t.contactPhone) html += '<a href="tel:' + t.contactPhone + '" class="btn btn-call btn-sm">📞</a>';
+      if(t.contactPhone) html += '<a href="tel:' + t.contactPhone + '" class="btn btn-call btn-sm">📞 اتصال</a>';
       html += '</div>';
     }
     if(t.principal){
       html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span>👤 مدير: <b>' + escapeHtml(t.principal) + '</b></span>';
-      if(t.principalPhone) html += '<a href="tel:' + t.principalPhone + '" class="btn btn-call btn-sm">📞</a>';
+      if(t.principalPhone) html += '<a href="tel:' + t.principalPhone + '" class="btn btn-call btn-sm">📞 اتصال</a>';
       html += '</div>';
     }
     if(t.secretary){
       html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span>💻 أمين سر: <b>' + escapeHtml(t.secretary) + '</b></span>';
-      if(t.secretaryPhone) html += '<a href="tel:' + t.secretaryPhone + '" class="btn btn-call btn-sm">📞</a>';
+      if(t.secretaryPhone) html += '<a href="tel:' + t.secretaryPhone + '" class="btn btn-call btn-sm">📞 اتصال</a>';
       html += '</div>';
     }
     html += '</div>';
   }
 
   // معلومات المدرسة
-  if(t.schoolAddress || t.schoolGrade || t.schoolPhone || t.building || t.room || t.schoolHalls){
-    html += '<div style="background:var(--copper-100);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--copper-700);line-height:1.7">';
+  if(t.schoolAddress || t.schoolGrade || t.building || t.room || t.schoolHalls){
+    html += '<div style="background:var(--copper-100);border-radius:10px;padding:10px;margin-bottom:10px;font-size:13px;color:var(--copper-700);line-height:1.7">';
     if(t.schoolAddress) html += '📍 ' + escapeHtml(t.schoolAddress) + '<br>';
     if(t.building) html += '🏢 ' + escapeHtml(t.building) + '<br>';
     if(t.room) html += '🚪 قاعة: ' + escapeHtml(t.room) + '<br>';
@@ -2571,11 +2489,11 @@ function openDetail(id){
   }
 
   // المواد والفني
-  html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px;font-size:12.5px">';
-  html += '<div style="display:flex;justify-content:space-between"><span>📦 المواد: <b>' + matCount + '</b></span>';
+  html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px;font-size:13px">';
+  html += '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px"><span>📦 المواد: <b>' + matCount + '</b></span>';
   html += '<span>📎 المرفقات: <b>' + attachCount + '</b></span>';
   html += '<span>👷 الفني: <b>' + (t.technician ? escapeHtml(t.technician) : '—') + '</b></span></div>';
-  if(t.executionNotes) html += '<div style="margin-top:6px;color:var(--gray-600);font-size:12px">📝 ' + escapeHtml(t.executionNotes) + '</div>';
+  if(t.executionNotes) html += '<div style="margin-top:6px;color:var(--gray-600);font-size:13px">📝 ' + escapeHtml(t.executionNotes) + '</div>';
   html += '</div>';
 
   if(t.notes) html += '<div class="task-note" style="margin-bottom:10px">📝 ' + escapeHtml(t.notes) + '</div>';
@@ -2583,7 +2501,7 @@ function openDetail(id){
   // المرفقات
   if(t.attachments && t.attachments.length > 0){
     html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px">';
-    html += '<div style="font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📎 المرفقات (' + t.attachments.length + '):</div>';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📎 المرفقات (' + t.attachments.length + '):</div>';
     html += '<div class="attachments-list">';
     t.attachments.forEach(a => {
       const at = ATTACH_TYPES[a.type] || { icon:'📎', label:a.type };
@@ -2594,7 +2512,8 @@ function openDetail(id){
       html += '<div class="attachment-meta">📅 ' + a.date + ' • ' + Math.round(a.size/1024) + ' KB' + (a.desc ? ' • ' + escapeHtml(a.desc) : '') + '</div>';
       html += '</div>';
       html += '<div class="attachment-actions">';
-      html += '<button class="btn btn-primary btn-sm" onclick="viewAttachment(' + t.id + ',' + a.id + ')">👁️</button>';
+      html += '<button class="btn btn-details btn-sm" onclick="viewAttachment(' + t.id + ',' + a.id + ')">👁️</button>';
+      html += '<button class="btn btn-primary btn-sm" onclick="downloadAttachment(' + t.id + ',' + a.id + ')">⬇️</button>';
       html += '<button class="btn btn-del btn-sm" onclick="deleteAttachment(' + t.id + ',' + a.id + ')">✕</button>';
       html += '</div>';
       html += '</div>';
@@ -2602,10 +2521,10 @@ function openDetail(id){
     html += '</div></div>';
   }
 
-  // تتبع الموافقات
+  // الموافقات
   if(t.approvalLog && t.approvalLog.length > 0){
     html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px">';
-    html += '<div style="font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📄 تتبع الموافقات:</div>';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📄 تتبع الموافقات:</div>';
     html += '<div class="timeline">';
     t.approvalLog.forEach(a => {
       const stg = APPROVAL_STAGES[a.stage] || { icon:'📌', label:a.stage };
@@ -2617,10 +2536,10 @@ function openDetail(id){
     html += '</div></div>';
   }
 
-  // سجل الزيارات
+  // الزيارات
   if(t.visitLog && t.visitLog.length > 0){
     html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:10px;margin-bottom:10px">';
-    html += '<div style="font-size:12.5px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📅 سجل الزيارات (' + t.visitLog.length + '):</div>';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:8px">📅 سجل الزيارات (' + t.visitLog.length + '):</div>';
     t.visitLog.forEach((v, idx) => {
       const vt = VISIT_TYPES[v.type] || { icon:'📌', label:v.type };
       html += '<div class="visit-row">';
@@ -2638,17 +2557,17 @@ function openDetail(id){
 
   const mapQuery = encodeURIComponent(displayName + ' ' + (t.schoolAddress || '') + ' دمشق');
   const mapLink = 'https://maps.google.com/?q=' + mapQuery;
-  html += '<a href="' + mapLink + '" target="_blank" class="btn-lg btn-map" style="margin-bottom:8px;font-size:13px;padding:11px;text-decoration:none">📍 فتح الخريطة</a>';
+  html += '<a href="' + mapLink + '" target="_blank" class="btn-lg btn-map" style="margin-bottom:8px;font-size:14px;padding:11px;text-decoration:none">📍 فتح الخريطة</a>';
 
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
-  html += '<button class="btn-lg" style="background:#25d366;color:#fff;font-size:13px;padding:11px" onclick="openWhatsForTask(' + t.id + ')">📱 واتس</button>';
-  html += '<button class="btn-lg btn-ghost" onclick="editTaskFromDetail(' + t.id + ')" style="font-size:13px;padding:11px">✏️ تعديل</button>';
+  html += '<button class="btn-lg btn-whats" onclick="openWhatsForTask(' + t.id + ')" style="font-size:13px;padding:11px">📱 واتس</button>';
+  html += '<button class="btn-lg btn-edit" onclick="editTaskFromDetail(' + t.id + ')" style="font-size:13px;padding:11px">✏️ تعديل</button>';
   html += '</div>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
   html += '<button class="btn-lg btn-primary" onclick="printTask(' + t.id + ')" style="font-size:13px;padding:11px">🖨️ كشف المواد</button>';
   html += '<button class="btn-lg btn-word" onclick="printVisitReport(' + t.id + ')" style="font-size:13px;padding:11px">📄 تقرير زيارة</button>';
   html += '</div>';
-  html += '<button class="btn-lg btn-ghost" style="color:var(--danger);font-size:13px;padding:11px" onclick="deleteTask(' + t.id + ')">🗑️ حذف</button>';
+  html += '<button class="btn-lg btn-del" style="font-size:13px;padding:11px" onclick="deleteTask(' + t.id + ')">🗑️ حذف</button>';
 
   document.getElementById('detailTitle').textContent = '📋 تفاصيل المهمة #' + t.number;
   document.getElementById('detailContent').innerHTML = html;
@@ -2656,14 +2575,13 @@ function openDetail(id){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 17: WhatsApp
+   القسم 17: WhatsApp الموسّع
    ═══════════════════════════════════════════════════════ */
 function openWhatsForTask(taskId){
   const t = state.tasks.find(x => x.id === taskId);
   if(!t) return;
   state.currentTaskId = taskId;
-  fillTechnicianSelects();
-  if(t.technician) document.getElementById('whatsTech').value = t.technician;
+  fillWhatsRecipients();
   const displayName = t.newName || t.name;
   const fullAddress = displayName + (t.schoolAddress ? ' ' + t.schoolAddress : '') + ' ' + (t.area || '') + ' دمشق';
   const mapQuery = encodeURIComponent(fullAddress);
@@ -2675,24 +2593,46 @@ function openWhatsForTask(taskId){
     '⚡ *الأولوية:* ' + (PRIORITY_LABELS[t.priority] || '') + '\n' +
     (t.notes ? '📝 *الملاحظات:* ' + t.notes + '\n' : '') +
     (t.contact ? '👤 *المشرف:* ' + t.contact + '\n' : '') +
-    '\n📍 *الموقع:*\n' + mapLink;
+    '\n🗺️ *الموقع:*\n' + mapLink;
   document.getElementById('whatsMessage').value = msg;
   closeSheet('detailSheetBg');
   setTimeout(() => openSheet('whatsSheetBg'), 200);
 }
 
 function sendWhatsApp(){
-  const techName = document.getElementById('whatsTech').value;
-  const tech = state.technicians.find(t => t.name === techName);
+  const recipient = document.getElementById('whatsRecipient').value;
   const msg = encodeURIComponent(document.getElementById('whatsMessage').value);
-  if(!tech || !tech.phone){
-    const num = prompt('أدخل رقم جوال الفني (مثال: 963xxxxxxxxx)');
-    if(!num) return;
-    window.open('https://wa.me/' + num.replace(/[^0-9]/g,'') + '?text=' + msg, '_blank');
+  const t = state.tasks.find(x => x.id === state.currentTaskId) || {};
+  let phone = '';
+
+  if(recipient.startsWith('__tech__')){
+    const name = recipient.replace('__tech__','');
+    const tech = state.technicians.find(x => x.name === name);
+    if(tech && tech.phone) phone = tech.phone;
+  } else if(recipient.startsWith('__sup__')){
+    const name = recipient.replace('__sup__','');
+    const sup = state.supervisors.find(x => x.name === name);
+    if(sup && sup.phone) phone = sup.phone;
+  } else if(recipient === '__sign2__'){
+    phone = state.settings.sign2Phone || '';
+  } else if(recipient === '__sign3__'){
+    phone = state.settings.sign3Phone || '';
+  } else if(recipient === '__principal__'){
+    phone = t.principalPhone || '';
+  } else if(recipient === '__secretary__'){
+    phone = t.secretaryPhone || '';
+  } else if(recipient === '__custom__' || !recipient){
+    phone = prompt('أدخل رقم الجوال (مثال: 963xxxxxxxxx)') || '';
+    if(!phone) return;
+  }
+
+  if(!phone){
+    showToast('❌ لا يوجد رقم جوال لهذا الشخص', 'error');
     return;
   }
-  const phone = tech.phone.replace(/[^0-9]/g, '');
-  const intl = phone.startsWith('963') ? phone : (phone.startsWith('0') ? '963' + phone.substring(1) : '963' + phone);
+
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const intl = cleanPhone.startsWith('963') ? cleanPhone : (cleanPhone.startsWith('0') ? '963' + cleanPhone.substring(1) : '963' + cleanPhone);
   window.open('https://wa.me/' + intl + '?text=' + msg, '_blank');
   closeSheet('whatsSheetBg');
 }
@@ -2727,7 +2667,7 @@ function buildTodayTrip(){
   const sortedAreas = Object.keys(byArea).sort((a,b) => byArea[b].length - byArea[a].length);
   sortedAreas.forEach(area => {
     const tasks = byArea[area];
-    html += '<div style="font-weight:800;font-size:13px;color:var(--emerald-700);margin:14px 0 6px;padding-right:4px">📍 ' + escapeHtml(area) + ' (' + tasks.length + ')</div>';
+    html += '<div style="font-weight:800;font-size:14px;color:var(--emerald-700);margin:14px 0 6px;padding-right:4px">📍 ' + escapeHtml(area) + ' (' + tasks.length + ')</div>';
     const prioOrder = { high:0, med:1, low:2 };
     tasks.sort((a,b) => prioOrder[a.priority] - prioOrder[b.priority]);
     let stopNum = 1;
@@ -2760,21 +2700,17 @@ function renderStats(){
   const completion = total > 0 ? Math.round((done/total)*100) : 0;
 
   let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  html += '<div style="background:var(--emerald-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--emerald-700)">' + total + '</div><div style="font-size:11px;color:var(--gray-600)">📋 إجمالي</div></div>';
-  html += '<div style="background:var(--green-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--green-700)">' + done + '</div><div style="font-size:11px;color:var(--gray-600)">✅ منجزة</div></div>';
-  html += '<div style="background:var(--orange-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--orange-700)">' + pending + '</div><div style="font-size:11px;color:var(--gray-600)">⏳ معلقة</div></div>';
-  html += '<div style="background:var(--danger-light);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--danger)">' + overdue + '</div><div style="font-size:11px;color:var(--gray-600)">⚠️ متأخرة</div></div>';
-  html += '<div style="background:var(--gray-100);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--gray-600)">' + canceled + '</div><div style="font-size:11px;color:var(--gray-600)">🚫 ملغاة</div></div>';
-  html += '<div style="background:var(--emerald-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--emerald-700)">' + completion + '%</div><div style="font-size:11px;color:var(--gray-600)">📈 الإنجاز</div></div>';
+  html += '<div style="background:var(--emerald-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--emerald-700)">' + total + '</div><div style="font-size:12px;color:var(--gray-600)">📋 إجمالي</div></div>';
+  html += '<div style="background:var(--green-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--green-700)">' + done + '</div><div style="font-size:12px;color:var(--gray-600)">✅ منجزة</div></div>';
+  html += '<div style="background:var(--orange-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--orange-700)">' + pending + '</div><div style="font-size:12px;color:var(--gray-600)">⏳ معلقة</div></div>';
+  html += '<div style="background:var(--danger-light);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--danger)">' + overdue + '</div><div style="font-size:12px;color:var(--gray-600)">⚠️ متأخرة</div></div>';
+  html += '<div style="background:var(--gray-100);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--gray-600)">' + canceled + '</div><div style="font-size:12px;color:var(--gray-600)">🚫 ملغاة</div></div>';
+  html += '<div style="background:var(--emerald-50);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--emerald-700)">' + completion + '%</div><div style="font-size:12px;color:var(--gray-600)">📈 الإنجاز</div></div>';
   html += '</div>';
   generalStats.innerHTML = html;
 
-  // مناطق
   const byArea = {};
-  state.tasks.forEach(t => {
-    const a = t.area || 'غير محدد';
-    byArea[a] = (byArea[a] || 0) + 1;
-  });
+  state.tasks.forEach(t => { const a = t.area || 'غير محدد'; byArea[a] = (byArea[a] || 0) + 1; });
   const maxArea = Math.max.apply(null, Object.values(byArea).concat([1]));
   let areaHtml = '';
   Object.keys(byArea).sort((a,b) => byArea[b] - byArea[a]).forEach(a => {
@@ -2783,12 +2719,8 @@ function renderStats(){
   });
   areaStats.innerHTML = areaHtml || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
 
-  // مشرفين
   const bySup = {};
-  state.tasks.forEach(t => {
-    const s = t.contact || 'غير محدد';
-    bySup[s] = (bySup[s] || 0) + 1;
-  });
+  state.tasks.forEach(t => { const s = t.contact || 'غير محدد'; bySup[s] = (bySup[s] || 0) + 1; });
   const maxSup = Math.max.apply(null, Object.values(bySup).concat([1]));
   let supHtml = '';
   Object.keys(bySup).sort((a,b) => bySup[b] - bySup[a]).forEach(s => {
@@ -2797,12 +2729,8 @@ function renderStats(){
   });
   supervisorStats.innerHTML = supHtml || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
 
-  // أنواع
   const byType = {};
-  state.tasks.forEach(t => {
-    const ty = t.type || 'غير محدد';
-    byType[ty] = (byType[ty] || 0) + 1;
-  });
+  state.tasks.forEach(t => { const ty = t.type || 'غير محدد'; byType[ty] = (byType[ty] || 0) + 1; });
   const maxType = Math.max.apply(null, Object.values(byType).concat([1]));
   let typeHtml = '';
   Object.keys(byType).sort((a,b) => byType[b] - byType[a]).forEach(ty => {
@@ -2813,7 +2741,7 @@ function renderStats(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 19: المواد الرئيسية (مع بحث)
+   القسم 19: المواد الرئيسية
    ═══════════════════════════════════════════════════════ */
 function renderMaterials(query){
   const container = document.getElementById('materialsList');
@@ -2900,6 +2828,7 @@ function renderTechniciansList(){
   });
   container.innerHTML = html;
   fillTechnicianSelects();
+  fillWhatsRecipients();
 }
 
 function openTechnicianSheet(){
@@ -2963,13 +2892,15 @@ function loadSettingsToForm(){
   document.getElementById('setHeader2').value = state.settings.header2 || '';
   document.getElementById('setHeader3').value = state.settings.header3 || '';
   document.getElementById('setSign2').value = state.settings.sign2 || '';
+  document.getElementById('setSign2Phone').value = state.settings.sign2Phone || '';
   document.getElementById('setSign3').value = state.settings.sign3 || '';
+  document.getElementById('setSign3Phone').value = state.settings.sign3Phone || '';
   document.getElementById('setNightMode').value = state.settings.nightMode || 'auto';
   document.getElementById('setOverdueDays').value = state.settings.overdueDays || 7;
 }
 
 function setupSettingsListeners(){
-  const map = { setHeader1: 'header1', setHeader2: 'header2', setHeader3: 'header3', setSign2: 'sign2', setSign3: 'sign3' };
+  const map = { setHeader1: 'header1', setHeader2: 'header2', setHeader3: 'header3', setSign2: 'sign2', setSign2Phone: 'sign2Phone', setSign3: 'sign3', setSign3Phone: 'sign3Phone' };
   Object.keys(map).forEach(elId => {
     const el = document.getElementById(elId);
     if(!el) return;
@@ -3002,7 +2933,7 @@ document.addEventListener('change', (e) => {
   }
 });
 
-// إغلاق نتائج البحث عند النقر خارجها
+// إغلاق قوائم البحث عند النقر خارجها
 document.addEventListener('click', (e) => {
   const results = document.getElementById('schoolResults');
   const search = document.getElementById('fSchoolSearch');
@@ -3013,9 +2944,13 @@ document.addEventListener('click', (e) => {
 });
 
 /* ═══════════════════════════════════════════════════════
-   القسم 22: الطباعة — شعار العقاب
+   القسم 22: شعار العقاب
    ═══════════════════════════════════════════════════════ */
 const EAGLE_SVG = '<img src="https://basamassaf.github.io/jam3iyati/eagle.png" alt="شعار" style="width:100%;height:auto;display:block">';
+
+function getEagleHtml(){
+  return '<div class="gov-eagle">' + EAGLE_SVG + '</div>';
+}
 
 /* ═══════════════════════════════════════════════════════
    القسم 23: طباعة كشف المواد
@@ -3046,7 +2981,7 @@ function printTask(taskId){
 
   let html = '';
   html += '<div class="gov-header">';
-  html += '<div class="gov-eagle">' + EAGLE_SVG + '</div>';
+  html += getEagleHtml();
   html += '<div class="gov-header-top">';
   html += '<div class="gov-header-right">';
   html += '<div>' + escapeHtml(settings.header1 || '') + '</div>';
@@ -3084,12 +3019,13 @@ function printTask(taskId){
   document.getElementById('printPage').style.display = 'block';
   document.body.style.overflow = 'hidden';
   document.querySelector('.bottom-nav').style.display = 'none';
+  document.querySelector('.top-tabs').style.display = 'none';
   const fab = document.querySelector('.fab');
   if(fab) fab.style.display = 'none';
 }
 
 /* ═══════════════════════════════════════════════════════
-   القسم 24: طباعة تقرير زيارة
+   القسم 24: تقرير زيارة (مع الشعار)
    ═══════════════════════════════════════════════════════ */
 function printVisitReport(taskId){
   const t = state.tasks.find(x => x.id === taskId);
@@ -3099,7 +3035,7 @@ function printVisitReport(taskId){
 
   let html = '';
   html += '<div class="gov-header">';
-  html += '<div class="gov-eagle">' + EAGLE_SVG + '</div>';
+  html += getEagleHtml();
   html += '<div class="gov-header-top">';
   html += '<div class="gov-header-right">';
   html += '<div>' + escapeHtml(settings.header1 || '') + '</div>';
@@ -3143,6 +3079,7 @@ function printVisitReport(taskId){
   document.getElementById('printPage').style.display = 'block';
   document.body.style.overflow = 'hidden';
   document.querySelector('.bottom-nav').style.display = 'none';
+  document.querySelector('.top-tabs').style.display = 'none';
   const fab = document.querySelector('.fab');
   if(fab) fab.style.display = 'none';
 }
@@ -3165,13 +3102,13 @@ function exportToWord(){
     + 'td.mat-name{text-align:right}'
     + '.gov-eagle img{width:85px}'
     + '.gov-eagle{text-align:center}'
-    + '.gov-header{text-align:center;margin-bottom:15px}'
+    + '.gov-header{position:relative;text-align:center;margin-bottom:15px;min-height:130px}'
     + '.gov-header-right{text-align:right;font-size:13px;font-weight:700}'
     + '.gov-header-left{text-align:left;font-size:13px;font-weight:700}'
     + '.gov-salutation{text-align:center;font-size:16px;font-weight:800;margin:10px 0}'
     + '.gov-body{font-size:14px;font-weight:600;margin:10px 0;line-height:1.9}'
     + '.gov-signatures{display:flex;justify-content:space-between;margin-top:30px}'
-    + '.gov-sign-box{text-align:center}'
+    + '.gov-sign-box{text-align:center;flex:1}'
     + '.gov-sign-box .role{display:block;margin-bottom:4px}'
     + '.gov-sign-box .name{font-weight:800}'
     + 'hr{border:none;border-top:1.5px solid #000;margin:15px 0}'
@@ -3191,6 +3128,7 @@ function closePrint(){
   document.getElementById('printPage').style.display = 'none';
   document.body.style.overflow = '';
   document.querySelector('.bottom-nav').style.display = '';
+  document.querySelector('.top-tabs').style.display = '';
   const activePage = document.querySelector('.page.active');
   if(activePage && activePage.id === 'pageHome'){
     const fab = document.querySelector('.fab');
@@ -3203,7 +3141,7 @@ function closePrint(){
    ═══════════════════════════════════════════════════════ */
 function exportJSON(){
   const data = {
-    version: 3,
+    version: 4,
     exportedAt: new Date().toISOString(),
     tasks: state.tasks,
     materials: state.materials,
@@ -3220,7 +3158,7 @@ function exportJSON(){
   a.download = 'ورشة_الكهرباء_نسخة_' + todayISO().replace(/\//g, '-') + '.json';
   a.click();
   URL.revokeObjectURL(url);
-  showToast('✅ تم التصدير', 'success');
+  showToast('✅ تم التصدير — افتح الملفات للتأكد', 'success');
 }
 
 function importJSON(event){
@@ -3242,7 +3180,7 @@ function importJSON(event){
       saveTasks(); saveMaterials(); saveSchools(); saveTechnicians(); saveSupervisors(); saveSettings(); saveCounter();
       renderTasks(); updateStats(); updateFilterCounts(); renderAlerts();
       renderMaterials(); renderSchoolsList(); updateSchoolsStats(); renderTechniciansList(); renderSupervisorsList();
-      fillAreaFilters(); fillSupervisorFilters(); fillSupervisorSelects();
+      fillAreaFilters(); fillSupervisorFilters(); fillSupervisorSelects(); fillWhatsRecipients();
       applyNightMode();
       showToast('✅ تم الاستيراد', 'success');
     }catch(err){ showToast('❌ ملف غير صالح', 'error'); }
@@ -3371,6 +3309,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fillSupervisorSelects();
   fillAreaFilters();
   fillSupervisorFilters();
+  fillWhatsRecipients();
 
   const saved = localStorage.getItem('wk_current_page');
   if(saved && document.getElementById(saved)){ switchPage(saved); }
