@@ -1623,31 +1623,19 @@ function renderSchoolsList(q){
     if(s.examCenter) meta += ' • 📋 ' + escapeHtml(s.examCenter);
     if(s.cameras) meta += ' • 📹 ' + escapeHtml(s.cameras);
     
-    html += '<div class="material-row" style="flex-direction:column;align-items:flex-start;gap:6px">';
+    html += '<div class="material-row" style="flex-direction:column;align-items:flex-start;gap:6px;cursor:pointer" onclick="editSchool(' + idx + ')">';
     html += '<div style="display:flex;width:100%;gap:6px;align-items:center">';
     html += '<span class="mat-name" style="font-weight:800;font-size:15px;flex:1">' + escapeHtml(s.n);
     if(s.oldName) html += ' <span style="color:var(--copper-600);font-size:11px">(سابقاً: ' + escapeHtml(s.oldName) + ')</span>';
     html += '</span>';
-    html += '<button type="button" class="mat-del btn-school-action" data-action="edit" data-idx="' + idx + '" style="background:var(--emerald-50);color:var(--emerald-700);cursor:pointer">✏️</button>';
-    html += '<button type="button" class="mat-del btn-school-action" data-action="delete" data-idx="' + idx + '" style="cursor:pointer">✕</button>';
+    html += '<button type="button" class="mat-del" onclick="event.stopPropagation(); deleteSchool(' + idx + ')" style="cursor:pointer">✕</button>';
     html += '</div>';
     html += '<div style="font-size:12px;color:var(--gray-500);line-height:1.5">' + meta + '</div>';
     if(s.ad) html += '<div style="font-size:11.5px;color:var(--gray-400)">📍 ' + escapeHtml(s.ad) + '</div>';
+    html += '<div style="font-size:11px;color:var(--emerald-600);margin-top:4px;font-weight:700">👆 اضغط للتعديل</div>';
     html += '</div>';
   });
   container.innerHTML = html;
-  
-  // ✅ Event Delegation — يعمل 100% على الجوال
-  container.querySelectorAll('.btn-school-action').forEach(btn => {
-    btn.addEventListener('click', function(e){
-      e.stopPropagation();
-      e.preventDefault();
-      const idx = parseInt(this.getAttribute('data-idx'));
-      const action = this.getAttribute('data-action');
-      if(action === 'edit') editSchool(idx);
-      if(action === 'delete') deleteSchool(idx);
-    });
-  });
 }
 function updateSchoolsStats(){
   const sups = new Set(state.schools.map(s => s.s).filter(Boolean));
@@ -1688,142 +1676,42 @@ function openSchoolSheet(){
   openSheet('schoolSheetBg');
 }
 function editSchool(idx){
-  const s = state.schools[idx];
-  if(!s) return;
-  state.editingSchoolIdx = idx;
-  document.getElementById('schoolSheetTitle').textContent = '✏️ تعديل';
-  document.getElementById('schName').value = s.n || '';
-  document.getElementById('schOldName').value = s.oldName || '';
-  document.getElementById('schSupervisor').value = s.s || '';
-  document.getElementById('schArea').value = s.a || '';
-  document.getElementById('schDistrict').value = s.d || '';
-  document.getElementById('schAddress').value = s.ad || '';
-  document.getElementById('schPhone').value = s.p || '';
-  document.getElementById('schHalls').value = s.halls || '';
-  document.getElementById('schPrincipal').value = s.principal || '';
-  document.getElementById('schPrincipalPhone').value = s.principalPhone || '';
-  document.getElementById('schSecretary').value = s.secretary || '';
-  document.getElementById('schSecretaryPhone').value = s.secretaryPhone || '';
-  document.getElementById('schCycle').value = s.cycle || '';
-  document.getElementById('schWave').value = s.wave || '';
-  document.getElementById('schExamCenter').value = s.examCenter || '';
-  document.getElementById('schCameras').value = s.cameras || '';
-  document.getElementById('schElectrician').value = s.electrician || '';
-  openSheet('schoolSheetBg');
-}
-function saveSchoolMaster(){
-  const name = document.getElementById('schName').value.trim();
-  if(!name){ showToast('أدخل الاسم', 'error'); return; }
-  const data = {
-    n: name, oldName: document.getElementById('schOldName').value.trim(),
-    s: document.getElementById('schSupervisor').value.trim(),
-    a: document.getElementById('schArea').value.trim(), d: document.getElementById('schDistrict').value.trim(),
-    ad: document.getElementById('schAddress').value.trim(),
-    p: document.getElementById('schPhone').value.trim(), halls: document.getElementById('schHalls').value.trim(),
-    principal: document.getElementById('schPrincipal').value.trim(), principalPhone: document.getElementById('schPrincipalPhone').value.trim(),
-    secretary: document.getElementById('schSecretary').value.trim(), secretaryPhone: document.getElementById('schSecretaryPhone').value.trim(),
-    cycle: document.getElementById('schCycle').value,
-    wave: document.getElementById('schWave').value.trim(),
-    examCenter: document.getElementById('schExamCenter').value,
-    cameras: document.getElementById('schCameras').value,
-    electrician: document.getElementById('schElectrician').value.trim()
-  };
-  if(state.editingSchoolIdx !== null){
-    state.schools[state.editingSchoolIdx] = Object.assign({}, state.schools[state.editingSchoolIdx], data);
-    showToast('✅ تم التحديث', 'success');
-  } else { state.schools.push(data); showToast('✅ أُضيفت', 'success'); }
-  saveSchools();
-  closeSheet('schoolSheetBg');
-  renderSchoolsList(); updateSchoolsStats(); fillAreaFilters();
-}
-function deleteSchool(idx){ if(!confirm('حذف "' + state.schools[idx].n + '"؟')) return; state.schools.splice(idx, 1); saveSchools(); renderSchoolsList(); updateSchoolsStats(); showToast('🗑️ تم الحذف', 'warn'); }
-
-function renderSupervisorsList(){
-  const container = document.getElementById('supervisorsList');
-  if(state.supervisors.length === 0){ container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500)">لا يوجد</div>'; return; }
-  container.innerHTML = state.supervisors.map((s, idx) => {
-    const count = state.schools.filter(x => x.s === s.name).length;
-    return '<div class="material-row" style="flex-direction:column;align-items:flex-start;gap:6px"><div style="display:flex;width:100%;gap:6px"><span class="mat-name" style="font-weight:800;font-size:15px">👤 ' + escapeHtml(s.name) + '</span><button class="mat-del" onclick="editSupervisor(' + idx + ')" style="background:var(--emerald-50);color:var(--emerald-700)">✏️</button><button class="mat-del" onclick="deleteSupervisor(' + idx + ')">✕</button></div>' + (s.phone ? '<div style="font-size:12px;color:var(--gray-500)">📞 ' + escapeHtml(s.phone) + '</div>' : '') + (s.areas ? '<div style="font-size:12px;color:var(--gray-500)">📍 ' + escapeHtml(s.areas) + '</div>' : '') + '<div style="font-size:12px;color:var(--emerald-700);font-weight:800">🏫 ' + count + ' مدرسة</div></div>';
-  }).join('');
-}
-function openSupervisorSheet(){ state.editingSupervisorIdx = null; document.getElementById('supervisorSheetTitle').textContent = '➕ إضافة'; document.getElementById('supervisorName').value = ''; document.getElementById('supervisorPhone').value = ''; document.getElementById('supervisorAreas').value = ''; openSheet('supervisorSheetBg'); }
-function editSupervisor(idx){ const s = state.supervisors[idx]; if(!s) return; state.editingSupervisorIdx = idx; document.getElementById('supervisorSheetTitle').textContent = '✏️ تعديل'; document.getElementById('supervisorName').value = s.name || ''; document.getElementById('supervisorPhone').value = s.phone || ''; document.getElementById('supervisorAreas').value = s.areas || ''; openSheet('supervisorSheetBg'); }
-function saveSupervisor(){ const name = document.getElementById('supervisorName').value.trim(); if(!name){ showToast('أدخل الاسم', 'error'); return; } const data = { name, phone: document.getElementById('supervisorPhone').value.trim(), areas: document.getElementById('supervisorAreas').value.trim() }; if(state.editingSupervisorIdx !== null){ data.id = state.supervisors[state.editingSupervisorIdx].id; state.supervisors[state.editingSupervisorIdx] = data; } else { data.id = Math.max.apply(null, state.supervisors.map(s => s.id || 0).concat([0])) + 1; state.supervisors.push(data); } saveSupervisors(); closeSheet('supervisorSheetBg'); renderSupervisorsList(); fillSupervisorSelects(); fillSupervisorFilters(); fillWhatsRecipients(); showToast('✅ تم الحفظ', 'success'); }
-function deleteSupervisor(idx){ if(!confirm('حذف "' + state.supervisors[idx].name + '"؟')) return; state.supervisors.splice(idx, 1); saveSupervisors(); renderSupervisorsList(); fillSupervisorSelects(); fillSupervisorFilters(); fillWhatsRecipients(); showToast('🗑️ تم الحذف', 'warn'); }
-
-function renderMaterials(q){
-  const container = document.getElementById('materialsList');
-  q = (q || document.getElementById('materialSearch').value || '').toLowerCase().trim();
-  let list = state.materials;
-  if(q) list = list.filter(m => m.name.toLowerCase().indexOf(q) !== -1);
-  if(list.length === 0){ container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500)">لا توجد مواد</div>'; return; }
-  container.innerHTML = list.map(m => '<div class="material-row"><span class="mat-name" style="font-weight:700">' + escapeHtml(m.name) + '</span><span class="mat-unit">' + escapeHtml(m.unit) + '</span><button class="mat-del" onclick="editMasterMaterial(' + m.id + ')" style="background:var(--emerald-50);color:var(--emerald-700)">✏️</button><button class="mat-del" onclick="deleteMasterMaterial(' + m.id + ')">✕</button></div>').join('');
-}
-function openMaterialSheet(id){
-  state.editingMasterMatId = id || null;
-  if(id){ const m = state.materials.find(x => x.id === id); if(!m) return; document.getElementById('masterMatTitle').textContent = '✏️ تعديل'; document.getElementById('masterMatName').value = m.name; document.getElementById('masterMatUnit').value = m.unit; }
-  else { document.getElementById('masterMatTitle').textContent = '➕ مادة جديدة'; document.getElementById('masterMatName').value = ''; document.getElementById('masterMatUnit').value = 'عدد'; }
-  openSheet('masterMatSheetBg');
-}
-function editMasterMaterial(id){ openMaterialSheet(id); }
-function saveMasterMaterial(){
-  const name = document.getElementById('masterMatName').value.trim();
-  const unit = document.getElementById('masterMatUnit').value.trim() || 'عدد';
-  if(!name){ showToast('أدخل الاسم', 'error'); return; }
-  if(state.editingMasterMatId){ const m = state.materials.find(x => x.id === state.editingMasterMatId); if(m){ m.name = name; m.unit = unit; } }
-  else { const dup = state.materials.find(m => m.name === name); if(dup){ showToast('⚠️ المادة موجودة', 'warn'); return; } const newId = Math.max.apply(null, state.materials.map(m => m.id).concat([0])) + 1; state.materials.push({ id: newId, name, unit }); }
-  saveMaterials(); closeSheet('masterMatSheetBg'); renderMaterials(); showToast('✅ تم الحفظ', 'success');
-}
-function deleteMasterMaterial(id){ if(!confirm('حذف المادة؟')) return; state.materials = state.materials.filter(m => m.id !== id); saveMaterials(); renderMaterials(); showToast('🗑️ تم الحذف', 'warn'); }
-
-function renderTechniciansList(){
-  const container = document.getElementById('techniciansList');
-  if(state.technicians.length === 0){ container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500)">لا يوجد</div>'; return; }
-  container.innerHTML = state.technicians.map((t, idx) => '<div class="material-row"><span class="mat-name" style="font-weight:700">👷 ' + escapeHtml(t.name) + (t.notes ? ' <span style="color:var(--gray-500);font-size:12px">(' + escapeHtml(t.notes) + ')</span>' : '') + '</span>' + (t.phone ? '<span class="mat-unit">📞 ' + escapeHtml(t.phone) + '</span>' : '') + '<button class="mat-del" onclick="editTechnician(' + idx + ')" style="background:var(--emerald-50);color:var(--emerald-700)">✏️</button><button class="mat-del" onclick="deleteTechnician(' + idx + ')">✕</button></div>').join('');
-  fillWhatsRecipients();
-}
-function openTechnicianSheet(){ state.editingTechIdx = null; document.getElementById('techSheetTitle').textContent = '➕ إضافة'; document.getElementById('techName').value = ''; document.getElementById('techPhone').value = ''; document.getElementById('techNotes').value = ''; openSheet('techSheetBg'); }
-function editTechnician(idx){ const t = state.technicians[idx]; if(!t) return; state.editingTechIdx = idx; document.getElementById('techSheetTitle').textContent = '✏️ تعديل'; document.getElementById('techName').value = t.name || ''; document.getElementById('techPhone').value = t.phone || ''; document.getElementById('techNotes').value = t.notes || ''; openSheet('techSheetBg'); }
-function saveTechnician(){ const name = document.getElementById('techName').value.trim(); if(!name){ showToast('أدخل الاسم', 'error'); return; } const data = { name, phone: document.getElementById('techPhone').value.trim(), notes: document.getElementById('techNotes').value.trim() }; if(state.editingTechIdx !== null){ data.id = state.technicians[state.editingTechIdx].id; state.technicians[state.editingTechIdx] = data; } else { data.id = Math.max.apply(null, state.technicians.map(t => t.id || 0).concat([0])) + 1; state.technicians.push(data); } saveTechnicians(); closeSheet('techSheetBg'); renderTechniciansList(); showToast('✅ تم الحفظ', 'success'); }
-function deleteTechnician(idx){ if(!confirm('حذف "' + state.technicians[idx].name + '"؟')) return; state.technicians.splice(idx, 1); saveTechnicians(); renderTechniciansList(); showToast('🗑️ تم الحذف', 'warn'); }
-
-/* ═══ الإعدادات والفلاتر ═══ */
-function loadSettingsToForm(){
-  document.getElementById('setHeader1').value = state.settings.header1 || '';
-  document.getElementById('setHeader2').value = state.settings.header2 || '';
-  document.getElementById('setHeader3').value = state.settings.header3 || '';
-  document.getElementById('setSign2').value = state.settings.sign2 || '';
-  document.getElementById('setSign2Phone').value = state.settings.sign2Phone || '';
-  document.getElementById('setSign3').value = state.settings.sign3 || '';
-  document.getElementById('setSign3Phone').value = state.settings.sign3Phone || '';
-  document.getElementById('setNightMode').value = state.settings.nightMode || 'auto';
-  document.getElementById('setOverdueDays').value = state.settings.overdueDays || 7;
-}
-function setupSettingsListeners(){
-  const map = { setHeader1:'header1', setHeader2:'header2', setHeader3:'header3', setSign2:'sign2', setSign2Phone:'sign2Phone', setSign3:'sign3', setSign3Phone:'sign3Phone' };
-  Object.keys(map).forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', () => { state.settings[map[id]] = el.value; saveSettings(); }); });
-  document.getElementById('setNightMode').addEventListener('change', e => { state.settings.nightMode = e.target.value; saveSettings(); applyNightMode(); });
-  document.getElementById('setOverdueDays').addEventListener('change', e => { state.settings.overdueDays = parseInt(e.target.value) || 7; saveSettings(); refreshAllViews(); });
-}
-function setupFilters(){
-  document.querySelectorAll('#filters .chip').forEach(chip => {
-    chip.addEventListener('click', () => { document.querySelectorAll('#filters .chip').forEach(c => c.classList.remove('active')); chip.classList.add('active'); state.currentFilter = chip.dataset.filter; renderAllTasks(); });
-  });
-  document.getElementById('searchInput').addEventListener('input', renderAllTasks);
-}
-function fillSupervisorSelects(){
-  const opts = '<option value="">-- اختر مشرف --</option>' + state.supervisors.map(s => '<option value="' + escapeHtml(s.name) + '">' + escapeHtml(s.name) + '</option>').join('');
-  ['fContact','schSupervisor'].forEach(id => { const el = document.getElementById(id); if(el){ const cur = el.value; el.innerHTML = opts; if(cur) el.value = cur; } });
-}
-function fillAreaFilters(){
-  const areas = [...new Set(state.schools.map(s => s.a).filter(Boolean))].sort();
-  ['filterArea','schoolFilterArea'].forEach(id => {
-    const el = document.getElementById(id);
-    if(!el) return;
-    let html = '<option value="">📍 كل المناطق</option>';
-    areas.forEach(a => { html += '<option value="' + escapeHtml(a) + '">' + escapeHtml(a) + '</option>'; });
-    el.innerHTML = html;
-  });
+  try {
+    const s = state.schools[idx];
+    if(!s){
+      showToast('❌ المدرسة غير موجودة', 'error');
+      return;
+    }
+    state.editingSchoolIdx = idx;
+    
+    // تعبئة النافذة
+    document.getElementById('schoolSheetTitle').textContent = '✏️ تعديل: ' + (s.n || '');
+    document.getElementById('schName').value = s.n || '';
+    document.getElementById('schOldName').value = s.oldName || '';
+    document.getElementById('schSupervisor').value = s.s || '';
+    document.getElementById('schArea').value = s.a || '';
+    document.getElementById('schDistrict').value = s.d || '';
+    document.getElementById('schAddress').value = s.ad || '';
+    document.getElementById('schPhone').value = s.p || '';
+    document.getElementById('schHalls').value = s.halls || '';
+    document.getElementById('schPrincipal').value = s.principal || '';
+    document.getElementById('schPrincipalPhone').value = s.principalPhone || '';
+    document.getElementById('schSecretary').value = s.secretary || '';
+    document.getElementById('schSecretaryPhone').value = s.secretaryPhone || '';
+    document.getElementById('schCycle').value = s.cycle || '';
+    document.getElementById('schWave').value = s.wave || '';
+    document.getElementById('schExamCenter').value = s.examCenter || '';
+    document.getElementById('schCameras').value = s.cameras || '';
+    document.getElementById('schElectrician').value = s.electrician || '';
+    
+    // فتح النافذة
+    openSheet('schoolSheetBg');
+    showToast('✏️ ' + s.n, 'success');
+    
+  } catch(err) {
+    console.error('خطأ editSchool:', err);
+    showToast('❌ خطأ: ' + err.message, 'error');
+  }
 }
 function fillSupervisorFilters(){
   ['filterSupervisor','schoolFilterSupervisor'].forEach(id => {
