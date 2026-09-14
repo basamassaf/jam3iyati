@@ -13,7 +13,7 @@
 :root{
   --emerald-900:#0d3d2e;--emerald-800:#0d5c46;--emerald-700:#127a5d;--emerald-600:#1a9b76;
   --emerald-500:#22b88d;--emerald-200:#a7e8d0;--emerald-100:#d4f4e8;--emerald-50:#eefaf5;
-  --copper-700:#8b5a2b;--copper-600:#b87333;--copper-500:#d49249;--copper-300:#e8b878;--copper-100:#f5e6d3;
+  --copper-700:#8b5a2b;--copper-600:#b87333;--copper-500:#d49249;--copper-100:#f5e6d3;
   --blue-700:#1e40af;--blue-600:#2563eb;--blue-100:#dbeafe;--blue-50:#eff6ff;
   --purple-700:#6d28d9;--purple-600:#7c3aed;--purple-100:#ede9fe;--purple-50:#f5f3ff;
   --orange-700:#c2410c;--orange-600:#ea580c;--orange-100:#ffedd5;--orange-50:#fff7ed;
@@ -37,7 +37,7 @@ body{
   font-family:'Segoe UI',Tahoma,Arial,sans-serif;
   background:linear-gradient(160deg,#f0f7f4 0%,#f8fafc 100%);
   color:var(--gray-700);min-height:100vh;
-  padding-bottom:80px;padding-top:60px;
+  padding-bottom:100px;padding-top:60px;
   overflow-x:hidden;-webkit-font-smoothing:antialiased;
   transition:background .3s,color .3s;
 }
@@ -49,26 +49,25 @@ body.night-mode .search-box{background:#1e293b;border-color:#334155}
 body.night-mode .search-box input{color:#e2e8f0}
 body.night-mode .chip{background:#1e293b;border-color:#334155;color:#cbd5e1}
 body.night-mode .chip.active{background:var(--emerald-700);color:#fff}
-body.night-mode .task-card{background:#1e293b;color:#e2e8f0}
-body.night-mode .task-name{color:#e2e8f0}
-body.night-mode .task-note{background:#0f172a;color:#cbd5e1}
+body.night-mode .task-card-new{background:#1e293b;color:#e2e8f0}
+body.night-mode .tc-school{color:#a7e8d0}
 body.night-mode .section{background:#1e293b;border-color:#334155;color:#e2e8f0}
 body.night-mode .section-title{color:#a7e8d0;border-color:#0d5c46}
 body.night-mode .field input,body.night-mode .field select,body.night-mode .field textarea{background:#0f172a;border-color:#334155;color:#e2e8f0}
 body.night-mode .sheet{background:#1e293b}
 body.night-mode .sheet-title{color:#a7e8d0}
 body.night-mode .material-row{background:#0f172a;border-color:#334155}
-body.night-mode .bottom-nav{background:#1e293b;border-color:#334155}
+body.night-mode .bottom-nav{background:#1e293b;border-color:#0d5c46}
 body.night-mode .nav-item{color:#94a3b8}
 body.night-mode .nav-item.active{background:#0d5c46;color:#a7e8d0}
 body.night-mode .selected-school{background:#0d3d2e;border-color:#22b88d}
 body.night-mode .school-results{background:#1e293b;border-color:#334155}
-body.night-mode .autocomplete-results{background:#1e293b;border-color:#334155}
-body.night-mode .visit-row{background:#0f172a}
-body.night-mode .attachment-item{background:#0f172a;border-color:#334155}
+body.night-mode .school-item{border-color:#334155}
 body.night-mode .drawer{background:#1e293b}
 body.night-mode .drawer-item{color:#e2e8f0;border-color:#334155}
-body.night-mode .drawer-item:hover{background:#0f172a}
+body.night-mode .drawer-item:active{background:#0f172a}
+body.night-mode .material-check{background:#0f172a;border-color:#334155;color:#e2e8f0}
+body.night-mode .material-check-name{color:#e2e8f0}
 
 /* ═══ الشريط العلوي ═══ */
 .top-bar{
@@ -76,8 +75,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
   background:linear-gradient(135deg,var(--emerald-800),var(--emerald-700));
   padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));
   display:flex;align-items:center;gap:10px;
-  box-shadow:0 4px 12px rgba(13,92,70,.25);
-  color:#fff;
+  box-shadow:0 4px 12px rgba(13,92,70,.25);color:#fff;
 }
 .menu-btn{
   background:rgba(255,255,255,.15);border:none;color:#fff;
@@ -96,7 +94,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 }
 .top-bar-night:active{transform:scale(.92)}
 
-/* ═══ القائمة المنسدلة (Drawer) ═══ */
+/* ═══ القائمة الجانبية ═══ */
 .drawer-bg{
   position:fixed;inset:0;background:rgba(15,23,42,.55);
   backdrop-filter:blur(3px);z-index:200;display:none;
@@ -145,7 +143,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 .page.active{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-/* ═══ البطاقة الرئيسية — مساعد القرار ═══ */
+/* ═══ البطاقة الرئيسية ═══ */
 .decision-card{
   background:linear-gradient(135deg,var(--emerald-700),var(--emerald-600));
   color:#fff;border-radius:var(--radius-lg);padding:18px;
@@ -184,13 +182,11 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 
 /* ═══ إحصائيات سريعة ═══ */
 .quick-stats{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
-  margin-bottom:16px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;
 }
 .q-stat{
   background:var(--white);border-radius:12px;padding:12px 8px;
-  text-align:center;box-shadow:var(--shadow-sm);
-  border:1px solid var(--gray-200);
+  text-align:center;box-shadow:var(--shadow-sm);border:1px solid var(--gray-200);
 }
 .q-stat-num{font-size:22px;font-weight:800;line-height:1}
 .q-stat-lbl{font-size:11px;color:var(--gray-500);margin-top:4px;font-weight:600}
@@ -207,14 +203,12 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 .group-header.danger{color:var(--danger)}
 .group-header.warn{color:var(--orange-700)}
 .group-header.info{color:var(--cyan-700)}
-.group-header.gray{color:var(--gray-500)}
 .group-header .group-count{
   background:var(--gray-100);color:var(--gray-600);
   font-size:12px;padding:2px 10px;border-radius:12px;font-weight:800;
 }
 .group-header.danger .group-count{background:var(--danger-light);color:var(--danger)}
 .group-header.warn .group-count{background:var(--orange-100);color:var(--orange-700)}
-.group-header.info .group-count{background:var(--cyan-100);color:var(--cyan-700)}
 
 /* ═══ بطاقة المهمة الجديدة ═══ */
 .task-card-new{
@@ -231,6 +225,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 .task-card-new.st-working{border-right-color:var(--cyan-600)}
 .task-card-new.st-done{border-right-color:var(--green-600);background:var(--green-50);opacity:.8}
 .task-card-new.st-suspended{border-right-color:var(--gray-400);background:var(--gray-50)}
+.task-card-new.st-postponed{border-right-color:var(--gray-500);background:var(--gray-50)}
 .task-card-new.st-canceled{border-right-color:var(--gray-500);opacity:.6;background:var(--gray-100)}
 .task-card-new.st-transferred{border-right-color:var(--brown-600);opacity:.85}
 .task-card-new.overdue{animation:pulse 2s infinite}
@@ -238,36 +233,48 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 
 .tc-school{
   font-size:22px;font-weight:900;color:var(--emerald-800);
-  line-height:1.25;margin-bottom:6px;
-  letter-spacing:-0.3px;
+  line-height:1.25;margin-bottom:6px;letter-spacing:-0.3px;
 }
 .task-card-new.st-done .tc-school{text-decoration:line-through;color:var(--gray-500)}
 
 .tc-info{
   display:flex;flex-wrap:wrap;gap:8px 14px;
-  font-size:13px;color:var(--gray-600);margin-bottom:10px;
-  align-items:center;
+  font-size:13px;color:var(--gray-600);margin-bottom:10px;align-items:center;
 }
 .tc-info-item{display:inline-flex;align-items:center;gap:4px}
 .tc-info-item.strong{font-weight:800;color:var(--gray-800)}
 .tc-info-item.danger{color:var(--danger);font-weight:800}
 
-.tc-badges{
-  display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;
-}
+.tc-badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .tc-badge{
   font-size:11px;font-weight:800;padding:4px 10px;border-radius:10px;
   display:inline-flex;align-items:center;gap:4px;
 }
+.mini-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;white-space:nowrap}
+.mb-new{background:var(--blue-100);color:var(--blue-700)}
+.mb-inspecting{background:var(--purple-100);color:var(--purple-700)}
+.mb-awaiting{background:var(--orange-100);color:var(--orange-700)}
+.mb-materials{background:var(--yellow-100);color:var(--yellow-700)}
+.mb-working{background:var(--cyan-100);color:var(--cyan-700)}
+.mb-done{background:var(--green-100);color:var(--green-700)}
+.mb-suspended{background:var(--gray-100);color:var(--gray-600)}
+.mb-canceled{background:var(--gray-200);color:var(--gray-700)}
+.mb-transferred{background:var(--brown-100);color:var(--brown-700)}
+.mb-urgent{background:var(--danger);color:#fff}
+.mb-overdue{background:var(--danger);color:#fff}
+.mb-high{background:var(--danger-light);color:var(--danger)}
+.mb-med{background:var(--orange-100);color:var(--orange-700)}
+.mb-low{background:var(--green-100);color:var(--green-700)}
 
-.tc-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tc-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .tc-btn{
-  padding:10px 4px;border-radius:10px;border:none;
-  font-size:16px;cursor:pointer;font-family:inherit;
-  display:flex;align-items:center;justify-content:center;
+  padding:12px 8px;border-radius:12px;border:none;
+  font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:5px;
   transition:.2s;color:#fff;
+  box-shadow:0 3px 8px rgba(0,0,0,.12);
 }
-.tc-btn:active{transform:scale(.92)}
+.tc-btn:active{transform:scale(.95);box-shadow:0 1px 4px rgba(0,0,0,.15)}
 .tc-btn-details{background:linear-gradient(135deg,#1e40af,#3b82f6)}
 .tc-btn-done{background:linear-gradient(135deg,#15803d,#22c55e)}
 .tc-btn-postpone{background:linear-gradient(135deg,#64748b,#94a3b8)}
@@ -280,23 +287,31 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 
 /* ═══ الشريط السفلي ═══ */
 .bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;background:var(--white);
-  box-shadow:0 -4px 20px rgba(0,0,0,.08);display:flex;
-  justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));
-  z-index:50;border-top:1px solid var(--gray-200);
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--white);
+  box-shadow:0 -6px 24px rgba(13,92,70,.12);
+  display:flex;justify-content:space-around;
+  padding:8px 4px calc(10px + env(safe-area-inset-bottom));
+  z-index:50;
+  border-top:2px solid var(--emerald-100);
+  border-radius:20px 20px 0 0;
 }
 .nav-item{
-  flex:1;text-align:center;padding:6px 4px;cursor:pointer;
-  border-radius:10px;transition:.2s;color:var(--gray-500);
-  display:flex;flex-direction:column;align-items:center;gap:2px;
+  flex:1;text-align:center;padding:8px 4px;cursor:pointer;
+  border-radius:12px;transition:.2s;color:var(--gray-500);
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  max-width:80px;
 }
-.nav-item.active{color:var(--emerald-700);background:var(--emerald-50)}
-.nav-item .nav-icon{font-size:20px;line-height:1}
-.nav-item span{font-size:10.5px;font-weight:800}
+.nav-item.active{
+  color:var(--emerald-700);background:var(--emerald-50);
+  transform:translateY(-4px);box-shadow:0 6px 14px rgba(13,92,70,.12);
+}
+.nav-item .nav-icon{font-size:22px;line-height:1}
+.nav-item span{font-size:11px;font-weight:800}
 
 /* ═══ الزر العائم ═══ */
 .fab{
-  position:fixed;bottom:calc(78px + env(safe-area-inset-bottom));left:50%;
+  position:fixed;bottom:calc(90px + env(safe-area-inset-bottom));left:50%;
   transform:translateX(-50%);width:60px;height:60px;border-radius:50%;
   background:linear-gradient(135deg,var(--copper-600),var(--copper-500));
   color:#fff;border:none;box-shadow:0 8px 24px rgba(184,115,51,.45);
@@ -341,10 +356,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 
 /* ═══ الحقول ═══ */
 .field{margin-bottom:14px}
-.field label{
-  display:block;font-size:13.5px;font-weight:800;
-  color:var(--gray-700);margin-bottom:6px;
-}
+.field label{display:block;font-size:13.5px;font-weight:800;color:var(--gray-700);margin-bottom:6px}
 .field label .req{color:var(--danger)}
 .field input,.field select,.field textarea{
   width:100%;padding:12px 14px;border:1.5px solid var(--gray-200);
@@ -375,6 +387,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 .btn-word{background:linear-gradient(135deg,#2b579a,#1e4073)}
 .btn-map{background:linear-gradient(135deg,#1a73e8,#4285f4)}
 .btn-gray{background:linear-gradient(135deg,#64748b,#94a3b8)}
+.btn-sm{padding:6px 10px;font-size:12px;border-radius:8px}
 
 .btn-lg{
   width:100%;padding:14px;border-radius:13px;border:none;
@@ -399,7 +412,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
   border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;
 }
 
-/* ═══ المواد داخل المهمة ═══ */
+/* ═══ المواد ═══ */
 .material-row{
   display:flex;align-items:center;gap:8px;background:var(--gray-50);
   border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid var(--gray-200);
@@ -417,11 +430,10 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 .mat-del{
   background:var(--danger-light);color:var(--danger);border:none;
   width:32px;height:32px;border-radius:8px;cursor:pointer;
-  font-size:15px;font-weight:800;
-  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;
 }
 
-/* ═══ شبكة المواد (اختيار متعدد) ═══ */
+/* ═══ شبكة المواد ═══ */
 .materials-grid{
   display:grid;grid-template-columns:1fr;gap:6px;
   max-height:320px;overflow-y:auto;padding:8px;
@@ -431,12 +443,9 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 .material-check{
   display:flex;align-items:center;gap:10px;
   padding:10px 12px;background:var(--white);border-radius:10px;
-  border:1.5px solid var(--gray-200);cursor:pointer;transition:.2s;
-  font-size:14px;
+  border:1.5px solid var(--gray-200);cursor:pointer;transition:.2s;font-size:14px;
 }
-.material-check.selected{
-  border-color:var(--emerald-600);background:var(--emerald-50);
-}
+.material-check.selected{border-color:var(--emerald-600);background:var(--emerald-50)}
 .material-check-name{flex:1;font-weight:700;color:var(--gray-700)}
 .material-check-unit{font-size:11px;color:var(--gray-500);font-weight:700}
 .material-check-qty{
@@ -454,9 +463,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
   border:1.5px solid var(--emerald-200);border-radius:10px;background:#fff;
 }
 .school-results.show{display:block}
-.school-item{
-  padding:12px;border-bottom:1px solid var(--gray-100);cursor:pointer;font-size:13px;
-}
+.school-item{padding:12px;border-bottom:1px solid var(--gray-100);cursor:pointer;font-size:13px}
 .school-item:last-child{border-bottom:none}
 .school-item:active{background:var(--emerald-50)}
 .school-item-name{font-weight:800;color:var(--emerald-800);margin-bottom:3px;font-size:14px}
@@ -485,14 +492,12 @@ body.night-mode .drawer-item:hover{background:#0f172a}
   background:var(--gray-300);border:2px solid var(--white);
 }
 .timeline-item.done::before{background:var(--green-600)}
-.timeline-item.pending::before{background:var(--orange-500)}
 .timeline-item.postponed::before{background:var(--gray-500)}
 .timeline-item-label{font-weight:800;color:var(--gray-700)}
 .timeline-item-date{font-size:12px;color:var(--gray-500);margin-top:3px}
-.timeline-item.postponed{color:var(--gray-600)}
 .timeline-item.postponed .timeline-item-label{color:var(--gray-700)}
 
-/* ═══ سجل الزيارات ═══ */
+/* ═══ الزيارات ═══ */
 .visit-row{
   display:flex;gap:10px;padding:12px 14px;background:var(--gray-50);
   border-radius:10px;margin-bottom:8px;border-right:4px solid var(--cyan-600);
@@ -528,26 +533,18 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 }
 .upload-btn:active{background:var(--purple-100)}
 
-/* ═══ إحصائيات المناطق ═══ */
+/* ═══ إحصائيات ═══ */
 .area-stat-row{
   display:flex;align-items:center;gap:10px;padding:12px;
   background:var(--white);border:1px solid var(--gray-200);
   border-radius:10px;margin-bottom:8px;font-size:14px;
 }
 .area-stat-name{flex:1;font-weight:800;color:var(--gray-700)}
-.area-stat-bar{
-  height:10px;border-radius:5px;background:var(--gray-200);
-  width:100px;overflow:hidden;
-}
-.area-stat-bar-fill{
-  height:100%;background:linear-gradient(90deg,var(--emerald-600),var(--emerald-500));
-  border-radius:5px;transition:width .5s;
-}
-.area-stat-count{
-  font-weight:900;color:var(--emerald-700);min-width:32px;text-align:center;
-}
+.area-stat-bar{height:10px;border-radius:5px;background:var(--gray-200);width:100px;overflow:hidden}
+.area-stat-bar-fill{height:100%;background:linear-gradient(90deg,var(--emerald-600),var(--emerald-500));border-radius:5px;transition:width .5s}
+.area-stat-count{font-weight:900;color:var(--emerald-700);min-width:32px;text-align:center}
 
-/* ═══ جولة اليوم ═══ */
+/* ═══ الجولة ═══ */
 .trip-stop{
   display:flex;align-items:center;gap:12px;padding:14px;
   background:var(--white);border-radius:12px;margin-bottom:10px;
@@ -564,6 +561,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 .trip-stop .stop-meta{font-size:12px;color:var(--gray-500);margin-top:3px}
 
 /* ═══ التنبيهات ═══ */
+.alerts-container{padding:0 0 12px}
 .alert-row{
   display:flex;align-items:center;gap:10px;padding:12px 14px;
   background:var(--orange-50);border-right:4px solid var(--orange-600);
@@ -579,6 +577,45 @@ body.night-mode .drawer-item:hover{background:#0f172a}
   background:transparent;border:none;color:var(--gray-500);
   cursor:pointer;font-size:18px;padding:4px;font-weight:800;
 }
+
+/* ═══ البحث ═══ */
+.search-wrap{padding:0 0 10px}
+.search-box{
+  display:flex;align-items:center;gap:10px;background:var(--white);
+  border-radius:14px;padding:12px 14px;box-shadow:var(--shadow-sm);
+  border:1px solid var(--gray-200);transition:.2s;
+}
+.search-box:focus-within{border-color:var(--emerald-600);box-shadow:0 0 0 3px rgba(26,155,118,.1)}
+.search-box svg{
+  width:18px !important;height:18px !important;
+  min-width:18px;max-width:18px;min-height:18px;max-height:18px;
+  color:var(--gray-500);flex-shrink:0;display:block;
+}
+.search-box input{flex:1;border:none;outline:none;font-size:14px;background:transparent;font-family:inherit;color:inherit}
+
+/* ═══ SVG عام ═══ */
+svg{max-width:24px;max-height:24px}
+.search-box svg, .section svg, .filters svg{max-width:20px !important;max-height:20px !important}
+
+/* ═══ الفلاتر ═══ */
+.filters{padding:0 0 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.chip{
+  padding:8px 14px;border-radius:20px;border:1px solid var(--gray-200);
+  background:var(--white);font-size:12.5px;font-weight:700;color:var(--gray-600);
+  cursor:pointer;white-space:nowrap;transition:.2s;font-family:inherit;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.chip.active{background:var(--emerald-700);color:#fff;border-color:var(--emerald-700);box-shadow:0 4px 10px rgba(13,92,70,.25)}
+.chip .count{background:rgba(255,255,255,.25);padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700}
+.chip:not(.active) .count{background:var(--gray-100);color:var(--gray-500)}
+.filters-advanced{padding:0 0 12px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.filters-advanced select{
+  padding:10px 12px;border-radius:10px;border:1px solid var(--gray-200);
+  background:var(--white);font-size:13px;font-family:inherit;color:var(--gray-700);
+  outline:none;width:100%;font-weight:700;
+}
+.filters-advanced select:focus{border-color:var(--emerald-600)}
 
 /* ═══ Toast ═══ */
 .toast{
@@ -600,7 +637,6 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 .print-page{padding:20px;background:var(--gray-100);min-height:100vh}
 .print-toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .print-toolbar .btn{flex:1;min-width:130px;padding:14px}
-
 .gov-paper{
   background:#fff;width:100%;max-width:800px;margin:0 auto;
   padding:15mm 15mm 12mm;box-shadow:0 4px 20px rgba(0,0,0,.12);
@@ -614,35 +650,17 @@ body.night-mode .drawer-item:hover{background:#0f172a}
   width:85px;height:auto;z-index:2;
 }
 .gov-eagle img{width:100%;height:auto;display:block}
-.gov-header-top{
-  display:flex;justify-content:space-between;align-items:flex-start;
-  padding-top:6px;direction:rtl;
-}
-.gov-header-right{
-  text-align:right;font-size:13px;font-weight:800;line-height:1.5;
-  padding-right:4px;flex:1;
-}
-.gov-header-left{
-  text-align:left;font-size:13px;font-weight:800;
-  padding-top:14px;padding-left:4px;flex:0 0 auto;
-}
+.gov-header-top{display:flex;justify-content:space-between;align-items:flex-start;padding-top:6px;direction:rtl}
+.gov-header-right{text-align:right;font-size:13px;font-weight:800;line-height:1.5;padding-right:4px;flex:1}
+.gov-header-left{text-align:left;font-size:13px;font-weight:800;padding-top:14px;padding-left:4px;flex:0 0 auto}
 .gov-salutation{text-align:center;font-size:16px;font-weight:800;margin:6px 0 10px}
-.gov-body{
-  font-size:14px;font-weight:700;text-align:justify;
-  margin-bottom:12px;padding:0 6px;line-height:1.7;
-}
+.gov-body{font-size:14px;font-weight:700;text-align:justify;margin-bottom:12px;padding:0 6px;line-height:1.7}
 .gov-table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:13px}
-.gov-table th,.gov-table td{
-  border:1px solid #000;padding:5px 8px;text-align:center;
-  font-weight:700;vertical-align:middle;
-}
+.gov-table th,.gov-table td{border:1px solid #000;padding:5px 8px;text-align:center;font-weight:700;vertical-align:middle}
 .gov-table th{background:#f3f3f3;font-weight:800;font-size:12.5px}
 .gov-table td.mat-name{text-align:right;padding-right:10px}
 .gov-table td.mat-qty{width:60px;font-weight:800}
-.gov-signatures{
-  display:flex;justify-content:space-between;margin-top:14px;
-  padding:0 15px;font-size:13.5px;font-weight:800;text-align:center;line-height:1.6;
-}
+.gov-signatures{display:flex;justify-content:space-between;margin-top:14px;padding:0 15px;font-size:13.5px;font-weight:800;text-align:center;line-height:1.6}
 .gov-sign-box{flex:1;max-width:45%}
 .gov-sign-box .role{display:block;margin-bottom:2px}
 .gov-sign-box .name{font-weight:900;font-size:14px}
@@ -676,13 +694,13 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 
 <!-- ═══ الشريط العلوي ═══ -->
 <div class="top-bar no-print">
-  <button class="menu-btn" onclick="toggleDrawer()" aria-label="القائمة">☰</button>
+  <button class="menu-btn" onclick="toggleDrawer()">☰</button>
   <div class="top-bar-title" id="topBarTitle">ورشة الكهرباء</div>
   <div class="top-bar-date" id="topBarDate"></div>
   <button class="top-bar-night" onclick="toggleNightMode()" id="nightToggle">🌙</button>
 </div>
 
-<!-- ═══ القائمة المنسدلة ═══ -->
+<!-- ═══ القائمة الجانبية ═══ -->
 <div class="drawer-bg" id="drawerBg" onclick="toggleDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-header">
@@ -691,66 +709,54 @@ body.night-mode .drawer-item:hover{background:#0f172a}
   </div>
   <div class="drawer-list">
     <div class="drawer-item" data-page="pageHome" onclick="switchPage('pageHome')">
-      <span class="drawer-item-icon">🏠</span>
-      <span class="drawer-item-label">الرئيسية</span>
+      <span class="drawer-item-icon">🏠</span><span class="drawer-item-label">الرئيسية</span>
     </div>
     <div class="drawer-item" data-page="pageToday" onclick="switchPage('pageToday')">
-      <span class="drawer-item-icon">🎯</span>
-      <span class="drawer-item-label">مهام اليوم</span>
+      <span class="drawer-item-icon">🎯</span><span class="drawer-item-label">مهام اليوم</span>
     </div>
     <div class="drawer-item" data-page="pageAll" onclick="switchPage('pageAll')">
-      <span class="drawer-item-icon">📋</span>
-      <span class="drawer-item-label">كل المهام</span>
+      <span class="drawer-item-icon">📋</span><span class="drawer-item-label">كل المهام</span>
       <span class="drawer-item-count" id="dcAll">0</span>
     </div>
     <div class="drawer-item" data-page="pagePostponed" onclick="switchPage('pagePostponed')">
-      <span class="drawer-item-icon">⏸️</span>
-      <span class="drawer-item-label">المؤجلة</span>
+      <span class="drawer-item-icon">⏸️</span><span class="drawer-item-label">المؤجلة</span>
       <span class="drawer-item-count" id="dcPostponed">0</span>
     </div>
     <div class="drawer-item" data-page="pageArchive" onclick="switchPage('pageArchive')">
-      <span class="drawer-item-icon">📚</span>
-      <span class="drawer-item-label">الأرشيف</span>
+      <span class="drawer-item-icon">📚</span><span class="drawer-item-label">الأرشيف</span>
       <span class="drawer-item-count" id="dcArchive">0</span>
     </div>
     <div class="drawer-divider"></div>
     <div class="drawer-item" data-page="pageTrip" onclick="switchPage('pageTrip')">
-      <span class="drawer-item-icon">🚗</span>
-      <span class="drawer-item-label">جولة اليوم</span>
+      <span class="drawer-item-icon">🚗</span><span class="drawer-item-label">جولة اليوم</span>
     </div>
     <div class="drawer-item" data-page="pageVisits" onclick="switchPage('pageVisits')">
-      <span class="drawer-item-icon">📅</span>
-      <span class="drawer-item-label">سجل الزيارات</span>
+      <span class="drawer-item-icon">📅</span><span class="drawer-item-label">سجل الزيارات</span>
     </div>
     <div class="drawer-item" data-page="pageStats" onclick="switchPage('pageStats')">
-      <span class="drawer-item-icon">📊</span>
-      <span class="drawer-item-label">الإحصائيات</span>
+      <span class="drawer-item-icon">📊</span><span class="drawer-item-label">الإحصائيات</span>
     </div>
     <div class="drawer-divider"></div>
     <div class="drawer-item" data-page="pageSchools" onclick="switchPage('pageSchools')">
-      <span class="drawer-item-icon">🏫</span>
-      <span class="drawer-item-label">المدارس</span>
+      <span class="drawer-item-icon">🏫</span><span class="drawer-item-label">المدارس</span>
       <span class="drawer-item-count" id="dcSchools">0</span>
     </div>
     <div class="drawer-item" data-page="pageMaterials" onclick="switchPage('pageMaterials')">
-      <span class="drawer-item-icon">📦</span>
-      <span class="drawer-item-label">المواد</span>
+      <span class="drawer-item-icon">📦</span><span class="drawer-item-label">المواد</span>
       <span class="drawer-item-count" id="dcMaterials">0</span>
     </div>
     <div class="drawer-item" data-page="pageSupervisors" onclick="switchPage('pageSupervisors')">
-      <span class="drawer-item-icon">👤</span>
-      <span class="drawer-item-label">المشرفون</span>
+      <span class="drawer-item-icon">👤</span><span class="drawer-item-label">المشرفون</span>
       <span class="drawer-item-count" id="dcSupervisors">0</span>
     </div>
     <div class="drawer-divider"></div>
     <div class="drawer-item" data-page="pageSettings" onclick="switchPage('pageSettings')">
-      <span class="drawer-item-icon">⚙️</span>
-      <span class="drawer-item-label">الإعدادات</span>
+      <span class="drawer-item-icon">⚙️</span><span class="drawer-item-label">الإعدادات</span>
     </div>
   </div>
 </div>
 
-<!-- ═══ صفحة الرئيسية (مساعد القرار) ═══ -->
+<!-- ═══ صفحة الرئيسية ═══ -->
 <div id="pageHome" class="page active">
   <div class="decision-card" id="decisionCard"></div>
   <div class="quick-stats">
@@ -769,20 +775,18 @@ body.night-mode .drawer-item:hover{background:#0f172a}
   </div>
   <div id="homeAlerts" class="alerts-container"></div>
   <div class="group-header danger" id="homeOverdueHeader" style="display:none">
-    <span>⚠️ متأخرة</span>
-    <span class="group-count" id="homeOverdueCount">0</span>
+    <span>⚠️ متأخرة</span><span class="group-count" id="homeOverdueCount">0</span>
   </div>
   <div id="homeOverdueList"></div>
   <div class="group-header warn" id="homeTodayHeader" style="display:none">
-    <span>📅 اليوم</span>
-    <span class="group-count" id="homeTodayCount">0</span>
+    <span>📅 اليوم</span><span class="group-count" id="homeTodayCount">0</span>
   </div>
   <div id="homeTodayList"></div>
 </div>
 
-<!-- ═══ صفحة مهام اليوم ═══ -->
+<!-- ═══ صفحة اليوم ═══ -->
 <div id="pageToday" class="page">
-  <div class="search-wrap" style="padding:0 0 10px">
+  <div class="search-wrap">
     <div class="search-box">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
       <input type="text" id="todaySearchInput" placeholder="ابحث..." oninput="renderTodayPage()">
@@ -793,13 +797,13 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 
 <!-- ═══ صفحة كل المهام ═══ -->
 <div id="pageAll" class="page">
-  <div class="search-wrap" style="padding:0 0 10px">
+  <div class="search-wrap">
     <div class="search-box">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
       <input type="text" id="searchInput" placeholder="ابحث باسم المدرسة أو المنطقة...">
     </div>
   </div>
-  <div class="filters" id="filters" style="padding:0 0 8px">
+  <div class="filters" id="filters">
     <button class="chip active" data-filter="all">الكل <span class="count" id="cntAll">0</span></button>
     <button class="chip" data-filter="new">📩 جديدة <span class="count" id="cntNew">0</span></button>
     <button class="chip" data-filter="inspecting">🔍 كشف <span class="count" id="cntInspecting">0</span></button>
@@ -807,7 +811,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
     <button class="chip" data-filter="materials">📦 مواد <span class="count" id="cntMaterials">0</span></button>
     <button class="chip" data-filter="working">🔧 تنفيذ <span class="count" id="cntWorking">0</span></button>
   </div>
-  <div class="filters-advanced" style="padding:0 0 10px">
+  <div class="filters-advanced">
     <select id="filterArea" onchange="renderAllTasks()"><option value="">📍 كل المناطق</option></select>
     <select id="filterSupervisor" onchange="renderAllTasks()"><option value="">👤 كل المشرفين</option></select>
     <select id="filterType" onchange="renderAllTasks()">
@@ -819,20 +823,20 @@ body.night-mode .drawer-item:hover{background:#0f172a}
     </select>
     <select id="filterSort" onchange="renderAllTasks()">
       <option value="priority">🔴 حسب الأولوية</option>
-      <option value="date-asc">📅 التاريخ (الأقدم)</option>
-      <option value="date-desc">📅 التاريخ (الأحدث)</option>
+      <option value="date-asc">📅 الأقدم أولاً</option>
+      <option value="date-desc">📅 الأحدث أولاً</option>
       <option value="area">📍 حسب المنطقة</option>
     </select>
   </div>
   <div id="allList"></div>
-  <button class="fab show" onclick="openTaskSheet()" aria-label="إضافة مهمة">
+  <button class="fab show" onclick="openTaskSheet()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
   </button>
 </div>
 
 <!-- ═══ صفحة المؤجلة ═══ -->
 <div id="pagePostponed" class="page">
-  <div class="search-wrap" style="padding:0 0 10px">
+  <div class="search-wrap">
     <div class="search-box">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
       <input type="text" id="postponedSearchInput" placeholder="ابحث..." oninput="renderPostponedPage()">
@@ -843,23 +847,23 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 
 <!-- ═══ صفحة الأرشيف ═══ -->
 <div id="pageArchive" class="page">
-  <div class="filters" id="archiveFilters" style="padding:0 0 10px">
+  <div class="filters" id="archiveFilters">
     <button class="chip active" data-archive="all">الكل</button>
     <button class="chip" data-archive="done">✅ منجزة</button>
     <button class="chip" data-archive="canceled">🚫 ملغاة</button>
     <button class="chip" data-archive="transferred">↔️ محوّلة</button>
   </div>
-  <div class="search-wrap" style="padding:0 0 10px">
+  <div class="search-wrap">
     <div class="search-box">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
       <input type="text" id="archiveSearchInput" placeholder="ابحث في الأرشيف..." oninput="renderArchivePage()">
     </div>
   </div>
-  <div id="archiveStats" style="font-size:13px;color:var(--gray-600);margin-bottom:10px;font-weight:700"></div>
+  <div id="archiveStats" style="font-size:13px;color:var(--gray-600);margin-bottom:10px;font-weight:700;padding:0 4px"></div>
   <div id="archiveList"></div>
 </div>
 
-<!-- ═══ صفحة جولة اليوم ═══ -->
+<!-- ═══ صفحة الجولة ═══ -->
 <div id="pageTrip" class="page">
   <div class="section">
     <div class="section-title"><span>🚗 جولة اليوم</span><button onclick="buildTodayTrip()">🔄 تحديث</button></div>
@@ -1103,6 +1107,11 @@ body.night-mode .drawer-item:hover{background:#0f172a}
       <div class="field"><label>📅 تاريخ الإنجاز</label><input type="date" id="fDoneDate"></div>
     </div>
 
+    <div class="field">
+      <label>👷 الفني المنفذ</label>
+      <select id="fTaskTechnician"><option value="">-- اختر فني --</option></select>
+    </div>
+
     <div class="field"><label>ملاحظات</label><textarea id="fNotes"></textarea></div>
 
     <button class="btn-lg btn-primary" onclick="saveTask()">💾 حفظ</button>
@@ -1123,7 +1132,6 @@ body.night-mode .drawer-item:hover{background:#0f172a}
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title"><span>⏸️ تأجيل المهمة</span><button class="sheet-close" onclick="closeSheet('postponeSheetBg')">✕</button></div>
-
     <div class="field">
       <label>📋 سبب التأجيل <span class="req">*</span></label>
       <select id="postponeReason">
@@ -1136,30 +1144,19 @@ body.night-mode .drawer-item:hover{background:#0f172a}
         <option value="__custom__">✏️ سبب آخر</option>
       </select>
     </div>
-
     <div class="field" id="customReasonField" style="display:none">
       <label>اكتب السبب</label>
-      <input type="text" id="postponeCustomReason" placeholder="السبب...">
+      <input type="text" id="postponeCustomReason">
     </div>
-
-    <div class="field">
-      <label>📅 تاريخ الاستئناف <span class="req">*</span></label>
-      <input type="date" id="postponeDate">
-    </div>
-
+    <div class="field"><label>📅 تاريخ الاستئناف <span class="req">*</span></label><input type="date" id="postponeDate"></div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">
       <button class="btn btn-ghost" onclick="setPostponeDate(1)">غداً</button>
       <button class="btn btn-ghost" onclick="setPostponeDate(3)">3 أيام</button>
       <button class="btn btn-ghost" onclick="setPostponeDate(7)">أسبوع</button>
       <button class="btn btn-ghost" onclick="setPostponeDate(30)">شهر</button>
     </div>
-
-    <div class="field">
-      <label>📝 ملاحظة (اختياري)</label>
-      <textarea id="postponeNotes" placeholder="تفاصيل..."></textarea>
-    </div>
-
-    <button class="btn-lg btn-warn" onclick="savePostpone()">⏸️ تأجيل المهمة</button>
+    <div class="field"><label>📝 ملاحظة</label><textarea id="postponeNotes"></textarea></div>
+    <button class="btn-lg btn-warn" onclick="savePostpone()">⏸️ تأجيل</button>
   </div>
 </div>
 
@@ -1168,21 +1165,17 @@ body.night-mode .drawer-item:hover{background:#0f172a}
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title"><span>📦 المواد</span><button class="sheet-close" onclick="closeSheet('matSheetBg')">✕</button></div>
-
     <div class="field">
       <label>🔍 ابحث عن مادة</label>
       <input type="text" id="matSearch" placeholder="اكتب 2 حروف..." oninput="filterMaterialsGrid(this.value)">
     </div>
-
     <div style="margin-bottom:8px;font-size:13px;font-weight:800;color:var(--gray-700)">
       ☑️ اختر المواد (يمكن اختيار عدة)
     </div>
     <div class="materials-grid" id="materialsGrid"></div>
-
-    <div style="margin-top:12px;padding:10px;background:var(--emerald-50);border-radius:10px;font-size:13px;font-weight:800;color:var(--emerald-800)">
+    <div style="margin-top:12px;padding:12px;background:var(--emerald-50);border-radius:10px;font-size:14px;font-weight:800;color:var(--emerald-800)">
       📦 المختارة: <span id="selectedCount">0</span>
     </div>
-
     <button class="btn-lg btn-primary" style="margin-top:14px" onclick="confirmAddMaterials()">✅ إضافة المختارة</button>
     <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="openAddNewMaterialFromTask()">➕ إضافة مادة جديدة</button>
   </div>
@@ -1306,7 +1299,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
     <div class="sheet-title"><span id="supervisorSheetTitle">مشرف</span><button class="sheet-close" onclick="closeSheet('supervisorSheetBg')">✕</button></div>
     <div class="field"><label>الاسم <span class="req">*</span></label><input type="text" id="supervisorName"></div>
     <div class="field"><label>📞 الجوال</label><input type="tel" id="supervisorPhone"></div>
-    <div class="field"><label>📍 المناطق</label><textarea id="supervisorAreas" placeholder="المزة، كفرسوسة..."></textarea></div>
+    <div class="field"><label>📍 المناطق</label><textarea id="supervisorAreas"></textarea></div>
     <button class="btn-lg btn-primary" onclick="saveSupervisor()">💾 حفظ</button>
   </div>
 </div>
@@ -1315,7 +1308,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 <div class="sheet-bg" id="whatsSheetBg" onclick="if(event.target===this)closeSheet('whatsSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title"><span>📱 إرسال واتساب</span><button class="sheet-close" onclick="closeSheet('whatsSheetBg')">✕</button></div>
+    <div class="sheet-title"><span>📱 واتساب</span><button class="sheet-close" onclick="closeSheet('whatsSheetBg')">✕</button></div>
     <div class="field">
       <label>المرسل إليه</label>
       <select id="whatsRecipient">
@@ -1333,10 +1326,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
         <option value="__custom__">📱 رقم آخر</option>
       </select>
     </div>
-    <div class="field">
-      <label>📝 الرسالة</label>
-      <textarea id="whatsMessage" rows="12" style="font-size:13px"></textarea>
-    </div>
+    <div class="field"><label>📝 الرسالة</label><textarea id="whatsMessage" rows="12" style="font-size:13px"></textarea></div>
     <button class="btn-lg btn-whats" onclick="sendWhatsApp()">📱 إرسال</button>
     <button class="btn-lg btn-ghost" style="margin-top:8px" onclick="copyWhatsMessage()">📋 نسخ</button>
   </div>
@@ -1350,7 +1340,7 @@ body.night-mode .drawer-item:hover{background:#0f172a}
   <div class="print-toolbar no-print" style="position:sticky;top:0;background:#fff;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);z-index:10">
     <button class="btn btn-ghost" onclick="closePrint()">← رجوع</button>
     <button class="btn btn-word" onclick="exportToWord()">📄 Word</button>
-    <button class="btn btn-primary" onclick="window.print()">🖨️ طباعة PDF</button>
+    <button class="btn btn-primary" onclick="window.print()">🖨️ PDF</button>
   </div>
   <div class="print-page">
     <div class="gov-paper" id="govPaper"></div>
@@ -1359,17 +1349,13 @@ body.night-mode .drawer-item:hover{background:#0f172a}
 
 <script>
 /* ═══════════════════════════════════════════════════════
-   القسم 1: الثوابت
+   الثوابت
    ═══════════════════════════════════════════════════════ */
 const STORAGE_KEYS = {
-  TASKS: 'wk_tasks_v5',
-  MATERIALS: 'wk_materials_v5',
-  SCHOOLS: 'wk_schools_v5',
-  TECHNICIANS: 'wk_technicians_v5',
-  SUPERVISORS: 'wk_supervisors_v5',
-  SETTINGS: 'wk_settings_v5',
-  COUNTER: 'wk_counter_v5',
-  DISMISSED_ALERTS: 'wk_dismissed_alerts'
+  TASKS: 'wk_tasks_v6', MATERIALS: 'wk_materials_v6', SCHOOLS: 'wk_schools_v6',
+  TECHNICIANS: 'wk_technicians_v6', SUPERVISORS: 'wk_supervisors_v6',
+  SETTINGS: 'wk_settings_v6', COUNTER: 'wk_counter_v6',
+  DISMISSED_ALERTS: 'wk_dismissed_alerts_v6'
 };
 
 let state = {
@@ -1380,8 +1366,7 @@ let state = {
   editingSchoolIdx: null, editingTechIdx: null, editingSupervisorIdx: null,
   editingMasterMatId: null,
   selectedSchool: null, currentAttachment: null,
-  selectedMaterialsInGrid: {},
-  dismissedAlerts: []
+  selectedMaterialsInGrid: {}, dismissedAlerts: []
 };
 
 const STATUS_LABELS = {
@@ -1402,17 +1387,13 @@ const SOURCE_LABELS = { call:'طلب', urgent:'طارئ', letter:'كتاب', rou
 const PRIORITY_LABELS = { high:'🔴 عالية', med:'🟡 متوسطة', low:'🟢 منخفضة' };
 const PRIORITY_CLS = { high:'mb-high', med:'mb-med', low:'mb-low' };
 const VISIT_TYPES = {
-  inspection: { icon:'🔍', label:'كشف مبدئي' },
-  execution: { icon:'🔧', label:'تنفيذ عمل' },
-  maintenance: { icon:'🛠️', label:'صيانة دورية' },
-  followup: { icon:'📋', label:'متابعة' },
+  inspection: { icon:'🔍', label:'كشف مبدئي' }, execution: { icon:'🔧', label:'تنفيذ عمل' },
+  maintenance: { icon:'🛠️', label:'صيانة دورية' }, followup: { icon:'📋', label:'متابعة' },
   emergency: { icon:'🚨', label:'طارئ' }
 };
 const APPROVAL_STAGES = {
-  raised: { icon:'📤', label:'رُفع الكشف' },
-  delivered: { icon:'📬', label:'وصل للجهة' },
-  approved: { icon:'✅', label:'وصلت الموافقة' },
-  rejected: { icon:'❌', label:'رُفض' }
+  raised: { icon:'📤', label:'رُفع الكشف' }, delivered: { icon:'📬', label:'وصل للجهة' },
+  approved: { icon:'✅', label:'وصلت الموافقة' }, rejected: { icon:'❌', label:'رُفض' }
 };
 const ATTACH_TYPES = {
   letter: { icon:'📄', label:'كتاب' }, approval: { icon:'✅', label:'موافقة' },
@@ -1479,9 +1460,7 @@ const SCHOOLS_DEFAULT = [
   {n:'أمية',s:'وسيم سعيد',a:'ساروجا',d:'',ad:'قصاع جانب ساحة التحرير',g:'ثانوي عام',p:'4445745'}
 ];
 
-/* ═══════════════════════════════════════════════════════
-   القسم 2: التخزين والترحيل
-   ═══════════════════════════════════════════════════════ */
+/* ═══ التحميل والترحيل ═══ */
 function loadState(){
   try{
     state.tasks = JSON.parse(localStorage.getItem(STORAGE_KEYS.TASKS) || '[]');
@@ -1499,7 +1478,6 @@ function loadState(){
     state.settings = Object.assign({}, DEFAULT_SETTINGS); state.counter = 1; state.dismissedAlerts = [];
   }
 }
-
 function migrateTasks(){
   let changed = false;
   state.tasks.forEach(t => {
@@ -1524,7 +1502,6 @@ function migrateTasks(){
   });
   if(changed) saveTasks();
 }
-
 function saveTasks(){ localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(state.tasks)); }
 function saveMaterials(){ localStorage.setItem(STORAGE_KEYS.MATERIALS, JSON.stringify(state.materials)); }
 function saveSchools(){ localStorage.setItem(STORAGE_KEYS.SCHOOLS, JSON.stringify(state.schools)); }
@@ -1534,9 +1511,7 @@ function saveSettings(){ localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.string
 function saveCounter(){ localStorage.setItem(STORAGE_KEYS.COUNTER, String(state.counter)); }
 function saveDismissedAlerts(){ localStorage.setItem(STORAGE_KEYS.DISMISSED_ALERTS, JSON.stringify(state.dismissedAlerts)); }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 3: الأدوات
-   ═══════════════════════════════════════════════════════ */
+/* ═══ الأدوات ═══ */
 function escapeHtml(s){
   if(s == null) return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -1584,7 +1559,7 @@ function getDaysDiff(dateStr){
   return Math.floor((new Date() - d) / (1000*60*60*24));
 }
 function isOverdue(t){
-  if(t.status === 'done' || t.status === 'canceled' || t.status === 'transferred') return false;
+  if(['done','canceled','transferred','postponed'].includes(t.status)) return false;
   return getDaysDiff(t.createdAt) >= (state.settings.overdueDays || 7);
 }
 function isPostponedActive(t){
@@ -1592,13 +1567,9 @@ function isPostponedActive(t){
   if(!t.postponeUntil) return true;
   return getDaysDiff(t.postponeUntil) <= 0;
 }
-function isToday(t){
-  return getDaysDiff(t.createdAt) === 0;
-}
+function isToday(t){ return getDaysDiff(t.createdAt) === 0; }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 4: التنقل
-   ═══════════════════════════════════════════════════════ */
+/* ═══ التنقل ═══ */
 function toggleDrawer(){
   document.getElementById('drawer').classList.toggle('open');
   document.getElementById('drawerBg').classList.toggle('open');
@@ -1606,21 +1577,18 @@ function toggleDrawer(){
 }
 
 const PAGE_TITLES = {
-  pageHome: 'ورشة الكهرباء',
-  pageToday: 'مهام اليوم',
-  pageAll: 'كل المهام',
-  pagePostponed: 'المؤجلة',
-  pageArchive: 'الأرشيف',
-  pageTrip: 'جولة اليوم',
-  pageVisits: 'سجل الزيارات',
-  pageStats: 'الإحصائيات',
-  pageSchools: 'المدارس',
-  pageMaterials: 'المواد',
-  pageSupervisors: 'المشرفون',
-  pageSettings: 'الإعدادات'
+  pageHome: 'ورشة الكهرباء', pageToday: 'مهام اليوم', pageAll: 'كل المهام',
+  pagePostponed: 'المؤجلة', pageArchive: 'الأرشيف', pageTrip: 'جولة اليوم',
+  pageVisits: 'سجل الزيارات', pageStats: 'الإحصائيات', pageSchools: 'المدارس',
+  pageMaterials: 'المواد', pageSupervisors: 'المشرفون', pageSettings: 'الإعدادات'
 };
 
 function switchPage(pageId){
+  // ✅ إغلاق القائمة تلقائياً
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerBg').classList.remove('open');
+  document.body.style.overflow = '';
+  
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const page = document.getElementById(pageId);
   if(page) page.classList.add('active');
@@ -1648,25 +1616,16 @@ function switchPage(pageId){
   window.scrollTo(0, 0);
 }
 
-function openSheet(id){
-  document.getElementById(id).classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeSheet(id){
-  document.getElementById(id).classList.remove('open');
-  document.body.style.overflow = '';
-}
+function openSheet(id){ document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeSheet(id){ document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 5: الوضع الليلي
-   ═══════════════════════════════════════════════════════ */
+/* ═══ الوضع الليلي ═══ */
 function toggleNightMode(){
   const isNight = document.body.classList.contains('night-mode');
   document.body.classList.toggle('night-mode');
   document.getElementById('nightToggle').textContent = isNight ? '🌙' : '☀️';
   state.settings.nightMode = isNight ? 'off' : 'on';
   saveSettings();
-  showToast(isNight ? '☀️ نهاري' : '🌙 ليلي', 'success');
 }
 function applyNightMode(){
   const mode = state.settings.nightMode || 'auto';
@@ -1680,9 +1639,7 @@ function applyNightMode(){
   if(btn) btn.textContent = shouldNight ? '☀️' : '🌙';
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 6: البحث في المدارس
-   ═══════════════════════════════════════════════════════ */
+/* ═══ البحث في المدارس ═══ */
 function searchSchools(query){
   const results = document.getElementById('schoolResults');
   const q = (query || '').trim().toLowerCase();
@@ -1691,8 +1648,7 @@ function searchSchools(query){
     (s.n && s.n.toLowerCase().indexOf(q) !== -1) ||
     (s.oldName && s.oldName.toLowerCase().indexOf(q) !== -1) ||
     (s.a && s.a.toLowerCase().indexOf(q) !== -1) ||
-    (s.s && s.s.toLowerCase().indexOf(q) !== -1) ||
-    (s.ad && s.ad.toLowerCase().indexOf(q) !== -1)
+    (s.s && s.s.toLowerCase().indexOf(q) !== -1)
   ).slice(0, 30);
   if(matches.length === 0){
     results.innerHTML = '<div style="padding:12px;text-align:center;color:var(--gray-500);font-size:13px">لا توجد نتائج</div>';
@@ -1705,7 +1661,7 @@ function searchSchools(query){
     html += '<div class="school-item-name">' + escapeHtml(s.n);
     if(s.oldName) html += ' <span class="old-tag">(سابقاً: ' + escapeHtml(s.oldName) + ')</span>';
     html += '</div>';
-    html += '<div class="school-item-meta">👤 ' + escapeHtml(s.s || '') + ' • 📍 ' + escapeHtml(s.a || '') + (s.d ? ' - ' + escapeHtml(s.d) : '') + '</div>';
+    html += '<div class="school-item-meta">👤 ' + escapeHtml(s.s || '') + ' • 📍 ' + escapeHtml(s.a || '') + '</div>';
     html += '</div>';
   });
   results.innerHTML = html;
@@ -1724,7 +1680,6 @@ function pickSchool(idx){
   if(s.g) info += '<br>📚 ' + escapeHtml(s.g);
   if(s.halls) info += ' • 🏫 ' + escapeHtml(s.halls) + ' قاعة';
   if(s.p) info += ' • 📞 ' + escapeHtml(s.p);
-  if(s.ad) info += '<br>📌 ' + escapeHtml(s.ad);
   document.getElementById('selInfo').innerHTML = info;
   document.getElementById('selectedSchool').style.display = 'block';
   document.getElementById('fName').value = s.n;
@@ -1746,21 +1701,23 @@ function clearSelectedSchool(){
   document.getElementById('schoolResults').classList.remove('show');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 7: إدارة المهام
-   ═══════════════════════════════════════════════════════ */
+/* ═══ إدارة المهام ═══ */
 function openTaskSheet(taskId){
   state.editingTaskId = taskId || null;
-  const title = document.getElementById('taskSheetTitle');
   document.getElementById('fSchoolSearch').value = '';
   document.getElementById('schoolResults').classList.remove('show');
   document.getElementById('selectedSchool').style.display = 'none';
   state.selectedSchool = null;
 
+  // ✅ تعبئة قائمة الفنيين
+  const techOpts = '<option value="">-- اختر فني --</option>' + state.technicians.map(t => '<option value="' + escapeHtml(t.name) + '">' + escapeHtml(t.name) + '</option>').join('');
+  const techSelect = document.getElementById('fTaskTechnician');
+  if(techSelect) techSelect.innerHTML = techOpts;
+
   if(taskId){
     const t = state.tasks.find(x => x.id === taskId);
     if(!t){ showToast('❌ المهمة غير موجودة', 'error'); return; }
-    title.textContent = '✏️ تعديل المهمة #' + t.number;
+    document.getElementById('taskSheetTitle').textContent = '✏️ تعديل #' + t.number;
     document.getElementById('fSource').value = t.source || 'call';
     document.getElementById('fName').value = t.name || '';
     document.getElementById('fNewName').value = t.newName || '';
@@ -1776,6 +1733,7 @@ function openTaskSheet(taskId){
     document.getElementById('fSecretary').value = t.secretary || '';
     document.getElementById('fSecretaryPhone').value = t.secretaryPhone || '';
     document.getElementById('fNotes').value = t.notes || '';
+    document.getElementById('fTaskTechnician').value = t.technician || '';
     document.getElementById('fCreatedDate').value = arToIso(t.createdAt) || new Date().toISOString().slice(0,10);
     document.getElementById('fDoneDate').value = arToIso(t.doneAt) || '';
     const foundSchool = state.schools.find(s => s.n === t.name);
@@ -1787,27 +1745,17 @@ function openTaskSheet(taskId){
       document.getElementById('selectedSchool').style.display = 'block';
     }
   }else{
-    title.textContent = '➕ مهمة جديدة';
+    document.getElementById('taskSheetTitle').textContent = '➕ مهمة جديدة';
+    ['fName','fNewName','fBuilding','fRoom','fContact','fContactPhone','fPrincipal','fPrincipalPhone','fSecretary','fSecretaryPhone','fNotes'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('fSource').value = 'call';
-    document.getElementById('fName').value = '';
-    document.getElementById('fNewName').value = '';
-    document.getElementById('fBuilding').value = '';
-    document.getElementById('fRoom').value = '';
     document.getElementById('fType').value = '🔌 إصلاح عطل';
     document.getElementById('fPriority').value = 'med';
     document.getElementById('fArea').value = 'المزة';
-    document.getElementById('fContact').value = '';
-    document.getElementById('fContactPhone').value = '';
-    document.getElementById('fPrincipal').value = '';
-    document.getElementById('fPrincipalPhone').value = '';
-    document.getElementById('fSecretary').value = '';
-    document.getElementById('fSecretaryPhone').value = '';
-    document.getElementById('fNotes').value = '';
+    document.getElementById('fTaskTechnician').value = '';
     document.getElementById('fCreatedDate').value = new Date().toISOString().slice(0,10);
     document.getElementById('fDoneDate').value = '';
   }
   openSheet('taskSheetBg');
-  setTimeout(() => document.getElementById('fSchoolSearch').focus(), 350);
 }
 
 function saveTask(){
@@ -1830,6 +1778,7 @@ function saveTask(){
     secretary: document.getElementById('fSecretary').value.trim(),
     secretaryPhone: document.getElementById('fSecretaryPhone').value.trim(),
     notes: document.getElementById('fNotes').value.trim(),
+    technician: document.getElementById('fTaskTechnician').value.trim(),
     createdAt: isoToAr(document.getElementById('fCreatedDate').value) || todayISO(),
     doneAt: isoToAr(document.getElementById('fDoneDate').value) || ''
   };
@@ -1848,24 +1797,16 @@ function saveTask(){
       const oldTask = state.tasks[idx];
       if(oldTask.name !== data.name && !data.oldName) data.oldName = oldTask.name;
       state.tasks[idx] = Object.assign({}, oldTask, data);
-      showToast('✅ تم تحديث المهمة', 'success');
-    } else { showToast('❌ المهمة غير موجودة', 'error'); return; }
+      showToast('✅ تم التحديث', 'success');
+    }
   }else{
     const task = Object.assign({
-      id: Date.now(),
-      number: state.counter++,
-      status: 'new',
-      materials: [],
-      technician: '',
-      executionNotes: '',
-      approvalLog: [],
-      visitLog: [],
-      attachments: [],
-      postponeLog: []
+      id: Date.now(), number: state.counter++, status: 'new',
+      materials: [], executionNotes: '', approvalLog: [], visitLog: [], attachments: [], postponeLog: []
     }, data);
     state.tasks.unshift(task);
     saveCounter();
-    showToast('✅ تمت إضافة المهمة', 'success');
+    showToast('✅ تمت الإضافة', 'success');
   }
   saveTasks();
   closeSheet('taskSheetBg');
@@ -1887,52 +1828,43 @@ function changeTaskStatus(id, newStatus){
   saveTasks();
   refreshAllViews();
   if(document.getElementById('detailSheetBg').classList.contains('open')) openDetail(id);
-  showToast('✅ تم تحديث الحالة', 'success');
+  showToast('✅ تم التحديث', 'success');
 }
 
 function deleteTask(id){
-  if(!confirm('حذف المهمة نهائياً؟')) return;
+  if(!confirm('حذف المهمة؟')) return;
   state.tasks = state.tasks.filter(x => x.id !== id);
-  saveTasks();
-  refreshAllViews();
+  saveTasks(); refreshAllViews();
   closeSheet('detailSheetBg');
   showToast('🗑️ تم الحذف', 'warn');
 }
 
 function editTaskFromDetail(taskId){
   closeSheet('detailSheetBg');
-  document.body.style.overflow = '';
   setTimeout(() => openTaskSheet(taskId), 300);
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 8: نظام التأجيل
-   ═══════════════════════════════════════════════════════ */
+/* ═══ التأجيل ═══ */
 function openPostponeSheet(taskId){
   state.currentTaskId = taskId;
   document.getElementById('postponeReason').value = 'توجيه من الإدارة';
   document.getElementById('customReasonField').style.display = 'none';
   document.getElementById('postponeCustomReason').value = '';
   document.getElementById('postponeNotes').value = '';
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
   document.getElementById('postponeDate').value = tomorrow.toISOString().slice(0,10);
   closeSheet('detailSheetBg');
   setTimeout(() => openSheet('postponeSheetBg'), 200);
 }
-
 function setPostponeDate(days){
-  const d = new Date();
-  d.setDate(d.getDate() + days);
+  const d = new Date(); d.setDate(d.getDate() + days);
   document.getElementById('postponeDate').value = d.toISOString().slice(0,10);
 }
-
-document.addEventListener('change', (e) => {
+document.addEventListener('change', e => {
   if(e.target && e.target.id === 'postponeReason'){
     document.getElementById('customReasonField').style.display = e.target.value === '__custom__' ? 'block' : 'none';
   }
 });
-
 function savePostpone(){
   const t = state.tasks.find(x => x.id === state.currentTaskId);
   if(!t) return;
@@ -1944,7 +1876,6 @@ function savePostpone(){
   const dateISO = document.getElementById('postponeDate').value;
   if(!dateISO){ showToast('اختر التاريخ', 'error'); return; }
   const dateAr = isoToAr(dateISO);
-
   if(!t.postponeLog) t.postponeLog = [];
   t.postponeLog.unshift({ reason, until: dateAr, notes: document.getElementById('postponeNotes').value.trim(), date: todayISO() });
   t.status = 'postponed';
@@ -1954,12 +1885,9 @@ function savePostpone(){
   showToast('⏸️ تم التأجيل حتى ' + dateAr, 'success');
   closeSheet('postponeSheetBg');
   refreshAllViews();
-  setTimeout(() => openDetail(t.id), 200);
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 9: المواد المتعددة
-   ═══════════════════════════════════════════════════════ */
+/* ═══ المواد المتعددة ═══ */
 function openMaterialsForTask(taskId){
   const t = state.tasks.find(x => x.id === taskId);
   if(!t) return;
@@ -1970,7 +1898,6 @@ function openMaterialsForTask(taskId){
   closeSheet('detailSheetBg');
   setTimeout(() => openSheet('matSheetBg'), 200);
 }
-
 function renderMaterialsGrid(query){
   const grid = document.getElementById('materialsGrid');
   const q = (query || '').trim().toLowerCase();
@@ -1984,7 +1911,7 @@ function renderMaterialsGrid(query){
   list.forEach(m => {
     const selected = state.selectedMaterialsInGrid[m.id] || false;
     html += '<label class="material-check' + (selected ? ' selected' : '') + '" onclick="toggleMaterialSelection(' + m.id + ', event)">';
-    html += '<input type="checkbox" ' + (selected ? 'checked' : '') + ' onchange="toggleMaterialSelection(' + m.id + ', event)">';
+    html += '<input type="checkbox" ' + (selected ? 'checked' : '') + '>';
     html += '<span class="material-check-name">' + escapeHtml(m.name) + '</span>';
     html += '<span class="material-check-unit">' + escapeHtml(m.unit) + '</span>';
     if(selected){
@@ -1995,29 +1922,20 @@ function renderMaterialsGrid(query){
   grid.innerHTML = html;
   updateSelectedCount();
 }
-
 function toggleMaterialSelection(matId, event){
   if(event) event.preventDefault();
-  if(state.selectedMaterialsInGrid[matId]){
-    delete state.selectedMaterialsInGrid[matId];
-  } else {
-    state.selectedMaterialsInGrid[matId] = 1;
-  }
+  if(state.selectedMaterialsInGrid[matId]) delete state.selectedMaterialsInGrid[matId];
+  else state.selectedMaterialsInGrid[matId] = 1;
   renderMaterialsGrid(document.getElementById('matSearch').value);
 }
-
 function updateSelectedQty(matId, val){
   const q = parseInt(val) || 1;
   state.selectedMaterialsInGrid[matId] = q < 1 ? 1 : q;
 }
-
 function updateSelectedCount(){
-  const count = Object.keys(state.selectedMaterialsInGrid).length;
-  document.getElementById('selectedCount').textContent = count;
+  document.getElementById('selectedCount').textContent = Object.keys(state.selectedMaterialsInGrid).length;
 }
-
 function filterMaterialsGrid(q){ renderMaterialsGrid(q); }
-
 function confirmAddMaterials(){
   const t = state.tasks.find(x => x.id === state.currentTaskId);
   if(!t) return;
@@ -2028,59 +1946,49 @@ function confirmAddMaterials(){
     if(!m) return;
     const exists = t.materials.find(x => x.name === m.name);
     if(exists) skipped++;
-    else {
-      t.materials.push({ name: m.name, unit: m.unit, qty: state.selectedMaterialsInGrid[id] });
-      added++;
-    }
+    else { t.materials.push({ name: m.name, unit: m.unit, qty: state.selectedMaterialsInGrid[id] }); added++; }
   });
   saveTasks();
-  showToast('✅ أُضيفت ' + added + (skipped ? ' — تم تجاهل ' + skipped + ' مكررة' : ''), 'success');
+  showToast('✅ أُضيفت ' + added + (skipped ? ' — تم تجاهل ' + skipped : ''), 'success');
   state.selectedMaterialsInGrid = {};
   closeSheet('matSheetBg');
   setTimeout(() => openDetail(t.id), 200);
 }
-
 function openAddNewMaterialFromTask(){
   state.editingMasterMatId = null;
-  document.getElementById('masterMatTitle').textContent = '➕ إضافة مادة جديدة';
+  document.getElementById('masterMatTitle').textContent = '➕ مادة جديدة';
   document.getElementById('masterMatName').value = '';
   document.getElementById('masterMatUnit').value = 'عدد';
   openSheet('masterMatSheetBg');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 10: عرض الصفحات
-   ═══════════════════════════════════════════════════════ */
+/* ═══ العرض ═══ */
 function refreshAllViews(){
   updateStatsAndCounts();
-  const currentPage = localStorage.getItem('wk_current_page') || 'pageHome';
-  if(currentPage === 'pageHome') renderHomePage();
-  if(currentPage === 'pageToday') renderTodayPage();
-  if(currentPage === 'pageAll') renderAllTasks();
-  if(currentPage === 'pagePostponed') renderPostponedPage();
-  if(currentPage === 'pageArchive') renderArchivePage();
+  const cp = localStorage.getItem('wk_current_page') || 'pageHome';
+  if(cp === 'pageHome') renderHomePage();
+  if(cp === 'pageToday') renderTodayPage();
+  if(cp === 'pageAll') renderAllTasks();
+  if(cp === 'pagePostponed') renderPostponedPage();
+  if(cp === 'pageArchive') renderArchivePage();
   renderAlerts();
 }
-
 function updateStatsAndCounts(){
   const overdue = state.tasks.filter(t => isOverdue(t)).length;
-  const today = state.tasks.filter(t => isToday(t) && t.status !== 'done' && t.status !== 'canceled' && t.status !== 'transferred').length;
+  const today = state.tasks.filter(t => isToday(t) && !['done','canceled','transferred','postponed'].includes(t.status)).length;
   const done = state.tasks.filter(t => t.status === 'done').length;
   const postponed = state.tasks.filter(t => t.status === 'postponed').length;
   const archived = state.tasks.filter(t => ['done','canceled','transferred'].includes(t.status)).length;
-
   document.getElementById('qsOverdue').textContent = overdue;
   document.getElementById('qsToday').textContent = today;
   document.getElementById('qsDone').textContent = done;
-
   document.getElementById('dcAll').textContent = state.tasks.filter(t => !['done','canceled','transferred'].includes(t.status)).length;
   document.getElementById('dcPostponed').textContent = postponed;
   document.getElementById('dcArchive').textContent = archived;
   document.getElementById('dcSchools').textContent = state.schools.length;
   document.getElementById('dcMaterials').textContent = state.materials.length;
   document.getElementById('dcSupervisors').textContent = state.supervisors.length;
-
-  const c = (s) => state.tasks.filter(t => t.status === s).length;
+  const c = s => state.tasks.filter(t => t.status === s).length;
   document.getElementById('cntAll').textContent = state.tasks.length;
   document.getElementById('cntNew').textContent = c('new');
   document.getElementById('cntInspecting').textContent = c('inspecting');
@@ -2089,15 +1997,11 @@ function updateStatsAndCounts(){
   document.getElementById('cntWorking').textContent = c('working');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 11: البطاقة الجديدة
-   ═══════════════════════════════════════════════════════ */
 function renderTaskCard(t){
   const displayName = t.newName || t.name;
   const overdue = isOverdue(t);
   const days = getDaysDiff(t.createdAt);
   const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
-
   let html = '<div class="task-card-new st-' + t.status + (overdue ? ' overdue' : '') + '" onclick="openDetail(' + t.id + ')">';
   html += '<div class="tc-school">' + escapeHtml(displayName) + '</div>';
   html += '<div class="tc-info">';
@@ -2113,20 +2017,20 @@ function renderTaskCard(t){
   if(t.status === 'postponed' && t.postponeReason) html += '<span class="tc-badge mb-suspended">⏸️ ' + escapeHtml(t.postponeReason) + '</span>';
   html += '</div>';
   html += '<div class="tc-actions" onclick="event.stopPropagation()">';
-  html += '<button class="tc-btn tc-btn-details" onclick="openDetail(' + t.id + ')" title="تفاصيل">📋</button>';
+  html += '<button class="tc-btn tc-btn-details" onclick="openDetail(' + t.id + ')">📋 تفاصيل</button>';
   if(t.status !== 'done' && t.status !== 'canceled' && t.status !== 'transferred'){
-    html += '<button class="tc-btn tc-btn-done" onclick="changeTaskStatus(' + t.id + ',\'done\')" title="إنجاز">✅</button>';
+    html += '<button class="tc-btn tc-btn-done" onclick="changeTaskStatus(' + t.id + ',\'done\')">✅ إنجاز</button>';
   } else if(t.status === 'done'){
-    html += '<button class="tc-btn tc-btn-done" onclick="changeTaskStatus(' + t.id + ',\'working\')" title="إرجاع">↩️</button>';
+    html += '<button class="tc-btn tc-btn-done" onclick="changeTaskStatus(' + t.id + ',\'working\')">↩️ إرجاع</button>';
   } else {
-    html += '<button class="tc-btn tc-btn-details" onclick="openDetail(' + t.id + ')" title="عرض">👁️</button>';
+    html += '<button class="tc-btn tc-btn-details" onclick="openDetail(' + t.id + ')">👁️ عرض</button>';
   }
-  if(t.status !== 'done' && t.status !== 'canceled' && t.status !== 'transferred'){
-    html += '<button class="tc-btn tc-btn-postpone" onclick="openPostponeSheet(' + t.id + ')" title="تأجيل">⏸️</button>';
+  if(!['done','canceled','transferred'].includes(t.status)){
+    html += '<button class="tc-btn tc-btn-postpone" onclick="openPostponeSheet(' + t.id + ')">⏸️ تأجيل</button>';
   } else {
-    html += '<button class="tc-btn tc-btn-postpone" onclick="openDetail(' + t.id + ')" title="—">—</button>';
+    html += '<button class="tc-btn tc-btn-postpone" onclick="openDetail(' + t.id + ')" style="opacity:.5">—</button>';
   }
-  html += '<button class="tc-btn tc-btn-whats" onclick="openWhatsForTask(' + t.id + ')" title="واتس">📱</button>';
+  html += '<button class="tc-btn tc-btn-whats" onclick="openWhatsForTask(' + t.id + ')">📱 واتس</button>';
   html += '</div>';
   html += '</div>';
   return html;
@@ -2136,8 +2040,7 @@ function sortTasksByPriority(list){
   const statusOrder = { new:0, inspecting:1, awaiting:2, materials:3, working:4, postponed:6, suspended:7, transferred:8, canceled:9, done:5 };
   const prioOrder = { high:0, med:1, low:2 };
   return list.sort((a,b) => {
-    const ao = isOverdue(a) ? -1 : 0;
-    const bo = isOverdue(b) ? -1 : 0;
+    const ao = isOverdue(a) ? -1 : 0, bo = isOverdue(b) ? -1 : 0;
     if(ao !== bo) return ao - bo;
     if(a.status !== b.status){
       const so = (statusOrder[a.status]||0) - (statusOrder[b.status]||0);
@@ -2147,22 +2050,17 @@ function sortTasksByPriority(list){
   });
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 12: الصفحة الرئيسية (مساعد القرار)
-   ═══════════════════════════════════════════════════════ */
+/* ═══ الرئيسية ═══ */
 function renderHomePage(){
   const activeTasks = state.tasks.filter(t => !['done','canceled','transferred','postponed'].includes(t.status));
   const overdueTasks = state.tasks.filter(t => isOverdue(t));
   const todayTasks = activeTasks.filter(t => isToday(t));
-
-  // مساعد القرار
-  const decisionCard = document.getElementById('decisionCard');
+  const dc = document.getElementById('decisionCard');
   if(overdueTasks.length > 0){
     const areas = {};
     overdueTasks.forEach(t => { areas[t.area] = (areas[t.area] || 0) + 1; });
     const topArea = Object.keys(areas).sort((a,b) => areas[b] - areas[a])[0];
-    decisionCard.innerHTML =
-      '<div class="d-title">🎯 اقتراح اليوم</div>' +
+    dc.innerHTML = '<div class="d-title">🎯 اقتراح اليوم</div>' +
       '<div class="d-main">📍 اذهب إلى ' + escapeHtml(topArea) + '</div>' +
       '<div class="d-reason">' + areas[topArea] + ' مهمة متأخرة هناك — ابدأ بها فوراً</div>' +
       '<div class="d-actions">' +
@@ -2170,58 +2068,43 @@ function renderHomePage(){
       '<button class="decision-btn secondary" onclick="switchPage(\'pageAll\')">📋 كل المهام</button>' +
       '</div>';
   } else if(todayTasks.length > 0){
-    decisionCard.innerHTML =
-      '<div class="d-title">☀️ يوم جيد!</div>' +
+    dc.innerHTML = '<div class="d-title">☀️ يوم جيد!</div>' +
       '<div class="d-main">' + todayTasks.length + ' مهمة اليوم</div>' +
       '<div class="d-reason">لا توجد مهام متأخرة — استمر!</div>' +
       '<div class="d-actions">' +
       '<button class="decision-btn primary" onclick="switchPage(\'pageToday\')">📅 مهام اليوم</button>' +
       '</div>';
   } else {
-    decisionCard.innerHTML =
-      '<div class="d-title">🎉 أحسنت!</div>' +
+    dc.innerHTML = '<div class="d-title">🎉 أحسنت!</div>' +
       '<div class="d-main">لا مهام معلقة</div>' +
       '<div class="d-reason">كل شيء تحت السيطرة</div>' +
       '<div class="d-actions">' +
       '<button class="decision-btn primary" onclick="openTaskSheet()">➕ مهمة جديدة</button>' +
       '</div>';
   }
-
-  // المتأخرة
-  const overdueHeader = document.getElementById('homeOverdueHeader');
-  const overdueList = document.getElementById('homeOverdueList');
+  const oH = document.getElementById('homeOverdueHeader');
+  const oL = document.getElementById('homeOverdueList');
   if(overdueTasks.length > 0){
-    overdueHeader.style.display = 'flex';
+    oH.style.display = 'flex';
     document.getElementById('homeOverdueCount').textContent = overdueTasks.length;
-    let sortedOverdue = sortTasksByPriority([...overdueTasks]);
-    overdueList.innerHTML = sortedOverdue.slice(0, 5).map(renderTaskCard).join('');
-  } else {
-    overdueHeader.style.display = 'none';
-    overdueList.innerHTML = '';
-  }
-
-  // اليوم
-  const todayHeader = document.getElementById('homeTodayHeader');
-  const todayList = document.getElementById('homeTodayList');
+    sortTasksByPriority([...overdueTasks]);
+    oL.innerHTML = overdueTasks.slice(0, 5).map(renderTaskCard).join('');
+  } else { oH.style.display = 'none'; oL.innerHTML = ''; }
+  const tH = document.getElementById('homeTodayHeader');
+  const tL = document.getElementById('homeTodayList');
   if(todayTasks.length > 0){
-    todayHeader.style.display = 'flex';
+    tH.style.display = 'flex';
     document.getElementById('homeTodayCount').textContent = todayTasks.length;
-    let sortedToday = sortTasksByPriority([...todayTasks]);
-    todayList.innerHTML = sortedToday.slice(0, 5).map(renderTaskCard).join('');
-  } else {
-    todayHeader.style.display = 'none';
-    todayList.innerHTML = '';
-  }
+    sortTasksByPriority([...todayTasks]);
+    tL.innerHTML = todayTasks.slice(0, 5).map(renderTaskCard).join('');
+  } else { tH.style.display = 'none'; tL.innerHTML = ''; }
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 13: صفحة اليوم
-   ═══════════════════════════════════════════════════════ */
 function renderTodayPage(){
   const container = document.getElementById('todayList');
   const search = (document.getElementById('todaySearchInput').value || '').toLowerCase().trim();
-  const todayTasks = state.tasks.filter(t => {
-    if(t.status === 'done' || t.status === 'canceled' || t.status === 'transferred' || t.status === 'postponed') return false;
+  let tasks = state.tasks.filter(t => {
+    if(['done','canceled','transferred','postponed'].includes(t.status)) return false;
     if(!isToday(t) && !isOverdue(t)) return false;
     if(search){
       const blob = (t.name + ' ' + (t.newName||'') + ' ' + t.area + ' ' + (t.contact||'')).toLowerCase();
@@ -2229,17 +2112,14 @@ function renderTodayPage(){
     }
     return true;
   });
-  if(todayTasks.length === 0){
+  if(tasks.length === 0){
     container.innerHTML = '<div class="empty"><div class="empty-icon">☀️</div><p>لا مهام لهذا اليوم</p></div>';
     return;
   }
-  sortTasksByPriority(todayTasks);
-  container.innerHTML = todayTasks.map(renderTaskCard).join('');
+  sortTasksByPriority(tasks);
+  container.innerHTML = tasks.map(renderTaskCard).join('');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 14: صفحة كل المهام
-   ═══════════════════════════════════════════════════════ */
 function renderAllTasks(){
   const container = document.getElementById('allList');
   const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
@@ -2248,7 +2128,6 @@ function renderAllTasks(){
   const supF = document.getElementById('filterSupervisor').value;
   const typeF = document.getElementById('filterType').value;
   const sortBy = document.getElementById('filterSort').value;
-
   let list = state.tasks.filter(t => {
     if(filter !== 'all' && t.status !== filter) return false;
     if(search){
@@ -2260,12 +2139,10 @@ function renderAllTasks(){
     if(typeF && t.type !== typeF) return false;
     return true;
   });
-
   if(sortBy === 'date-asc') list.sort((a,b) => a.createdAt.localeCompare(b.createdAt));
   else if(sortBy === 'date-desc') list.sort((a,b) => b.createdAt.localeCompare(a.createdAt));
   else if(sortBy === 'area') list.sort((a,b) => (a.area||'').localeCompare(b.area||'', 'ar'));
   else sortTasksByPriority(list);
-
   if(list.length === 0){
     container.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>لا توجد مهام</p></div>';
     return;
@@ -2273,16 +2150,11 @@ function renderAllTasks(){
   container.innerHTML = list.map(renderTaskCard).join('');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 15: صفحة المؤجلة
-   ═══════════════════════════════════════════════════════ */
 function renderPostponedPage(){
   const container = document.getElementById('postponedList');
   const search = (document.getElementById('postponedSearchInput').value || '').toLowerCase().trim();
   let list = state.tasks.filter(t => t.status === 'postponed');
-  if(search){
-    list = list.filter(t => (t.name + ' ' + t.area + ' ' + (t.postponeReason||'')).toLowerCase().indexOf(search) !== -1);
-  }
+  if(search) list = list.filter(t => (t.name + ' ' + t.area + ' ' + (t.postponeReason||'')).toLowerCase().indexOf(search) !== -1);
   if(list.length === 0){
     container.innerHTML = '<div class="empty"><div class="empty-icon">⏸️</div><p>لا توجد مهام مؤجلة</p></div>';
     return;
@@ -2291,10 +2163,7 @@ function renderPostponedPage(){
   container.innerHTML = list.map(renderTaskCard).join('');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 16: الأرشيف
-   ═══════════════════════════════════════════════════════ */
-document.addEventListener('click', (e) => {
+document.addEventListener('click', e => {
   if(e.target.matches('#archiveFilters .chip')){
     document.querySelectorAll('#archiveFilters .chip').forEach(c => c.classList.remove('active'));
     e.target.classList.add('active');
@@ -2302,7 +2171,6 @@ document.addEventListener('click', (e) => {
     renderArchivePage();
   }
 });
-
 function renderArchivePage(){
   const container = document.getElementById('archiveList');
   const search = (document.getElementById('archiveSearchInput').value || '').toLowerCase().trim();
@@ -2310,12 +2178,7 @@ function renderArchivePage(){
   if(state.currentArchiveFilter !== 'all') list = list.filter(t => t.status === state.currentArchiveFilter);
   if(search) list = list.filter(t => (t.name + ' ' + t.area).toLowerCase().indexOf(search) !== -1);
   list.sort((a,b) => (b.doneAt || b.createdAt).localeCompare(a.doneAt || a.createdAt));
-
-  const doneCount = state.tasks.filter(t => t.status === 'done').length;
-  const canceledCount = state.tasks.filter(t => t.status === 'canceled').length;
-  const transferredCount = state.tasks.filter(t => t.status === 'transferred').length;
-  document.getElementById('archiveStats').innerHTML = '✅ ' + doneCount + ' منجزة • 🚫 ' + canceledCount + ' ملغاة • ↔️ ' + transferredCount + ' محوّلة';
-
+  document.getElementById('archiveStats').innerHTML = '✅ ' + state.tasks.filter(t => t.status === 'done').length + ' منجزة • 🚫 ' + state.tasks.filter(t => t.status === 'canceled').length + ' ملغاة • ↔️ ' + state.tasks.filter(t => t.status === 'transferred').length + ' محوّلة';
   if(list.length === 0){
     container.innerHTML = '<div class="empty"><div class="empty-icon">📚</div><p>لا شيء في الأرشيف</p></div>';
     return;
@@ -2323,42 +2186,40 @@ function renderArchivePage(){
   container.innerHTML = list.map(renderTaskCard).join('');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 17: التنبيهات
-   ═══════════════════════════════════════════════════════ */
+/* ═══ التنبيهات (مع إغلاق تلقائي) ═══ */
+let autoDismissTimer = null;
 function renderAlerts(){
   const container = document.getElementById('homeAlerts');
   if(!container) return;
   const overdue = state.tasks.filter(t => isOverdue(t)).length;
   const returnedPostponed = state.tasks.filter(t => isPostponedActive(t)).length;
-
+  const todayKey = 'overdue_' + new Date().toDateString();
+  const postponedKey = 'postponed_' + new Date().toDateString();
   let html = '';
-  if(overdue > 0 && !state.dismissedAlerts.includes('overdue_' + new Date().toDateString())){
-    html += '<div class="alert-row danger">';
-    html += '<div class="alert-icon">⚠️</div>';
-    html += '<div class="alert-text">' + overdue + ' مهمة متأخرة</div>';
-    html += '<button class="alert-close" onclick="dismissAlert(\'overdue_' + new Date().toDateString() + '\')">✕</button>';
-    html += '</div>';
+  if(overdue > 0 && !state.dismissedAlerts.includes(todayKey)){
+    html += '<div class="alert-row danger"><div class="alert-icon">⚠️</div><div class="alert-text">' + overdue + ' مهمة متأخرة</div><button class="alert-close" onclick="dismissAlert(\'' + todayKey + '\')">✕</button></div>';
   }
-  if(returnedPostponed > 0){
-    html += '<div class="alert-row warn">';
-    html += '<div class="alert-icon">🔔</div>';
-    html += '<div class="alert-text">' + returnedPostponed + ' مهمة عادت من التأجيل</div>';
-    html += '<button class="alert-close" onclick="switchPage(\'pagePostponed\')">›</button>';
-    html += '</div>';
+  if(returnedPostponed > 0 && !state.dismissedAlerts.includes(postponedKey)){
+    html += '<div class="alert-row warn"><div class="alert-icon">🔔</div><div class="alert-text">' + returnedPostponed + ' مهمة عادت من التأجيل</div><button class="alert-close" onclick="dismissAlert(\'' + postponedKey + '\')">✕</button></div>';
   }
   container.innerHTML = html;
+  clearTimeout(autoDismissTimer);
+  if(html){
+    autoDismissTimer = setTimeout(() => {
+      if(overdue > 0 && !state.dismissedAlerts.includes(todayKey)) state.dismissedAlerts.push(todayKey);
+      if(returnedPostponed > 0 && !state.dismissedAlerts.includes(postponedKey)) state.dismissedAlerts.push(postponedKey);
+      saveDismissedAlerts();
+      container.innerHTML = '';
+    }, 8000);
+  }
 }
-
 function dismissAlert(key){
-  state.dismissedAlerts.push(key);
+  if(!state.dismissedAlerts.includes(key)) state.dismissedAlerts.push(key);
   saveDismissedAlerts();
   renderAlerts();
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 18: تفاصيل المهمة
-   ═══════════════════════════════════════════════════════ */
+/* ═══ التفاصيل ═══ */
 function openDetail(id){
   const t = state.tasks.find(x => x.id === id);
   if(!t) return;
@@ -2366,25 +2227,22 @@ function openDetail(id){
   const displayName = t.newName || t.name;
   const st = STATUS_LABELS[t.status] || STATUS_LABELS.new;
   const overdue = isOverdue(t);
-
   let html = '<div style="background:var(--gray-50);border-radius:12px;padding:16px;margin-bottom:12px">';
   html += '<div style="font-size:22px;font-weight:900;color:var(--emerald-800);margin-bottom:8px">' + escapeHtml(displayName) + '</div>';
   if(t.newName && t.name !== t.newName) html += '<div style="font-size:13px;color:var(--copper-600);margin-bottom:4px">📛 الأصلي: ' + escapeHtml(t.name) + '</div>';
   if(t.oldName) html += '<div style="font-size:13px;color:var(--gray-500);margin-bottom:4px">📜 القديم: ' + escapeHtml(t.oldName) + '</div>';
-  html += '<div style="font-size:13px;color:var(--gray-500)">#' + t.number + ' • ' + escapeHtml(t.area) + ' • ' + t.createdAt + '</div>';
+  html += '<div style="font-size:13px;color:var(--gray-500)">#' + t.number + ' • ' + escapeHtml(t.area) + ' • ' + t.createdAt + (t.doneAt ? ' • ✅ ' + t.doneAt : '') + '</div>';
   if(overdue) html += '<div style="margin-top:8px;background:var(--danger-light);color:var(--danger);padding:8px 12px;border-radius:8px;font-size:13px;font-weight:800">⚠️ متأخرة منذ ' + getDaysDiff(t.createdAt) + ' يوم</div>';
   if(t.status === 'postponed' && t.postponeUntil) html += '<div style="margin-top:8px;background:var(--gray-100);color:var(--gray-700);padding:8px 12px;border-radius:8px;font-size:13px">⏸️ مؤجلة حتى ' + t.postponeUntil + (t.postponeReason ? ' (' + escapeHtml(t.postponeReason) + ')' : '') + '</div>';
   html += '</div>';
 
-  // إجراءات سريعة
   html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px;background:var(--gray-50);border-radius:12px;margin-bottom:12px">';
-  html += '<button class="tc-btn tc-btn-details" onclick="openMaterialsForTask(' + t.id + ')" style="padding:14px 4px">📦</button>';
-  html += '<button class="tc-btn tc-btn-details" onclick="openVisitSheet(' + t.id + ')" style="padding:14px 4px;background:linear-gradient(135deg,#0e7490,#06b6d4)">📅</button>';
-  html += '<button class="tc-btn tc-btn-details" onclick="openApprovalSheet(' + t.id + ')" style="padding:14px 4px;background:linear-gradient(135deg,#c2410c,#f97316)">📄</button>';
-  html += '<button class="tc-btn tc-btn-details" onclick="openAttachSheet(' + t.id + ')" style="padding:14px 4px;background:linear-gradient(135deg,#be185d,#db2777)">📎</button>';
+  html += '<button class="tc-btn tc-btn-details" onclick="openMaterialsForTask(' + t.id + ')" style="padding:14px 4px">📦 مواد</button>';
+  html += '<button class="tc-btn" style="padding:14px 4px;background:linear-gradient(135deg,#0e7490,#06b6d4)" onclick="openVisitSheet(' + t.id + ')">📅 زيارة</button>';
+  html += '<button class="tc-btn" style="padding:14px 4px;background:linear-gradient(135deg,#c2410c,#f97316)" onclick="openApprovalSheet(' + t.id + ')">📄 موافقة</button>';
+  html += '<button class="tc-btn" style="padding:14px 4px;background:linear-gradient(135deg,#be185d,#db2777)" onclick="openAttachSheet(' + t.id + ')">📎 مرفق</button>';
   html += '</div>';
 
-  // الحالات
   html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:12px;margin-bottom:12px">';
   html += '<div style="font-size:13px;font-weight:800;color:var(--gray-700);margin-bottom:8px">🔄 الحالة:</div>';
   html += '<div style="display:flex;gap:6px;flex-wrap:wrap">';
@@ -2395,29 +2253,15 @@ function openDetail(id){
   });
   html += '</div></div>';
 
-  // جهات الاتصال
   if(t.contact || t.contactPhone || t.principal || t.principalPhone || t.secretary || t.secretaryPhone){
     html += '<div style="background:var(--emerald-50);border:1px solid var(--emerald-200);border-radius:12px;padding:12px;margin-bottom:12px;font-size:13px">';
     html += '<div style="font-weight:800;color:var(--emerald-800);margin-bottom:8px">📞 جهات الاتصال</div>';
-    if(t.contact){
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span>👨‍💼 مشرف: <b>' + escapeHtml(t.contact) + '</b></span>';
-      if(t.contactPhone) html += '<a href="tel:' + t.contactPhone + '" class="btn btn-primary btn-sm" style="padding:6px 10px;font-size:12px">📞</a>';
-      html += '</div>';
-    }
-    if(t.principal){
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span>👤 مدير: <b>' + escapeHtml(t.principal) + '</b></span>';
-      if(t.principalPhone) html += '<a href="tel:' + t.principalPhone + '" class="btn btn-primary btn-sm" style="padding:6px 10px;font-size:12px">📞</a>';
-      html += '</div>';
-    }
-    if(t.secretary){
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span>💻 أمين سر: <b>' + escapeHtml(t.secretary) + '</b></span>';
-      if(t.secretaryPhone) html += '<a href="tel:' + t.secretaryPhone + '" class="btn btn-primary btn-sm" style="padding:6px 10px;font-size:12px">📞</a>';
-      html += '</div>';
-    }
+    if(t.contact){ html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span>👨‍💼 مشرف: <b>' + escapeHtml(t.contact) + '</b></span>'; if(t.contactPhone) html += '<a href="tel:' + t.contactPhone + '" class="btn btn-primary btn-sm">📞</a>'; html += '</div>'; }
+    if(t.principal){ html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span>👤 مدير: <b>' + escapeHtml(t.principal) + '</b></span>'; if(t.principalPhone) html += '<a href="tel:' + t.principalPhone + '" class="btn btn-primary btn-sm">📞</a>'; html += '</div>'; }
+    if(t.secretary){ html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0"><span>💻 أمين سر: <b>' + escapeHtml(t.secretary) + '</b></span>'; if(t.secretaryPhone) html += '<a href="tel:' + t.secretaryPhone + '" class="btn btn-primary btn-sm">📞</a>'; html += '</div>'; }
     html += '</div>';
   }
 
-  // معلومات المدرسة
   if(t.schoolAddress || t.schoolGrade || t.building || t.room || t.schoolHalls){
     html += '<div style="background:var(--copper-100);border-radius:12px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--copper-700);line-height:1.7">';
     if(t.schoolAddress) html += '📍 ' + escapeHtml(t.schoolAddress) + '<br>';
@@ -2428,7 +2272,6 @@ function openDetail(id){
     html += '</div>';
   }
 
-  // المواد والفني
   html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:12px;margin-bottom:12px;font-size:13px">';
   html += '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><span>📦 المواد: <b>' + (t.materials||[]).length + '</b></span>';
   html += '<span>📎 المرفقات: <b>' + (t.attachments||[]).length + '</b></span>';
@@ -2438,21 +2281,19 @@ function openDetail(id){
 
   if(t.notes) html += '<div style="background:var(--gray-50);border-radius:8px;padding:12px;font-size:13px;color:var(--gray-600);margin-bottom:12px;border-right:3px solid var(--copper-500)">📝 ' + escapeHtml(t.notes) + '</div>';
 
-  // Timeline شامل
   let timeline = [];
-  timeline.push({ date: t.createdAt, label: '📩 إنشاء المهمة', type: 'done' });
-  if(t.visitLog) t.visitLog.slice().reverse().forEach(v => timeline.push({ date: v.date, label: (VISIT_TYPES[v.type]||{icon:'📅'}).icon + ' زيارة: ' + (VISIT_TYPES[v.type]||{label:''}).label, type: 'done' }));
-  if(t.postponeLog) t.postponeLog.slice().reverse().forEach(p => timeline.push({ date: p.date, label: '⏸️ تأجيل حتى ' + p.until + ' — ' + p.reason, type: 'postponed' }));
-  if(t.approvalLog) t.approvalLog.slice().reverse().forEach(a => timeline.push({ date: a.date, label: (APPROVAL_STAGES[a.stage]||{icon:'📄'}).icon + ' ' + (APPROVAL_STAGES[a.stage]||{label:''}).label, type: 'done' }));
-  if(t.doneAt) timeline.push({ date: t.doneAt, label: '✅ الإنجاز', type: 'done' });
+  timeline.push({ date: t.createdAt, label: '📩 إنشاء المهمة' });
+  if(t.visitLog) t.visitLog.slice().reverse().forEach(v => timeline.push({ date: v.date, label: (VISIT_TYPES[v.type]||{icon:'📅'}).icon + ' زيارة: ' + (VISIT_TYPES[v.type]||{label:''}).label }));
+  if(t.postponeLog) t.postponeLog.slice().reverse().forEach(p => timeline.push({ date: p.date, label: '⏸️ تأجيل حتى ' + p.until + ' — ' + p.reason, postponed: true }));
+  if(t.approvalLog) t.approvalLog.slice().reverse().forEach(a => timeline.push({ date: a.date, label: (APPROVAL_STAGES[a.stage]||{icon:'📄'}).icon + ' ' + (APPROVAL_STAGES[a.stage]||{label:''}).label }));
+  if(t.doneAt) timeline.push({ date: t.doneAt, label: '✅ الإنجاز' });
   timeline.sort((a,b) => a.date.localeCompare(b.date));
-
   if(timeline.length > 1){
     html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:12px;margin-bottom:12px">';
     html += '<div style="font-size:13px;font-weight:800;color:var(--gray-700);margin-bottom:8px">🕐 سجل الأحداث</div>';
     html += '<div class="timeline">';
     timeline.forEach(item => {
-      html += '<div class="timeline-item ' + item.type + '">';
+      html += '<div class="timeline-item ' + (item.postponed ? 'postponed' : 'done') + '">';
       html += '<div class="timeline-item-label">' + escapeHtml(item.label) + '</div>';
       html += '<div class="timeline-item-date">📅 ' + item.date + '</div>';
       html += '</div>';
@@ -2460,35 +2301,23 @@ function openDetail(id){
     html += '</div></div>';
   }
 
-  // المرفقات
   if(t.attachments && t.attachments.length > 0){
     html += '<div style="background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:12px;margin-bottom:12px">';
     html += '<div style="font-size:13px;font-weight:800;color:var(--gray-700);margin-bottom:8px">📎 المرفقات</div>';
     t.attachments.forEach(a => {
       const at = ATTACH_TYPES[a.type] || { icon:'📎', label:'مرفق' };
-      html += '<div class="attachment-item">';
-      html += '<div class="attachment-icon">' + at.icon + '</div>';
-      html += '<div class="attachment-info">';
-      html += '<div class="attachment-name">' + at.label + ' — ' + escapeHtml(a.name) + '</div>';
-      html += '<div class="attachment-meta">' + a.date + ' • ' + Math.round(a.size/1024) + ' KB</div>';
-      html += '</div>';
-      html += '<div class="attachment-actions">';
-      html += '<button class="btn btn-primary btn-sm" onclick="viewAttachment(' + t.id + ',' + a.id + ')">👁️</button>';
-      html += '<button class="btn btn-copper btn-sm" onclick="downloadAttachment(' + t.id + ',' + a.id + ')">⬇️</button>';
-      html += '<button class="btn btn-danger btn-sm" onclick="deleteAttachment(' + t.id + ',' + a.id + ')">✕</button>';
-      html += '</div></div>';
+      html += '<div class="attachment-item"><div class="attachment-icon">' + at.icon + '</div><div class="attachment-info"><div class="attachment-name">' + at.label + ' — ' + escapeHtml(a.name) + '</div><div class="attachment-meta">' + a.date + ' • ' + Math.round(a.size/1024) + ' KB</div></div><div class="attachment-actions"><button class="btn btn-primary btn-sm" onclick="viewAttachment(' + t.id + ',' + a.id + ')">👁️</button><button class="btn btn-copper btn-sm" onclick="downloadAttachment(' + t.id + ',' + a.id + ')">⬇️</button><button class="btn btn-danger btn-sm" onclick="deleteAttachment(' + t.id + ',' + a.id + ')">✕</button></div></div>';
     });
     html += '</div>';
   }
 
   const mapQuery = encodeURIComponent(displayName + ' ' + (t.schoolAddress || '') + ' دمشق');
   html += '<a href="https://maps.google.com/?q=' + mapQuery + '" target="_blank" class="btn-lg btn-map" style="margin-bottom:8px;text-decoration:none">📍 فتح الخريطة</a>';
-
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
   html += '<button class="btn-lg btn-whats" onclick="openWhatsForTask(' + t.id + ')">📱 واتس</button>';
-  html += '<button class="btn-lg btn-edit" style="background:linear-gradient(135deg,#c2410c,#f97316)" onclick="editTaskFromDetail(' + t.id + ')">✏️ تعديل</button>';
+  html += '<button class="btn-lg" style="background:linear-gradient(135deg,#c2410c,#f97316)" onclick="editTaskFromDetail(' + t.id + ')">✏️ تعديل</button>';
   html += '</div>';
-  if(t.status !== 'done' && t.status !== 'canceled' && t.status !== 'transferred'){
+  if(!['done','canceled','transferred'].includes(t.status)){
     html += '<button class="btn-lg btn-gray" style="margin-bottom:8px" onclick="openPostponeSheet(' + t.id + ')">⏸️ تأجيل المهمة</button>';
   }
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
@@ -2502,9 +2331,7 @@ function openDetail(id){
   openSheet('detailSheetBg');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 19: الزيارات + الموافقات + المرفقات
-   ═══════════════════════════════════════════════════════ */
+/* ═══ الزيارات + الموافقات + المرفقات ═══ */
 function openVisitSheet(taskId){
   state.currentTaskId = taskId;
   document.getElementById('visitType').value = 'inspection';
@@ -2522,9 +2349,7 @@ function saveVisit(){
   closeSheet('visitSheetBg');
   refreshAllViews();
   showToast('✅ تم تسجيل الزيارة', 'success');
-  setTimeout(() => openDetail(t.id), 200);
 }
-
 function openApprovalSheet(taskId){
   state.currentTaskId = taskId;
   document.getElementById('approvalStage').value = 'raised';
@@ -2544,9 +2369,7 @@ function saveApproval(){
   closeSheet('approvalSheetBg');
   refreshAllViews();
   showToast('✅ تم تحديث الموافقة', 'success');
-  setTimeout(() => openDetail(t.id), 200);
 }
-
 function openAttachSheet(taskId){
   state.currentTaskId = taskId;
   state.currentAttachment = null;
@@ -2575,22 +2398,12 @@ function saveAttachment(){
   const t = state.tasks.find(x => x.id === state.currentTaskId);
   if(!t) return;
   if(!t.attachments) t.attachments = [];
-  t.attachments.unshift({
-    id: Date.now(),
-    type: document.getElementById('attachType').value,
-    desc: document.getElementById('attachDesc').value.trim(),
-    name: state.currentAttachment.name,
-    mimeType: state.currentAttachment.type,
-    size: state.currentAttachment.size,
-    data: state.currentAttachment.data,
-    date: todayISO()
-  });
+  t.attachments.unshift({ id: Date.now(), type: document.getElementById('attachType').value, desc: document.getElementById('attachDesc').value.trim(), name: state.currentAttachment.name, mimeType: state.currentAttachment.type, size: state.currentAttachment.size, data: state.currentAttachment.data, date: todayISO() });
   saveTasks();
   state.currentAttachment = null;
   closeSheet('attachSheetBg');
   refreshAllViews();
   showToast('✅ تم حفظ المرفق', 'success');
-  setTimeout(() => openDetail(t.id), 200);
 }
 function viewAttachment(taskId, attachId){
   const t = state.tasks.find(x => x.id === taskId);
@@ -2625,9 +2438,7 @@ function deleteAttachment(taskId, attachId){
   showToast('🗑️ تم الحذف', 'warn');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 20: WhatsApp
-   ═══════════════════════════════════════════════════════ */
+/* ═══ WhatsApp ═══ */
 function fillWhatsRecipients(){
   const techGroup = document.getElementById('whatsTechGroup');
   const supGroup = document.getElementById('whatsSupGroup');
@@ -2641,16 +2452,8 @@ function openWhatsForTask(taskId){
   fillWhatsRecipients();
   const displayName = t.newName || t.name;
   const fullAddress = displayName + (t.schoolAddress ? ' ' + t.schoolAddress : '') + ' ' + (t.area || '') + ' دمشق';
-  const mapQuery = encodeURIComponent(fullAddress);
-  const mapLink = 'https://maps.google.com/?q=' + mapQuery;
-  const msg = '🔧 *مهمة صيانة*\n\n' +
-    '🏫 *المدرسة:* ' + displayName + '\n' +
-    '📍 *المنطقة:* ' + (t.area || '') + (t.building ? '\n🏢 *المبنى:* ' + t.building : '') + (t.room ? '\n🚪 *القاعة:* ' + t.room : '') + '\n' +
-    '📋 *نوع العمل:* ' + (t.type || '') + '\n' +
-    '⚡ *الأولوية:* ' + (PRIORITY_LABELS[t.priority] || '') + '\n' +
-    (t.notes ? '📝 *ملاحظات:* ' + t.notes + '\n' : '') +
-    (t.contact ? '👤 *المشرف:* ' + t.contact + '\n' : '') +
-    '\n🗺️ *الموقع:*\n' + mapLink;
+  const mapLink = 'https://maps.google.com/?q=' + encodeURIComponent(fullAddress);
+  const msg = '🔧 *مهمة صيانة*\n\n🏫 *المدرسة:* ' + displayName + '\n📍 *المنطقة:* ' + (t.area || '') + (t.building ? '\n🏢 *المبنى:* ' + t.building : '') + (t.room ? '\n🚪 *القاعة:* ' + t.room : '') + '\n📋 *نوع العمل:* ' + (t.type || '') + '\n⚡ *الأولوية:* ' + (PRIORITY_LABELS[t.priority] || '') + '\n' + (t.notes ? '📝 *ملاحظات:* ' + t.notes + '\n' : '') + (t.contact ? '👤 *المشرف:* ' + t.contact + '\n' : '') + '\n🗺️ *الموقع:*\n' + mapLink;
   document.getElementById('whatsMessage').value = msg;
   closeSheet('detailSheetBg');
   setTimeout(() => openSheet('whatsSheetBg'), 200);
@@ -2661,12 +2464,10 @@ function sendWhatsApp(){
   const t = state.tasks.find(x => x.id === state.currentTaskId) || {};
   let phone = '';
   if(recipient.startsWith('__tech__')){
-    const name = recipient.replace('__tech__','');
-    const tech = state.technicians.find(x => x.name === name);
+    const tech = state.technicians.find(x => x.name === recipient.replace('__tech__',''));
     if(tech && tech.phone) phone = tech.phone;
   } else if(recipient.startsWith('__sup__')){
-    const name = recipient.replace('__sup__','');
-    const sup = state.supervisors.find(x => x.name === name);
+    const sup = state.supervisors.find(x => x.name === recipient.replace('__sup__',''));
     if(sup && sup.phone) phone = sup.phone;
   } else if(recipient === '__sign2__') phone = state.settings.sign2Phone || '';
   else if(recipient === '__sign3__') phone = state.settings.sign3Phone || '';
@@ -2690,9 +2491,7 @@ function copyWhatsMessage(){
   showToast('✅ تم النسخ', 'success');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 21: جولة اليوم + الإحصائيات
-   ═══════════════════════════════════════════════════════ */
+/* ═══ الجولة والإحصائيات ═══ */
 function buildTodayTrip(){
   const tripSummary = document.getElementById('tripSummary');
   const tripStops = document.getElementById('tripStops');
@@ -2711,12 +2510,7 @@ function buildTodayTrip(){
     html += '<div class="group-header"><span>📍 ' + escapeHtml(area) + '</span><span class="group-count">' + tasks.length + '</span></div>';
     sortTasksByPriority(tasks);
     tasks.forEach((t, i) => {
-      const displayName = t.newName || t.name;
-      html += '<div class="trip-stop" onclick="openDetail(' + t.id + ')">';
-      html += '<div class="stop-num">' + (i+1) + '</div>';
-      html += '<div class="stop-info"><div class="stop-name">' + escapeHtml(displayName) + '</div>';
-      html += '<div class="stop-meta">' + (STATUS_LABELS[t.status]||{label:''}).label + ' • ' + PRIORITY_LABELS[t.priority] + '</div></div>';
-      html += '</div>';
+      html += '<div class="trip-stop" onclick="openDetail(' + t.id + ')"><div class="stop-num">' + (i+1) + '</div><div class="stop-info"><div class="stop-name">' + escapeHtml(t.newName || t.name) + '</div><div class="stop-meta">' + (STATUS_LABELS[t.status]||{label:''}).label + ' • ' + PRIORITY_LABELS[t.priority] + '</div></div></div>';
     });
   });
   tripSummary.innerHTML = html;
@@ -2724,92 +2518,59 @@ function buildTodayTrip(){
 }
 
 function renderStats(){
-  const g = document.getElementById('generalStats');
   const total = state.tasks.length;
   const done = state.tasks.filter(t => t.status === 'done').length;
   const overdue = state.tasks.filter(t => isOverdue(t)).length;
   const postponed = state.tasks.filter(t => t.status === 'postponed').length;
   const completion = total > 0 ? Math.round((done/total)*100) : 0;
-
   let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
   html += '<div style="background:var(--emerald-50);border-radius:10px;padding:14px;text-align:center"><div style="font-size:26px;font-weight:900;color:var(--emerald-700)">' + total + '</div><div style="font-size:12px">📋 إجمالي</div></div>';
   html += '<div style="background:var(--green-50);border-radius:10px;padding:14px;text-align:center"><div style="font-size:26px;font-weight:900;color:var(--green-700)">' + done + '</div><div style="font-size:12px">✅ منجزة</div></div>';
   html += '<div style="background:var(--danger-light);border-radius:10px;padding:14px;text-align:center"><div style="font-size:26px;font-weight:900;color:var(--danger)">' + overdue + '</div><div style="font-size:12px">⚠️ متأخرة</div></div>';
   html += '<div style="background:var(--gray-100);border-radius:10px;padding:14px;text-align:center"><div style="font-size:26px;font-weight:900;color:var(--gray-600)">' + postponed + '</div><div style="font-size:12px">⏸️ مؤجلة</div></div>';
   html += '</div>';
-  html += '<div style="margin-top:14px"><div style="font-size:13px;color:var(--gray-600);margin-bottom:6px;font-weight:700">نسبة الإنجاز: <b>' + completion + '%</b></div>';
-  html += '<div style="height:14px;background:var(--gray-200);border-radius:7px;overflow:hidden"><div style="height:100%;width:' + completion + '%;background:linear-gradient(90deg,var(--emerald-600),var(--emerald-500))"></div></div></div>';
-  g.innerHTML = html;
-
+  html += '<div style="margin-top:14px"><div style="font-size:13px;color:var(--gray-600);margin-bottom:6px;font-weight:700">نسبة الإنجاز: <b>' + completion + '%</b></div><div style="height:14px;background:var(--gray-200);border-radius:7px;overflow:hidden"><div style="height:100%;width:' + completion + '%;background:linear-gradient(90deg,var(--emerald-600),var(--emerald-500))"></div></div></div>';
+  document.getElementById('generalStats').innerHTML = html;
   const byArea = {};
   state.tasks.forEach(t => { byArea[t.area] = (byArea[t.area] || 0) + 1; });
   const maxA = Math.max.apply(null, Object.values(byArea).concat([1]));
-  document.getElementById('areaStats').innerHTML = Object.keys(byArea).sort((a,b) => byArea[b] - byArea[a]).map(a => 
-    '<div class="area-stat-row"><span class="area-stat-name">' + escapeHtml(a) + '</span><div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + Math.round((byArea[a]/maxA)*100) + '%"></div></div><span class="area-stat-count">' + byArea[a] + '</span></div>'
-  ).join('') || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
-
+  document.getElementById('areaStats').innerHTML = Object.keys(byArea).sort((a,b) => byArea[b] - byArea[a]).map(a => '<div class="area-stat-row"><span class="area-stat-name">' + escapeHtml(a) + '</span><div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + Math.round((byArea[a]/maxA)*100) + '%"></div></div><span class="area-stat-count">' + byArea[a] + '</span></div>').join('') || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
   const bySup = {};
   state.tasks.forEach(t => { const s = t.contact || 'غير محدد'; bySup[s] = (bySup[s] || 0) + 1; });
   const maxS = Math.max.apply(null, Object.values(bySup).concat([1]));
-  document.getElementById('supervisorStats').innerHTML = Object.keys(bySup).sort((a,b) => bySup[b] - bySup[a]).map(s => 
-    '<div class="area-stat-row"><span class="area-stat-name">👤 ' + escapeHtml(s) + '</span><div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + Math.round((bySup[s]/maxS)*100) + '%"></div></div><span class="area-stat-count">' + bySup[s] + '</span></div>'
-  ).join('') || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
-
+  document.getElementById('supervisorStats').innerHTML = Object.keys(bySup).sort((a,b) => bySup[b] - bySup[a]).map(s => '<div class="area-stat-row"><span class="area-stat-name">👤 ' + escapeHtml(s) + '</span><div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + Math.round((bySup[s]/maxS)*100) + '%"></div></div><span class="area-stat-count">' + bySup[s] + '</span></div>').join('') || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
   const byType = {};
   state.tasks.forEach(t => { byType[t.type] = (byType[t.type] || 0) + 1; });
   const maxT = Math.max.apply(null, Object.values(byType).concat([1]));
-  document.getElementById('typeStats').innerHTML = Object.keys(byType).sort((a,b) => byType[b] - byType[a]).map(ty => 
-    '<div class="area-stat-row"><span class="area-stat-name">' + escapeHtml(ty) + '</span><div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + Math.round((byType[ty]/maxT)*100) + '%"></div></div><span class="area-stat-count">' + byType[ty] + '</span></div>'
-  ).join('') || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
+  document.getElementById('typeStats').innerHTML = Object.keys(byType).sort((a,b) => byType[b] - byType[a]).map(ty => '<div class="area-stat-row"><span class="area-stat-name">' + escapeHtml(ty) + '</span><div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + Math.round((byType[ty]/maxT)*100) + '%"></div></div><span class="area-stat-count">' + byType[ty] + '</span></div>').join('') || '<div style="text-align:center;color:var(--gray-500);padding:20px">لا توجد بيانات</div>';
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 22: الزيارات (تبويب مستقل)
-   ═══════════════════════════════════════════════════════ */
 function renderVisits(){
   const container = document.getElementById('visitsList');
   const typeF = document.getElementById('visitFilterType').value;
   const dateF = document.getElementById('visitFilterDate').value;
   let visits = [];
   state.tasks.forEach(t => {
-    if(t.visitLog) t.visitLog.forEach(v => visits.push({
-      taskId: t.id, num: t.number, school: t.newName || t.name, area: t.area,
-      type: v.type, notes: v.notes, date: v.date
-    }));
+    if(t.visitLog) t.visitLog.forEach(v => visits.push({ taskId: t.id, num: t.number, school: t.newName || t.name, area: t.area, type: v.type, notes: v.notes, date: v.date }));
   });
   if(typeF) visits = visits.filter(v => v.type === typeF);
-  if(dateF){
-    visits = visits.filter(v => {
-      const d = getDaysDiff(v.date);
-      if(dateF === 'today') return d === 0;
-      if(dateF === 'week') return d <= 7;
-      if(dateF === 'month') return d <= 30;
-      return true;
-    });
-  }
+  if(dateF) visits = visits.filter(v => {
+    const d = getDaysDiff(v.date);
+    if(dateF === 'today') return d === 0;
+    if(dateF === 'week') return d <= 7;
+    if(dateF === 'month') return d <= 30;
+    return true;
+  });
   visits.sort((a,b) => b.date.localeCompare(a.date));
   document.getElementById('visitsStats').innerHTML = '📅 إجمالي: <b>' + visits.length + '</b>';
-  if(visits.length === 0){
-    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-500);font-size:14px">لا توجد زيارات</div>';
-    return;
-  }
-  let html = '';
-  visits.slice(0, 200).forEach(v => {
+  if(visits.length === 0){ container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-500)">لا توجد زيارات</div>'; return; }
+  container.innerHTML = visits.slice(0, 200).map(v => {
     const vt = VISIT_TYPES[v.type] || { icon:'📌', label:v.type };
-    html += '<div class="visit-row" onclick="openDetail(' + v.taskId + ')">';
-    html += '<div class="visit-icon">' + vt.icon + '</div>';
-    html += '<div class="visit-info">';
-    html += '<div class="visit-type">' + vt.label + ' — ' + escapeHtml(v.school) + '</div>';
-    html += '<div class="visit-date">📅 ' + v.date + ' • 📍 ' + escapeHtml(v.area || '') + '</div>';
-    if(v.notes) html += '<div class="visit-note">' + escapeHtml(v.notes) + '</div>';
-    html += '</div></div>';
-  });
-  container.innerHTML = html;
+    return '<div class="visit-row" onclick="openDetail(' + v.taskId + ')"><div class="visit-icon">' + vt.icon + '</div><div class="visit-info"><div class="visit-type">' + vt.label + ' — ' + escapeHtml(v.school) + '</div><div class="visit-date">📅 ' + v.date + ' • 📍 ' + escapeHtml(v.area || '') + '</div>' + (v.notes ? '<div class="visit-note">' + escapeHtml(v.notes) + '</div>' : '') + '</div></div>';
+  }).join('');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 23: المدارس + المشرفين + المواد + الفنيين
-   ═══════════════════════════════════════════════════════ */
+/* ═══ المدارس والمشرفون والمواد والفنيون ═══ */
 function renderSchoolsList(q){
   const container = document.getElementById('schoolsList');
   q = (q || document.getElementById('schoolListSearch').value || '').toLowerCase().trim();
@@ -2817,7 +2578,6 @@ function renderSchoolsList(q){
   const supF = document.getElementById('schoolFilterSupervisor').value;
   const gradeF = document.getElementById('schoolFilterGrade').value;
   const sortBy = document.getElementById('schoolSortBy').value;
-
   let list = state.schools.filter(s => {
     if(q){
       const blob = ((s.n||'') + ' ' + (s.oldName||'') + ' ' + (s.s||'') + ' ' + (s.a||'')).toLowerCase();
@@ -2831,24 +2591,21 @@ function renderSchoolsList(q){
   if(sortBy === 'area') list.sort((a,b) => (a.a||'').localeCompare(b.a||'', 'ar'));
   else if(sortBy === 'supervisor') list.sort((a,b) => (a.s||'').localeCompare(b.s||'', 'ar'));
   else list.sort((a,b) => (a.n||'').localeCompare(b.n||'', 'ar'));
-
   if(list.length === 0){ container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-500)">لا توجد نتائج</div>'; return; }
   container.innerHTML = list.slice(0,500).map(s => {
     const idx = state.schools.indexOf(s);
-    return '<div class="material-row" style="flex-direction:column;align-items:flex-start;gap:6px"><div style="display:flex;width:100%;gap:6px"><span class="mat-name" style="font-weight:800;font-size:15px">' + escapeHtml(s.n) + (s.oldName ? ' <span style="color:var(--copper-600);font-size:11px">(سابقاً: ' + escapeHtml(s.oldName) + ')</span>' : '') + '</span><button class="mat-del" onclick="editSchool(' + idx + ')" style="background:var(--emerald-50);color:var(--emerald-700)">✏️</button><button class="mat-del" onclick="deleteSchool(' + idx + ')">✕</button></div><div style="font-size:12px;color:var(--gray-500)">' + (s.s ? '👤 ' + escapeHtml(s.s) : '') + (s.a ? ' • 📍 ' + escapeHtml(s.a) + (s.d ? ' - ' + escapeHtml(s.d) : '') : '') + (s.g ? ' • 🎓 ' + escapeHtml(s.g) : '') + (s.halls ? ' • 🏫 ' + escapeHtml(s.halls) + ' قاعة' : '') + (s.p ? ' • 📞 ' + escapeHtml(s.p) : '') + '</div></div>';
+    return '<div class="material-row" style="flex-direction:column;align-items:flex-start;gap:6px"><div style="display:flex;width:100%;gap:6px"><span class="mat-name" style="font-weight:800;font-size:15px">' + escapeHtml(s.n) + (s.oldName ? ' <span style="color:var(--copper-600);font-size:11px">(سابقاً: ' + escapeHtml(s.oldName) + ')</span>' : '') + '</span><button class="mat-del" onclick="editSchool(' + idx + ')" style="background:var(--emerald-50);color:var(--emerald-700)">✏️</button><button class="mat-del" onclick="deleteSchool(' + idx + ')">✕</button></div><div style="font-size:12px;color:var(--gray-500)">' + (s.s ? '👤 ' + escapeHtml(s.s) : '') + (s.a ? ' • 📍 ' + escapeHtml(s.a) : '') + (s.g ? ' • 🎓 ' + escapeHtml(s.g) : '') + (s.halls ? ' • 🏫 ' + escapeHtml(s.halls) : '') + '</div></div>';
   }).join('');
 }
-
 function updateSchoolsStats(){
   const sups = new Set(state.schools.map(s => s.s).filter(Boolean));
   const areas = new Set(state.schools.map(s => s.a).filter(Boolean));
   document.getElementById('schoolsStats').innerHTML = '📊 <b>' + state.schools.length + '</b> مدرسة • 👤 <b>' + sups.size + '</b> مشرف • 📍 <b>' + areas.size + '</b> منطقة';
 }
-
 function openSchoolSheet(){
   state.editingSchoolIdx = null;
-  document.getElementById('schoolSheetTitle').textContent = '➕ إضافة مدرسة';
-  ['schName','schOldName','schArea','schDistrict','schAddress','schGrade','schPhone','schHalls','schPrincipal','schPrincipalPhone','schSecretary','schSecretaryPhone'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  document.getElementById('schoolSheetTitle').textContent = '➕ إضافة';
+  ['schName','schOldName','schArea','schDistrict','schAddress','schGrade','schPhone','schHalls','schPrincipal','schPrincipalPhone','schSecretary','schSecretaryPhone'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('schSupervisor').value = '';
   openSheet('schoolSheetBg');
 }
@@ -2856,7 +2613,7 @@ function editSchool(idx){
   const s = state.schools[idx];
   if(!s) return;
   state.editingSchoolIdx = idx;
-  document.getElementById('schoolSheetTitle').textContent = '✏️ تعديل مدرسة';
+  document.getElementById('schoolSheetTitle').textContent = '✏️ تعديل';
   document.getElementById('schName').value = s.n || '';
   document.getElementById('schOldName').value = s.oldName || '';
   document.getElementById('schSupervisor').value = s.s || '';
@@ -2886,8 +2643,7 @@ function saveSchoolMaster(){
   };
   if(state.editingSchoolIdx !== null){ state.schools[state.editingSchoolIdx] = data; showToast('✅ تم التحديث', 'success'); }
   else { state.schools.push(data); showToast('✅ أُضيفت', 'success'); }
-  saveSchools();
-  closeSheet('schoolSheetBg');
+  saveSchools(); closeSheet('schoolSheetBg');
   renderSchoolsList(); updateSchoolsStats(); fillAreaFilters();
 }
 function deleteSchool(idx){
@@ -2907,7 +2663,7 @@ function renderSupervisorsList(){
 }
 function openSupervisorSheet(){
   state.editingSupervisorIdx = null;
-  document.getElementById('supervisorSheetTitle').textContent = '➕ إضافة مشرف';
+  document.getElementById('supervisorSheetTitle').textContent = '➕ إضافة';
   document.getElementById('supervisorName').value = '';
   document.getElementById('supervisorPhone').value = '';
   document.getElementById('supervisorAreas').value = '';
@@ -2929,8 +2685,7 @@ function saveSupervisor(){
   const data = { name, phone: document.getElementById('supervisorPhone').value.trim(), areas: document.getElementById('supervisorAreas').value.trim() };
   if(state.editingSupervisorIdx !== null){ data.id = state.supervisors[state.editingSupervisorIdx].id; state.supervisors[state.editingSupervisorIdx] = data; }
   else { data.id = Math.max.apply(null, state.supervisors.map(s => s.id || 0).concat([0])) + 1; state.supervisors.push(data); }
-  saveSupervisors();
-  closeSheet('supervisorSheetBg');
+  saveSupervisors(); closeSheet('supervisorSheetBg');
   renderSupervisorsList(); fillSupervisorSelects(); fillSupervisorFilters(); fillWhatsRecipients();
   showToast('✅ تم الحفظ', 'success');
 }
@@ -2981,10 +2736,6 @@ function saveMasterMaterial(){
   saveMaterials();
   closeSheet('masterMatSheetBg');
   renderMaterials();
-  const t = state.tasks.find(x => x.id === state.currentTaskId);
-  if(t && document.getElementById('matSheetBg').classList.contains('open') === false && document.getElementById('detailSheetBg').classList.contains('open')){
-    // Reopen materials grid
-  }
   showToast('✅ تم الحفظ', 'success');
 }
 function deleteMasterMaterial(id){
@@ -3002,7 +2753,7 @@ function renderTechniciansList(){
 }
 function openTechnicianSheet(){
   state.editingTechIdx = null;
-  document.getElementById('techSheetTitle').textContent = '➕ إضافة فني';
+  document.getElementById('techSheetTitle').textContent = '➕ إضافة';
   document.getElementById('techName').value = '';
   document.getElementById('techPhone').value = '';
   document.getElementById('techNotes').value = '';
@@ -3024,8 +2775,7 @@ function saveTechnician(){
   const data = { name, phone: document.getElementById('techPhone').value.trim(), notes: document.getElementById('techNotes').value.trim() };
   if(state.editingTechIdx !== null){ data.id = state.technicians[state.editingTechIdx].id; state.technicians[state.editingTechIdx] = data; }
   else { data.id = Math.max.apply(null, state.technicians.map(t => t.id || 0).concat([0])) + 1; state.technicians.push(data); }
-  saveTechnicians();
-  closeSheet('techSheetBg');
+  saveTechnicians(); closeSheet('techSheetBg');
   renderTechniciansList();
   showToast('✅ تم الحفظ', 'success');
 }
@@ -3036,9 +2786,7 @@ function deleteTechnician(idx){
   showToast('🗑️ تم الحذف', 'warn');
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 24: الإعدادات + الفلاتر
-   ═══════════════════════════════════════════════════════ */
+/* ═══ الإعدادات والفلاتر ═══ */
 function loadSettingsToForm(){
   document.getElementById('setHeader1').value = state.settings.header1 || '';
   document.getElementById('setHeader2').value = state.settings.header2 || '';
@@ -3096,27 +2844,24 @@ function fillSupervisorFilters(){
     el.innerHTML = html;
   });
 }
-
-document.addEventListener('change', (e) => {
+document.addEventListener('change', e => {
   if(e.target && e.target.id === 'fContact'){
     const sup = state.supervisors.find(s => s.name === e.target.value);
     const phoneField = document.getElementById('fContactPhone');
     if(phoneField) phoneField.value = sup && sup.phone ? sup.phone : '';
   }
 });
-
-document.addEventListener('click', (e) => {
+document.addEventListener('click', e => {
   const results = document.getElementById('schoolResults');
   const search = document.getElementById('fSchoolSearch');
   if(results && search && !results.contains(e.target) && e.target !== search) results.classList.remove('show');
 });
 
-/* ═══════════════════════════════════════════════════════
-   القسم 25: الطباعة (مع الشعار في Word و PDF)
-   ═══════════════════════════════════════════════════════ */
+/* ═══ الطباعة ═══ */
 const EAGLE_SVG = '<img src="https://basamassaf.github.io/jam3iyati/eagle.png" alt="شعار" crossorigin="anonymous" style="width:100%;height:auto;display:block">';
 
 function printTask(taskId){
+  state.currentTaskId = taskId;
   const t = state.tasks.find(x => x.id === taskId);
   if(!t) return;
   const s = state.settings;
@@ -3129,139 +2874,139 @@ function printTask(taskId){
   let rows = '';
   for(let i = 0; i < rowsCount; i++){
     const m1 = col1[i], m2 = col2[i];
-    rows += '<tr>';
-    rows += '<td class="mat-name">' + (m1 ? escapeHtml(m1.name) : '') + '</td>';
-    rows += '<td class="mat-qty">' + (m1 ? escapeHtml(String(m1.qty || 1)) : '') + '</td>';
-    rows += '<td class="mat-name">' + (m2 ? escapeHtml(m2.name) : '') + '</td>';
-    rows += '<td class="mat-qty">' + (m2 ? escapeHtml(String(m2.qty || 1)) : '') + '</td>';
-    rows += '</tr>';
+    rows += '<tr><td class="mat-name">' + (m1 ? escapeHtml(m1.name) : '') + '</td><td class="mat-qty">' + (m1 ? escapeHtml(String(m1.qty || 1)) : '') + '</td><td class="mat-name">' + (m2 ? escapeHtml(m2.name) : '') + '</td><td class="mat-qty">' + (m2 ? escapeHtml(String(m2.qty || 1)) : '') + '</td></tr>';
   }
   let schoolLine = 'مدرسة ' + escapeHtml(displayName);
   if(t.building) schoolLine += ' / ' + escapeHtml(t.building);
   const roomLine = t.room ? 'على قاعة ' + escapeHtml(t.room) : 'على قاعة ................';
-
   let html = '';
   html += '<div class="gov-header">';
   html += '<div class="gov-eagle">' + EAGLE_SVG + '</div>';
-  html += '<div class="gov-header-top">';
-  html += '<div class="gov-header-right">';
-  html += '<div>' + escapeHtml(s.header1 || '') + '</div>';
-  html += '<div>' + escapeHtml(s.header2 || '') + '</div>';
-  html += '<div>' + escapeHtml(s.header3 || '') + '</div>';
-  html += '<div style="margin-top:4px">التاريخ ' + escapeHtml(t.createdAt || todayISO()) + '</div>';
-  html += '</div>';
-  html += '<div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div>';
-  html += '</div>';
-  html += '</div>';
-
+  html += '<div class="gov-header-top"><div class="gov-header-right"><div>' + escapeHtml(s.header1 || '') + '</div><div>' + escapeHtml(s.header2 || '') + '</div><div>' + escapeHtml(s.header3 || '') + '</div><div style="margin-top:4px">التاريخ ' + escapeHtml(t.createdAt || todayISO()) + '</div></div><div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div></div></div>';
   html += '<div class="gov-salutation">السيد مدير التربية المحترم</div>';
   html += '<div class="gov-body">ــ بعد الكشف في ' + schoolLine + ' ' + roomLine + ' رقم ( ' + escapeHtml(t.room || '1') + ' ) تبين الحاجة للمواد التالية:</div>';
   html += '<table class="gov-table"><thead><tr><th>اسم المادة والقياس</th><th style="width:60px">العدد</th><th>اسم المادة والقياس</th><th style="width:60px">العدد</th></tr></thead><tbody>' + rows + '</tbody></table>';
-
-  html += '<div class="gov-signatures">';
-  html += '<div class="gov-sign-box"><span class="role">القائم بالكشف</span><span class="name">الفني ' + escapeHtml(t.technician || '.....................') + '</span></div>';
-  html += '<div class="gov-sign-box"><span class="role">رئيس شعبة الصيانة</span><span class="name">' + escapeHtml(s.sign2 || '') + '</span></div>';
-  html += '</div>';
+  html += '<div class="gov-signatures"><div class="gov-sign-box"><span class="role">القائم بالكشف</span><span class="name">الفني ' + escapeHtml(t.technician || '.....................') + '</span></div><div class="gov-sign-box"><span class="role">رئيس شعبة الصيانة</span><span class="name">' + escapeHtml(s.sign2 || '') + '</span></div></div>';
   html += '<div style="text-align:center;font-size:14px;font-weight:800;margin:16px 0 8px">يرجى الاطلاع والتوجيه</div>';
   html += '<hr class="gov-divider">';
   html += '<div style="text-align:left;font-size:14px;font-weight:800;padding-left:8px">رئيس دائرة المعلوماتية<br>' + escapeHtml(s.sign3 || '') + '</div>';
   html += '<hr class="gov-divider" style="margin-top:14px">';
-  html += '<div class="gov-sub" style="text-align:right">أقترح السيد معاون مدير التربية لشؤون التعليم المهني والفني:</div>';
-  html += '<div style="height:30px"></div>';
+  html += '<div class="gov-sub" style="text-align:right">أقترح السيد معاون مدير التربية لشؤون التعليم المهني والفني:</div><div style="height:30px"></div>';
   html += '<hr class="gov-divider" style="margin-top:8px">';
-  html += '<div class="gov-sub" style="text-align:right">قرار السيد المدير</div>';
-  html += '<div style="height:25px"></div>';
-
+  html += '<div class="gov-sub" style="text-align:right">قرار السيد المدير</div><div style="height:25px"></div>';
   document.getElementById('govPaper').innerHTML = html;
   document.getElementById('printPage').style.display = 'block';
   document.body.style.overflow = 'hidden';
   document.querySelector('.bottom-nav').style.display = 'none';
   document.querySelector('.top-bar').style.display = 'none';
-  const fab = document.querySelector('.fab');
-  if(fab) fab.style.display = 'none';
 }
 
 function printVisitReport(taskId){
+  state.currentTaskId = taskId;
   const t = state.tasks.find(x => x.id === taskId);
   if(!t) return;
   const s = state.settings;
   const displayName = t.newName || t.name;
-
   let html = '';
   html += '<div class="gov-header">';
   html += '<div class="gov-eagle">' + EAGLE_SVG + '</div>';
-  html += '<div class="gov-header-top">';
-  html += '<div class="gov-header-right">';
-  html += '<div>' + escapeHtml(s.header1 || '') + '</div>';
-  html += '<div>' + escapeHtml(s.header2 || '') + '</div>';
-  html += '<div>' + escapeHtml(s.header3 || '') + '</div>';
-  html += '<div style="margin-top:4px">التاريخ ' + todayISO() + '</div>';
-  html += '</div>';
-  html += '<div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div>';
-  html += '</div>';
-  html += '</div>';
-
+  html += '<div class="gov-header-top"><div class="gov-header-right"><div>' + escapeHtml(s.header1 || '') + '</div><div>' + escapeHtml(s.header2 || '') + '</div><div>' + escapeHtml(s.header3 || '') + '</div><div style="margin-top:4px">التاريخ ' + todayISO() + '</div></div><div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div></div></div>';
   html += '<div class="gov-salutation" style="font-size:18px;font-weight:800">تقرير زيارة ميدانية</div>';
   html += '<table class="gov-table"><tbody>';
   html += '<tr><td style="width:130px;text-align:right;font-weight:800;background:#f3f3f3">المدرسة</td><td style="text-align:right;padding-right:10px">' + escapeHtml(displayName) + '</td></tr>';
-  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">المنطقة</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.area || '') + (t.building ? ' — ' + escapeHtml(t.building) : '') + '</td></tr>';
+  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">المنطقة</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.area || '') + '</td></tr>';
   html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">نوع العمل</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.type || '') + '</td></tr>';
   html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">الحالة</td><td style="text-align:right;padding-right:10px">' + (STATUS_LABELS[t.status] ? STATUS_LABELS[t.status].label : '') + '</td></tr>';
-  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">المشرف</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.contact || '') + (t.contactPhone ? ' — ' + escapeHtml(t.contactPhone) : '') + '</td></tr>';
-  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">مدير المدرسة</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.principal || '') + (t.principalPhone ? ' — ' + escapeHtml(t.principalPhone) : '') + '</td></tr>';
-  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">أمين السر</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.secretary || '') + (t.secretaryPhone ? ' — ' + escapeHtml(t.secretaryPhone) : '') + '</td></tr>';
+  html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">المشرف</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.contact || '') + '</td></tr>';
   html += '<tr><td style="text-align:right;font-weight:800;background:#f3f3f3">الفني المنفذ</td><td style="text-align:right;padding-right:10px">' + escapeHtml(t.technician || '') + '</td></tr>';
   html += '</tbody></table>';
-
   if(t.notes){ html += '<div style="font-size:14px;font-weight:800;margin:12px 0 6px">ملاحظات العطل:</div><div style="border:1px solid #000;padding:10px;font-size:13px;line-height:1.7;min-height:60px">' + escapeHtml(t.notes) + '</div>'; }
   if(t.executionNotes){ html += '<div style="font-size:14px;font-weight:800;margin:12px 0 6px">ما تم تنفيذه:</div><div style="border:1px solid #000;padding:10px;font-size:13px;line-height:1.7;min-height:60px">' + escapeHtml(t.executionNotes) + '</div>'; }
-
-  html += '<div class="gov-signatures" style="margin-top:30px">';
-  html += '<div class="gov-sign-box"><span class="role">القائم بالزيارة</span><span class="name">' + escapeHtml(t.technician || '.....................') + '</span></div>';
-  html += '<div class="gov-sign-box"><span class="role">مدير المدرسة</span><span class="name">' + escapeHtml(t.principal || '.....................') + '</span></div>';
-  html += '</div>';
-
+  html += '<div class="gov-signatures" style="margin-top:30px"><div class="gov-sign-box"><span class="role">القائم بالزيارة</span><span class="name">' + escapeHtml(t.technician || '.....................') + '</span></div><div class="gov-sign-box"><span class="role">مدير المدرسة</span><span class="name">' + escapeHtml(t.principal || '.....................') + '</span></div></div>';
   document.getElementById('govPaper').innerHTML = html;
   document.getElementById('printPage').style.display = 'block';
   document.body.style.overflow = 'hidden';
   document.querySelector('.bottom-nav').style.display = 'none';
   document.querySelector('.top-bar').style.display = 'none';
-  const fab = document.querySelector('.fab');
-  if(fab) fab.style.display = 'none';
 }
 
+/* ═══ تصدير Word (مع الشعار - جداول) ═══ */
 function exportToWord(){
-  const content = document.getElementById('govPaper').innerHTML;
-  if(!content || content.trim() === ''){ showToast('⚠️ لا يوجد محتوى', 'warn'); return; }
+  const t = state.tasks.find(x => x.id === state.currentTaskId);
+  if(!t){ showToast('❌ المهمة غير محددة', 'error'); return; }
+  const s = state.settings;
+  const materials = t.materials || [];
+  const displayName = t.newName || t.name;
+  const perCol = Math.ceil(materials.length / 2) || 1;
+  const col1 = materials.slice(0, perCol);
+  const col2 = materials.slice(perCol);
+  const rowsCount = Math.max(col1.length, col2.length, 1);
+  let tableRows = '';
+  for(let i = 0; i < rowsCount; i++){
+    const m1 = col1[i], m2 = col2[i];
+    tableRows += '<tr>';
+    tableRows += '<td style="border:1px solid #000;padding:5px;text-align:right;font-weight:bold">' + (m1 ? escapeHtml(m1.name) : '&nbsp;') + '</td>';
+    tableRows += '<td style="border:1px solid #000;padding:5px;text-align:center;font-weight:bold;width:60px">' + (m1 ? escapeHtml(String(m1.qty || 1)) : '&nbsp;') + '</td>';
+    tableRows += '<td style="border:1px solid #000;padding:5px;text-align:right;font-weight:bold">' + (m2 ? escapeHtml(m2.name) : '&nbsp;') + '</td>';
+    tableRows += '<td style="border:1px solid #000;padding:5px;text-align:center;font-weight:bold;width:60px">' + (m2 ? escapeHtml(String(m2.qty || 1)) : '&nbsp;') + '</td>';
+    tableRows += '</tr>';
+  }
+  let schoolLine = 'مدرسة ' + escapeHtml(displayName);
+  if(t.building) schoolLine += ' / ' + escapeHtml(t.building);
+  const roomLine = t.room ? 'على قاعة ' + escapeHtml(t.room) : 'على قاعة ................';
   const eagleUrl = 'https://basamassaf.github.io/jam3iyati/eagle.png';
-  const fullHtml = '<html dir="rtl" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'
-    + '<head><meta charset="UTF-8"><title>مستند</title>'
-    + '<style>'
-    + '@page{size:A4;margin:1.5cm}'
-    + 'body{font-family:"Traditional Arabic","Sakkal Majalla","Amiri",Tahoma,serif;direction:rtl;font-size:14pt;line-height:1.5}'
-    + 'table{width:100%;border-collapse:collapse;margin:10px 0}'
-    + 'th,td{border:1px solid #000;padding:5px 8px;text-align:center;font-weight:bold;font-size:12pt}'
-    + 'th{background:#f3f3f3}'
-    + 'td.mat-name{text-align:right}'
-    + '.gov-header{position:relative;min-height:130px}'
-    + '.gov-eagle{position:absolute;left:50%;top:0;transform:translateX(-50%);width:85px;text-align:center}'
-    + '.gov-eagle img{width:85px;height:auto}'
-    + '.gov-header-top{display:flex;justify-content:space-between}'
-    + '.gov-header-right{text-align:right;font-size:12pt;font-weight:bold;line-height:1.5}'
-    + '.gov-header-left{text-align:left;font-size:12pt;font-weight:bold;padding-top:14px}'
-    + '.gov-salutation{text-align:center;font-size:14pt;font-weight:bold;margin:10px 0}'
-    + '.gov-body{font-size:13pt;font-weight:bold;line-height:1.7}'
-    + '.gov-signatures{display:flex;justify-content:space-between;margin-top:20px}'
-    + '.gov-sign-box{text-align:center;flex:1}'
-    + '.gov-sign-box .role{display:block;margin-bottom:4px}'
-    + '.gov-sign-box .name{font-weight:bold}'
-    + 'hr{border:none;border-top:1.5px solid #000;margin:10px 0}'
-    + '</style></head><body>' + content + '</body></html>';
-  const blob = new Blob(['\ufeff', fullHtml], { type: 'application/msword' });
+
+  let w = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40" dir="rtl">';
+  w += '<head><meta charset="UTF-8"><title>كشف</title>';
+  w += '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->';
+  w += '<style>';
+  w += '@page WordSection1 { size: 21cm 29.7cm; margin: 1.5cm; }';
+  w += 'div.WordSection1 { page: WordSection1; }';
+  w += 'body { font-family: "Traditional Arabic", "Sakkal Majalla", Tahoma, serif; font-size: 14pt; direction: rtl; text-align: right; line-height: 1.6; }';
+  w += 'table { border-collapse: collapse; }';
+  w += 'th, td { border: 1px solid #000; padding: 5px 8px; }';
+  w += 'th { background: #f3f3f3; font-weight: bold; text-align: center; }';
+  w += '</style></head><body><div class="WordSection1">';
+
+  w += '<table style="width:100%;border:none"><tr>';
+  w += '<td style="border:none;text-align:left;font-size:12pt;font-weight:bold;width:120px;vertical-align:top;padding-top:14px">رقم ( ' + (t.number || '') + ' )</td>';
+  w += '<td style="border:none;text-align:center;width:100px;vertical-align:top"><img src="' + eagleUrl + '" width="85" alt="شعار" /></td>';
+  w += '<td style="border:none;text-align:right;font-size:12pt;font-weight:bold;line-height:1.5;vertical-align:top">';
+  w += '<div>' + escapeHtml(s.header1 || '') + '</div>';
+  w += '<div>' + escapeHtml(s.header2 || '') + '</div>';
+  w += '<div>' + escapeHtml(s.header3 || '') + '</div>';
+  w += '<div>التاريخ ' + escapeHtml(t.createdAt || todayISO()) + '</div>';
+  w += '</td></tr></table>';
+
+  w += '<div style="text-align:center;font-size:15pt;font-weight:bold;margin:15px 0">السيد مدير التربية المحترم</div>';
+  w += '<div style="font-size:14pt;font-weight:bold;text-align:justify;margin:10px 0;line-height:1.8">ــ بعد الكشف في ' + schoolLine + ' ' + roomLine + ' رقم ( ' + escapeHtml(t.room || '1') + ' ) تبين الحاجة للمواد التالية:</div>';
+
+  w += '<table style="width:100%;border-collapse:collapse;font-size:12pt">';
+  w += '<thead><tr><th style="border:1px solid #000;padding:5px 8px;background:#f3f3f3">اسم المادة والقياس</th><th style="border:1px solid #000;padding:5px 8px;background:#f3f3f3;width:60px">العدد</th><th style="border:1px solid #000;padding:5px 8px;background:#f3f3f3">اسم المادة والقياس</th><th style="border:1px solid #000;padding:5px 8px;background:#f3f3f3;width:60px">العدد</th></tr></thead>';
+  w += '<tbody>' + tableRows + '</tbody></table>';
+
+  w += '<table style="width:100%;border:none;margin-top:20px"><tr>';
+  w += '<td style="border:none;text-align:center;font-size:13pt;font-weight:bold;padding:10px;vertical-align:top"><span style="display:block">القائم بالكشف</span><span style="font-weight:bold;font-size:14pt">الفني ' + escapeHtml(t.technician || '.....................') + '</span></td>';
+  w += '<td style="border:none;text-align:center;font-size:13pt;font-weight:bold;padding:10px;vertical-align:top"><span style="display:block">رئيس شعبة الصيانة</span><span style="font-weight:bold;font-size:14pt">' + escapeHtml(s.sign2 || '') + '</span></td>';
+  w += '</tr></table>';
+
+  w += '<div style="text-align:center;font-size:13pt;font-weight:bold;margin:15px 0">يرجى الاطلاع والتوجيه</div>';
+  w += '<hr style="border:none;border-top:1.5px solid #000;margin:15px 0">';
+  w += '<div style="text-align:left;font-size:13pt;font-weight:bold">رئيس دائرة المعلوماتية<br>' + escapeHtml(s.sign3 || '') + '</div>';
+  w += '<hr style="border:none;border-top:1.5px solid #000;margin:15px 0">';
+  w += '<div style="font-size:13pt;font-weight:bold;text-align:right;margin:10px 0">أقترح السيد معاون مدير التربية لشؤون التعليم المهني والفني:</div>';
+  w += '<div style="height:30px"></div>';
+  w += '<hr style="border:none;border-top:1.5px solid #000;margin:15px 0">';
+  w += '<div style="font-size:13pt;font-weight:bold;text-align:right;margin:10px 0">قرار السيد المدير</div>';
+  w += '<div style="height:25px"></div>';
+
+  w += '</div></body></html>';
+
+  const blob = new Blob(['\ufeff', w], { type: 'application/msword' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'ورشة_الكهرباء_' + todayISO().replace(/\//g, '-') + '.doc';
+  a.download = 'كشف_' + (t.number || 'مهمة') + '_' + todayISO().replace(/\//g, '-') + '.doc';
   a.click();
   URL.revokeObjectURL(url);
   showToast('✅ تم تصدير Word', 'success');
@@ -3279,11 +3024,9 @@ function closePrint(){
   }
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 26: التصدير والاستيراد
-   ═══════════════════════════════════════════════════════ */
+/* ═══ التصدير والاستيراد ═══ */
 function exportJSON(){
-  const data = { version: 5, exportedAt: new Date().toISOString(), tasks: state.tasks, materials: state.materials, schools: state.schools, technicians: state.technicians, supervisors: state.supervisors, settings: state.settings, counter: state.counter };
+  const data = { version: 6, exportedAt: new Date().toISOString(), tasks: state.tasks, materials: state.materials, schools: state.schools, technicians: state.technicians, supervisors: state.supervisors, settings: state.settings, counter: state.counter };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -3433,9 +3176,7 @@ function parseCSVLine(line){
   return result.map(s => s.trim());
 }
 
-/* ═══════════════════════════════════════════════════════
-   القسم 27: التهيئة
-   ═══════════════════════════════════════════════════════ */
+/* ═══ التهيئة ═══ */
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
   updateTopBar();
@@ -3453,11 +3194,9 @@ document.addEventListener('DOMContentLoaded', () => {
   fillSupervisorFilters();
   fillWhatsRecipients();
   refreshAllViews();
-
   const saved = localStorage.getItem('wk_current_page');
   if(saved && document.getElementById(saved)) switchPage(saved);
   else switchPage('pageHome');
-
   document.addEventListener('keydown', e => {
     if(e.key === 'Escape'){
       document.querySelectorAll('.sheet-bg.open').forEach(s => s.classList.remove('open'));
@@ -3466,7 +3205,6 @@ document.addEventListener('DOMContentLoaded', () => {
       document.body.style.overflow = '';
     }
   });
-
   setInterval(applyNightMode, 3600000);
   showToast('مرحباً بك ⚡', 'success');
 });
