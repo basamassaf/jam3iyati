@@ -481,7 +481,6 @@ svg{max-width:24px;max-height:24px}
     <button class="btn-lg btn-word" onclick="exportTasksCSV()">📊 تصدير المهام CSV</button>
   </div>
 </div>
-
 <div class="sheet-bg" id="taskSheetBg" onclick="if(event.target===this)closeSheet('taskSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -524,7 +523,6 @@ svg{max-width:24px;max-height:24px}
   </div>
 </div>
 
-<!-- ✅ NEW: نافذة سبب الإلغاء/التحويل (بدلاً من prompt) -->
 <div class="sheet-bg" id="reasonSheetBg" onclick="if(event.target===this)closeSheet('reasonSheetBg')">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -589,9 +587,10 @@ svg{max-width:24px;max-height:24px}
     <div class="field-row"><div class="field"><label>المنطقة</label><input type="text" id="schArea"></div><div class="field"><label>الحي</label><input type="text" id="schDistrict"></div></div>
     <div class="field"><label>العنوان</label><input type="text" id="schAddress"></div>
     <div class="field-row"><div class="field"><label>🏫 عدد القاعات</label><input type="number" id="schHalls"></div><div class="field"><label>👤 المشرف</label><select id="schSupervisor"><option value="">-- اختر --</option></select></div></div>
+    <div class="field"><label>📞 هاتف المدرسة</label><input type="tel" id="schPhone"></div>
     <div class="field-row"><div class="field"><label>📚 الحلقة</label><select id="schCycle"><option value="">-- اختر --</option><option value="حلقة أولى">حلقة أولى (1-6)</option><option value="حلقة ثانية">حلقة ثانية (7-9)</option><option value="أساسي + ثانوي">أساسي + ثانوي</option><option value="ثانوي">ثانوي</option><option value="رياض أطفال">رياض أطفال</option><option value="ثانوي/مهني">ثانوي مهني</option><option value="معهد">معهد</option><option value="ح1+ح2+ثا">ح1+ح2+ثا</option></select></div><div class="field"><label>🏷️ الفوج</label><input type="text" id="schWave" placeholder="واحد / اثنين"></div></div>
     <div class="field-row"><div class="field"><label>📋 مركز امتحاني</label><select id="schExamCenter"><option value="">لا</option><option value="نعم">نعم</option><option value="مركز امتحان">مركز امتحان</option></select></div><div class="field"><label>📹 كاميرات المراقبة</label><select id="schCameras"><option value="">لا يوجد</option><option value="نعم - تعمل">نعم - تعمل</option><option value="نعم - تحتاج صيانة">نعم - تحتاج صيانة</option></select></div></div>
-    <div class="field"><label>👷 فني الكهرباء</label><input type="text" id="schElectrician"></div>
+    <div class="field"><label>👷 فني الكهرباء</label><select id="schElectrician"><option value="">-- اختر فني --</option></select></div>
     <div class="field-row"><div class="field"><label>👤 مدير</label><input type="text" id="schPrincipal"></div><div class="field"><label>📞 جواله</label><input type="tel" id="schPrincipalPhone"></div></div>
     <div class="field-row"><div class="field"><label>💻 أمين سر</label><input type="text" id="schSecretary"></div><div class="field"><label>📞 جواله</label><input type="tel" id="schSecretaryPhone"></div></div>
     <button class="btn-lg btn-primary" onclick="saveSchoolMaster()">💾 حفظ</button>
@@ -651,10 +650,9 @@ svg{max-width:24px;max-height:24px}
   </div>
   <div class="print-page"><div class="gov-paper" id="govPaper"></div></div>
 </div>
-
 <script>
 /* ═══════════════════════════════════════════════════════
-   الثوابت
+   الثوابت والتخزين
    ═══════════════════════════════════════════════════════ */
 const STORAGE_KEYS = {
   TASKS: 'wk_tasks_v10', MATERIALS: 'wk_materials_v10', SCHOOLS: 'wk_schools_v10',
@@ -662,6 +660,30 @@ const STORAGE_KEYS = {
   SETTINGS: 'wk_settings_v10', COUNTER: 'wk_counter_v10',
   DISMISSED_ALERTS: 'wk_dismissed_alerts_v10'
 };
+
+// 🌟 تخزين الشعار base64 مؤقتاً لاستخدامه في Word والطباعة
+let EAGLE_BASE64_CACHE = '';
+(async function preloadEagle(){
+  try {
+    const response = await fetch('https://basamassaf.github.io/jam3iyati/eagle.png');
+    const blob = await response.blob();
+    EAGLE_BASE64_CACHE = await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+    console.log('✅ تم تحميل الشعار بنجاح');
+  } catch(e) { 
+    console.log('⚠️ تعذّر تحميل الشعار:', e); 
+  }
+})();
+
+function getEagleImg(){
+  if(EAGLE_BASE64_CACHE){
+    return '<img src="' + EAGLE_BASE64_CACHE + '" alt="شعار" style="width:100%;height:auto;display:block">';
+  }
+  return '<img src="https://basamassaf.github.io/jam3iyati/eagle.png" alt="شعار" style="width:100%;height:auto;display:block">';
+}
 
 let state = {
   tasks: [], materials: [], schools: [], technicians: [], supervisors: [],
@@ -831,7 +853,7 @@ function migrateTasks(){
   });
   if(changed){
     saveTasks();
-    saveCounter(); // ✅ حفظ العدّاد بعد الترحيل
+    saveCounter();
   }
 }
 
@@ -857,7 +879,7 @@ function saveCounter(){ localStorage.setItem(STORAGE_KEYS.COUNTER, String(state.
 function saveDismissedAlerts(){ localStorage.setItem(STORAGE_KEYS.DISMISSED_ALERTS, JSON.stringify(state.dismissedAlerts)); }
 
 /* ═══════════════════════════════════════════════════════
-   الأدوات
+   الأدوات المساعدة
    ═══════════════════════════════════════════════════════ */
 function escapeHtml(s){ if(s == null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function escapeCSV(s){ if(s == null) return ''; s = String(s); if(s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1){ return '"' + s.replace(/"/g, '""') + '"'; } return s; }
@@ -875,7 +897,6 @@ function isoToAr(iso){ if(!iso) return ''; const p = iso.split('-'); if(p.length
 function arToIso(ar){ if(!ar) return ''; const p = ar.split('/'); if(p.length !== 3) return ''; return p[0] + '-' + p[1].padStart(2,'0') + '-' + p[2].padStart(2,'0'); }
 function getDaysDiff(dateStr){ if(!dateStr) return 0; const p = dateStr.split('/'); if(p.length !== 3) return 0; const d = new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2])); return Math.floor((new Date() - d) / (1000*60*60*24)); }
 
-// ✅ دالة موحّدة لتاريخ الاستحقاق (احترام التأجيل)
 function getDueDays(t){
   const dueDate = (t.status === 'postponed' && t.postponeUntil) ? t.postponeUntil : t.createdAt;
   return getDaysDiff(dueDate);
@@ -883,13 +904,11 @@ function getDueDays(t){
 
 function isOverdue(t){ if(['done','canceled','transferred','postponed'].includes(t.status)) return false; return getDaysDiff(t.createdAt) >= (state.settings.overdueDays || 7); }
 function isPostponedActive(t){ if(t.status !== 'postponed') return false; if(!t.postponeUntil) return true; return getDaysDiff(t.postponeUntil) <= 0; }
-// ✅ استخدام getDueDays لاحترام التأجيل
 function isToday(t){ return getDueDays(t) === 0; }
 function isTomorrow(t){ return getDueDays(t) === -1; }
 
-// ✅ التحقق من صحة رقم الجوال
 function isValidPhone(phone){
-  if(!phone) return true; // فارغ مسموح
+  if(!phone) return true;
   const clean = phone.replace(/[^0-9+]/g, '');
   return clean.length >= 9 && clean.length <= 15;
 }
@@ -999,7 +1018,6 @@ function pickSchool(idx){
   document.getElementById('selectedSchool').style.display = 'block';
   document.getElementById('fName').value = s.n;
   if(s.s) document.getElementById('fContact').value = s.s;
-  // ✅ جوال المشرف من سجل المشرفين
   const sup = state.supervisors.find(x => x.name === s.s);
   if(sup && sup.phone) document.getElementById('fContactPhone').value = sup.phone;
   if(s.principal) document.getElementById('fPrincipal').value = s.principal;
@@ -1011,7 +1029,6 @@ function pickSchool(idx){
   if(s.d) document.getElementById('fBuilding').value = s.d;
 }
 function clearSelectedSchool(){ state.selectedSchool = null; document.getElementById('fSchoolSearch').value = ''; document.getElementById('selectedSchool').style.display = 'none'; document.getElementById('schoolResults').classList.remove('show'); }
-
 /* ═══════════════════════════════════════════════════════
    إدارة المهام
    ═══════════════════════════════════════════════════════ */
@@ -1037,7 +1054,6 @@ function openTaskSheet(taskId){
     document.getElementById('fPriority').value = t.priority || 'med';
     document.getElementById('fArea').value = t.area || 'المزة';
     document.getElementById('fContact').value = t.contact || '';
-    // ✅ ملء جوال المشرف: من المهمة أولاً، ثم من سجل المشرفين
     document.getElementById('fContactPhone').value = t.contactPhone || '';
     if(!t.contactPhone && t.contact){
       const sup = state.supervisors.find(x => x.name === t.contact);
@@ -1069,7 +1085,6 @@ function saveTask(){
   const name = document.getElementById('fName').value.trim();
   if(!name){ showToast('الرجاء إدخال اسم المدرسة', 'error'); return; }
   
-  // ✅ التحقق من أرقام الجوال
   const phones = [
     { v: document.getElementById('fContactPhone').value.trim(), n: 'جوال المشرف' },
     { v: document.getElementById('fPrincipalPhone').value.trim(), n: 'جوال المدير' },
@@ -1125,13 +1140,11 @@ function saveTask(){
   refreshAllViews();
 }
 
-/* ✅ طلب تغيير الحالة (يستخدم sheet بدل prompt) */
 let pendingStatusChange = null;
 function requestStatusChange(id, newStatus){
   const t = state.tasks.find(x => x.id === id);
   if(!t) return;
   
-  // الإلغاء أو التحويل → نافذة سبب
   if(newStatus === 'canceled' || newStatus === 'transferred'){
     pendingStatusChange = { id: id, newStatus: newStatus };
     document.getElementById('reasonSheetTitle').textContent = newStatus === 'canceled' ? '🚫 سبب الإلغاء' : '↔️ سبب التحويل';
@@ -1140,7 +1153,6 @@ function requestStatusChange(id, newStatus){
     return;
   }
   
-  // الإرجاع من "منجزة" → تأكيد
   if(newStatus !== 'done' && t.status === 'done'){
     if(!confirm('هل تريد إرجاع المهمة من "منجزة"؟')) return;
   }
@@ -1289,7 +1301,6 @@ function openAddNewMaterialFromTask(){
   document.getElementById('masterMatUnit').value = 'عدد';
   openSheet('masterMatSheetBg');
 }
-
 /* ═══════════════════════════════════════════════════════
    العرض العام
    ═══════════════════════════════════════════════════════ */
@@ -1443,7 +1454,6 @@ function renderTodayPage(){
     return blob.indexOf(search) !== -1;
   }
 
-  // ✅ استخدام getDueDays العامة الموحّدة (لا تكرار)
   const overdueTasks = state.tasks.filter(t => {
     if(['done','canceled','transferred'].includes(t.status)) return false;
     if(getDueDays(t) < 0) return false;
@@ -1755,7 +1765,6 @@ function sendWhatsApp(){
   closeSheet('whatsSheetBg');
 }
 function copyWhatsMessage(){ const msg = document.getElementById('whatsMessage'); msg.select(); msg.setSelectionRange(0, 99999); document.execCommand('copy'); showToast('✅ تم النسخ', 'success'); }
-
 /* ═══════════════════════════════════════════════════════
    الجولة والإحصائيات
    ═══════════════════════════════════════════════════════ */
@@ -1912,8 +1921,16 @@ function updateSchoolsStats(){
 function openSchoolSheet(){
   state.editingSchoolIdx = null;
   document.getElementById('schoolSheetTitle').textContent = '➕ إضافة';
-  ['schName','schOldName','schArea','schDistrict','schAddress','schPhone','schHalls','schPrincipal','schPrincipalPhone','schSecretary','schSecretaryPhone','schWave','schElectrician'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-  ['schSupervisor','schCycle','schExamCenter','schCameras'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  ['schName','schOldName','schArea','schDistrict','schAddress','schPhone','schHalls','schPrincipal','schPrincipalPhone','schSecretary','schSecretaryPhone','schWave'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  ['schSupervisor','schCycle','schExamCenter','schCameras','schElectrician'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  
+  // ✅ ملء قائمة الفنيين
+  const techSelect = document.getElementById('schElectrician');
+  if(techSelect){
+    techSelect.innerHTML = '<option value="">-- اختر فني --</option>' + 
+      state.technicians.map(t => '<option value="' + escapeHtml(t.name) + '">' + escapeHtml(t.name) + '</option>').join('');
+  }
+  
   openSheet('schoolSheetBg');
 }
 
@@ -1947,7 +1964,14 @@ function editSchool(idx){
     setVal('schWave', s.wave || '');
     setVal('schExamCenter', s.examCenter || '');
     setVal('schCameras', s.cameras || '');
-    setVal('schElectrician', s.electrician || '');
+    
+    // ✅ ملء قائمة الفنيين قبل اختيار القيمة
+    const techSelect = document.getElementById('schElectrician');
+    if(techSelect){
+      techSelect.innerHTML = '<option value="">-- اختر فني --</option>' + 
+        state.technicians.map(t => '<option value="' + escapeHtml(t.name) + '">' + escapeHtml(t.name) + '</option>').join('');
+      techSelect.value = s.electrician || '';
+    }
     
     openSheet('schoolSheetBg');
   } catch(err) {
@@ -1957,29 +1981,53 @@ function editSchool(idx){
 }
 
 function saveSchoolMaster(){
-  const name = document.getElementById('schName').value.trim();
-  if(!name){ showToast('أدخل الاسم', 'error'); return; }
-  const data = {
-    n: name, oldName: document.getElementById('schOldName').value.trim(),
-    s: document.getElementById('schSupervisor').value.trim(),
-    a: document.getElementById('schArea').value.trim(), d: document.getElementById('schDistrict').value.trim(),
-    ad: document.getElementById('schAddress').value.trim(),
-    p: document.getElementById('schPhone').value.trim(), halls: document.getElementById('schHalls').value.trim(),
-    principal: document.getElementById('schPrincipal').value.trim(), principalPhone: document.getElementById('schPrincipalPhone').value.trim(),
-    secretary: document.getElementById('schSecretary').value.trim(), secretaryPhone: document.getElementById('schSecretaryPhone').value.trim(),
-    cycle: document.getElementById('schCycle').value,
-    wave: document.getElementById('schWave').value.trim(),
-    examCenter: document.getElementById('schExamCenter').value,
-    cameras: document.getElementById('schCameras').value,
-    electrician: document.getElementById('schElectrician').value.trim()
-  };
-  if(state.editingSchoolIdx !== null){
-    state.schools[state.editingSchoolIdx] = Object.assign({}, state.schools[state.editingSchoolIdx], data);
-    showToast('✅ تم التحديث', 'success');
-  } else { state.schools.push(data); showToast('✅ أُضيفت', 'success'); }
-  saveSchools();
-  closeSheet('schoolSheetBg');
-  renderSchoolsList(); updateSchoolsStats(); fillAreaFilters();
+  try {
+    const name = document.getElementById('schName').value.trim();
+    if(!name){ showToast('❌ أدخل اسم المدرسة', 'error'); return; }
+    
+    // ✅ دالة آمنة للقراءة (تتجنب أخطاء null)
+    const getVal = (id) => {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
+    };
+    
+    const data = {
+      n: name,
+      oldName: getVal('schOldName'),
+      s: getVal('schSupervisor'),
+      a: getVal('schArea'),
+      d: getVal('schDistrict'),
+      ad: getVal('schAddress'),
+      p: getVal('schPhone'),
+      halls: getVal('schHalls'),
+      principal: getVal('schPrincipal'),
+      principalPhone: getVal('schPrincipalPhone'),
+      secretary: getVal('schSecretary'),
+      secretaryPhone: getVal('schSecretaryPhone'),
+      cycle: getVal('schCycle'),
+      wave: getVal('schWave'),
+      examCenter: getVal('schExamCenter'),
+      cameras: getVal('schCameras'),
+      electrician: getVal('schElectrician')
+    };
+    
+    if(state.editingSchoolIdx !== null && state.editingSchoolIdx !== undefined){
+      state.schools[state.editingSchoolIdx] = Object.assign({}, state.schools[state.editingSchoolIdx], data);
+      showToast('✅ تم التحديث بنجاح', 'success');
+    } else {
+      state.schools.push(data);
+      showToast('✅ تمت الإضافة بنجاح', 'success');
+    }
+    
+    saveSchools();
+    closeSheet('schoolSheetBg');
+    renderSchoolsList();
+    updateSchoolsStats();
+    fillAreaFilters();
+  } catch(err) {
+    console.error('❌ خطأ في حفظ المدرسة:', err);
+    showToast('❌ حدث خطأ: ' + err.message, 'error');
+  }
 }
 
 function deleteSchool(idx){ if(!confirm('حذف "' + (state.schools[idx]?.n || '') + '"؟')) return; state.schools.splice(idx, 1); saveSchools(); renderSchoolsList(); updateSchoolsStats(); showToast('🗑️ تم الحذف', 'warn'); }
@@ -2128,8 +2176,6 @@ function diagnoseData(){
 /* ═══════════════════════════════════════════════════════
    الطباعة
    ═══════════════════════════════════════════════════════ */
-const EAGLE_SVG = '<img src="https://basamassaf.github.io/jam3iyati/eagle.png" alt="شعار" crossorigin="anonymous" style="width:100%;height:auto;display:block">';
-
 function printTask(taskId){
   state.currentTaskId = taskId;
   const t = state.tasks.find(x => x.id === taskId);
@@ -2151,7 +2197,7 @@ function printTask(taskId){
   const roomLine = t.room ? 'على قاعة ' + escapeHtml(t.room) : 'على قاعة ................';
   
   let html = '';
-  html += '<div class="gov-header"><div class="gov-eagle">' + EAGLE_SVG + '</div><div class="gov-header-top"><div class="gov-header-right"><div>' + escapeHtml(s.header1 || '') + '</div><div>' + escapeHtml(s.header2 || '') + '</div><div>' + escapeHtml(s.header3 || '') + '</div><div style="margin-top:4px">التاريخ ' + escapeHtml(t.createdAt || todayISO()) + '</div></div><div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div></div></div>';
+  html += '<div class="gov-header"><div class="gov-eagle">' + getEagleImg() + '</div><div class="gov-header-top"><div class="gov-header-right"><div>' + escapeHtml(s.header1 || '') + '</div><div>' + escapeHtml(s.header2 || '') + '</div><div>' + escapeHtml(s.header3 || '') + '</div><div style="margin-top:4px">التاريخ ' + escapeHtml(t.createdAt || todayISO()) + '</div></div><div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div></div></div>';
   html += '<div class="gov-salutation">السيد مدير التربية المحترم</div>';
   html += '<div class="gov-body">ــ بعد الكشف في ' + schoolLine + ' ' + roomLine + ' رقم ( ' + escapeHtml(t.room || '1') + ' ) تبين الحاجة للمواد التالية:</div>';
   html += '<table class="gov-table"><thead><tr><th>اسم المادة والقياس</th><th style="width:60px">العدد</th><th>اسم المادة والقياس</th><th style="width:60px">العدد</th></tr></thead><tbody>' + rows + '</tbody></table>';
@@ -2178,7 +2224,7 @@ function printVisitReport(taskId){
   const s = state.settings;
   const displayName = t.newName || t.name;
   let html = '';
-  html += '<div class="gov-header"><div class="gov-eagle">' + EAGLE_SVG + '</div><div class="gov-header-top"><div class="gov-header-right"><div>' + escapeHtml(s.header1 || '') + '</div><div>' + escapeHtml(s.header2 || '') + '</div><div>' + escapeHtml(s.header3 || '') + '</div><div style="margin-top:4px">التاريخ ' + todayISO() + '</div></div><div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div></div></div>';
+  html += '<div class="gov-header"><div class="gov-eagle">' + getEagleImg() + '</div><div class="gov-header-top"><div class="gov-header-right"><div>' + escapeHtml(s.header1 || '') + '</div><div>' + escapeHtml(s.header2 || '') + '</div><div>' + escapeHtml(s.header3 || '') + '</div><div style="margin-top:4px">التاريخ ' + todayISO() + '</div></div><div class="gov-header-left">رقم ( ' + (t.number || '') + ' )</div></div></div>';
   html += '<div class="gov-salutation" style="font-size:18px;font-weight:800">تقرير زيارة ميدانية</div>';
   html += '<table class="gov-table"><tbody>';
   html += '<tr><td style="width:130px;text-align:right;font-weight:800;background:#f3f3f3">المدرسة</td><td style="text-align:right;padding-right:10px">' + escapeHtml(displayName) + '</td></tr>';
@@ -2219,12 +2265,7 @@ async function exportToWord(){
     tableRows += '<td style="border:1pt solid black;padding:5pt 8pt;text-align:center;font-family:\'Traditional Arabic\',Tahoma;font-size:12pt;font-weight:bold;width:55pt;mso-line-height-rule:exactly;">' + (m2 ? escapeHtml(String(m2.qty || 1)) : '&nbsp;') + '</td>';
     tableRows += '</tr>';
   }
-  let eagleBase64 = '';
-  try {
-    const response = await fetch('https://basamassaf.github.io/jam3iyati/eagle.png');
-    const blob = await response.blob();
-    eagleBase64 = await new Promise((resolve) => { const reader = new FileReader(); reader.onloadend = () => resolve(reader.result); reader.readAsDataURL(blob); });
-  } catch(e) { console.log('الشعار:', e); }
+  const eagleBase64 = EAGLE_BASE64_CACHE;
   let schoolLine = 'مدرسة ' + escapeHtml(displayName);
   if(t.building) schoolLine += ' / ' + escapeHtml(t.building);
   const roomLine = t.room ? 'على قاعة ' + escapeHtml(t.room) : 'على قاعة ................';
@@ -2245,7 +2286,8 @@ async function exportToWord(){
   w += '<table style="border:none;width:100%;"><tr>';
   w += '<td style="border:none;width:25%;text-align:left;vertical-align:top;font-family:\'Traditional Arabic\';font-size:12pt;font-weight:bold;padding-top:8pt;">رقم ( ' + (t.number || '') + ' )</td>';
   w += '<td style="border:none;width:22%;text-align:center;vertical-align:top;">';
-  if(eagleBase64) w += '<img src="' + eagleBase64 + '" width="70" height="60" />'; else w += '&nbsp;';
+  if(eagleBase64) w += '<img src="' + eagleBase64 + '" width="70" height="60" />';
+  else w += '<img src="https://basamassaf.github.io/jam3iyati/eagle.png" width="70" height="60" />';
   w += '</td>';
   w += '<td style="border:none;width:53%;text-align:right;vertical-align:top;font-family:\'Traditional Arabic\';font-size:12pt;font-weight:bold;line-height:1.6;">';
   w += escapeHtml(s.header1 || '') + '<br/>';
@@ -2455,7 +2497,6 @@ function importMaterialsCSV(event){
   event.target.value = '';
 }
 
-// ✅ parseCSVLine محسّنة (تنظيف \r و \n)
 function parseCSVLine(line){
   if(!line) return [];
   line = String(line).replace(/[\r\n]+$/, '');
