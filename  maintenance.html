@@ -493,7 +493,7 @@ svg{max-width:24px;max-height:24px}
     <div class="field-row"><div class="field"><label>المبنى</label><input type="text" id="fBuilding"></div><div class="field"><label>رقم القاعة</label><input type="text" id="fRoom"></div></div>
     <div class="field-row"><div class="field"><label>نوع العمل</label><select id="fType"><option>🔌 إصلاح عطل</option><option>🔧 صيانة دورية</option><option>🏗️ تمديد قاعة</option><option>🚚 نقل قاعة</option><option>🆕 إحداث قاعة</option><option>💡 تركيب إنارة</option><option>⚡ توصيل أجهزة</option><option>📦 تأمين مواد</option><option>📝 كشف فني</option><option>🖨️ صيانة حواسب</option><option>🔄 إعادة تأهيل</option><option>أخرى</option></select></div><div class="field"><label>الأولوية</label><select id="fPriority"><option value="high">🔴 عالية</option><option value="med" selected>🟡 متوسطة</option><option value="low">🟢 منخفضة</option></select></div></div>
     <div class="field-row"><div class="field"><label>المنطقة</label><select id="fArea"><option>المزة</option><option>المزة - أبو زهير</option><option>برزة</option><option>الزاهرة</option><option>كفرسوسة</option><option>الميدان</option><option>القنوات</option><option>الشاغور</option><option>دمشق القديمة</option><option>ساروجا</option><option>ركن الدين</option><option>الصالحية</option><option>المهاجرين</option><option>القدم</option><option>دمر</option><option>القابون</option><option>جوبر</option><option>المخيم</option><option>أخرى</option></select></div><div class="field"><label>المشرف</label><select id="fContact"><option value="">-- اختر --</option></select></div></div>
-    <div class="field"><label>📞 جوال المشرف</label><input type="tel" id="fContactPhone" readonly style="background:var(--gray-100)"></div>
+    <div class="field"><label>📞 جوال المشرف</label><input type="tel" id="fContactPhone" placeholder="يُملأ تلقائياً أو اكتب يدوياً"></div>
     <div class="field-row"><div class="field"><label>👤 مدير المدرسة</label><input type="text" id="fPrincipal"></div><div class="field"><label>📞 جوال المدير</label><input type="tel" id="fPrincipalPhone"></div></div>
     <div class="field-row"><div class="field"><label>💻 أمين سر الحاسب</label><input type="text" id="fSecretary"></div><div class="field"><label>📞 جواله</label><input type="tel" id="fSecretaryPhone"></div></div>
     <div class="field-row"><div class="field"><label>📅 تاريخ الإنشاء</label><input type="date" id="fCreatedDate"></div><div class="field"><label>📅 تاريخ الإنجاز</label><input type="date" id="fDoneDate"></div></div>
@@ -521,6 +521,16 @@ svg{max-width:24px;max-height:24px}
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px"><button class="btn btn-ghost" onclick="setPostponeDate(1)">غداً</button><button class="btn btn-ghost" onclick="setPostponeDate(3)">3 أيام</button><button class="btn btn-ghost" onclick="setPostponeDate(7)">أسبوع</button><button class="btn btn-ghost" onclick="setPostponeDate(30)">شهر</button></div>
     <div class="field"><label>📝 ملاحظة</label><textarea id="postponeNotes"></textarea></div>
     <button class="btn-lg btn-warn" onclick="savePostpone()">⏸️ تأجيل</button>
+  </div>
+</div>
+
+<!-- ✅ NEW: نافذة سبب الإلغاء/التحويل (بدلاً من prompt) -->
+<div class="sheet-bg" id="reasonSheetBg" onclick="if(event.target===this)closeSheet('reasonSheetBg')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title"><span id="reasonSheetTitle">السبب</span><button class="sheet-close" onclick="closeSheet('reasonSheetBg')">✕</button></div>
+    <div class="field"><label>السبب <span class="req">*</span></label><textarea id="reasonText" placeholder="اكتب السبب هنا..." style="min-height:100px"></textarea></div>
+    <button class="btn-lg btn-primary" onclick="confirmReasonAction()">💾 تأكيد</button>
   </div>
 </div>
 
@@ -746,7 +756,7 @@ const DEFAULT_SUPERVISORS = [
 const SCHOOLS_DEFAULT = [];
 
 /* ═══════════════════════════════════════════════════════
-   التحميل والترحيل (يقرأ من كل المفاتيح القديمة)
+   التحميل والترحيل
    ═══════════════════════════════════════════════════════ */
 function readKeyWithFallback(newKey, oldKeys, defaultValue) {
   const current = localStorage.getItem(newKey);
@@ -787,7 +797,6 @@ function loadState(){
     state.counter = parseInt(cntRaw || '1');
     state.dismissedAlerts = JSON.parse(localStorage.getItem(STORAGE_KEYS.DISMISSED_ALERTS) || '[]');
     
-    // حفظ في المفاتيح الجديدة
     saveTasks(); saveMaterials(); saveSchools(); saveTechnicians();
     saveSupervisors(); saveSettings(); saveCounter();
     
@@ -820,7 +829,10 @@ function migrateTasks(){
     if(!t.postponeLog){ t.postponeLog = []; changed = true; }
     if(!t.number){ t.number = state.counter++; changed = true; }
   });
-  if(changed) saveTasks();
+  if(changed){
+    saveTasks();
+    saveCounter(); // ✅ حفظ العدّاد بعد الترحيل
+  }
 }
 
 function migrateSchools(){
@@ -861,17 +873,25 @@ function showToast(msg, type){
 function todayISO(){ const d = new Date(); return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0'); }
 function isoToAr(iso){ if(!iso) return ''; const p = iso.split('-'); if(p.length !== 3) return iso; return p[0] + '/' + p[1] + '/' + p[2]; }
 function arToIso(ar){ if(!ar) return ''; const p = ar.split('/'); if(p.length !== 3) return ''; return p[0] + '-' + p[1].padStart(2,'0') + '-' + p[2].padStart(2,'0'); }
-function updateTopBar(){ const d = new Date(); const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت']; const el = document.getElementById('topBarDate'); if(el) el.textContent = days[d.getDay()] + ' ' + d.toLocaleDateString('ar-SY'); }
 function getDaysDiff(dateStr){ if(!dateStr) return 0; const p = dateStr.split('/'); if(p.length !== 3) return 0; const d = new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2])); return Math.floor((new Date() - d) / (1000*60*60*24)); }
-function isOverdue(t){ if(['done','canceled','transferred','postponed'].includes(t.status)) return false; return getDaysDiff(t.createdAt) >= (state.settings.overdueDays || 7); }
-function isPostponedActive(t){ if(t.status !== 'postponed') return false; if(!t.postponeUntil) return true; return getDaysDiff(t.postponeUntil) <= 0; }
-function isToday(t){ return getDaysDiff(t.createdAt) === 0; }
-function isTomorrow(t){ return getDaysDiff(t.createdAt) === -1; }
 
-// ✅ تاريخ الاستحقاق (يستخدم تاريخ التأجيل إن وجد)
-function getDueDays(t) {
+// ✅ دالة موحّدة لتاريخ الاستحقاق (احترام التأجيل)
+function getDueDays(t){
   const dueDate = (t.status === 'postponed' && t.postponeUntil) ? t.postponeUntil : t.createdAt;
   return getDaysDiff(dueDate);
+}
+
+function isOverdue(t){ if(['done','canceled','transferred','postponed'].includes(t.status)) return false; return getDaysDiff(t.createdAt) >= (state.settings.overdueDays || 7); }
+function isPostponedActive(t){ if(t.status !== 'postponed') return false; if(!t.postponeUntil) return true; return getDaysDiff(t.postponeUntil) <= 0; }
+// ✅ استخدام getDueDays لاحترام التأجيل
+function isToday(t){ return getDueDays(t) === 0; }
+function isTomorrow(t){ return getDueDays(t) === -1; }
+
+// ✅ التحقق من صحة رقم الجوال
+function isValidPhone(phone){
+  if(!phone) return true; // فارغ مسموح
+  const clean = phone.replace(/[^0-9+]/g, '');
+  return clean.length >= 9 && clean.length <= 15;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -979,6 +999,7 @@ function pickSchool(idx){
   document.getElementById('selectedSchool').style.display = 'block';
   document.getElementById('fName').value = s.n;
   if(s.s) document.getElementById('fContact').value = s.s;
+  // ✅ جوال المشرف من سجل المشرفين
   const sup = state.supervisors.find(x => x.name === s.s);
   if(sup && sup.phone) document.getElementById('fContactPhone').value = sup.phone;
   if(s.principal) document.getElementById('fPrincipal').value = s.principal;
@@ -1016,7 +1037,12 @@ function openTaskSheet(taskId){
     document.getElementById('fPriority').value = t.priority || 'med';
     document.getElementById('fArea').value = t.area || 'المزة';
     document.getElementById('fContact').value = t.contact || '';
+    // ✅ ملء جوال المشرف: من المهمة أولاً، ثم من سجل المشرفين
     document.getElementById('fContactPhone').value = t.contactPhone || '';
+    if(!t.contactPhone && t.contact){
+      const sup = state.supervisors.find(x => x.name === t.contact);
+      if(sup && sup.phone) document.getElementById('fContactPhone').value = sup.phone;
+    }
     document.getElementById('fPrincipal').value = t.principal || '';
     document.getElementById('fPrincipalPhone').value = t.principalPhone || '';
     document.getElementById('fSecretary').value = t.secretary || '';
@@ -1042,6 +1068,17 @@ function openTaskSheet(taskId){
 function saveTask(){
   const name = document.getElementById('fName').value.trim();
   if(!name){ showToast('الرجاء إدخال اسم المدرسة', 'error'); return; }
+  
+  // ✅ التحقق من أرقام الجوال
+  const phones = [
+    { v: document.getElementById('fContactPhone').value.trim(), n: 'جوال المشرف' },
+    { v: document.getElementById('fPrincipalPhone').value.trim(), n: 'جوال المدير' },
+    { v: document.getElementById('fSecretaryPhone').value.trim(), n: 'جوال أمين السر' }
+  ];
+  for(const p of phones){
+    if(!isValidPhone(p.v)){ showToast('❌ ' + p.n + ' غير صالح', 'error'); return; }
+  }
+  
   const data = {
     source: document.getElementById('fSource').value,
     name: name,
@@ -1088,10 +1125,43 @@ function saveTask(){
   refreshAllViews();
 }
 
-function changeTaskStatus(id, newStatus){
+/* ✅ طلب تغيير الحالة (يستخدم sheet بدل prompt) */
+let pendingStatusChange = null;
+function requestStatusChange(id, newStatus){
   const t = state.tasks.find(x => x.id === id);
   if(!t) return;
-  if(newStatus === 'canceled' || newStatus === 'transferred'){ const reason = prompt('السبب:'); if(reason === null) return; t.reason = reason; }
+  
+  // الإلغاء أو التحويل → نافذة سبب
+  if(newStatus === 'canceled' || newStatus === 'transferred'){
+    pendingStatusChange = { id: id, newStatus: newStatus };
+    document.getElementById('reasonSheetTitle').textContent = newStatus === 'canceled' ? '🚫 سبب الإلغاء' : '↔️ سبب التحويل';
+    document.getElementById('reasonText').value = t.reason || '';
+    openSheet('reasonSheetBg');
+    return;
+  }
+  
+  // الإرجاع من "منجزة" → تأكيد
+  if(newStatus !== 'done' && t.status === 'done'){
+    if(!confirm('هل تريد إرجاع المهمة من "منجزة"؟')) return;
+  }
+  
+  applyStatusChange(id, newStatus);
+}
+
+function confirmReasonAction(){
+  const reason = document.getElementById('reasonText').value.trim();
+  if(!reason){ showToast('الرجاء كتابة السبب', 'error'); return; }
+  if(!pendingStatusChange) return;
+  const t = state.tasks.find(x => x.id === pendingStatusChange.id);
+  if(t) t.reason = reason;
+  applyStatusChange(pendingStatusChange.id, pendingStatusChange.newStatus);
+  pendingStatusChange = null;
+  closeSheet('reasonSheetBg');
+}
+
+function applyStatusChange(id, newStatus){
+  const t = state.tasks.find(x => x.id === id);
+  if(!t) return;
   t.status = newStatus;
   if(newStatus === 'done') t.doneAt = todayISO();
   else if(newStatus !== 'done') t.doneAt = '';
@@ -1287,7 +1357,6 @@ function renderTaskCard(t){
   html += '<div class="tc-badges">';
   if(t.source && t.source !== 'call') html += '<span class="tc-badge ' + (t.source === 'urgent' ? 'mb-urgent' : 'mb-high') + '">' + SOURCE_ICONS[t.source] + ' ' + SOURCE_LABELS[t.source] + '</span>';
   html += '<span class="tc-badge ' + st.cls + '">' + st.label + '</span>';
-  // ✅ إخفاء الأولوية للمنجزة/الملغاة/المحوّلة
   if(t.status === 'done') {
     html += '<span class="tc-badge" style="background:#e2e8f0;color:#475569">🔒 منتهية</span>';
   } else if(t.status === 'canceled') {
@@ -1301,8 +1370,8 @@ function renderTaskCard(t){
   html += '</div>';
   html += '<div class="tc-actions" onclick="event.stopPropagation()">';
   html += '<button type="button" class="tc-btn tc-btn-details" onclick="openDetail(' + t.id + ')">📋 تفاصيل</button>';
-  if(!['done','canceled','transferred'].includes(t.status)) html += '<button type="button" class="tc-btn tc-btn-done" onclick="changeTaskStatus(' + t.id + ',\'done\')">✅ إنجاز</button>';
-  else if(t.status === 'done') html += '<button type="button" class="tc-btn tc-btn-done" onclick="changeTaskStatus(' + t.id + ',\'working\')">↩️ إرجاع</button>';
+  if(!['done','canceled','transferred'].includes(t.status)) html += '<button type="button" class="tc-btn tc-btn-done" onclick="requestStatusChange(' + t.id + ',\'done\')">✅ إنجاز</button>';
+  else if(t.status === 'done') html += '<button type="button" class="tc-btn tc-btn-done" onclick="requestStatusChange(' + t.id + ',\'working\')">↩️ إرجاع</button>';
   else html += '<button type="button" class="tc-btn tc-btn-details" onclick="openDetail(' + t.id + ')">👁️ عرض</button>';
   if(!['done','canceled','transferred'].includes(t.status)) html += '<button type="button" class="tc-btn tc-btn-postpone" onclick="openPostponeSheet(' + t.id + ')">⏸️ تأجيل</button>';
   else html += '<button type="button" class="tc-btn tc-btn-postpone" onclick="openDetail(' + t.id + ')" style="opacity:.5">—</button>';
@@ -1362,17 +1431,11 @@ function renderHomePage(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   تبويب اليوم والأسبوع (محدّث بالكامل)
+   تبويب اليوم والأسبوع
    ═══════════════════════════════════════════════════════ */
 function renderTodayPage(){
   const container = document.getElementById('todayList');
   const search = (document.getElementById('todaySearchInput').value || '').toLowerCase().trim();
-
-  // دالة مساعدة: تاريخ استحقاق المهمة
-  function getDueDays(t) {
-    const dueDate = (t.status === 'postponed' && t.postponeUntil) ? t.postponeUntil : t.createdAt;
-    return getDaysDiff(dueDate);
-  }
 
   function matchSearch(t) {
     if(!search) return true;
@@ -1380,28 +1443,25 @@ function renderTodayPage(){
     return blob.indexOf(search) !== -1;
   }
 
-  // المتأخرة
+  // ✅ استخدام getDueDays العامة الموحّدة (لا تكرار)
   const overdueTasks = state.tasks.filter(t => {
     if(['done','canceled','transferred'].includes(t.status)) return false;
     if(getDueDays(t) < 0) return false;
     return matchSearch(t);
   });
 
-  // اليوم
   const todayTasks = state.tasks.filter(t => {
     if(['done','canceled','transferred'].includes(t.status)) return false;
     if(getDueDays(t) !== 0) return false;
     return matchSearch(t);
   });
 
-  // الغد
   const tomorrowTasks = state.tasks.filter(t => {
     if(['done','canceled','transferred'].includes(t.status)) return false;
     if(getDueDays(t) !== -1) return false;
     return matchSearch(t);
   });
 
-  // باقي الأسبوع (بعد الغد حتى 6 أيام)
   const restOfWeekTasks = state.tasks.filter(t => {
     if(['done','canceled','transferred'].includes(t.status)) return false;
     const d = getDueDays(t);
@@ -1416,14 +1476,12 @@ function renderTodayPage(){
 
   let html = '';
 
-  // ✅ المتأخرة
   if(overdueTasks.length > 0){
     html += '<div class="group-header danger" style="margin-top:0"><span>⚠️ متأخرة (' + overdueTasks.length + ')</span></div>';
     sortTasksByPriority(overdueTasks);
     html += overdueTasks.map(renderTaskCard).join('');
   }
 
-  // ✅ اليوم
   html += '<div class="group-header" style="color:var(--emerald-700);margin-top:' + (overdueTasks.length ? '16px' : '0') + '"><span>📅 مهام اليوم (' + todayTasks.length + ')</span></div>';
   if(todayTasks.length > 0){
     sortTasksByPriority(todayTasks);
@@ -1432,7 +1490,6 @@ function renderTodayPage(){
     html += '<div style="text-align:center;padding:16px;color:var(--gray-500);font-size:13px;background:var(--gray-50);border-radius:10px;margin-bottom:12px">لا مهام لهذا اليوم</div>';
   }
 
-  // ✅ الغد
   html += '<div class="group-header warn" style="margin-top:20px"><span>📅 مهام الغد — للتحضير (' + tomorrowTasks.length + ')</span></div>';
   if(tomorrowTasks.length > 0){
     sortTasksByPriority(tomorrowTasks);
@@ -1441,7 +1498,6 @@ function renderTodayPage(){
     html += '<div style="text-align:center;padding:16px;color:var(--gray-500);font-size:13px;background:var(--gray-50);border-radius:10px">لا مهام مجدولة للغد</div>';
   }
 
-  // ✅ باقي الأسبوع
   html += '<div class="group-header purple" style="margin-top:20px"><span>📅 باقي الأسبوع (' + restOfWeekTasks.length + ')</span></div>';
   if(restOfWeekTasks.length > 0){
     restOfWeekTasks.sort((a, b) => getDueDays(a) - getDueDays(b));
@@ -1454,7 +1510,7 @@ function renderTodayPage(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   كل المهام (يخفي المنجزة)
+   كل المهام
    ═══════════════════════════════════════════════════════ */
 function renderAllTasks(){
   const container = document.getElementById('allList');
@@ -1519,7 +1575,7 @@ function renderArchivePage(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   التنبيهات (تختفي بعد 3 ثوانٍ)
+   التنبيهات
    ═══════════════════════════════════════════════════════ */
 let autoDismissTimer = null;
 function renderAlerts(){
@@ -1565,6 +1621,7 @@ function openDetail(id){
   html += '<div style="font-size:13px;color:var(--gray-500)">#' + t.number + ' • ' + escapeHtml(t.area) + ' • ' + t.createdAt + (t.doneAt ? ' • ✅ ' + t.doneAt : '') + '</div>';
   if(overdue) html += '<div style="margin-top:8px;background:var(--danger-light);color:var(--danger);padding:8px 12px;border-radius:8px;font-size:13px;font-weight:800">⚠️ متأخرة منذ ' + getDaysDiff(t.createdAt) + ' يوم</div>';
   if(t.status === 'postponed' && t.postponeUntil) html += '<div style="margin-top:8px;background:var(--gray-100);color:var(--gray-700);padding:8px 12px;border-radius:8px;font-size:13px">⏸️ مؤجلة حتى ' + t.postponeUntil + (t.postponeReason ? ' (' + escapeHtml(t.postponeReason) + ')' : '') + '</div>';
+  if(t.reason) html += '<div style="margin-top:8px;background:var(--gray-100);color:var(--gray-700);padding:8px 12px;border-radius:8px;font-size:13px">📝 السبب: ' + escapeHtml(t.reason) + '</div>';
   html += '</div>';
   
   html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px;background:var(--gray-50);border-radius:12px;margin-bottom:12px">';
@@ -1579,7 +1636,7 @@ function openDetail(id){
   Object.keys(STATUS_LABELS).forEach(k => {
     const s = STATUS_LABELS[k];
     const active = k === t.status;
-    html += '<button type="button" class="mini-badge ' + s.cls + '" style="cursor:pointer;border:' + (active?'2px solid var(--emerald-700)':'1px solid transparent') + ';opacity:' + (active?'1':'0.6') + ';font-size:12px;padding:6px 12px" onclick="changeTaskStatus(' + t.id + ',\'' + k + '\')">' + s.label + '</button>';
+    html += '<button type="button" class="mini-badge ' + s.cls + '" style="cursor:pointer;border:' + (active?'2px solid var(--emerald-700)':'1px solid transparent') + ';opacity:' + (active?'1':'0.6') + ';font-size:12px;padding:6px 12px" onclick="requestStatusChange(' + t.id + ',\'' + k + '\')">' + s.label + '</button>';
   });
   html += '</div></div>';
   
@@ -1763,7 +1820,7 @@ function renderVisits(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   المدارس (بطاقة قابلة للضغط)
+   المدارس
    ═══════════════════════════════════════════════════════ */
 function renderSchoolsList(q){
   const container = document.getElementById('schoolsList');
@@ -1846,7 +1903,7 @@ function updateSchoolsStats(){
   const maxCycle = Math.max.apply(null, Object.values(byCycle).concat([1]));
   sortedCycles.forEach(c => {
     const perc = Math.round((byCycle[c] / maxCycle) * 100);
-    const percOfTotal = Math.round((byCycle[c] / total) * 100);
+    const percOfTotal = total > 0 ? Math.round((byCycle[c] / total) * 100) : 0;
     html += '<div class="area-stat-row"><span class="area-stat-name">' + escapeHtml(c) + '</span><div class="area-stat-bar"><div class="area-stat-bar-fill" style="width:' + perc + '%"></div></div><span class="area-stat-count">' + byCycle[c] + '</span><span style="font-size:11px;color:var(--gray-500);min-width:35px;text-align:left">' + percOfTotal + '%</span></div>';
   });
   detailed.innerHTML = html;
@@ -2156,10 +2213,10 @@ async function exportToWord(){
   for(let i = 0; i < rowsCount; i++){
     const m1 = col1[i], m2 = col2[i];
     tableRows += '<tr>';
-    tableRows += '<td style="border:1pt solid black;padding:5pt 8pt;text-align:right;font-family:\'Traditional Arabic\',Tahoma;font-size:12pt;font-weight:bold;">' + (m1 ? escapeHtml(m1.name) : '&nbsp;') + '</td>';
-    tableRows += '<td style="border:1pt solid black;padding:5pt 8pt;text-align:center;font-family:\'Traditional Arabic\',Tahoma;font-size:12pt;font-weight:bold;width:55pt;">' + (m1 ? escapeHtml(String(m1.qty || 1)) : '&nbsp;') + '</td>';
-    tableRows += '<td style="border:1pt solid black;padding:5pt 8pt;text-align:right;font-family:\'Traditional Arabic\',Tahoma;font-size:12pt;font-weight:bold;">' + (m2 ? escapeHtml(m2.name) : '&nbsp;') + '</td>';
-    tableRows += '<td style="border:1pt solid black;padding:5pt 8pt;text-align:center;font-family:\'Traditional Arabic\',Tahoma;font-size:12pt;font-weight:bold;width:55pt;">' + (m2 ? escapeHtml(String(m2.qty || 1)) : '&nbsp;') + '</td>';
+    tableRows += '<td style="border:1pt solid black;padding:5pt 8pt;text-align:right;font-family:\'Traditional Arabic\',Tahoma;font-size:12pt;font-weight:bold;mso-line-height-rule:exactly;">' + (m1 ? escapeHtml(m1.name) : '&nbsp;') + '</td>';
+    tableRows += '<td style="border:1pt solid black;padding:5pt 8pt;text-align:center;font-family:\'Traditional Arabic\',Tahoma;font-size:12pt;font-weight:bold;width:55pt;mso-line-height-rule:exactly;">' + (m1 ? escapeHtml(String(m1.qty || 1)) : '&nbsp;') + '</td>';
+    tableRows += '<td style="border:1pt solid black;padding:5pt 8pt;text-align:right;font-family:\'Traditional Arabic\',Tahoma;font-size:12pt;font-weight:bold;mso-line-height-rule:exactly;">' + (m2 ? escapeHtml(m2.name) : '&nbsp;') + '</td>';
+    tableRows += '<td style="border:1pt solid black;padding:5pt 8pt;text-align:center;font-family:\'Traditional Arabic\',Tahoma;font-size:12pt;font-weight:bold;width:55pt;mso-line-height-rule:exactly;">' + (m2 ? escapeHtml(String(m2.qty || 1)) : '&nbsp;') + '</td>';
     tableRows += '</tr>';
   }
   let eagleBase64 = '';
@@ -2175,8 +2232,15 @@ async function exportToWord(){
   let w = '';
   w += '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40" dir="rtl" lang="ar">';
   w += '<head><meta charset="UTF-8"><title>كشف</title>';
-  w += '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->';
-  w += '<style>@page{size:A4;margin:1.5cm;}body{font-family:"Traditional Arabic",Tahoma;font-size:12pt;direction:rtl;text-align:right;}table{border-collapse:collapse;width:100%;}</style>';
+  w += '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->';
+  w += '<style>';
+  w += '@page{size:A4;margin:1.5cm;}';
+  w += 'body{font-family:"Traditional Arabic",Tahoma;font-size:12pt;direction:rtl;text-align:right;mso-line-height-rule:exactly;}';
+  w += 'table{border-collapse:collapse;width:100%;mso-table-lspace:0pt;mso-table-rspace:0pt;mso-cellspacing:0;mso-padding-alt:5pt 8pt;}';
+  w += 'td,th{border:1pt solid black;padding:5pt 8pt;font-family:"Traditional Arabic",Tahoma;font-size:12pt;font-weight:bold;vertical-align:middle;}';
+  w += 'th{background:#f0f0f0;}';
+  w += 'p{margin:6pt 0;}';
+  w += '</style>';
   w += '</head><body dir="rtl">';
   w += '<table style="border:none;width:100%;"><tr>';
   w += '<td style="border:none;width:25%;text-align:left;vertical-align:top;font-family:\'Traditional Arabic\';font-size:12pt;font-weight:bold;padding-top:8pt;">رقم ( ' + (t.number || '') + ' )</td>';
@@ -2191,12 +2255,12 @@ async function exportToWord(){
   w += '</td></tr></table>';
   w += '<p style="text-align:center;font-family:\'Traditional Arabic\';font-size:14pt;font-weight:bold;margin:14pt 0 10pt;">السيد مدير التربية المحترم</p>';
   w += '<p style="font-family:\'Traditional Arabic\';font-size:12pt;font-weight:bold;margin:10pt 0;line-height:1.9;">ــ بعد الكشف في ' + schoolLine + ' ' + roomLine + ' رقم ( ' + escapeHtml(t.room || '1') + ' ) تبين الحاجة للمواد التالية:</p>';
-  w += '<table style="border-collapse:collapse;width:100%;margin:12pt 0;">';
+  w += '<table>';
   w += '<tr>';
-  w += '<th style="border:1pt solid black;padding:5pt 8pt;background:#f0f0f0;text-align:center;font-family:\'Traditional Arabic\';font-size:12pt;font-weight:bold;">اسم المادة والقياس</th>';
-  w += '<th style="border:1pt solid black;padding:5pt 8pt;background:#f0f0f0;text-align:center;font-family:\'Traditional Arabic\';font-size:12pt;font-weight:bold;width:55pt;">العدد</th>';
-  w += '<th style="border:1pt solid black;padding:5pt 8pt;background:#f0f0f0;text-align:center;font-family:\'Traditional Arabic\';font-size:12pt;font-weight:bold;">اسم المادة والقياس</th>';
-  w += '<th style="border:1pt solid black;padding:5pt 8pt;background:#f0f0f0;text-align:center;font-family:\'Traditional Arabic\';font-size:12pt;font-weight:bold;width:55pt;">العدد</th>';
+  w += '<th style="width:40%;">اسم المادة والقياس</th>';
+  w += '<th style="width:10%;">العدد</th>';
+  w += '<th style="width:40%;">اسم المادة والقياس</th>';
+  w += '<th style="width:10%;">العدد</th>';
   w += '</tr>';
   w += tableRows;
   w += '</table>';
@@ -2391,7 +2455,10 @@ function importMaterialsCSV(event){
   event.target.value = '';
 }
 
+// ✅ parseCSVLine محسّنة (تنظيف \r و \n)
 function parseCSVLine(line){
+  if(!line) return [];
+  line = String(line).replace(/[\r\n]+$/, '');
   const result = [];
   let cur = '', inQ = false;
   for(let i = 0; i < line.length; i++){
@@ -2415,7 +2482,6 @@ function parseCSVLine(line){
    ═══════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
-  updateTopBar();
   applyNightMode();
   setupFilters();
   setupSettingsListeners();
