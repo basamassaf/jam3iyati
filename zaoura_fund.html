@@ -825,3 +825,1120 @@ main{max-width:900px;margin:0 auto;padding:12px}
      ═══════════════════════════════════════════ -->
 <div class="toasts" id="toasts"></div>
 <div class="loader" id="loader"><div class="spin"></div></div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════════════════
+   🏘️ صندوق زعورة — نظام الاشتراكات
+   Part 3: الأساس التقني
+   ═══════════════════════════════════════════════════════ */
+
+/* ──────────────── الإعدادات العامة ──────────────── */
+const APP_NAME = 'صندوق زعورة';
+const DB_NAME = 'zaoura_fund_v1';
+const DB_VERSION = 1;
+const STORE_NAMES = [
+  'people',           // الأفراد
+  'sectors',          // القطاعات
+  'admins',           // الإداريون
+  'constants',        // الثوابت السنوية
+  'subscriptions',    // حالات الاشتراك لكل فرد في كل سنة
+  'assocPayments',    // دفعات الجمعية
+  'deathEvents',      // أحداث الوفاة
+  'deathInstallments',// أقساط الوفاة
+  'donations',        // التبرعات
+  'expenses',         // المصاريف
+  'handovers',        // عمليات التسليم
+  'auditLog'          // سجل التدقيق
+];
+
+/* ──────────────── الأدوار والصلاحيات ──────────────── */
+const ROLES = {
+  president: { name: 'رئيس اللجنة',    icon: '👑', color: 'president' },
+  manager:   { name: 'مدير',           icon: '🎯', color: 'manager' },
+  assocTreasurer: { name: 'أمين الجمعية', icon: '💰', color: 'treasurer' },
+  deathTreasurer: { name: 'أمين الوفاة',  icon: '⚰️', color: 'treasurer' },
+  collector: { name: 'معتمد',           icon: '👤', color: 'collector' },
+  auditor:   { name: 'مدقق',            icon: '👁️', color: 'auditor' }
+};
+
+/* الصلاحيات التفصيلية */
+const PERMISSIONS = {
+  president:       ['payment.add','death.add','donation.add','handover.receive','person.manage','subscription.manage','exemptions.manage','constants.manage','admins.manage','expenses.manage','reports.all','audit.view'],
+  manager:         ['payment.add','death.add','donation.add','handover.receive','person.manage','subscription.manage','exemptions.manage','expenses.manage','reports.all','audit.view'],
+  assocTreasurer:  ['payment.add','donation.add','handover.receive','reports.assoc'],
+  deathTreasurer:  ['payment.add','death.add','handover.receive','reports.death'],
+  collector:       ['payment.add','reports.own'],
+  auditor:         ['reports.all','audit.view']
+};
+
+/* ──────────────── القطاعات الافتراضية ──────────────── */
+const DEFAULT_SECTORS = [
+  { id: 'S1', name: 'الجبل',    order: 1 },
+  { id: 'S2', name: 'الحارة1',  order: 2 },
+  { id: 'S3', name: 'الحارة2',  order: 3 },
+  { id: 'S4', name: 'الوادي',   order: 4 },
+  { id: 'S5', name: 'المنصورة', order: 5 },
+  { id: 'S6', name: 'دمر',      order: 6 }
+];
+
+/* ──────────────── الحالات ──────────────── */
+const STATUS = {
+  active:    { label: 'نشط',         icon: '✅', cls: 'success' },
+  exemptTemp:{ label: 'معاف مؤقت',   icon: '⏸️', cls: 'warning' },
+  exemptPerm:{ label: 'معاف نهائي',  icon: '🚫', cls: 'muted' },
+  withdrawn: { label: 'منسحب',       icon: '↩️', cls: 'muted' },
+  stopped:   { label: 'متوقف',       icon: '💤', cls: 'muted' }
+};
+
+const PAYMENT_STATUS = {
+  paid:    { label: 'مدفوع',   icon: '✅', cls: 'success' },
+  pending: { label: 'مستحق',   icon: '⏳', cls: 'warning' },
+  late:    { label: 'متأخر',   icon: '❌', cls: 'danger' },
+  exempt:  { label: 'معفى',    icon: '🎁', cls: 'muted' }
+};
+
+/* ──────────────── الحالة العامة للتطبيق ──────────────── */
+const S = {
+  // البيانات
+  people: [],
+  sectors: [],
+  admins: [],
+  constants: [],
+  subscriptions: [],
+  assocPayments: [],
+  deathEvents: [],
+  deathInstallments: [],
+  donations: [],
+  expenses: [],
+  handovers: [],
+  auditLog: [],
+
+  // المستخدم الحالي
+  currentUser: null,
+  currentYear: new Date().getFullYear(),
+
+  // الواجهة
+  page: 'pg-home',
+  filters: {
+    people: 'all',
+    payments: 'all'
+  },
+  search: '',
+
+  // مؤقت
+  editing: null,
+  pendingWorkbook: null
+};
+
+/* ═══════════════════════════════════════════════════════
+   INDEXEDDB — طبقة قاعدة البيانات
+   ═══════════════════════════════════════════════════════ */
+let db = null;
+
+function openDB(){
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    
+    req.onupgradeneeded = e => {
+      const database = e.target.result;
+      STORE_NAMES.forEach(name => {
+        if(!database.objectStoreNames.contains(name)){
+          database.createObjectStore(name, { keyPath: 'id', autoIncrement: true });
+        }
+      });
+    };
+    
+    req.onsuccess = () => { db = req.result; resolve(db); };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function tx(store, mode = 'readonly'){
+  return db.transaction(store, mode).objectStore(store);
+}
+
+function dbAll(store){
+  return new Promise((res, rej) => {
+    const q = tx(store).getAll();
+    q.onsuccess = () => res(q.result || []);
+    q.onerror = () => rej(q.error);
+  });
+}
+
+function dbGet(store, id){
+  return new Promise((res, rej) => {
+    const q = tx(store).get(id);
+    q.onsuccess = () => res(q.result);
+    q.onerror = () => rej(q.error);
+  });
+}
+
+function dbPut(store, obj){
+  return new Promise((res, rej) => {
+    const q = tx(store, 'readwrite').put(obj);
+    q.onsuccess = () => res(q.result);
+    q.onerror = () => rej(q.error);
+  });
+}
+
+function dbDel(store, id){
+  return new Promise((res, rej) => {
+    const q = tx(store, 'readwrite').delete(id);
+    q.onsuccess = () => res();
+    q.onerror = () => rej(q.error);
+  });
+}
+
+function dbClear(store){
+  return new Promise((res, rej) => {
+    const q = tx(store, 'readwrite').clear();
+    q.onsuccess = () => res();
+    q.onerror = () => rej(q.error);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   🛠️ الأدوات العامة
+   ═══════════════════════════════════════════════════════ */
+
+const $ = id => document.getElementById(id);
+const $$ = sel => document.querySelectorAll(sel);
+
+/* تهريب HTML */
+const esc = v => String(v ?? '')
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
+/* تنظيف النص */
+const cleanText = v => String(v ?? '').trim().replace(/\s+/g, ' ');
+
+/* تطبيع النص العربي (للمقارنة) */
+const normAr = v => String(v ?? '').toLowerCase().trim()
+  .replace(/[أإآ]/g, 'ا')
+  .replace(/ة/g, 'ه')
+  .replace(/[ىي]/g, 'ي')
+  .replace(/[ًٌٍَُِّْـ]/g, '');
+
+/* تنظيف رقم الهاتف */
+function cleanPhone(v){
+  if(!v) return '';
+  let s = String(v).trim().replace(/\.0+$/, '').replace(/[\s\-\(\)\u200f\u200e]/g, '');
+  if(s.startsWith('+963')) s = '0' + s.slice(4);
+  return s;
+}
+
+/* تنسيق التاريخ */
+function fmtDate(d){
+  if(!d) return '—';
+  try{
+    return new Date(d).toLocaleDateString('ar-EG', {
+      year: 'numeric', month: 'short', day: 'numeric'
+    });
+  } catch(e){ return d; }
+}
+
+/* تاريخ اليوم YYYY-MM-DD */
+function today(){
+  return new Date().toISOString().slice(0, 10);
+}
+
+/* تحويل التاريخ من Excel */
+function toDate(v){
+  if(!v) return '';
+  if(typeof v === 'string' && v.trim().startsWith('=')) return '';
+  if(v instanceof Date && !isNaN(v)) return v.toISOString().slice(0, 10);
+  if(typeof v === 'number'){
+    const d = new Date((v - 25569) * 86400000);
+    return isNaN(d) ? '' : d.toISOString().slice(0, 10);
+  }
+  const s = String(v).trim();
+  const m1 = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s]|$)/);
+  if(m1) return `${m1[1]}-${m1[2].padStart(2,'0')}-${m1[3].padStart(2,'0')}`;
+  const m2 = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);
+  if(m2) return `${m2[3]}-${m2[2].padStart(2,'0')}-${m2[1].padStart(2,'0')}`;
+  const d = new Date(s);
+  if(!isNaN(d) && d.getFullYear() > 1900 && d.getFullYear() < 2100){
+    return d.toISOString().slice(0, 10);
+  }
+  return '';
+}
+
+/* حساب العمر */
+function calcAge(birthDate){
+  if(!birthDate) return '';
+  const b = new Date(birthDate);
+  if(isNaN(b)) return '';
+  const now = new Date();
+  let age = now.getFullYear() - b.getFullYear();
+  if(now.getMonth() < b.getMonth() ||
+     (now.getMonth() === b.getMonth() && now.getDate() < b.getDate())){
+    age--;
+  }
+  return age >= 0 ? age : '';
+}
+
+/* تنسيق الأرقام */
+function fmtNum(n){
+  if(!n && n !== 0) return '0';
+  return Number(n).toLocaleString('en-US');
+}
+
+/* تنسيق المبلغ مع العملة */
+function fmtMoney(n){
+  if(!n && n !== 0) return '0 ل.س';
+  return fmtNum(n) + ' ل.س';
+}
+
+/* اختصار الرقم (1000 → 1K، 1000000 → 1M) */
+function fmtShort(n){
+  if(!n) return '0';
+  const num = Number(n);
+  if(num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+  if(num >= 1000) return (num / 1000).toFixed(1) + 'K';
+  return String(num);
+}
+
+/* معرف فريد قصير */
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+/* Debounce */
+const debounce = (fn, delay = 250) => {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), delay);
+  };
+};
+
+/* ═══════════════════════════════════════════════════════
+   🍞 TOAST — الإشعارات
+   ═══════════════════════════════════════════════════════ */
+function toast(msg, type = 'success', duration = 2800){
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  $('toasts').appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = '.3s';
+    setTimeout(() => el.remove(), 300);
+  }, duration);
+}
+
+/* ═══════════════════════════════════════════════════════
+   ⏳ LOADER — شاشة التحميل
+   ═══════════════════════════════════════════════════════ */
+function showLoad(v){
+  $('loader').classList.toggle('on', v);
+}
+
+/* ═══════════════════════════════════════════════════════
+   📋 SHEET — النوافذ المنبثقة السفلية
+   ═══════════════════════════════════════════════════════ */
+function openSheet(title, bodyHTML, footHTML = '', opts = {}){
+  $('sheetTitle').textContent = title;
+  $('sheetBody').innerHTML = bodyHTML;
+  $('sheetFoot').innerHTML = footHTML;
+  $('sheetFoot').style.display = footHTML ? 'flex' : 'none';
+  $('sheetBack').classList.add('on');
+  $('sheet').classList.add('on');
+  if(opts.wide) $('sheet').classList.add('wide');
+  else $('sheet').classList.remove('wide');
+  document.body.style.overflow = 'hidden';
+  
+  if(opts.focus){
+    setTimeout(() => {
+      const el = $(opts.focus);
+      if(el) el.focus();
+    }, 250);
+  }
+}
+
+function closeSheet(){
+  $('sheetBack').classList.remove('on');
+  $('sheet').classList.remove('on');
+  document.body.style.overflow = '';
+  S.editing = null;
+  S.pendingWorkbook = null;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🌓 THEME — الوضع الليلي
+   ═══════════════════════════════════════════════════════ */
+function toggleTheme(){
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('zt_fund', next);
+  toast(next === 'dark' ? '🌙 الوضع الليلي' : '☀️ الوضع النهاري', 'info', 1500);
+}
+
+function loadTheme(){
+  const saved = localStorage.getItem('zt_fund');
+  if(saved) document.documentElement.setAttribute('data-theme', saved);
+}
+
+/* ═══════════════════════════════════════════════════════
+   🧭 NAVIGATION — التنقل بين الشاشات
+   ═══════════════════════════════════════════════════════ */
+function go(page){
+  S.page = page;
+  
+  // إخفاء الكل
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  
+  // إظهار المطلوب
+  const target = $(page);
+  if(target) target.classList.add('active');
+  
+  // تحديث شريط التنقل
+  document.querySelectorAll('.bnav button').forEach(b => {
+    b.classList.toggle('on', b.dataset.pg === page);
+  });
+  
+  // اسحب لأعلى
+  window.scrollTo(0, 0);
+  
+  // إظهار/إخفاء FAB
+  $('fab').style.display = (page === 'pg-home') ? 'none' : 'flex';
+  
+  // استدعاء دوال العرض
+  if(typeof onPageChange === 'function') onPageChange(page);
+}
+
+/* ما يفعله FAB حسب الصفحة */
+function handleFab(){
+  switch(S.page){
+    case 'pg-people':   openPersonSheet(); break;
+    case 'pg-payments': openAssocPaymentSheet(); break;
+    default:            openQuickActionsSheet();
+  }
+}
+
+/* شاشة الإجراءات السريعة (احتياطية) */
+function openQuickActionsSheet(){
+  const body = `
+    <div class="quick-actions">
+      <div class="quick-btn assoc" onclick="closeSheet();openAssocPaymentSheet()">
+        <div class="ico">💰</div>
+        <div class="lbl">دفعة جمعية</div>
+      </div>
+      <div class="quick-btn death" onclick="closeSheet();openDeathPaymentSheet()">
+        <div class="ico">⚰️</div>
+        <div class="lbl">دفعة وفاة</div>
+      </div>
+      <div class="quick-btn donation" onclick="closeSheet();openDonationSheet()">
+        <div class="ico">💚</div>
+        <div class="lbl">تسجيل تبرع</div>
+      </div>
+      <div class="quick-btn" onclick="closeSheet();openPersonSheet()">
+        <div class="ico">👤</div>
+        <div class="lbl">إضافة فرد</div>
+      </div>
+    </div>
+  `;
+  openSheet('⚡ إجراءات سريعة', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>');
+}
+
+/* ═══════════════════════════════════════════════════════
+   🔍 SEARCH — البحث الشامل
+   ═══════════════════════════════════════════════════════ */
+const globalSearch = debounce(q => {
+  S.search = q;
+  $('searchClear').style.display = q ? 'block' : 'none';
+  
+  if(S.page === 'pg-people') renderPeople();
+  else if(S.page === 'pg-payments') renderPayments();
+  else if(S.page === 'pg-home') renderHome();
+}, 250);
+
+function clearSearch(){
+  $('globalSearch').value = '';
+  globalSearch('');
+}
+
+/* ═══════════════════════════════════════════════════════
+   🔐 SESSION — إدارة الجلسة
+   ═══════════════════════════════════════════════════════ */
+function saveCurrentUser(user){
+  S.currentUser = user;
+  if(user){
+    localStorage.setItem('zt_fund_user', JSON.stringify({
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      sectorId: user.sectorId || null
+    }));
+  } else {
+    localStorage.removeItem('zt_fund_user');
+  }
+}
+
+function restoreCurrentUser(){
+  try{
+    const saved = localStorage.getItem('zt_fund_user');
+    if(!saved) return null;
+    return JSON.parse(saved);
+  } catch(e){ return null; }
+}
+
+/* التحقق من صلاحية */
+function hasPerm(perm){
+  if(!S.currentUser) return false;
+  const role = S.currentUser.role;
+  const perms = PERMISSIONS[role] || [];
+  return perms.includes(perm);
+}
+
+/* ═══════════════════════════════════════════════════════
+   📅 SESSION HELPERS — معلومات إضافية
+   ═══════════════════════════════════════════════════════ */
+function getConstantForYear(year){
+  return S.constants.find(c => c.year === year) || S.constants.find(c => c.year === S.currentYear) || null;
+}
+
+function getPersonById(id){
+  return S.people.find(p => p.id === id);
+}
+
+function getPersonByCode(code){
+  return S.people.find(p => p.code === code);
+}
+
+function getSectorById(id){
+  return S.sectors.find(s => s.id === id);
+}
+
+function getSectorByName(name){
+  return S.sectors.find(s => s.name === name);
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎬 INIT — التشغيل
+   ═══════════════════════════════════════════════════════ */
+async function init(){
+  loadTheme();
+  
+  try{
+    await openDB();
+    
+    // تحميل كل البيانات
+    await Promise.all([
+      dbAll('people').then(d => S.people = d),
+      dbAll('sectors').then(d => S.sectors = d),
+      dbAll('admins').then(d => S.admins = d),
+      dbAll('constants').then(d => S.constants = d),
+      dbAll('subscriptions').then(d => S.subscriptions = d),
+      dbAll('assocPayments').then(d => S.assocPayments = d),
+      dbAll('deathEvents').then(d => S.deathEvents = d),
+      dbAll('deathInstallments').then(d => S.deathInstallments = d),
+      dbAll('donations').then(d => S.donations = d),
+      dbAll('expenses').then(d => S.expenses = d),
+      dbAll('handovers').then(d => S.handovers = d),
+      dbAll('auditLog').then(d => S.auditLog = d)
+    ]);
+    
+    // إعداد القطاعات الافتراضية (أول مرة فقط)
+    if(S.sectors.length === 0){
+      for(const sec of DEFAULT_SECTORS){
+        await dbPut('sectors', sec);
+      }
+      S.sectors = [...DEFAULT_SECTORS];
+      console.log('✅ تم إعداد 6 قطاعات افتراضية');
+    }
+    
+    // إعداد ثوابت افتراضية (أول مرة فقط)
+    if(S.constants.length === 0){
+      const currentY = new Date().getFullYear();
+      const defaults = [
+        { year: currentY - 1, assocYearly: 24000, deathInstallment: 5000, deathCompensation: 25000, joinAssoc: 100000, joinDeath: 50000, joinReduced: 50000 },
+        { year: currentY,     assocYearly: 24000, deathInstallment: 5000, deathCompensation: 25000, joinAssoc: 100000, joinDeath: 50000, joinReduced: 50000 }
+      ];
+      for(const c of defaults){
+        await dbPut('constants', c);
+      }
+      S.constants = [...defaults];
+      console.log('✅ تم إعداد ثوابت افتراضية');
+    }
+    
+    // استرجاع المستخدم
+    const savedUser = restoreCurrentUser();
+    if(savedUser){
+      // تحقق أنه موجود فعلاً
+      const fullUser = S.admins.find(a => a.id === savedUser.id);
+      if(fullUser){
+        S.currentUser = fullUser;
+        showMainApp();
+        console.log('✅ مرحباً', fullUser.name);
+      } else {
+        saveCurrentUser(null);
+        showLogin();
+      }
+    } else {
+      showLogin();
+    }
+    
+  } catch(e){
+    console.error('❌ خطأ في التهيئة:', e);
+    toast('خطأ في التحميل: ' + e.message, 'error', 5000);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   🖼️ SHOW LOGIN / MAIN
+   ═══════════════════════════════════════════════════════ */
+function showLogin(){
+  $('loginScreen').classList.add('on');
+  $('appHeader').style.display = 'none';
+  $('userBanner').style.display = 'none';
+  $('searchWrap').style.display = 'none';
+  $('appMain').style.display = 'none';
+  $('appNav').style.display = 'none';
+  $('fab').style.display = 'none';
+  
+  // استدعاء دالة شاشة الدخول (من Part 4)
+  if(typeof renderLoginScreen === 'function') renderLoginScreen();
+}
+
+function showMainApp(){
+  $('loginScreen').classList.remove('on');
+  $('appHeader').style.display = 'flex';
+  $('userBanner').style.display = 'flex';
+  $('searchWrap').style.display = 'block';
+  $('appMain').style.display = 'block';
+  $('appNav').style.display = 'flex';
+  
+  // عرض معلومات المستخدم
+  const u = S.currentUser;
+  if(u){
+    $('currentUserName').textContent = u.name;
+    const roleInfo = ROLES[u.role] || { name: 'مستخدم', icon: '👤', color: 'collector' };
+    $('currentUserRole').textContent = roleInfo.icon + ' ' + roleInfo.name;
+    $('currentUserRole').className = 'role-badge ' + roleInfo.color;
+  }
+  
+  $('hdrYear').textContent = 'السنة ' + S.currentYear;
+  
+  // عرض الصفحة الرئيسية
+  go('pg-home');
+  
+  // استدعاء الدالة الرئيسية (من Part 4)
+  if(typeof onAppReady === 'function') onAppReady();
+}
+
+function logout(){
+  if(!confirm('هل تريد تسجيل الخروج؟')) return;
+  saveCurrentUser(null);
+  S.currentUser = null;
+  showLogin();
+  toast('تم الخروج', 'info', 2000);
+}
+
+/* ═══════════════════════════════════════════════════════
+   🔐 LOGIN SCREEN — شاشة تسجيل الدخول
+   ═══════════════════════════════════════════════════════ */
+
+/* حالة تسجيل الدخول المؤقتة */
+let _pinAttempt = '';
+let _pinTargetUser = null;
+
+/* ──────────────── عرض شاشة الدخول ──────────────── */
+function renderLoginScreen(){
+  _pinAttempt = '';
+  _pinTargetUser = null;
+  
+  $('loginUsers').style.display = 'block';
+  $('loginPin').style.display = 'none';
+  
+  const list = $('loginUsersList');
+  
+  // لا يوجد مستخدمون → زر إعداد أول مرة
+  if(S.admins.length === 0){
+    list.innerHTML = `
+      <div style="text-align:center;padding:24px 12px">
+        <div style="font-size:52px;margin-bottom:12px">🏘️</div>
+        <div style="font-weight:800;font-size:15px;margin-bottom:6px">مرحباً بك</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          هذه أول مرة يُفتح فيها التطبيق.<br>
+          ابدأ بإضافة مدير للنظام.
+        </div>
+      </div>
+    `;
+    return;
+  }
+  
+  // عرض المستخدمين
+  list.innerHTML = S.admins.map(u => {
+    const roleInfo = ROLES[u.role] || { name: 'مستخدم', icon: '👤', color: 'collector' };
+    const sector = u.sectorId ? getSectorById(u.sectorId) : null;
+    const sectorTxt = sector ? ' • ' + sector.name : '';
+    return `
+      <div class="login-user" onclick="selectLoginUser(${u.id})">
+        <div class="av">${roleInfo.icon}</div>
+        <div class="info">
+          <div class="nm">${esc(u.name)}</div>
+          <div class="role">${roleInfo.name}${sectorTxt}</div>
+        </div>
+        ${u.hasPin ? '<span style="font-size:18px;color:var(--muted)">🔒</span>' : '<span style="font-size:18px;color:var(--success)">🔓</span>'}
+      </div>
+    `;
+  }).join('');
+}
+
+/* ──────────────── اختيار مستخدم ──────────────── */
+function selectLoginUser(userId){
+  const user = S.admins.find(a => a.id === userId);
+  if(!user) return;
+  
+  _pinTargetUser = user;
+  _pinAttempt = '';
+  
+  // إذا لم يكن له PIN → دخول مباشر
+  if(!user.hasPin){
+    doLogin(user);
+    return;
+  }
+  
+  // عرض شاشة PIN
+  $('loginUsers').style.display = 'none';
+  $('loginPin').style.display = 'block';
+  
+  const roleInfo = ROLES[user.role] || { name: 'مستخدم', icon: '👤' };
+  $('pinAvatar').textContent = roleInfo.icon;
+  $('pinName').textContent = user.name;
+  $('pinRole').textContent = roleInfo.name;
+  $('pinError').textContent = '';
+  
+  updatePinDisplay();
+}
+
+/* ──────────────── إدخال PIN ──────────────── */
+function pinPress(digit){
+  if(_pinAttempt.length >= 4) return;
+  _pinAttempt += digit;
+  updatePinDisplay();
+  
+  // التحقق التلقائي عند 4 أرقام
+  if(_pinAttempt.length === 4){
+    setTimeout(() => checkPin(), 200);
+  }
+}
+
+function pinBack(){
+  _pinAttempt = _pinAttempt.slice(0, -1);
+  updatePinDisplay();
+  $('pinError').textContent = '';
+}
+
+function pinBackLogin(){
+  $('loginPin').style.display = 'none';
+  $('loginUsers').style.display = 'block';
+  _pinAttempt = '';
+  _pinTargetUser = null;
+}
+
+function updatePinDisplay(){
+  const dots = document.querySelectorAll('#pinDisplay .pin-dot');
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('on', i < _pinAttempt.length);
+  });
+}
+
+function checkPin(){
+  if(!_pinTargetUser) return;
+  
+  // مقارنة PIN (نصياً - للنظام الداخلي)
+  if(_pinAttempt === String(_pinTargetUser.pin)){
+    $('pinError').textContent = '✅ صحيح';
+    $('pinError').style.color = 'var(--success)';
+    setTimeout(() => doLogin(_pinTargetUser), 400);
+  } else {
+    $('pinError').textContent = '❌ خطأ، حاول مجدداً';
+    $('pinError').style.color = 'var(--danger)';
+    _pinAttempt = '';
+    updatePinDisplay();
+    
+    // اهتزاز (إن مدعوم)
+    if(navigator.vibrate) navigator.vibrate(200);
+  }
+}
+
+/* ──────────────── تنفيذ الدخول ──────────────── */
+function doLogin(user){
+  S.currentUser = user;
+  saveCurrentUser(user);
+  
+  // تحديث آخر دخول
+  user.lastLogin = new Date().toISOString();
+  dbPut('admins', user).catch(() => {});
+  
+  // سجل التدقيق
+  logAudit('login', 'admin', user.id, { name: user.name });
+  
+  toast('👋 مرحباً ' + user.name, 'success', 2500);
+  showMainApp();
+}
+
+/* ═══════════════════════════════════════════════════════
+   👤 إعداد أول مدير (First Run)
+   ═══════════════════════════════════════════════════════ */
+function showAddFirstAdmin(){
+  const body = `
+    <div style="text-align:center;padding:10px 0 18px">
+      <div style="font-size:44px;margin-bottom:8px">👑</div>
+      <div style="font-weight:800;font-size:15px">إنشاء مدير النظام</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">
+        سيُمنح هذا الحساب كل الصلاحيات
+      </div>
+    </div>
+    
+    <div class="fld">
+      <label>الاسم <span class="req">*</span></label>
+      <input id="firstAdminName" placeholder="مثال: أحمد" maxlength="50">
+    </div>
+    
+    <div class="fld">
+      <label>الهاتف (اختياري)</label>
+      <input id="firstAdminPhone" placeholder="09xxxxxxxx" inputmode="tel" maxlength="20">
+    </div>
+    
+    <div class="fld">
+      <label>كلمة المرور (4 أرقام) <span class="req">*</span></label>
+      <input id="firstAdminPin" type="tel" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+      <div class="fld-hint">ستُستخدم في كل تسجيل دخول</div>
+    </div>
+    
+    <div class="fld">
+      <label>تأكيد كلمة المرور <span class="req">*</span></label>
+      <input id="firstAdminPin2" type="tel" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+    </div>
+  `;
+  
+  const foot = `
+    <button class="btn ghost" onclick="closeSheet()">إلغاء</button>
+    <button class="btn primary" onclick="saveFirstAdmin()">✅ إنشاء</button>
+  `;
+  
+  openSheet('👑 إعداد أول مرة', body, foot, { focus: 'firstAdminName' });
+}
+
+async function saveFirstAdmin(){
+  const name = cleanText($('firstAdminName').value);
+  const phone = cleanPhone($('firstAdminPhone').value);
+  const pin = $('firstAdminPin').value.trim();
+  const pin2 = $('firstAdminPin2').value.trim();
+  
+  // تحقق
+  if(!name){
+    toast('الاسم مطلوب', 'error');
+    return;
+  }
+  if(!/^\d{4}$/.test(pin)){
+    toast('كلمة المرور: 4 أرقام بالضبط', 'error');
+    return;
+  }
+  if(pin !== pin2){
+    toast('كلمتا المرور غير متطابقتين', 'error');
+    return;
+  }
+  
+  try{
+    const admin = {
+      name,
+      phone,
+      pin,
+      hasPin: true,
+      role: 'president',
+      sectorId: null,
+      createdAt: new Date().toISOString(),
+      lastLogin: null,
+      active: true
+    };
+    
+    const newId = await dbPut('admins', admin);
+    admin.id = newId;
+    S.admins.push(admin);
+    
+    closeSheet();
+    toast('✅ تم إنشاء المدير بنجاح', 'success', 3000);
+    
+    // تحديث شاشة الدخول
+    setTimeout(() => {
+      renderLoginScreen();
+    }, 400);
+    
+  } catch(e){
+    console.error(e);
+    toast('خطأ: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   👥 إدارة الإداريين (من داخل التطبيق)
+   ═══════════════════════════════════════════════════════ */
+function openAdminsSheet(){
+  if(!hasPerm('admins.manage')){
+    toast('غير مصرح', 'error');
+    return;
+  }
+  
+  const list = S.admins.map(u => {
+    const roleInfo = ROLES[u.role] || { name: 'مستخدم', icon: '👤' };
+    const sector = u.sectorId ? getSectorById(u.sectorId) : null;
+    const sectorTxt = sector ? ' • ' + sector.name : '';
+    const isMe = S.currentUser && S.currentUser.id === u.id;
+    return `
+      <div class="item" style="cursor:default">
+        <div class="av">${roleInfo.icon}</div>
+        <div class="body">
+          <div class="ttl">
+            ${esc(u.name)}
+            ${isMe ? '<span class="badge primary">أنت</span>' : ''}
+          </div>
+          <div class="sub">${roleInfo.name}${sectorTxt}${u.phone ? ' • ' + esc(u.phone) : ''}</div>
+        </div>
+        <button class="btn ghost sm" onclick="openEditAdminSheet(${u.id})">✏️</button>
+        ${!isMe ? `<button class="btn danger sm" onclick="deleteAdmin(${u.id})">🗑️</button>` : ''}
+      </div>
+    `;
+  }).join('');
+  
+  const body = `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
+      ${S.admins.length} مستخدم في النظام
+    </div>
+    ${S.admins.length ? `<div class="list">${list}</div>` : '<div style="text-align:center;padding:30px;color:var(--muted)">لا يوجد إداريون</div>'}
+  `;
+  
+  const foot = `
+    <button class="btn primary" onclick="openEditAdminSheet()">➕ إضافة إداري</button>
+  `;
+  
+  openSheet('👥 إدارة الإداريين', body, foot, { wide: true });
+}
+
+/* ──────────────── إضافة / تعديل إداري ──────────────── */
+function openEditAdminSheet(id = null){
+  const isNew = !id;
+  const admin = isNew ? { role: 'collector' } : S.admins.find(a => a.id === id);
+  if(!admin) return;
+  
+  S.editing = { type: 'admin', id: isNew ? null : id };
+  
+  const sectorOpts = S.sectors.map(s => 
+    `<option value="${s.id}" ${admin.sectorId === s.id ? 'selected' : ''}>${esc(s.name)}</option>`
+  ).join('');
+  
+  const roleOpts = Object.keys(ROLES).map(key => {
+    const r = ROLES[key];
+    return `<option value="${key}" ${admin.role === key ? 'selected' : ''}>${r.icon} ${r.name}</option>`;
+  }).join('');
+  
+  const body = `
+    <div class="fld">
+      <label>الاسم <span class="req">*</span></label>
+      <input id="adminName" value="${esc(admin.name || '')}" placeholder="الاسم الكامل" maxlength="50">
+    </div>
+    
+    <div class="fld">
+      <label>الهاتف</label>
+      <input id="adminPhone" value="${esc(admin.phone || '')}" placeholder="09xxxxxxxx" inputmode="tel">
+    </div>
+    
+    <div class="fld">
+      <label>الدور <span class="req">*</span></label>
+      <select id="adminRole">${roleOpts}</select>
+    </div>
+    
+    <div class="fld" id="adminSectorField">
+      <label>القطاع <span style="color:var(--muted);font-weight:500">(للمعتمد فقط)</span></label>
+      <select id="adminSector">
+        <option value="">— بدون —</option>
+        ${sectorOpts}
+      </select>
+    </div>
+    
+    <div class="fld">
+      <label>كلمة المرور (4 أرقام)</label>
+      <input id="adminPin" type="tel" placeholder="${admin.hasPin ? 'اتركها فارغة للإبقاء' : '••••'}" 
+             maxlength="4" inputmode="numeric" pattern="[0-9]*">
+      <div class="fld-hint">
+        ${admin.hasPin ? '🔒 لديها PIN — اترك الحقل فارغاً للإبقاء' : '🔓 بدون PIN (دخول مباشر)'}
+      </div>
+    </div>
+  `;
+  
+  const foot = isNew
+    ? `<button class="btn ghost" onclick="closeSheet()">إلغاء</button>
+       <button class="btn primary" onclick="saveAdmin()">💾 حفظ</button>`
+    : `<button class="btn ghost" onclick="closeSheet()">إلغاء</button>
+       <button class="btn primary" onclick="saveAdmin(${id})">💾 حفظ</button>`;
+  
+  openSheet(isNew ? '➕ إضافة إداري' : '✏️ تعديل إداري', body, foot, { focus: 'adminName' });
+  
+  // إخفاء حقل القطاع إذا لم يكن معتمد
+  const updateSectorVisibility = () => {
+    const role = $('adminRole').value;
+    $('adminSectorField').style.display = (role === 'collector') ? 'block' : 'none';
+  };
+  $('adminRole').addEventListener('change', updateSectorVisibility);
+  updateSectorVisibility();
+}
+
+/* ──────────────── حفظ إداري ──────────────── */
+async function saveAdmin(id = null){
+  const name = cleanText($('adminName').value);
+  const phone = cleanPhone($('adminPhone').value);
+  const role = $('adminRole').value;
+  const sectorId = $('adminSector').value || null;
+  const pin = $('adminPin').value.trim();
+  
+  if(!name){
+    toast('الاسم مطلوب', 'error');
+    return;
+  }
+  
+  // تحقق من PIN إذا أدخل
+  if(pin && !/^\d{4}$/.test(pin)){
+    toast('كلمة المرور: 4 أرقام بالضبط', 'error');
+    return;
+  }
+  
+  try{
+    const old = id ? await dbGet('admins', id) : null;
+    
+    const admin = {
+      name,
+      phone,
+      role,
+      sectorId: role === 'collector' ? sectorId : null,
+      hasPin: pin ? true : (old ? old.hasPin : false),
+      pin: pin ? pin : (old ? old.pin : null),
+      updatedAt: new Date().toISOString(),
+      createdAt: old ? old.createdAt : new Date().toISOString(),
+      lastLogin: old ? old.lastLogin : null,
+      active: old ? old.active : true
+    };
+    
+    if(id){
+      admin.id = id;
+      await dbPut('admins', admin);
+      const idx = S.admins.findIndex(a => a.id === id);
+      if(idx > -1) S.admins[idx] = admin;
+      logAudit('update', 'admin', id, { name });
+      toast('✅ تم التعديل');
+    } else {
+      const newId = await dbPut('admins', admin);
+      admin.id = newId;
+      S.admins.push(admin);
+      logAudit('add', 'admin', newId, { name });
+      toast('✅ تمت الإضافة');
+    }
+    
+    closeSheet();
+    setTimeout(openAdminsSheet, 250);
+    
+    // تحديث المستخدم الحالي إذا عدّل نفسه
+    if(S.currentUser && S.currentUser.id === id){
+      S.currentUser = admin;
+      saveCurrentUser(admin);
+      showMainApp();
+    }
+    
+  } catch(e){
+    console.error(e);
+    toast('خطأ: ' + e.message, 'error');
+  }
+}
+
+/* ──────────────── حذف إداري ──────────────── */
+async function deleteAdmin(id){
+  if(!confirm('هل تريد حذف هذا الإداري نهائياً؟')) return;
+  if(!confirm('⚠️ تأكيد أخير — لا يمكن التراجع!')) return;
+  
+  try{
+    const admin = S.admins.find(a => a.id === id);
+    if(!admin) return;
+    
+    // لا تسمح بحذف الرئيس الأخير
+    if(admin.role === 'president'){
+      const presidents = S.admins.filter(a => a.role === 'president');
+      if(presidents.length <= 1){
+        toast('⚠️ لا يمكن حذف الرئيس الوحيد', 'error', 3500);
+        return;
+      }
+    }
+    
+    await dbDel('admins', id);
+    S.admins = S.admins.filter(a => a.id !== id);
+    
+    logAudit('delete', 'admin', id, { name: admin.name });
+    toast('🗑️ تم الحذف');
+    openAdminsSheet();
+    
+  } catch(e){
+    console.error(e);
+    toast('خطأ: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   📜 AUDIT LOG — سجل التدقيق
+   ═══════════════════════════════════════════════════════ */
+async function logAudit(action, target, targetId, details = {}){
+  const entry = {
+    timestamp: new Date().toISOString(),
+    userId: S.currentUser ? S.currentUser.id : null,
+    userName: S.currentUser ? S.currentUser.name : 'system',
+    action,
+    target,
+    targetId,
+    details
+  };
+  
+  try{
+    const id = await dbPut('auditLog', entry);
+    entry.id = id;
+    S.auditLog.push(entry);
+    
+    // حد أقصى 10,000 سجل
+    if(S.auditLog.length > 10000){
+      const oldest = S.auditLog.slice(0, S.auditLog.length - 10000);
+      for(const old of oldest){
+        await dbDel('auditLog', old.id);
+      }
+      S.auditLog = S.auditLog.slice(-10000);
+    }
+  } catch(e){
+    console.warn('تعذر تسجيل التدقيق:', e);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎯 دالة مساعدة للاختبار — تخطي تسجيل الدخول
+   ═══════════════════════════════════════════════════════ */
+/* استخدمها في Console فقط للاختبار */
+window.debugSkipLogin = function(){
+  if(S.admins.length === 0){
+    console.log('❌ لا يوجد إداريون');
+    return;
+  }
+  const admin = S.admins[0];
+  S.currentUser = admin;
+  saveCurrentUser(admin);
+  showMainApp();
+  console.log('✅ دخلت كـ ' + admin.name);
+};
+/* ═══════════════════════════════════════════════════════
+   🚀 تشغيل التطبيق
+   ═══════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
