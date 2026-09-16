@@ -1647,6 +1647,749 @@ async function init(){
   }
 }
 
+/* ═══════════════════════════════════════════════════════
+   💰 PART 6 — الدفعات + الوفاة + التبرعات + التسليم
+   ═══════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════
+   💰 دفعات الجمعية
+   ═══════════════════════════════════════════════════════ */
+function openAssocPaymentSheet(personId = null){
+  if(!hasPerm('payment.add')){toast('غير مصرح','error');return}
+  
+  const year = S.currentYear;
+  const consts = S.constants.find(c => c.year === year);
+  const yearly = consts ? consts.assocYearly : 24000;
+  
+  // بحث عن فرد
+  const body = `
+    <div class="fld" style="position:relative">
+      <label>الفرد <span class="req">*</span></label>
+      <input id="payPersonInput" placeholder="اكتب حرفاً للبحث..." oninput="onPayPersonInput()" onfocus="onPayPersonInput()" autocomplete="off">
+      <input type="hidden" id="payPersonId" value="${personId || ''}">
+      <div class="options-list" id="payPersonOptions"></div>
+    </div>
+    
+    <div id="payBalanceBox" style="display:none;padding:12px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px">
+      <div style="font-weight:800;font-size:14px" id="payPersonName"></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px" id="payPersonInfo"></div>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span class="muted">المطلوب سنوياً</span>
+          <b id="payYearly">${fmtNum(yearly)}</b>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px">
+          <span class="muted">المدفوع</span>
+          <b style="color:var(--success)" id="payPaid">0</b>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:4px">
+          <span style="font-weight:800">المتبقي</span>
+          <b style="color:var(--danger)" id="payRemaining">${fmtNum(yearly)}</b>
+        </div>
+      </div>
+    </div>
+    
+    <div class="fld">
+      <label>المبلغ <span class="req">*</span></label>
+      <div class="amount-input">
+        <input id="payAmount" type="tel" inputmode="numeric" placeholder="0" value="${yearly}">
+        <span class="currency">ل.س</span>
+      </div>
+      <div class="amount-quick">
+        <button onclick="$('payAmount').value=${yearly}">كامل ${fmtShort(yearly)}</button>
+        <button onclick="$('payAmount').value=${Math.round(yearly/2)}">نصف</button>
+        <button onclick="$('payAmount').value=${Math.round(yearly/4)}">ربع</button>
+        <button onclick="$('payAmount').value=1000">1000</button>
+      </div>
+    </div>
+    
+    <div class="fld-row">
+      <div class="fld"><label>التاريخ</label>
+        <input id="payDate" type="date" value="${today()}"></div>
+      <div class="fld"><label>السنة</label>
+        <input id="payYear" type="tel" value="${year}" readonly class="fld-readonly"></div>
+    </div>
+    
+    <div class="fld">
+      <label>ملاحظات</label>
+      <input id="payNotes" placeholder="اختياري">
+    </div>
+  `;
+  
+  const foot = `
+    <button class="btn ghost" onclick="closeSheet()">إلغاء</button>
+    <button class="btn assoc" onclick="saveAssocPayment()">💾 حفظ الدفعة</button>
+  `;
+  
+  openSheet('💰 دفعة جمعية', body, foot, { focus: 'payPersonInput' });
+  
+  if(personId){
+    const p = getPersonById(personId);
+    if(p){
+      $('payPersonInput').value = p.name;
+      updatePayBalance(personId);
+    }
+  }
+}
+
+function onPayPersonInput(){
+  const input = $('payPersonInput');
+  const opts = $('payPersonOptions');
+  const q = input.value.trim();
+  
+  let list = S.people.filter(p => p.status === 'حي' || p.status === 'متوفى');
+  if(q){
+    const s = normAr(q);
+    list = list.filter(p => normAr(p.name + ' ' + (p.code||'') + ' ' + (p.phone||'')).includes(s));
+  }
+  list = list.slice(0, 30);
+  
+  if(!list.length){
+    opts.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px">لا نتائج</div>';
+  } else {
+    opts.innerHTML = list.map(p => `
+      <div class="option-item" onclick="selectPayPerson(${p.id},'${esc(p.name).replace(/'/g,"&#39;")}')">
+        <span>${esc(p.name)}</span>
+        <small>${esc(p.code||'')} • ${esc(p.sector||'')}</small>
+      </div>
+    `).join('');
+  }
+  opts.classList.add('on');
+}
+
+function selectPayPerson(id, name){
+  $('payPersonInput').value = name;
+  $('payPersonId').value = id;
+  $('payPersonOptions').classList.remove('on');
+  updatePayBalance(id);
+}
+
+function updatePayBalance(personId){
+  const p = getPersonById(personId);
+  if(!p) return;
+  
+  const year = S.currentYear;
+  const consts = S.constants.find(c => c.year === year);
+  const yearly = consts ? consts.assocYearly : 24000;
+  const paid = S.assocPayments
+    .filter(x => x.personId === personId && x.year === year)
+    .reduce((s, x) => s + (Number(x.amount) || 0), 0);
+  const remaining = Math.max(0, yearly - paid);
+  
+  $('payBalanceBox').style.display = 'block';
+  $('payPersonName').textContent = p.name;
+  $('payPersonInfo').textContent = `${p.code || ''} • ${p.sector || ''} • ${p.relation || ''}`;
+  $('payYearly').textContent = fmtNum(yearly);
+  $('payPaid').textContent = fmtNum(paid);
+  $('payRemaining').textContent = fmtNum(remaining);
+  $('payAmount').value = remaining > 0 ? remaining : yearly;
+}
+
+async function saveAssocPayment(){
+  const personId = Number($('payPersonId').value);
+  const amount = Number($('payAmount').value);
+  const date = $('payDate').value;
+  const year = Number($('payYear').value);
+  const notes = cleanText($('payNotes').value);
+  
+  if(!personId){ toast('اختر الفرد','error'); return }
+  if(!amount || amount <= 0){ toast('المبلغ مطلوب','error'); return }
+  if(!date){ toast('التاريخ مطلوب','error'); return }
+  
+  try{
+    const payment = {
+      personId,
+      amount,
+      date,
+      year,
+      collectorId: S.currentUser.id,
+      collectorName: S.currentUser.name,
+      notes,
+      createdAt: new Date().toISOString()
+    };
+    
+    const id = await dbPut('assocPayments', payment);
+    payment.id = id;
+    S.assocPayments.push(payment);
+    
+    logAudit('add', 'assocPayment', id, { personId, amount });
+    toast('✅ تم تسجيل الدفعة', 'success', 3000);
+    closeSheet();
+    
+    renderHome();
+    if(S.page === 'pg-payments') renderPayments();
+    
+  } catch(e){
+    console.error(e);
+    toast('خطأ: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   ⚰️ أحداث الوفاة
+   ═══════════════════════════════════════════════════════ */
+function openDeathEventSheet(){
+  if(!hasPerm('death.add')){ toast('غير مصرح','error'); return }
+  
+  const year = S.currentYear;
+  const consts = S.constants.find(c => c.year === year);
+  const comp = consts ? consts.deathCompensation : 25000;
+  const installment = consts ? consts.deathInstallment : 5000;
+  
+  const body = `
+    <div class="fld">
+      <label>اسم المتوفى <span class="req">*</span></label>
+      <input id="deName" placeholder="الاسم الكامل">
+    </div>
+    
+    <div class="fld-row">
+      <div class="fld"><label>تاريخ الوفاة <span class="req">*</span></label>
+        <input id="deDate" type="date" value="${today()}"></div>
+      <div class="fld"><label>السنة</label>
+        <input id="deYear" type="tel" value="${year}" readonly class="fld-readonly"></div>
+    </div>
+    
+    <div class="fld">
+      <label>تعويض العائلة (ل.س)</label>
+      <div class="amount-input">
+        <input id="deComp" type="tel" inputmode="numeric" value="${comp}">
+        <span class="currency">ل.س</span>
+      </div>
+      <div class="fld-hint">المبلغ المُعطى لأهل المتوفى</div>
+    </div>
+    
+    <div class="fld">
+      <label>قسط الوفاة على كل مشترك (ل.س)</label>
+      <div class="amount-input">
+        <input id="deInstallment" type="tel" inputmode="numeric" value="${installment}">
+        <span class="currency">ل.س</span>
+      </div>
+      <div class="fld-hint">سيُضاف قسط لكل عضو مشترك في صندوق الوفاة</div>
+    </div>
+    
+    <div class="fld">
+      <label>صُرف إلى (اسم من استلم التعويض)</label>
+      <input id="deRecipient" placeholder="اسم الشخص المستلم">
+    </div>
+    
+    <div class="fld">
+      <label>ملاحظات</label>
+      <textarea id="deNotes" rows="2"></textarea>
+    </div>
+    
+    <div id="deImpactBox" style="padding:12px;background:var(--warning);color:#fff;border-radius:12px;margin-top:14px;font-size:12px;line-height:1.7">
+      ⚠️ <b>تنبيه:</b> سيتم إضافة قسط بقيمة <b id="deImpactAmount">${fmtNum(installment)}</b> ل.س على كل مشترك في صندوق الوفاة.
+    </div>
+  `;
+  
+  const foot = `
+    <button class="btn ghost" onclick="closeSheet()">إلغاء</button>
+    <button class="btn death" onclick="saveDeathEvent()">⚰️ تسجيل + إضافة الأقساط</button>
+  `;
+  
+  openSheet('⚰️ حدث وفاة جديد', body, foot, { focus: 'deName' });
+  
+  $('deInstallment').addEventListener('input', () => {
+    $('deImpactAmount').textContent = fmtNum(Number($('deInstallment').value) || 0);
+  });
+}
+
+async function saveDeathEvent(){
+  const name = cleanText($('deName').value);
+  const date = $('deDate').value;
+  const year = Number($('deYear').value);
+  const comp = Number($('deComp').value);
+  const installment = Number($('deInstallment').value);
+  const recipient = cleanText($('deRecipient').value);
+  const notes = cleanText($('deNotes').value);
+  
+  if(!name){ toast('اسم المتوفى مطلوب','error'); return }
+  if(!date){ toast('التاريخ مطلوب','error'); return }
+  if(!comp || comp <= 0){ toast('التعويض مطلوب','error'); return }
+  if(!installment || installment <= 0){ toast('القسط مطلوب','error'); return }
+  
+  if(!confirm(`⚠️ سيُضاف قسط بقيمة ${fmtNum(installment)} ل.س على كل مشترك في صندوق الوفاة. متابعة؟`)) return;
+  
+  showLoad(true);
+  try{
+    // 1) إنشاء حدث الوفاة
+    const event = {
+      deceasedName: name,
+      deathDate: date,
+      year,
+      compensation: comp,
+      installment,
+      recipient,
+      notes,
+      createdBy: S.currentUser.id,
+      createdByName: S.currentUser.name,
+      createdAt: new Date().toISOString()
+    };
+    
+    const eventId = await dbPut('deathEvents', event);
+    event.id = eventId;
+    S.deathEvents.push(event);
+    
+    // 2) إضافة قسط لكل مشترك نشط في صندوق الوفاة لهذه السنة
+    const activeSubs = S.subscriptions.filter(s =>
+      s.year === year && s.deathStatus === 'active'
+    );
+    
+    let created = 0;
+    for(const sub of activeSubs){
+      const inst = {
+        personId: sub.personId,
+        eventId,
+        eventName: name,
+        deathDate: date,
+        year,
+        amount: installment,
+        status: 'pending',
+        paidDate: null,
+        collectorId: null,
+        createdAt: new Date().toISOString()
+      };
+      const iid = await dbPut('deathInstallments', inst);
+      inst.id = iid;
+      S.deathInstallments.push(inst);
+      created++;
+    }
+    
+    logAudit('add', 'deathEvent', eventId, { name, created });
+    toast(`⚰️ تم تسجيل الوفاة وإضافة ${created} قسط`, 'success', 4000);
+    closeSheet();
+    
+    renderHome();
+    if(S.page === 'pg-payments') renderPayments();
+    
+  } catch(e){
+    console.error(e);
+    toast('خطأ: ' + e.message, 'error');
+  }
+  showLoad(false);
+}
+
+/* ═══════════════════════════════════════════════════════
+   💚 التبرعات
+   ═══════════════════════════════════════════════════════ */
+function openDonationSheet(){
+  if(!hasPerm('donation.add')){ toast('غير مصرح','error'); return }
+  
+  const body = `
+    <div class="fld">
+      <label>اسم المتبرع</label>
+      <input id="doDonor" placeholder="اختياري — يمكن تركه فارغاً للتبرع المجهول">
+    </div>
+    
+    <div class="fld">
+      <label>المبلغ <span class="req">*</span></label>
+      <div class="amount-input">
+        <input id="doAmount" type="tel" inputmode="numeric" placeholder="0">
+        <span class="currency">ل.س</span>
+      </div>
+    </div>
+    
+    <div class="fld-row">
+      <div class="fld"><label>التاريخ</label>
+        <input id="doDate" type="date" value="${today()}"></div>
+      <div class="fld"><label>القطاع</label>
+        <select id="doSector">
+          <option value="">— بدون —</option>
+          ${S.sectors.map(s => `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('')}
+        </select></div>
+    </div>
+    
+    <div class="fld">
+      <label>الغرض / ملاحظات</label>
+      <input id="doNotes" placeholder="مثال: لصيانة المقبرة، عام…">
+    </div>
+  `;
+  
+  const foot = `
+    <button class="btn ghost" onclick="closeSheet()">إلغاء</button>
+    <button class="btn donation" onclick="saveDonation()">💚 حفظ التبرع</button>
+  `;
+  
+  openSheet('💚 تسجيل تبرع', body, foot, { focus: 'doAmount' });
+}
+
+async function saveDonation(){
+  const donorName = cleanText($('doDonor').value);
+  const amount = Number($('doAmount').value);
+  const date = $('doDate').value;
+  const sector = $('doSector').value;
+  const notes = cleanText($('doNotes').value);
+  
+  if(!amount || amount <= 0){ toast('المبلغ مطلوب','error'); return }
+  if(!date){ toast('التاريخ مطلوب','error'); return }
+  
+  try{
+    const donation = {
+      donorName: donorName || 'متبرع مجهول',
+      amount, date, sector, notes,
+      year: new Date(date).getFullYear(),
+      collectorId: S.currentUser.id,
+      collectorName: S.currentUser.name,
+      createdAt: new Date().toISOString()
+    };
+    
+    const id = await dbPut('donations', donation);
+    donation.id = id;
+    S.donations.push(donation);
+    
+    logAudit('add', 'donation', id, { amount });
+    toast('💚 تم تسجيل التبرع', 'success', 3000);
+    closeSheet();
+    
+    renderHome();
+    if(S.page === 'pg-payments') renderPayments();
+    
+  } catch(e){
+    console.error(e);
+    toast('خطأ: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   💰 صفحة الدفعات
+   ═══════════════════════════════════════════════════════ */
+function setPaymentsFilter(k){ S.filters.payments = k; renderPayments() }
+
+function renderPayments(){
+  // إحصائيات
+  const year = S.currentYear;
+  const assocYear = S.assocPayments.filter(p => p.year === year);
+  const deathYear = S.deathInstallments.filter(i => i.year === year);
+  const donYear = S.donations.filter(d => d.year === year);
+  
+  const totalAssoc = assocYear.reduce((s, p) => s + (Number(p.amount)||0), 0);
+  const totalDeath = deathYear.filter(i => i.status === 'paid').reduce((s, i) => s + (Number(i.amount)||0), 0);
+  const totalDon = donYear.reduce((s, d) => s + (Number(d.amount)||0), 0);
+  const pendingDeath = deathYear.filter(i => i.status === 'pending').length;
+  
+  $('paymentsStats').innerHTML = `
+    <div class="stat assoc"><div class="val">${fmtShort(totalAssoc)}</div><div class="lbl">💰 جمعية ${year}</div></div>
+    <div class="stat death"><div class="val">${fmtShort(totalDeath)}</div><div class="lbl">⚰️ وفاة ${year}</div></div>
+    <div class="stat orange"><div class="val">${pendingDeath}</div><div class="lbl">⏳ أقساط معلقة</div></div>
+    <div class="stat donation"><div class="val">${fmtShort(totalDon)}</div><div class="lbl">💚 تبرعات</div></div>
+  `;
+  
+  const chips = [
+    { k: 'assoc', l: '💰 جمعية' },
+    { k: 'death', l: '⚰️ وفاة' },
+    { k: 'donation', l: '💚 تبرعات' }
+  ];
+  $('paymentsChips').innerHTML = chips.map(c =>
+    `<button class="chip ${S.filters.payments === c.k ? 'on' : ''}" onclick="setPaymentsFilter('${c.k}')">${c.l}</button>`
+  ).join('');
+  
+  // عرض القائمة
+  const el = $('paymentsContent');
+  
+  if(S.filters.payments === 'assoc'){
+    const list = [...S.assocPayments].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 200);
+    if(!list.length){ el.innerHTML = `<div class="empty"><span class="ico">💰</span><h3>لا توجد دفعات جمعية</h3></div>`; return }
+    el.innerHTML = `<div class="list">${list.map(p => {
+      const person = getPersonById(p.personId);
+      return `<div class="item" style="cursor:default">
+        <div class="av blue">💰</div>
+        <div class="body">
+          <div class="ttl">${esc(person ? person.name : '—')}</div>
+          <div class="sub">${fmtDate(p.date)} • ${esc(p.collectorName || '')}</div>
+        </div>
+        <div style="font-weight:800;color:var(--assoc);font-size:14px">${fmtNum(p.amount)}</div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+  else if(S.filters.payments === 'death'){
+    const list = [...S.deathInstallments].sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||'')).slice(0, 200);
+    if(!list.length){ el.innerHTML = `<div class="empty"><span class="ico">⚰️</span><h3>لا توجد أقساط وفاة</h3></div>`; return }
+    el.innerHTML = `<div class="list">${list.map(i => {
+      const person = getPersonById(i.personId);
+      const isPaid = i.status === 'paid';
+      return `<div class="item" onclick="openDeathInstallmentSheet(${i.id})">
+        <div class="av ${isPaid ? 'green' : 'red'}">${isPaid ? '✅' : '⏳'}</div>
+        <div class="body">
+          <div class="ttl">${esc(person ? person.name : '—')}</div>
+          <div class="sub">وفاة: ${esc(i.eventName || '')} • ${fmtDate(i.deathDate)}</div>
+        </div>
+        <div style="font-weight:800;color:${isPaid ? 'var(--success)' : 'var(--danger)'};font-size:14px">${fmtNum(i.amount)}</div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+  else if(S.filters.payments === 'donation'){
+    const list = [...S.donations].sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 200);
+    if(!list.length){ el.innerHTML = `<div class="empty"><span class="ico">💚</span><h3>لا توجد تبرعات</h3></div>`; return }
+    el.innerHTML = `<div class="list">${list.map(d => `
+      <div class="item" style="cursor:default">
+        <div class="av green">💚</div>
+        <div class="body">
+          <div class="ttl">${esc(d.donorName || 'متبرع')}</div>
+          <div class="sub">${fmtDate(d.date)}${d.notes ? ' • ' + esc(d.notes) : ''}</div>
+        </div>
+        <div style="font-weight:800;color:var(--donation);font-size:14px">${fmtNum(d.amount)}</div>
+      </div>
+    `).join('')}</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   ⚰️ تسديد قسط وفاة
+   ═══════════════════════════════════════════════════════ */
+function openDeathInstallmentSheet(id){
+  const inst = S.deathInstallments.find(i => i.id === id);
+  if(!inst) return;
+  const person = getPersonById(inst.personId);
+  const isPaid = inst.status === 'paid';
+  
+  const body = `
+    <div style="padding:14px;background:var(--death-soft);border-radius:12px;margin-bottom:14px">
+      <div style="font-weight:800;font-size:15px;color:var(--death)">${esc(person ? person.name : '—')}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">
+        ${esc(person?.code || '')} • ${esc(person?.sector || '')}
+      </div>
+    </div>
+    
+    <div style="padding:12px;background:var(--bg);border-radius:12px;margin-bottom:14px;font-size:13px">
+      <div style="display:flex;justify-content:space-between;padding:4px 0">
+        <span class="muted">المتوفى</span><b>${esc(inst.eventName)}</b></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0">
+        <span class="muted">تاريخ الوفاة</span><b>${fmtDate(inst.deathDate)}</b></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0">
+        <span class="muted">المبلغ المستحق</span><b style="color:var(--death);font-size:15px">${fmtNum(inst.amount)} ل.س</b></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid var(--border);margin-top:6px;padding-top:8px">
+        <span class="muted">الحالة</span>
+        <b style="color:${isPaid ? 'var(--success)' : 'var(--danger)'}">${isPaid ? '✅ مدفوع' : '⏳ معلّق'}</b></div>
+      ${isPaid ? `<div style="display:flex;justify-content:space-between;padding:4px 0">
+        <span class="muted">تاريخ السداد</span><b>${fmtDate(inst.paidDate)}</b></div>` : ''}
+    </div>
+  `;
+  
+  let foot = '';
+  if(isPaid){
+    foot = `<button class="btn ghost" onclick="closeSheet()">إغلاق</button>`;
+  } else if(hasPerm('payment.add')){
+    foot = `
+      <button class="btn ghost" onclick="closeSheet()">إلغاء</button>
+      <button class="btn death" onclick="markDeathPaid(${id})">✅ تسجيل السداد</button>
+    `;
+  } else {
+    foot = `<button class="btn ghost" onclick="closeSheet()">إغلاق</button>`;
+  }
+  
+  openSheet('⚰️ قسط وفاة', body, foot);
+}
+
+async function markDeathPaid(id){
+  if(!hasPerm('payment.add')){ toast('غير مصرح','error'); return }
+  if(!confirm('تأكيد تسجيل السداد؟')) return;
+  
+  try{
+    const inst = S.deathInstallments.find(i => i.id === id);
+    if(!inst) return;
+    
+    inst.status = 'paid';
+    inst.paidDate = today();
+    inst.collectorId = S.currentUser.id;
+    inst.collectorName = S.currentUser.name;
+    inst.updatedAt = new Date().toISOString();
+    
+    await dbPut('deathInstallments', inst);
+    
+    logAudit('update', 'deathInstallment', id, { paid: true });
+    toast('✅ تم تسجيل السداد', 'success');
+    closeSheet();
+    renderPayments();
+    renderHome();
+  } catch(e){
+    console.error(e);
+    toast('خطأ: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   📤 التسليم (Handovers)
+   ═══════════════════════════════════════════════════════ */
+function openHandoverSheet(){
+  if(!hasPerm('handover.receive')){ toast('غير مصرح','error'); return }
+  
+  // مجموع ما حصّله هذا المستخدم ولم يُسلّم بعد
+  const myCollected = S.assocPayments
+    .filter(p => p.collectorId === S.currentUser.id)
+    .reduce((s, p) => s + (Number(p.amount)||0), 0);
+  
+  const myDelivered = S.handovers
+    .filter(h => h.fromUserId === S.currentUser.id)
+    .reduce((s, h) => s + (Number(h.amount)||0), 0);
+  
+  const myBalance = myCollected - myDelivered;
+  
+  const body = `
+    <div style="padding:14px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px">
+      <div style="font-size:12px;color:var(--muted)">الرصيد في عهدتك</div>
+      <div style="font-size:28px;font-weight:800;color:var(--primary);margin-top:4px">${fmtNum(myBalance)} ل.س</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">
+        حصّلت: ${fmtNum(myCollected)} • سلّمت: ${fmtNum(myDelivered)}
+      </div>
+    </div>
+    
+    <div class="fld">
+      <label>أسلّم إلى <span class="req">*</span></label>
+      <select id="hoToUser">
+        <option value="">— اختر —</option>
+        ${S.admins
+          .filter(a => ['assocTreasurer','deathTreasurer','manager','president'].includes(a.role))
+          .map(a => `<option value="${a.id}">${ROLES[a.role].icon} ${esc(a.name)} — ${ROLES[a.role].name}</option>`)
+          .join('')}
+      </select>
+    </div>
+    
+    <div class="fld">
+      <label>المبلغ المُسلَّم <span class="req">*</span></label>
+      <div class="amount-input">
+        <input id="hoAmount" type="tel" inputmode="numeric" value="${myBalance > 0 ? myBalance : ''}" placeholder="0">
+        <span class="currency">ل.س</span>
+      </div>
+    </div>
+    
+    <div class="fld">
+      <label>الصندوق</label>
+      <select id="hoFund">
+        <option value="assoc">💰 صندوق الجمعية</option>
+        <option value="death">⚰️ صندوق الوفاة</option>
+      </select>
+    </div>
+    
+    <div class="fld">
+      <label>ملاحظات</label>
+      <input id="hoNotes" placeholder="اختياري">
+    </div>
+  `;
+  
+  const foot = `
+    <button class="btn ghost" onclick="closeSheet()">إلغاء</button>
+    <button class="btn success" onclick="saveHandover()">📤 تسجيل التسليم</button>
+  `;
+  
+  openSheet('📤 تسليم الأموال', body, foot, { focus: 'hoAmount' });
+}
+
+async function saveHandover(){
+  const toUserId = Number($('hoToUser').value);
+  const amount = Number($('hoAmount').value);
+  const fund = $('hoFund').value;
+  const notes = cleanText($('hoNotes').value);
+  
+  if(!toUserId){ toast('اختر المستلم','error'); return }
+  if(!amount || amount <= 0){ toast('المبلغ مطلوب','error'); return }
+  
+  const toUser = S.admins.find(a => a.id === toUserId);
+  if(!toUser) return;
+  
+  try{
+    const handover = {
+      fromUserId: S.currentUser.id,
+      fromUserName: S.currentUser.name,
+      toUserId,
+      toUserName: toUser.name,
+      amount,
+      fund,
+      notes,
+      date: today(),
+      createdAt: new Date().toISOString()
+    };
+    
+    const id = await dbPut('handovers', handover);
+    handover.id = id;
+    S.handovers.push(handover);
+    
+    logAudit('add', 'handover', id, { amount, to: toUser.name });
+    toast('📤 تم تسجيل التسليم', 'success');
+    closeSheet();
+    renderHome();
+    
+  } catch(e){
+    console.error(e);
+    toast('خطأ: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   🔄 تحديث الشاشة الرئيسية — إضافة أزرار جديدة
+   ═══════════════════════════════════════════════════════ */
+const _originalRenderHome = renderHome;
+window.renderHome = function(){
+  _originalRenderHome();
+  
+  // تعديل أزرار الإجراءات السريعة
+  const quickBox = document.querySelector('.quick-actions');
+  if(quickBox){
+    const canPay = hasPerm('payment.add');
+    const canDeath = hasPerm('death.add');
+    const canDon = hasPerm('donation.add');
+    
+    quickBox.innerHTML = `
+      ${canPay ? `<div class="quick-btn assoc" onclick="openAssocPaymentSheet()"><div class="ico">💰</div><div class="lbl">دفعة جمعية</div></div>` : ''}
+      ${canDeath ? `<div class="quick-btn death" onclick="openDeathEventSheet()"><div class="ico">⚰️</div><div class="lbl">حدث وفاة</div></div>` : ''}
+      ${canDon ? `<div class="quick-btn donation" onclick="openDonationSheet()"><div class="ico">💚</div><div class="lbl">تسجيل تبرع</div></div>` : ''}
+      <div class="quick-btn" onclick="openPersonSheet()"><div class="ico">👤</div><div class="lbl">إضافة فرد</div></div>
+    `;
+  }
+  
+  // زر تسليم الأموال (للأمناء والمعتمدين)
+  const canHandover = hasPerm('handover.receive') || S.currentUser?.role === 'collector';
+  if(canHandover){
+    const payBalanceCard = document.querySelector('#fundBalances');
+    if(payBalanceCard && !document.getElementById('handoverBtn')){
+      const btn = document.createElement('button');
+      btn.id = 'handoverBtn';
+      btn.className = 'btn success block';
+      btn.style.marginTop = '12px';
+      btn.innerHTML = '📤 تسليم الأموال لأمين الصندوق';
+      btn.onclick = openHandoverSheet;
+      payBalanceCard.appendChild(btn);
+    }
+  }
+};
+
+/* ═══════════════════════════════════════════════════════
+   🔄 تحديث صفحة الدفعات (تُستدعى عند الفتح)
+   ═══════════════════════════════════════════════════════ */
+const _originalGo6 = window.go || go;
+window.go = function(page){
+  _originalGo6(page);
+  if(page === 'pg-payments'){
+    if(!S.filters.payments) S.filters.payments = 'assoc';
+    renderPayments();
+  }
+};
+
+/* ═══════════════════════════════════════════════════════
+   🔄 تحديث handleFab — يدعم الدفعات
+   ═══════════════════════════════════════════════════════ */
+const _originalFab6 = window.handleFab || handleFab;
+window.handleFab = function(){
+  if(S.page === 'pg-payments'){
+    // قائمة اختيار نوع الدفعة
+    const body = `
+      <div class="quick-actions">
+        <div class="quick-btn assoc" onclick="closeSheet();openAssocPaymentSheet()">
+          <div class="ico">💰</div><div class="lbl">دفعة جمعية</div></div>
+        <div class="quick-btn death" onclick="closeSheet();openDeathEventSheet()">
+          <div class="ico">⚰️</div><div class="lbl">حدث وفاة</div></div>
+        <div class="quick-btn donation" onclick="closeSheet();openDonationSheet()">
+          <div class="ico">💚</div><div class="lbl">تبرع</div></div>
+        <div class="quick-btn" onclick="closeSheet();openHandoverSheet()">
+          <div class="ico">📤</div><div class="lbl">تسليم</div></div>
+      </div>
+    `;
+    openSheet('⚡ إجراء سريع', body, '<button class="btn ghost" onclick="closeSheet()">إلغاء</button>');
+  } else {
+    _originalFab6();
+  }
+};
+
+console.log('✅ Part 6 تم تحميله');
 document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
