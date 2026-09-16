@@ -1,1 +1,827 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#7c3aed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>صندوق زعورة — نظام الاشتراكات</title>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════
+   نظام الألوان — البنفسجي (لتمييزه عن تطبيق المقبرة)
+   ═══════════════════════════════════════════════════════ */
+:root{
+  /* الألوان الأساسية */
+  --primary:#7c3aed;        /* بنفسجي رئيسي */
+  --primary-2:#6d28d9;
+  --primary-soft:#f5f3ff;
+  --primary-dark:#4c1d95;
+  
+  /* ألوان الصناديق */
+  --assoc:#2563eb;          /* أزرق - جمعية */
+  --assoc-soft:#dbeafe;
+  --death:#dc2626;          /* أحمر - وفاة */
+  --death-soft:#fee2e2;
+  --donation:#16a34a;       /* أخضر - تبرع */
+  --donation-soft:#dcfce7;
+  
+  /* ألوان الحالات */
+  --success:#16a34a;
+  --danger:#dc2626;
+  --warning:#f59e0b;
+  --info:#2563eb;
+  --muted:#64748b;
+  
+  /* الأساسيات */
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#0f172a;
+  --border:#e2e8f0;
+  --radius:16px;
+  --radius-sm:12px;
+  --shadow-sm:0 1px 3px rgba(15,23,42,.06);
+  --shadow:0 8px 24px rgba(15,23,42,.08);
+  --shadow-lg:0 20px 60px rgba(15,23,42,.2);
+  --safe:env(safe-area-inset-bottom,0);
+}
+[data-theme="dark"]{
+  --bg:#0b1220;
+  --card:#1e293b;
+  --text:#e2e8f0;
+  --border:#334155;
+  --primary-soft:#2e1065;
+  --assoc-soft:#1e3a8a;
+  --death-soft:#7f1d1d;
+  --donation-soft:#14532d;
+}
 
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overscroll-behavior-y:contain}
+body{
+  font-family:system-ui,-apple-system,'Segoe UI',Tahoma,'Noto Sans Arabic',sans-serif;
+  background:var(--bg);color:var(--text);direction:rtl;
+  font-size:15px;line-height:1.5;min-height:100vh;
+  padding-bottom:calc(78px + var(--safe));
+  transition:background .2s,color .2s;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+input,select,textarea{outline:0}
+
+/* ═══════════ HEADER ═══════════ */
+.app-header{
+  position:sticky;top:0;z-index:30;
+  background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  color:#fff;
+  padding:10px 14px;
+  padding-top:calc(10px + env(safe-area-inset-top,0));
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 4px 20px rgba(124,58,237,.3);
+}
+.app-header .brand{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.app-header .logo{
+  width:40px;height:40px;border-radius:12px;
+  background:rgba(255,255,255,.2);
+  backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.app-header .brand-text{flex:1;min-width:0}
+.app-header h1{font-size:16px;font-weight:800;line-height:1.1}
+.app-header .sub{font-size:10px;opacity:.85;font-weight:600;margin-top:2px}
+.app-header .icon-btn{
+  width:38px;height:38px;border-radius:12px;
+  background:rgba(255,255,255,.15);
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;transition:.15s;flex-shrink:0;
+}
+.app-header .icon-btn:active{transform:scale(.92);background:rgba(255,255,255,.25)}
+
+/* شريط المستخدم الحالي */
+.user-banner{
+  background:var(--card);border-bottom:1px solid var(--border);
+  padding:8px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;font-size:12px;
+  position:sticky;top:60px;z-index:29;
+}
+.user-banner .who{display:flex;align-items:center;gap:8px;color:var(--muted)}
+.user-banner .who b{color:var(--text)}
+.role-badge{
+  padding:3px 10px;border-radius:20px;
+  font-size:10px;font-weight:800;
+  background:var(--primary-soft);color:var(--primary);
+}
+.role-badge.president{background:#fef3c7;color:#92400e}
+.role-badge.manager{background:#dbeafe;color:#1e40af}
+.role-badge.treasurer{background:#dcfce7;color:#166534}
+.role-badge.collector{background:#f1f5f9;color:#475569}
+.role-badge.auditor{background:#e9d5ff;color:#6b21a8}
+
+/* ═══════════ SEARCH ═══════════ */
+.search-wrap{padding:10px 12px 0;max-width:900px;margin:0 auto}
+.search-box{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:10px 14px;
+  box-shadow:var(--shadow-sm);
+}
+.search-box .ico{color:var(--muted);font-size:17px}
+.search-box input{flex:1;background:none;border:0;font-size:15px;min-width:0}
+.search-box .clear{color:var(--muted);font-size:18px;padding:4px}
+
+/* ═══════════ MAIN ═══════════ */
+main{max-width:900px;margin:0 auto;padding:12px}
+.page{display:none;animation:fade .2s ease}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ═══════════ CARDS ═══════════ */
+.card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px;margin-bottom:12px;
+  box-shadow:var(--shadow-sm);
+}
+.card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;margin-bottom:12px;
+}
+.card-head h2{font-size:14px;font-weight:800;display:flex;align-items:center;gap:6px}
+.card-head .actions{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ═══════════ STATS (البطاقات الرقمية) ═══════════ */
+.stats-scroll{
+  display:flex;gap:10px;overflow-x:auto;
+  margin:0 -12px 14px;padding:0 12px 6px;
+  scroll-snap-type:x mandatory;scrollbar-width:none;
+}
+.stats-scroll::-webkit-scrollbar{display:none}
+.stat{
+  flex:0 0 auto;min-width:130px;scroll-snap-align:start;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px;
+  box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
+}
+.stat::before{content:'';position:absolute;top:0;right:0;width:4px;height:100%;background:var(--primary)}
+.stat.assoc::before{background:var(--assoc)}
+.stat.death::before{background:var(--death)}
+.stat.donation::before{background:var(--donation)}
+.stat.green::before{background:var(--success)}
+.stat.red::before{background:var(--danger)}
+.stat.orange::before{background:var(--warning)}
+.stat.blue::before{background:var(--info)}
+.stat .val{font-size:22px;font-weight:800;line-height:1.1;color:var(--primary);word-break:break-all}
+.stat.assoc .val{color:var(--assoc)}
+.stat.death .val{color:var(--death)}
+.stat.donation .val{color:var(--donation)}
+.stat.green .val{color:var(--success)}
+.stat.red .val{color:var(--danger)}
+.stat.orange .val{color:var(--warning)}
+.stat.blue .val{color:var(--info)}
+.stat .lbl{font-size:11px;color:var(--muted);margin-top:6px;font-weight:600}
+.stat .sub{font-size:9px;color:var(--muted);margin-top:2px;opacity:.7}
+
+/* ═══════════ LISTS ═══════════ */
+.list{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+.item{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:.15s;min-height:64px;
+}
+.item:last-child{border-bottom:0}
+.item:active{background:var(--bg)}
+.item .av{
+  width:46px;height:46px;border-radius:13px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;background:var(--primary-soft);color:var(--primary);font-weight:800;
+  overflow:hidden;
+}
+.item .av img{width:100%;height:100%;object-fit:cover}
+.item .av.blue{background:var(--assoc-soft);color:var(--assoc)}
+.item .av.red{background:var(--death-soft);color:var(--death)}
+.item .av.green{background:var(--donation-soft);color:var(--donation)}
+.item .av.orange{background:#fef3c7;color:#92400e}
+.item .av.gray{background:#f1f5f9;color:#475569}
+.item .body{flex:1;min-width:0}
+.item .ttl{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.item .sub{font-size:12px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .trail{color:var(--muted);font-size:20px;font-weight:300;flex-shrink:0}
+.item .amount{
+  font-weight:800;font-size:14px;color:var(--success);
+  flex-shrink:0;text-align:left;
+}
+.item .amount.danger{color:var(--danger)}
+.item .amount.assoc{color:var(--assoc)}
+.item .amount.death{color:var(--death)}
+
+/* ═══════════ BADGES ═══════════ */
+.badge{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:2px 9px;border-radius:8px;
+  font-size:10px;font-weight:700;white-space:nowrap;
+}
+.badge.success{background:#dcfce7;color:#166534}
+.badge.danger{background:#fee2e2;color:#991b1b}
+.badge.warning{background:#fef3c7;color:#92400e}
+.badge.info{background:#dbeafe;color:#1e40af}
+.badge.muted{background:#f1f5f9;color:#475569}
+.badge.primary{background:var(--primary-soft);color:var(--primary)}
+.badge.assoc{background:var(--assoc-soft);color:var(--assoc)}
+.badge.death{background:var(--death-soft);color:var(--death)}
+.badge.donation{background:var(--donation-soft);color:var(--donation)}
+
+/* ═══════════ CHIPS (الفلاتر) ═══════════ */
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex-shrink:0;padding:7px 14px;border-radius:20px;
+  background:var(--card);border:1px solid var(--border);
+  font-size:12px;font-weight:700;color:var(--muted);transition:.15s;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.chip:active{transform:scale(.95)}
+.chip.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.chip.on.assoc{background:var(--assoc);border-color:var(--assoc)}
+.chip.on.death{background:var(--death);border-color:var(--death)}
+.chip.on.donation{background:var(--donation);border-color:var(--donation)}
+.chip .count{
+  background:rgba(255,255,255,.25);
+  padding:0 6px;border-radius:10px;
+  font-size:10px;font-weight:800;
+}
+.chip:not(.on) .count{background:var(--bg);color:var(--muted)}
+
+/* ═══════════ BUTTONS ═══════════ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:6px;padding:11px 18px;border-radius:13px;
+  font-size:14px;font-weight:700;transition:.15s;
+  min-height:44px;white-space:nowrap;
+}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.assoc{background:var(--assoc);color:#fff}
+.btn.death{background:var(--death);color:#fff}
+.btn.donation{background:var(--donation);color:#fff}
+.btn.success{background:var(--success);color:#fff}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.warning{background:var(--warning);color:#fff}
+.btn.info{background:var(--info);color:#fff}
+.btn.ghost{background:var(--bg);color:var(--text);border:1px solid var(--border)}
+.btn.sm{padding:7px 12px;min-height:36px;font-size:12px;border-radius:10px}
+.btn.lg{padding:14px 22px;min-height:52px;font-size:15px}
+.btn.block{display:flex;width:100%}
+.btn[disabled]{opacity:.5;pointer-events:none}
+
+/* شريط الإجراءات السريعة */
+.quick-actions{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  margin-bottom:12px;
+}
+.quick-btn{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:16px 10px;border-radius:14px;
+  background:var(--card);border:2px solid var(--border);
+  cursor:pointer;transition:.15s;text-align:center;
+}
+.quick-btn:active{transform:scale(.97);border-color:var(--primary)}
+.quick-btn .ico{font-size:28px;line-height:1}
+.quick-btn .lbl{font-size:12px;font-weight:800;color:var(--text)}
+.quick-btn.assoc{border-color:var(--assoc)}
+.quick-btn.assoc .lbl{color:var(--assoc)}
+.quick-btn.death{border-color:var(--death)}
+.quick-btn.death .lbl{color:var(--death)}
+.quick-btn.donation{border-color:var(--donation)}
+.quick-btn.donation .lbl{color:var(--donation)}
+
+/* ═══════════ FAB ═══════════ */
+.fab{
+  position:fixed;bottom:calc(88px + var(--safe));left:18px;
+  width:60px;height:60px;border-radius:20px;
+  background:var(--primary);color:#fff;
+  font-size:28px;font-weight:300;
+  box-shadow:0 12px 32px rgba(124,58,237,.5);
+  z-index:25;display:flex;align-items:center;justify-content:center;
+  transition:.15s;
+}
+.fab:active{transform:scale(.92)}
+
+/* ═══════════ BOTTOM NAV ═══════════ */
+.bnav{
+  position:fixed;bottom:0;left:0;right:0;z-index:30;
+  background:var(--card);border-top:1px solid var(--border);
+  display:flex;justify-content:space-around;
+  padding:6px 4px calc(6px + var(--safe));
+  box-shadow:0 -4px 20px rgba(15,23,42,.05);
+}
+.bnav button{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:2px;padding:6px 2px;border-radius:12px;
+  color:var(--muted);font-size:10px;font-weight:700;
+  transition:.15s;position:relative;min-width:0;
+}
+.bnav button .i{font-size:22px;line-height:1;transition:.15s}
+.bnav button.on{color:var(--primary)}
+.bnav button.on .i{transform:scale(1.1)}
+.bnav button .nb{
+  position:absolute;top:3px;right:calc(50% - 20px);
+  background:var(--danger);color:#fff;
+  border-radius:10px;padding:0 5px;font-size:9px;
+  font-weight:700;min-width:16px;text-align:center;
+  line-height:16px;height:16px;
+}
+
+/* ═══════════ SHEET (Bottom Sheet) ═══════════ */
+.sheet-back{
+  position:fixed;inset:0;background:rgba(15,23,42,.55);
+  z-index:90;opacity:0;pointer-events:none;transition:.2s;
+  backdrop-filter:blur(3px);
+}
+.sheet-back.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;bottom:0;left:0;right:0;z-index:91;
+  background:var(--card);
+  border-radius:24px 24px 0 0;
+  max-height:94vh;overflow-y:auto;
+  transform:translateY(100%);
+  transition:transform .28s cubic-bezier(.2,.9,.3,1);
+  padding-bottom:calc(16px + var(--safe));
+  box-shadow:0 -20px 60px rgba(15,23,42,.2);
+}
+.sheet.on{transform:translateY(0)}
+.sheet.wide{max-height:98vh}
+.sheet-grip{
+  width:44px;height:5px;background:var(--border);
+  border-radius:3px;margin:12px auto 0;
+}
+.sheet-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:var(--card);z-index:2;
+  border-radius:24px 24px 0 0;
+}
+.sheet-hd h2{font-size:16px;font-weight:800}
+.sheet-bd{padding:16px 18px}
+.sheet-ft{
+  display:flex;gap:10px;padding:12px 18px;
+  border-top:1px solid var(--border);
+  position:sticky;bottom:0;background:var(--card);
+  flex-wrap:wrap;
+}
+.sheet-ft .btn{flex:1;min-width:90px}
+
+/* ═══════════ FORMS ═══════════ */
+.fld{margin-bottom:14px;position:relative}
+.fld label{
+  display:block;font-size:12px;font-weight:700;
+  color:var(--muted);margin-bottom:6px;
+}
+.fld label .req{color:var(--danger)}
+.fld input,.fld select,.fld textarea{
+  width:100%;padding:12px 14px;
+  background:var(--bg);border:1.5px solid var(--border);
+  border-radius:12px;font-size:15px;
+  transition:.15s;font-family:inherit;
+}
+.fld input:focus,.fld select:focus,.fld textarea:focus{
+  border-color:var(--primary);background:var(--card);
+  box-shadow:0 0 0 3px rgba(124,58,237,.12);
+}
+.fld textarea{resize:vertical;min-height:70px}
+.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fld-row.three{grid-template-columns:1fr 1fr 1fr}
+.fld-hint{font-size:11px;color:var(--muted);margin-top:4px}
+.fld-readonly{background:var(--primary-soft)!important;color:var(--primary);font-weight:700}
+
+/* البحث مع القائمة المنسدلة */
+.options-list{
+  position:absolute;top:100%;left:0;right:0;
+  background:var(--card);border:1.5px solid var(--primary);
+  border-radius:12px;max-height:250px;overflow-y:auto;
+  z-index:100;box-shadow:var(--shadow);margin-top:4px;display:none;
+}
+.options-list.on{display:block}
+.option-item{
+  padding:11px 14px;cursor:pointer;
+  display:flex;justify-content:space-between;align-items:center;
+  gap:8px;border-bottom:1px solid var(--border);font-size:14px;
+}
+.option-item:hover,.option-item:active{background:var(--primary-soft)}
+.option-item:last-child{border-bottom:0}
+.option-item small{color:var(--muted);font-size:11px;flex-shrink:0}
+
+/* مبلغ كبير (شاشة الدفع) */
+.amount-input{
+  display:flex;align-items:center;gap:10px;
+  background:var(--card);border:2px solid var(--primary);
+  border-radius:14px;padding:8px 16px;
+}
+.amount-input input{
+  flex:1;border:0;background:none;
+  font-size:28px;font-weight:800;color:var(--primary);
+  text-align:center;padding:8px 0;
+}
+.amount-input .currency{font-size:14px;font-weight:800;color:var(--muted)}
+.amount-quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.amount-quick button{
+  padding:6px 12px;border-radius:10px;
+  background:var(--primary-soft);color:var(--primary);
+  font-size:12px;font-weight:700;
+}
+.amount-quick button:active{transform:scale(.95)}
+
+/* ═══════════ BALANCE / PROGRESS ═══════════ */
+.balance-block{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:12px;margin-bottom:10px;
+}
+.balance-row{
+  display:flex;justify-content:space-between;
+  padding:6px 0;font-size:13px;border-bottom:1px solid var(--border);
+}
+.balance-row:last-child{border-bottom:0}
+.balance-row .lbl{color:var(--muted)}
+.balance-row .val{font-weight:800}
+.balance-row .val.green{color:var(--success)}
+.balance-row .val.red{color:var(--danger)}
+.balance-row .val.orange{color:var(--warning)}
+
+.progress{
+  height:10px;background:var(--bg);
+  border-radius:5px;overflow:hidden;margin-top:8px;
+}
+.progress > div{
+  height:100%;border-radius:5px;
+  transition:width .4s ease;
+}
+.progress.assoc > div{background:var(--assoc)}
+.progress.death > div{background:var(--death)}
+.progress.green > div{background:var(--success)}
+.progress.warning > div{background:var(--warning)}
+
+/* ═══════════ EMPTY STATE ═══════════ */
+.empty{
+  text-align:center;padding:50px 20px;
+  color:var(--muted);
+}
+.empty .ico{font-size:52px;opacity:.4;display:block;margin-bottom:10px}
+.empty h3{font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)}
+.empty p{font-size:12px}
+
+/* ═══════════ TOASTS ═══════════ */
+.toasts{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);
+  z-index:9999;display:flex;flex-direction:column;gap:8px;
+  pointer-events:none;width:calc(100% - 28px);max-width:400px;
+}
+.toast{
+  background:var(--text);color:var(--card);
+  padding:12px 18px;border-radius:14px;
+  font-size:13px;font-weight:600;
+  box-shadow:var(--shadow-lg);
+  animation:slideDown .25s ease;
+  pointer-events:auto;
+}
+.toast.success{background:var(--success);color:#fff}
+.toast.error{background:var(--danger);color:#fff}
+.toast.warning{background:var(--warning);color:#fff}
+.toast.info{background:var(--info);color:#fff}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+
+/* ═══════════ LOADER ═══════════ */
+.loader{
+  position:fixed;inset:0;background:rgba(15,23,42,.4);
+  backdrop-filter:blur(3px);z-index:9998;
+  display:none;align-items:center;justify-content:center;
+}
+.loader.on{display:flex}
+.spin{
+  width:42px;height:42px;
+  border:3px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════ LOGIN SCREEN ═══════════ */
+.login-screen{
+  position:fixed;inset:0;z-index:10000;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  display:none;align-items:center;justify-content:center;
+  padding:20px;
+}
+.login-screen.on{display:flex}
+.login-card{
+  background:var(--card);color:var(--text);
+  border-radius:24px;padding:28px 24px;
+  max-width:400px;width:100%;
+  box-shadow:var(--shadow-lg);
+}
+.login-card .logo-lg{
+  width:64px;height:64px;border-radius:20px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:32px;margin:0 auto 16px;
+}
+.login-card h1{font-size:20px;font-weight:800;text-align:center;margin-bottom:4px}
+.login-card .sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:24px}
+.login-card .users-list{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto}
+.login-user{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-radius:14px;
+  background:var(--bg);border:2px solid transparent;
+  cursor:pointer;transition:.15s;
+}
+.login-user:active{transform:scale(.98);border-color:var(--primary);background:var(--primary-soft)}
+.login-user .av{
+  width:44px;height:44px;border-radius:12px;
+  background:var(--primary);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:800;flex-shrink:0;
+}
+.login-user .info{flex:1;min-width:0}
+.login-user .nm{font-weight:700;font-size:14px}
+.login-user .role{font-size:11px;color:var(--muted);margin-top:2px}
+.pin-pad{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;margin-top:20px;
+}
+.pin-btn{
+  padding:16px;border-radius:14px;
+  background:var(--bg);font-size:20px;font-weight:800;
+  transition:.15s;
+}
+.pin-btn:active{transform:scale(.95);background:var(--primary-soft)}
+.pin-display{
+  display:flex;justify-content:center;gap:10px;
+  margin:20px 0;
+}
+.pin-dot{
+  width:16px;height:16px;border-radius:50%;
+  background:var(--border);transition:.2s;
+}
+.pin-dot.on{background:var(--primary);transform:scale(1.2)}
+
+/* ═══════════ UTILITIES ═══════════ */
+.muted{color:var(--muted)}
+.bold{font-weight:800}
+.center{text-align:center}
+.mb-1{margin-bottom:8px}
+.mb-2{margin-bottom:16px}
+.mt-1{margin-top:8px}
+.mt-2{margin-top:16px}
+.row{display:flex;align-items:center;gap:8px}
+.row.between{justify-content:space-between}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.divider-dashed{height:1px;border-top:2px dashed var(--border);margin:16px 0}
+
+/* ═══════════ RESPONSIVE ═══════════ */
+@media (max-width:380px){
+  .stat{min-width:110px;padding:10px}
+  .stat .val{font-size:18px}
+  .quick-btn{padding:12px 8px}
+  .quick-btn .ico{font-size:24px}
+  .quick-btn .lbl{font-size:11px}
+}
+
+@media print{
+  .app-header,.bnav,.fab,.search-wrap,.user-banner{display:none!important}
+  main{padding:0;max-width:100%}
+  body{background:#fff;padding-bottom:0}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     LOGIN SCREEN — شاشة تسجيل الدخول
+     ═══════════════════════════════════════════ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="logo-lg">🏘️</div>
+    <h1>صندوق زعورة</h1>
+    <div class="sub">نظام إدارة الاشتراكات والتكافل</div>
+    
+    <!-- قائمة المستخدمين -->
+    <div id="loginUsers">
+      <div class="users-list" id="loginUsersList">
+        <!-- تُملأ بالكود -->
+      </div>
+      <button class="btn ghost block" style="margin-top:14px" onclick="showAddFirstAdmin()">
+        ⚙️ إعداد أول مرة (إضافة مدير)
+      </button>
+    </div>
+
+    <!-- شاشة إدخال PIN -->
+    <div id="loginPin" style="display:none">
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:44px" id="pinAvatar">👤</div>
+        <div style="font-weight:800;font-size:16px;margin-top:6px" id="pinName">—</div>
+        <div style="font-size:11px;color:var(--muted)" id="pinRole">—</div>
+      </div>
+      <div class="pin-display" id="pinDisplay">
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:12px" id="pinError"></div>
+      <div class="pin-pad" id="pinPad">
+        <button class="pin-btn" onclick="pinPress('1')">1</button>
+        <button class="pin-btn" onclick="pinPress('2')">2</button>
+        <button class="pin-btn" onclick="pinPress('3')">3</button>
+        <button class="pin-btn" onclick="pinPress('4')">4</button>
+        <button class="pin-btn" onclick="pinPress('5')">5</button>
+        <button class="pin-btn" onclick="pinPress('6')">6</button>
+        <button class="pin-btn" onclick="pinPress('7')">7</button>
+        <button class="pin-btn" onclick="pinPress('8')">8</button>
+        <button class="pin-btn" onclick="pinPress('9')">9</button>
+        <button class="pin-btn" onclick="pinBack()" style="font-size:16px">⌫</button>
+        <button class="pin-btn" onclick="pinPress('0')">0</button>
+        <button class="pin-btn" onclick="pinBackLogin()" style="font-size:14px">↩️</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     HEADER — الشريط العلوي
+     ═══════════════════════════════════════════ -->
+<header class="app-header" id="appHeader" style="display:none">
+  <div class="brand">
+    <div class="logo">🏘️</div>
+    <div class="brand-text">
+      <h1>صندوق زعورة</h1>
+      <div class="sub" id="hdrYear">— السنة</div>
+    </div>
+  </div>
+  <button class="icon-btn" onclick="openDashboardSheet()" title="لوحة كاملة">📊</button>
+  <button class="icon-btn" onclick="toggleTheme()" title="الوضع">🌓</button>
+  <button class="icon-btn" onclick="openSettingsSheet()" title="إعدادات">⚙️</button>
+</header>
+
+<!-- شريط المستخدم الحالي -->
+<div class="user-banner" id="userBanner" style="display:none">
+  <div class="who">
+    <span>👤 أنت:</span>
+    <b id="currentUserName">—</b>
+    <span class="role-badge" id="currentUserRole">—</span>
+  </div>
+  <button class="btn ghost sm" onclick="logout()">🚪 خروج</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SEARCH — شريط البحث
+     ═══════════════════════════════════════════ -->
+<div class="search-wrap" id="searchWrap" style="display:none">
+  <div class="search-box">
+    <span class="ico">🔍</span>
+    <input id="globalSearch" placeholder="ابحث بالاسم، الكود، رقم الهاتف…" oninput="globalSearch(this.value)">
+    <button class="clear" onclick="clearSearch()" style="display:none" id="searchClear">✕</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MAIN — المحتوى الرئيسي
+     ═══════════════════════════════════════════ -->
+<main id="appMain" style="display:none">
+
+  <!-- 🏠 الصفحة الرئيسية -->
+  <section id="pg-home" class="page active">
+    <div class="stats-scroll" id="homeStats"></div>
+    <div class="card">
+      <div class="card-head"><h2>⚡ إجراءات سريعة</h2></div>
+      <div class="quick-actions">
+        <div class="quick-btn assoc" onclick="openAssocPaymentSheet()">
+          <div class="ico">💰</div>
+          <div class="lbl">دفعة جمعية</div>
+        </div>
+        <div class="quick-btn death" onclick="openDeathPaymentSheet()">
+          <div class="ico">⚰️</div>
+          <div class="lbl">دفعة وفاة</div>
+        </div>
+        <div class="quick-btn donation" onclick="openDonationSheet()">
+          <div class="ico">💚</div>
+          <div class="lbl">تسجيل تبرع</div>
+        </div>
+        <div class="quick-btn" onclick="openPersonSheet()">
+          <div class="ico">👤</div>
+          <div class="lbl">إضافة فرد</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h2>📊 أرصدة الصناديق</h2>
+        <button class="btn ghost sm" onclick="openDashboardSheet()">تفاصيل</button>
+      </div>
+      <div id="fundBalances"></div>
+    </div>
+    <div class="card" id="alertsCard" style="display:none">
+      <div class="card-head"><h2>🔔 تنبيهات مهمة</h2></div>
+      <div id="alertsList"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h2>🕐 آخر العمليات</h2>
+        <button class="btn ghost sm" onclick="go('pg-payments')">الكل</button>
+      </div>
+      <div id="recentOps"></div>
+    </div>
+  </section>
+
+  <!-- 👥 الأفراد -->
+  <section id="pg-people" class="page">
+    <div class="stats-scroll" id="peopleStats"></div>
+    <div class="card" style="padding:12px">
+      <div class="chips" id="peopleChips"></div>
+    </div>
+    <div id="peopleContent"></div>
+  </section>
+
+  <!-- 💰 الدفعات -->
+  <section id="pg-payments" class="page">
+    <div class="stats-scroll" id="paymentsStats"></div>
+    <div class="card" style="padding:12px">
+      <div class="chips" id="paymentsChips"></div>
+    </div>
+    <div id="paymentsContent"></div>
+  </section>
+
+  <!-- 📊 التقارير -->
+  <section id="pg-reports" class="page">
+    <div class="card">
+      <div class="card-head"><h2>📊 التقارير</h2></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn assoc" onclick="openReport('assoc')">💰 تقرير الجمعية</button>
+        <button class="btn death" onclick="openReport('death')">⚰️ تقرير الوفاة</button>
+        <button class="btn donation" onclick="openReport('donation')">💚 تقرير التبرعات</button>
+        <button class="btn info" onclick="openReport('sector')">🗺️ حسب القطاع</button>
+        <button class="btn warning" onclick="openReport('late')">⏰ المتأخرون</button>
+        <button class="btn primary" onclick="openReport('yearly')">📅 تقرير سنوي</button>
+      </div>
+    </div>
+    <div id="reportOutput"></div>
+  </section>
+
+  <!-- ⚙️ الإدارة -->
+  <section id="pg-admin" class="page">
+    <div class="card">
+      <div class="card-head"><h2>⚙️ الإدارة</h2></div>
+      <div id="adminMenu"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ═══════════════════════════════════════════
+     FAB — زر الإضافة العائم
+     ═══════════════════════════════════════════ -->
+<button class="fab" id="fab" onclick="handleFab()" style="display:none">+</button>
+
+<!-- ═══════════════════════════════════════════
+     BOTTOM NAV — شريط التنقل
+     ═══════════════════════════════════════════ -->
+<nav class="bnav" id="appNav" style="display:none">
+  <button data-pg="pg-home" class="on" onclick="go('pg-home')">
+    <span class="i">🏠</span>الرئيسية
+  </button>
+  <button data-pg="pg-people" onclick="go('pg-people')">
+    <span class="i">👥</span>الأفراد
+    <span class="nb" id="nbPeople" style="display:none">0</span>
+  </button>
+  <button data-pg="pg-payments" onclick="go('pg-payments')">
+    <span class="i">💰</span>الدفعات
+  </button>
+  <button data-pg="pg-reports" onclick="go('pg-reports')">
+    <span class="i">📊</span>التقارير
+  </button>
+  <button data-pg="pg-admin" onclick="go('pg-admin')">
+    <span class="i">⚙️</span>الإدارة
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     BOTTOM SHEET — النافذة المنبثقة
+     ═══════════════════════════════════════════ -->
+<div class="sheet-back" id="sheetBack" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-grip"></div>
+  <div class="sheet-hd">
+    <h2 id="sheetTitle">…</h2>
+    <button class="icon-btn" onclick="closeSheet()">✕</button>
+  </div>
+  <div class="sheet-bd" id="sheetBody"></div>
+  <div class="sheet-ft" id="sheetFoot"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TOASTS + LOADER
+     ═══════════════════════════════════════════ -->
+<div class="toasts" id="toasts"></div>
+<div class="loader" id="loader"><div class="spin"></div></div>
