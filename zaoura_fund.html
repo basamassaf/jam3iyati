@@ -4,79 +4,42 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#7c3aed">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <title>صندوق زعورة — نظام الاشتراكات</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <style>
-/* ═══════════════════════════════════════════════════════
-   نظام الألوان — البنفسجي (لتمييزه عن تطبيق المقبرة)
-   ═══════════════════════════════════════════════════════ */
 :root{
-  /* الألوان الأساسية */
-  --primary:#7c3aed;        /* بنفسجي رئيسي */
-  --primary-2:#6d28d9;
-  --primary-soft:#f5f3ff;
-  --primary-dark:#4c1d95;
-  
-  /* ألوان الصناديق */
-  --assoc:#2563eb;          /* أزرق - جمعية */
-  --assoc-soft:#dbeafe;
-  --death:#dc2626;          /* أحمر - وفاة */
-  --death-soft:#fee2e2;
-  --donation:#16a34a;       /* أخضر - تبرع */
-  --donation-soft:#dcfce7;
-  
-  /* ألوان الحالات */
-  --success:#16a34a;
-  --danger:#dc2626;
-  --warning:#f59e0b;
-  --info:#2563eb;
-  --muted:#64748b;
-  
-  /* الأساسيات */
-  --bg:#f8fafc;
-  --card:#ffffff;
-  --text:#0f172a;
-  --border:#e2e8f0;
-  --radius:16px;
-  --radius-sm:12px;
+  --primary:#7c3aed;--primary-2:#6d28d9;--primary-soft:#f5f3ff;--primary-dark:#4c1d95;
+  --assoc:#2563eb;--assoc-soft:#dbeafe;
+  --death:#dc2626;--death-soft:#fee2e2;
+  --donation:#16a34a;--donation-soft:#dcfce7;
+  --success:#16a34a;--danger:#dc2626;--warning:#f59e0b;--info:#2563eb;--muted:#64748b;
+  --bg:#f8fafc;--card:#ffffff;--text:#0f172a;--border:#e2e8f0;
+  --radius:16px;--radius-sm:12px;
   --shadow-sm:0 1px 3px rgba(15,23,42,.06);
   --shadow:0 8px 24px rgba(15,23,42,.08);
   --shadow-lg:0 20px 60px rgba(15,23,42,.2);
   --safe:env(safe-area-inset-bottom,0);
 }
 [data-theme="dark"]{
-  --bg:#0b1220;
-  --card:#1e293b;
-  --text:#e2e8f0;
-  --border:#334155;
-  --primary-soft:#2e1065;
-  --assoc-soft:#1e3a8a;
-  --death-soft:#7f1d1d;
-  --donation-soft:#14532d;
+  --bg:#0b1220;--card:#1e293b;--text:#e2e8f0;--border:#334155;
+  --primary-soft:#2e1065;--assoc-soft:#1e3a8a;--death-soft:#7f1d1d;--donation-soft:#14532d;
 }
-
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{overscroll-behavior-y:contain}
 body{
   font-family:system-ui,-apple-system,'Segoe UI',Tahoma,'Noto Sans Arabic',sans-serif;
   background:var(--bg);color:var(--text);direction:rtl;
   font-size:15px;line-height:1.5;min-height:100vh;
   padding-bottom:calc(78px + var(--safe));
-  transition:background .2s,color .2s;
   -webkit-font-smoothing:antialiased;
 }
 button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none}
 input,select,textarea{outline:0}
 
-/* ═══════════ HEADER ═══════════ */
 .app-header{
   position:sticky;top:0;z-index:30;
   background:linear-gradient(135deg,var(--primary),var(--primary-2));
-  color:#fff;
-  padding:10px 14px;
+  color:#fff;padding:10px 14px;
   padding-top:calc(10px + env(safe-area-inset-top,0));
   display:flex;align-items:center;gap:10px;
   box-shadow:0 4px 20px rgba(124,58,237,.3);
@@ -84,8 +47,7 @@ input,select,textarea{outline:0}
 .app-header .brand{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
 .app-header .logo{
   width:40px;height:40px;border-radius:12px;
-  background:rgba(255,255,255,.2);
-  backdrop-filter:blur(10px);
+  background:rgba(255,255,255,.2);backdrop-filter:blur(10px);
   display:flex;align-items:center;justify-content:center;
   font-size:20px;flex-shrink:0;
 }
@@ -94,18 +56,15 @@ input,select,textarea{outline:0}
 .app-header .sub{font-size:10px;opacity:.85;font-weight:600;margin-top:2px}
 .app-header .icon-btn{
   width:38px;height:38px;border-radius:12px;
-  background:rgba(255,255,255,.15);
-  color:#fff;
+  background:rgba(255,255,255,.15);color:#fff;
   display:flex;align-items:center;justify-content:center;
   font-size:18px;transition:.15s;flex-shrink:0;
 }
 .app-header .icon-btn:active{transform:scale(.92);background:rgba(255,255,255,.25)}
 
-/* شريط المستخدم الحالي */
 .user-banner{
   background:var(--card);border-bottom:1px solid var(--border);
-  padding:8px 14px;
-  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;display:flex;align-items:center;justify-content:space-between;
   gap:10px;font-size:12px;
   position:sticky;top:60px;z-index:29;
 }
@@ -116,13 +75,7 @@ input,select,textarea{outline:0}
   font-size:10px;font-weight:800;
   background:var(--primary-soft);color:var(--primary);
 }
-.role-badge.president{background:#fef3c7;color:#92400e}
-.role-badge.manager{background:#dbeafe;color:#1e40af}
-.role-badge.treasurer{background:#dcfce7;color:#166534}
-.role-badge.collector{background:#f1f5f9;color:#475569}
-.role-badge.auditor{background:#e9d5ff;color:#6b21a8}
 
-/* ═══════════ SEARCH ═══════════ */
 .search-wrap{padding:10px 12px 0;max-width:900px;margin:0 auto}
 .search-box{
   display:flex;align-items:center;gap:8px;
@@ -134,13 +87,11 @@ input,select,textarea{outline:0}
 .search-box input{flex:1;background:none;border:0;font-size:15px;min-width:0}
 .search-box .clear{color:var(--muted);font-size:18px;padding:4px}
 
-/* ═══════════ MAIN ═══════════ */
 main{max-width:900px;margin:0 auto;padding:12px}
 .page{display:none;animation:fade .2s ease}
 .page.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-/* ═══════════ CARDS ═══════════ */
 .card{
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--radius);padding:16px;margin-bottom:12px;
@@ -151,17 +102,15 @@ main{max-width:900px;margin:0 auto;padding:12px}
   gap:8px;margin-bottom:12px;
 }
 .card-head h2{font-size:14px;font-weight:800;display:flex;align-items:center;gap:6px}
-.card-head .actions{display:flex;gap:6px;flex-wrap:wrap}
 
-/* ═══════════ STATS (البطاقات الرقمية) ═══════════ */
 .stats-scroll{
   display:flex;gap:10px;overflow-x:auto;
   margin:0 -12px 14px;padding:0 12px 6px;
-  scroll-snap-type:x mandatory;scrollbar-width:none;
+  scrollbar-width:none;
 }
 .stats-scroll::-webkit-scrollbar{display:none}
 .stat{
-  flex:0 0 auto;min-width:130px;scroll-snap-align:start;
+  flex:0 0 auto;min-width:130px;
   background:var(--card);border:1px solid var(--border);
   border-radius:var(--radius);padding:14px;
   box-shadow:var(--shadow-sm);position:relative;overflow:hidden;
@@ -183,9 +132,7 @@ main{max-width:900px;margin:0 auto;padding:12px}
 .stat.orange .val{color:var(--warning)}
 .stat.blue .val{color:var(--info)}
 .stat .lbl{font-size:11px;color:var(--muted);margin-top:6px;font-weight:600}
-.stat .sub{font-size:9px;color:var(--muted);margin-top:2px;opacity:.7}
 
-/* ═══════════ LISTS ═══════════ */
 .list{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
 .item{
   display:flex;align-items:center;gap:12px;
@@ -200,25 +147,11 @@ main{max-width:900px;margin:0 auto;padding:12px}
   font-size:20px;background:var(--primary-soft);color:var(--primary);font-weight:800;
   overflow:hidden;
 }
-.item .av img{width:100%;height:100%;object-fit:cover}
-.item .av.blue{background:var(--assoc-soft);color:var(--assoc)}
-.item .av.red{background:var(--death-soft);color:var(--death)}
-.item .av.green{background:var(--donation-soft);color:var(--donation)}
-.item .av.orange{background:#fef3c7;color:#92400e}
-.item .av.gray{background:#f1f5f9;color:#475569}
 .item .body{flex:1;min-width:0}
 .item .ttl{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .item .sub{font-size:12px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item .trail{color:var(--muted);font-size:20px;font-weight:300;flex-shrink:0}
-.item .amount{
-  font-weight:800;font-size:14px;color:var(--success);
-  flex-shrink:0;text-align:left;
-}
-.item .amount.danger{color:var(--danger)}
-.item .amount.assoc{color:var(--assoc)}
-.item .amount.death{color:var(--death)}
 
-/* ═══════════ BADGES ═══════════ */
 .badge{
   display:inline-flex;align-items:center;gap:3px;
   padding:2px 9px;border-radius:8px;
@@ -230,32 +163,16 @@ main{max-width:900px;margin:0 auto;padding:12px}
 .badge.info{background:#dbeafe;color:#1e40af}
 .badge.muted{background:#f1f5f9;color:#475569}
 .badge.primary{background:var(--primary-soft);color:var(--primary)}
-.badge.assoc{background:var(--assoc-soft);color:var(--assoc)}
-.badge.death{background:var(--death-soft);color:var(--death)}
-.badge.donation{background:var(--donation-soft);color:var(--donation)}
 
-/* ═══════════ CHIPS (الفلاتر) ═══════════ */
 .chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .chip{
   flex-shrink:0;padding:7px 14px;border-radius:20px;
   background:var(--card);border:1px solid var(--border);
   font-size:12px;font-weight:700;color:var(--muted);transition:.15s;
-  display:inline-flex;align-items:center;gap:5px;
 }
-.chip:active{transform:scale(.95)}
 .chip.on{background:var(--primary);color:#fff;border-color:var(--primary)}
-.chip.on.assoc{background:var(--assoc);border-color:var(--assoc)}
-.chip.on.death{background:var(--death);border-color:var(--death)}
-.chip.on.donation{background:var(--donation);border-color:var(--donation)}
-.chip .count{
-  background:rgba(255,255,255,.25);
-  padding:0 6px;border-radius:10px;
-  font-size:10px;font-weight:800;
-}
-.chip:not(.on) .count{background:var(--bg);color:var(--muted)}
 
-/* ═══════════ BUTTONS ═══════════ */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;
   gap:6px;padding:11px 18px;border-radius:13px;
@@ -273,15 +190,9 @@ main{max-width:900px;margin:0 auto;padding:12px}
 .btn.info{background:var(--info);color:#fff}
 .btn.ghost{background:var(--bg);color:var(--text);border:1px solid var(--border)}
 .btn.sm{padding:7px 12px;min-height:36px;font-size:12px;border-radius:10px}
-.btn.lg{padding:14px 22px;min-height:52px;font-size:15px}
 .btn.block{display:flex;width:100%}
-.btn[disabled]{opacity:.5;pointer-events:none}
 
-/* شريط الإجراءات السريعة */
-.quick-actions{
-  display:grid;grid-template-columns:1fr 1fr;gap:8px;
-  margin-bottom:12px;
-}
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .quick-btn{
   display:flex;flex-direction:column;align-items:center;gap:6px;
   padding:16px 10px;border-radius:14px;
@@ -298,7 +209,6 @@ main{max-width:900px;margin:0 auto;padding:12px}
 .quick-btn.donation{border-color:var(--donation)}
 .quick-btn.donation .lbl{color:var(--donation)}
 
-/* ═══════════ FAB ═══════════ */
 .fab{
   position:fixed;bottom:calc(88px + var(--safe));left:18px;
   width:60px;height:60px;border-radius:20px;
@@ -306,11 +216,9 @@ main{max-width:900px;margin:0 auto;padding:12px}
   font-size:28px;font-weight:300;
   box-shadow:0 12px 32px rgba(124,58,237,.5);
   z-index:25;display:flex;align-items:center;justify-content:center;
-  transition:.15s;
 }
 .fab:active{transform:scale(.92)}
 
-/* ═══════════ BOTTOM NAV ═══════════ */
 .bnav{
   position:fixed;bottom:0;left:0;right:0;z-index:30;
   background:var(--card);border-top:1px solid var(--border);
@@ -335,15 +243,15 @@ main{max-width:900px;margin:0 auto;padding:12px}
   line-height:16px;height:16px;
 }
 
-/* ═══════════ SHEET (Bottom Sheet) ═══════════ */
+/* ✅ إصلاح z-index للنوافذ المنبثقة */
 .sheet-back{
   position:fixed;inset:0;background:rgba(15,23,42,.55);
-  z-index:90;opacity:0;pointer-events:none;transition:.2s;
+  z-index:10100;opacity:0;pointer-events:none;transition:.2s;
   backdrop-filter:blur(3px);
 }
 .sheet-back.on{opacity:1;pointer-events:auto}
 .sheet{
-  position:fixed;bottom:0;left:0;right:0;z-index:91;
+  position:fixed;bottom:0;left:0;right:0;z-index:10101;
   background:var(--card);
   border-radius:24px 24px 0 0;
   max-height:94vh;overflow-y:auto;
@@ -374,7 +282,6 @@ main{max-width:900px;margin:0 auto;padding:12px}
 }
 .sheet-ft .btn{flex:1;min-width:90px}
 
-/* ═══════════ FORMS ═══════════ */
 .fld{margin-bottom:14px;position:relative}
 .fld label{
   display:block;font-size:12px;font-weight:700;
@@ -393,89 +300,17 @@ main{max-width:900px;margin:0 auto;padding:12px}
 }
 .fld textarea{resize:vertical;min-height:70px}
 .fld-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.fld-row.three{grid-template-columns:1fr 1fr 1fr}
 .fld-hint{font-size:11px;color:var(--muted);margin-top:4px}
 .fld-readonly{background:var(--primary-soft)!important;color:var(--primary);font-weight:700}
 
-/* البحث مع القائمة المنسدلة */
-.options-list{
-  position:absolute;top:100%;left:0;right:0;
-  background:var(--card);border:1.5px solid var(--primary);
-  border-radius:12px;max-height:250px;overflow-y:auto;
-  z-index:100;box-shadow:var(--shadow);margin-top:4px;display:none;
-}
-.options-list.on{display:block}
-.option-item{
-  padding:11px 14px;cursor:pointer;
-  display:flex;justify-content:space-between;align-items:center;
-  gap:8px;border-bottom:1px solid var(--border);font-size:14px;
-}
-.option-item:hover,.option-item:active{background:var(--primary-soft)}
-.option-item:last-child{border-bottom:0}
-.option-item small{color:var(--muted);font-size:11px;flex-shrink:0}
-
-/* مبلغ كبير (شاشة الدفع) */
-.amount-input{
-  display:flex;align-items:center;gap:10px;
-  background:var(--card);border:2px solid var(--primary);
-  border-radius:14px;padding:8px 16px;
-}
-.amount-input input{
-  flex:1;border:0;background:none;
-  font-size:28px;font-weight:800;color:var(--primary);
-  text-align:center;padding:8px 0;
-}
-.amount-input .currency{font-size:14px;font-weight:800;color:var(--muted)}
-.amount-quick{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.amount-quick button{
-  padding:6px 12px;border-radius:10px;
-  background:var(--primary-soft);color:var(--primary);
-  font-size:12px;font-weight:700;
-}
-.amount-quick button:active{transform:scale(.95)}
-
-/* ═══════════ BALANCE / PROGRESS ═══════════ */
-.balance-block{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:12px;padding:12px;margin-bottom:10px;
-}
-.balance-row{
-  display:flex;justify-content:space-between;
-  padding:6px 0;font-size:13px;border-bottom:1px solid var(--border);
-}
-.balance-row:last-child{border-bottom:0}
-.balance-row .lbl{color:var(--muted)}
-.balance-row .val{font-weight:800}
-.balance-row .val.green{color:var(--success)}
-.balance-row .val.red{color:var(--danger)}
-.balance-row .val.orange{color:var(--warning)}
-
-.progress{
-  height:10px;background:var(--bg);
-  border-radius:5px;overflow:hidden;margin-top:8px;
-}
-.progress > div{
-  height:100%;border-radius:5px;
-  transition:width .4s ease;
-}
-.progress.assoc > div{background:var(--assoc)}
-.progress.death > div{background:var(--death)}
-.progress.green > div{background:var(--success)}
-.progress.warning > div{background:var(--warning)}
-
-/* ═══════════ EMPTY STATE ═══════════ */
-.empty{
-  text-align:center;padding:50px 20px;
-  color:var(--muted);
-}
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}
 .empty .ico{font-size:52px;opacity:.4;display:block;margin-bottom:10px}
 .empty h3{font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)}
 .empty p{font-size:12px}
 
-/* ═══════════ TOASTS ═══════════ */
 .toasts{
   position:fixed;top:14px;left:50%;transform:translateX(-50%);
-  z-index:9999;display:flex;flex-direction:column;gap:8px;
+  z-index:10200;display:flex;flex-direction:column;gap:8px;
   pointer-events:none;width:calc(100% - 28px);max-width:400px;
 }
 .toast{
@@ -492,10 +327,9 @@ main{max-width:900px;margin:0 auto;padding:12px}
 .toast.info{background:var(--info);color:#fff}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 
-/* ═══════════ LOADER ═══════════ */
 .loader{
   position:fixed;inset:0;background:rgba(15,23,42,.4);
-  backdrop-filter:blur(3px);z-index:9998;
+  backdrop-filter:blur(3px);z-index:10300;
   display:none;align-items:center;justify-content:center;
 }
 .loader.on{display:flex}
@@ -507,12 +341,12 @@ main{max-width:900px;margin:0 auto;padding:12px}
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ═══════════ LOGIN SCREEN ═══════════ */
 .login-screen{
   position:fixed;inset:0;z-index:10000;
   background:linear-gradient(135deg,var(--primary),var(--primary-dark));
   display:none;align-items:center;justify-content:center;
   padding:20px;
+  overflow-y:auto;
 }
 .login-screen.on{display:flex}
 .login-card{
@@ -520,6 +354,7 @@ main{max-width:900px;margin:0 auto;padding:12px}
   border-radius:24px;padding:28px 24px;
   max-width:400px;width:100%;
   box-shadow:var(--shadow-lg);
+  margin:auto;
 }
 .login-card .logo-lg{
   width:64px;height:64px;border-radius:20px;
@@ -529,7 +364,7 @@ main{max-width:900px;margin:0 auto;padding:12px}
 }
 .login-card h1{font-size:20px;font-weight:800;text-align:center;margin-bottom:4px}
 .login-card .sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:24px}
-.login-card .users-list{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto}
+.users-list{display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto}
 .login-user{
   display:flex;align-items:center;gap:12px;
   padding:12px 16px;border-radius:14px;
@@ -546,49 +381,17 @@ main{max-width:900px;margin:0 auto;padding:12px}
 .login-user .info{flex:1;min-width:0}
 .login-user .nm{font-weight:700;font-size:14px}
 .login-user .role{font-size:11px;color:var(--muted);margin-top:2px}
-.pin-pad{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:10px;margin-top:20px;
-}
+
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
 .pin-btn{
   padding:16px;border-radius:14px;
   background:var(--bg);font-size:20px;font-weight:800;
   transition:.15s;
 }
 .pin-btn:active{transform:scale(.95);background:var(--primary-soft)}
-.pin-display{
-  display:flex;justify-content:center;gap:10px;
-  margin:20px 0;
-}
-.pin-dot{
-  width:16px;height:16px;border-radius:50%;
-  background:var(--border);transition:.2s;
-}
+.pin-display{display:flex;justify-content:center;gap:10px;margin:20px 0}
+.pin-dot{width:16px;height:16px;border-radius:50%;background:var(--border);transition:.2s}
 .pin-dot.on{background:var(--primary);transform:scale(1.2)}
-
-/* ═══════════ UTILITIES ═══════════ */
-.muted{color:var(--muted)}
-.bold{font-weight:800}
-.center{text-align:center}
-.mb-1{margin-bottom:8px}
-.mb-2{margin-bottom:16px}
-.mt-1{margin-top:8px}
-.mt-2{margin-top:16px}
-.row{display:flex;align-items:center;gap:8px}
-.row.between{justify-content:space-between}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.divider{height:1px;background:var(--border);margin:16px 0}
-.divider-dashed{height:1px;border-top:2px dashed var(--border);margin:16px 0}
-
-/* ═══════════ RESPONSIVE ═══════════ */
-@media (max-width:380px){
-  .stat{min-width:110px;padding:10px}
-  .stat .val{font-size:18px}
-  .quick-btn{padding:12px 8px}
-  .quick-btn .ico{font-size:24px}
-  .quick-btn .lbl{font-size:11px}
-}
 
 @media print{
   .app-header,.bnav,.fab,.search-wrap,.user-banner{display:none!important}
@@ -599,26 +402,20 @@ main{max-width:900px;margin:0 auto;padding:12px}
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════
-     LOGIN SCREEN — شاشة تسجيل الدخول
-     ═══════════════════════════════════════════ -->
+<!-- ═════ LOGIN SCREEN ═════ -->
 <div class="login-screen" id="loginScreen">
   <div class="login-card">
     <div class="logo-lg">🏘️</div>
     <h1>صندوق زعورة</h1>
     <div class="sub">نظام إدارة الاشتراكات والتكافل</div>
     
-    <!-- قائمة المستخدمين -->
     <div id="loginUsers">
-      <div class="users-list" id="loginUsersList">
-        <!-- تُملأ بالكود -->
-      </div>
+      <div class="users-list" id="loginUsersList"></div>
       <button class="btn ghost block" style="margin-top:14px" onclick="showAddFirstAdmin()">
         ⚙️ إعداد أول مرة (إضافة مدير)
       </button>
     </div>
 
-    <!-- شاشة إدخال PIN -->
     <div id="loginPin" style="display:none">
       <div style="text-align:center;margin-bottom:12px">
         <div style="font-size:44px" id="pinAvatar">👤</div>
@@ -631,8 +428,8 @@ main{max-width:900px;margin:0 auto;padding:12px}
         <div class="pin-dot"></div>
         <div class="pin-dot"></div>
       </div>
-      <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:12px" id="pinError"></div>
-      <div class="pin-pad" id="pinPad">
+      <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:12px;min-height:18px" id="pinError"></div>
+      <div class="pin-pad">
         <button class="pin-btn" onclick="pinPress('1')">1</button>
         <button class="pin-btn" onclick="pinPress('2')">2</button>
         <button class="pin-btn" onclick="pinPress('3')">3</button>
@@ -650,9 +447,7 @@ main{max-width:900px;margin:0 auto;padding:12px}
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     HEADER — الشريط العلوي
-     ═══════════════════════════════════════════ -->
+<!-- ═════ HEADER ═════ -->
 <header class="app-header" id="appHeader" style="display:none">
   <div class="brand">
     <div class="logo">🏘️</div>
@@ -661,12 +456,11 @@ main{max-width:900px;margin:0 auto;padding:12px}
       <div class="sub" id="hdrYear">— السنة</div>
     </div>
   </div>
-  <button class="icon-btn" onclick="openDashboardSheet()" title="لوحة كاملة">📊</button>
-  <button class="icon-btn" onclick="toggleTheme()" title="الوضع">🌓</button>
-  <button class="icon-btn" onclick="openSettingsSheet()" title="إعدادات">⚙️</button>
+  <button class="icon-btn" onclick="toast('قيد التطوير','info')">📊</button>
+  <button class="icon-btn" onclick="toggleTheme()">🌓</button>
+  <button class="icon-btn" onclick="openSettingsSheet()">⚙️</button>
 </header>
 
-<!-- شريط المستخدم الحالي -->
 <div class="user-banner" id="userBanner" style="display:none">
   <div class="who">
     <span>👤 أنت:</span>
@@ -676,9 +470,6 @@ main{max-width:900px;margin:0 auto;padding:12px}
   <button class="btn ghost sm" onclick="logout()">🚪 خروج</button>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     SEARCH — شريط البحث
-     ═══════════════════════════════════════════ -->
 <div class="search-wrap" id="searchWrap" style="display:none">
   <div class="search-box">
     <span class="ico">🔍</span>
@@ -687,128 +478,66 @@ main{max-width:900px;margin:0 auto;padding:12px}
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     MAIN — المحتوى الرئيسي
-     ═══════════════════════════════════════════ -->
 <main id="appMain" style="display:none">
-
-  <!-- 🏠 الصفحة الرئيسية -->
   <section id="pg-home" class="page active">
     <div class="stats-scroll" id="homeStats"></div>
     <div class="card">
       <div class="card-head"><h2>⚡ إجراءات سريعة</h2></div>
       <div class="quick-actions">
-        <div class="quick-btn assoc" onclick="openAssocPaymentSheet()">
-          <div class="ico">💰</div>
-          <div class="lbl">دفعة جمعية</div>
+        <div class="quick-btn assoc" onclick="toast('قيد التطوير','info')">
+          <div class="ico">💰</div><div class="lbl">دفعة جمعية</div>
         </div>
-        <div class="quick-btn death" onclick="openDeathPaymentSheet()">
-          <div class="ico">⚰️</div>
-          <div class="lbl">دفعة وفاة</div>
+        <div class="quick-btn death" onclick="toast('قيد التطوير','info')">
+          <div class="ico">⚰️</div><div class="lbl">دفعة وفاة</div>
         </div>
-        <div class="quick-btn donation" onclick="openDonationSheet()">
-          <div class="ico">💚</div>
-          <div class="lbl">تسجيل تبرع</div>
+        <div class="quick-btn donation" onclick="toast('قيد التطوير','info')">
+          <div class="ico">💚</div><div class="lbl">تسجيل تبرع</div>
         </div>
-        <div class="quick-btn" onclick="openPersonSheet()">
-          <div class="ico">👤</div>
-          <div class="lbl">إضافة فرد</div>
+        <div class="quick-btn" onclick="toast('قيد التطوير','info')">
+          <div class="ico">👤</div><div class="lbl">إضافة فرد</div>
         </div>
       </div>
     </div>
     <div class="card">
-      <div class="card-head">
-        <h2>📊 أرصدة الصناديق</h2>
-        <button class="btn ghost sm" onclick="openDashboardSheet()">تفاصيل</button>
-      </div>
+      <div class="card-head"><h2>📊 أرصدة الصناديق</h2></div>
       <div id="fundBalances"></div>
     </div>
-    <div class="card" id="alertsCard" style="display:none">
-      <div class="card-head"><h2>🔔 تنبيهات مهمة</h2></div>
-      <div id="alertsList"></div>
-    </div>
     <div class="card">
-      <div class="card-head">
-        <h2>🕐 آخر العمليات</h2>
-        <button class="btn ghost sm" onclick="go('pg-payments')">الكل</button>
-      </div>
+      <div class="card-head"><h2>🕐 آخر العمليات</h2></div>
       <div id="recentOps"></div>
     </div>
   </section>
 
-  <!-- 👥 الأفراد -->
   <section id="pg-people" class="page">
-    <div class="stats-scroll" id="peopleStats"></div>
-    <div class="card" style="padding:12px">
-      <div class="chips" id="peopleChips"></div>
-    </div>
-    <div id="peopleContent"></div>
+    <div class="card"><div class="empty"><span class="ico">👥</span><h3>الأفراد</h3><p>Part 5</p></div></div>
   </section>
 
-  <!-- 💰 الدفعات -->
   <section id="pg-payments" class="page">
-    <div class="stats-scroll" id="paymentsStats"></div>
-    <div class="card" style="padding:12px">
-      <div class="chips" id="paymentsChips"></div>
-    </div>
-    <div id="paymentsContent"></div>
+    <div class="card"><div class="empty"><span class="ico">💰</span><h3>الدفعات</h3><p>Part 6</p></div></div>
   </section>
 
-  <!-- 📊 التقارير -->
   <section id="pg-reports" class="page">
-    <div class="card">
-      <div class="card-head"><h2>📊 التقارير</h2></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <button class="btn assoc" onclick="openReport('assoc')">💰 تقرير الجمعية</button>
-        <button class="btn death" onclick="openReport('death')">⚰️ تقرير الوفاة</button>
-        <button class="btn donation" onclick="openReport('donation')">💚 تقرير التبرعات</button>
-        <button class="btn info" onclick="openReport('sector')">🗺️ حسب القطاع</button>
-        <button class="btn warning" onclick="openReport('late')">⏰ المتأخرون</button>
-        <button class="btn primary" onclick="openReport('yearly')">📅 تقرير سنوي</button>
-      </div>
-    </div>
-    <div id="reportOutput"></div>
+    <div class="card"><div class="empty"><span class="ico">📊</span><h3>التقارير</h3><p>Part 7</p></div></div>
   </section>
 
-  <!-- ⚙️ الإدارة -->
   <section id="pg-admin" class="page">
     <div class="card">
       <div class="card-head"><h2>⚙️ الإدارة</h2></div>
-      <div id="adminMenu"></div>
+      <button class="btn primary block" onclick="openAdminsSheet()">👥 إدارة الإداريين</button>
     </div>
   </section>
 </main>
 
-<!-- ═══════════════════════════════════════════
-     FAB — زر الإضافة العائم
-     ═══════════════════════════════════════════ -->
 <button class="fab" id="fab" onclick="handleFab()" style="display:none">+</button>
 
-<!-- ═══════════════════════════════════════════
-     BOTTOM NAV — شريط التنقل
-     ═══════════════════════════════════════════ -->
 <nav class="bnav" id="appNav" style="display:none">
-  <button data-pg="pg-home" class="on" onclick="go('pg-home')">
-    <span class="i">🏠</span>الرئيسية
-  </button>
-  <button data-pg="pg-people" onclick="go('pg-people')">
-    <span class="i">👥</span>الأفراد
-    <span class="nb" id="nbPeople" style="display:none">0</span>
-  </button>
-  <button data-pg="pg-payments" onclick="go('pg-payments')">
-    <span class="i">💰</span>الدفعات
-  </button>
-  <button data-pg="pg-reports" onclick="go('pg-reports')">
-    <span class="i">📊</span>التقارير
-  </button>
-  <button data-pg="pg-admin" onclick="go('pg-admin')">
-    <span class="i">⚙️</span>الإدارة
-  </button>
+  <button data-pg="pg-home" class="on" onclick="go('pg-home')"><span class="i">🏠</span>الرئيسية</button>
+  <button data-pg="pg-people" onclick="go('pg-people')"><span class="i">👥</span>الأفراد</button>
+  <button data-pg="pg-payments" onclick="go('pg-payments')"><span class="i">💰</span>الدفعات</button>
+  <button data-pg="pg-reports" onclick="go('pg-reports')"><span class="i">📊</span>التقارير</button>
+  <button data-pg="pg-admin" onclick="go('pg-admin')"><span class="i">⚙️</span>الإدارة</button>
 </nav>
 
-<!-- ═══════════════════════════════════════════
-     BOTTOM SHEET — النافذة المنبثقة
-     ═══════════════════════════════════════════ -->
 <div class="sheet-back" id="sheetBack" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
   <div class="sheet-grip"></div>
@@ -820,1126 +549,567 @@ main{max-width:900px;margin:0 auto;padding:12px}
   <div class="sheet-ft" id="sheetFoot"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     TOASTS + LOADER
-     ═══════════════════════════════════════════ -->
 <div class="toasts" id="toasts"></div>
 <div class="loader" id="loader"><div class="spin"></div></div>
 
 <script>
 'use strict';
 
-/* ═══════════════════════════════════════════════════════
-   🏘️ صندوق زعورة — نظام الاشتراكات
-   Part 3: الأساس التقني
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════ الإعدادات ═══════════ */
+const DB_NAME='zaoura_fund_v1', DB_VERSION=1;
+const STORE_NAMES=['people','sectors','admins','constants','subscriptions','assocPayments','deathEvents','deathInstallments','donations','expenses','handovers','auditLog'];
 
-/* ──────────────── الإعدادات العامة ──────────────── */
-const APP_NAME = 'صندوق زعورة';
-const DB_NAME = 'zaoura_fund_v1';
-const DB_VERSION = 1;
-const STORE_NAMES = [
-  'people',           // الأفراد
-  'sectors',          // القطاعات
-  'admins',           // الإداريون
-  'constants',        // الثوابت السنوية
-  'subscriptions',    // حالات الاشتراك لكل فرد في كل سنة
-  'assocPayments',    // دفعات الجمعية
-  'deathEvents',      // أحداث الوفاة
-  'deathInstallments',// أقساط الوفاة
-  'donations',        // التبرعات
-  'expenses',         // المصاريف
-  'handovers',        // عمليات التسليم
-  'auditLog'          // سجل التدقيق
+const ROLES={
+  president:{name:'رئيس اللجنة',icon:'👑',color:'president'},
+  manager:{name:'مدير',icon:'🎯',color:'manager'},
+  assocTreasurer:{name:'أمين الجمعية',icon:'💰',color:'treasurer'},
+  deathTreasurer:{name:'أمين الوفاة',icon:'⚰️',color:'treasurer'},
+  collector:{name:'معتمد',icon:'👤',color:'collector'},
+  auditor:{name:'مدقق',icon:'👁️',color:'auditor'}
+};
+
+const PERMISSIONS={
+  president:['payment.add','death.add','donation.add','handover.receive','person.manage','subscription.manage','exemptions.manage','constants.manage','admins.manage','expenses.manage','reports.all','audit.view'],
+  manager:['payment.add','death.add','donation.add','handover.receive','person.manage','subscription.manage','exemptions.manage','expenses.manage','reports.all','audit.view'],
+  assocTreasurer:['payment.add','donation.add','handover.receive','reports.assoc'],
+  deathTreasurer:['payment.add','death.add','handover.receive','reports.death'],
+  collector:['payment.add','reports.own'],
+  auditor:['reports.all','audit.view']
+};
+
+const DEFAULT_SECTORS=[
+  {id:'S1',name:'الجبل',order:1},
+  {id:'S2',name:'الحارة1',order:2},
+  {id:'S3',name:'الحارة2',order:3},
+  {id:'S4',name:'الوادي',order:4},
+  {id:'S5',name:'المنصورة',order:5},
+  {id:'S6',name:'دمر',order:6}
 ];
 
-/* ──────────────── الأدوار والصلاحيات ──────────────── */
-const ROLES = {
-  president: { name: 'رئيس اللجنة',    icon: '👑', color: 'president' },
-  manager:   { name: 'مدير',           icon: '🎯', color: 'manager' },
-  assocTreasurer: { name: 'أمين الجمعية', icon: '💰', color: 'treasurer' },
-  deathTreasurer: { name: 'أمين الوفاة',  icon: '⚰️', color: 'treasurer' },
-  collector: { name: 'معتمد',           icon: '👤', color: 'collector' },
-  auditor:   { name: 'مدقق',            icon: '👁️', color: 'auditor' }
+const S={
+  people:[], sectors:[], admins:[], constants:[], subscriptions:[],
+  assocPayments:[], deathEvents:[], deathInstallments:[], donations:[],
+  expenses:[], handovers:[], auditLog:[],
+  currentUser:null, currentYear:new Date().getFullYear(),
+  page:'pg-home', search:'', editing:null
 };
 
-/* الصلاحيات التفصيلية */
-const PERMISSIONS = {
-  president:       ['payment.add','death.add','donation.add','handover.receive','person.manage','subscription.manage','exemptions.manage','constants.manage','admins.manage','expenses.manage','reports.all','audit.view'],
-  manager:         ['payment.add','death.add','donation.add','handover.receive','person.manage','subscription.manage','exemptions.manage','expenses.manage','reports.all','audit.view'],
-  assocTreasurer:  ['payment.add','donation.add','handover.receive','reports.assoc'],
-  deathTreasurer:  ['payment.add','death.add','handover.receive','reports.death'],
-  collector:       ['payment.add','reports.own'],
-  auditor:         ['reports.all','audit.view']
-};
-
-/* ──────────────── القطاعات الافتراضية ──────────────── */
-const DEFAULT_SECTORS = [
-  { id: 'S1', name: 'الجبل',    order: 1 },
-  { id: 'S2', name: 'الحارة1',  order: 2 },
-  { id: 'S3', name: 'الحارة2',  order: 3 },
-  { id: 'S4', name: 'الوادي',   order: 4 },
-  { id: 'S5', name: 'المنصورة', order: 5 },
-  { id: 'S6', name: 'دمر',      order: 6 }
-];
-
-/* ──────────────── الحالات ──────────────── */
-const STATUS = {
-  active:    { label: 'نشط',         icon: '✅', cls: 'success' },
-  exemptTemp:{ label: 'معاف مؤقت',   icon: '⏸️', cls: 'warning' },
-  exemptPerm:{ label: 'معاف نهائي',  icon: '🚫', cls: 'muted' },
-  withdrawn: { label: 'منسحب',       icon: '↩️', cls: 'muted' },
-  stopped:   { label: 'متوقف',       icon: '💤', cls: 'muted' }
-};
-
-const PAYMENT_STATUS = {
-  paid:    { label: 'مدفوع',   icon: '✅', cls: 'success' },
-  pending: { label: 'مستحق',   icon: '⏳', cls: 'warning' },
-  late:    { label: 'متأخر',   icon: '❌', cls: 'danger' },
-  exempt:  { label: 'معفى',    icon: '🎁', cls: 'muted' }
-};
-
-/* ──────────────── الحالة العامة للتطبيق ──────────────── */
-const S = {
-  // البيانات
-  people: [],
-  sectors: [],
-  admins: [],
-  constants: [],
-  subscriptions: [],
-  assocPayments: [],
-  deathEvents: [],
-  deathInstallments: [],
-  donations: [],
-  expenses: [],
-  handovers: [],
-  auditLog: [],
-
-  // المستخدم الحالي
-  currentUser: null,
-  currentYear: new Date().getFullYear(),
-
-  // الواجهة
-  page: 'pg-home',
-  filters: {
-    people: 'all',
-    payments: 'all'
-  },
-  search: '',
-
-  // مؤقت
-  editing: null,
-  pendingWorkbook: null
-};
-
-/* ═══════════════════════════════════════════════════════
-   INDEXEDDB — طبقة قاعدة البيانات
-   ═══════════════════════════════════════════════════════ */
-let db = null;
-
+/* ═══════════ IndexedDB ═══════════ */
+let db=null;
 function openDB(){
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    
-    req.onupgradeneeded = e => {
-      const database = e.target.result;
-      STORE_NAMES.forEach(name => {
-        if(!database.objectStoreNames.contains(name)){
-          database.createObjectStore(name, { keyPath: 'id', autoIncrement: true });
-        }
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open(DB_NAME,DB_VERSION);
+    r.onupgradeneeded=e=>{
+      const d=e.target.result;
+      STORE_NAMES.forEach(n=>{
+        if(!d.objectStoreNames.contains(n)) d.createObjectStore(n,{keyPath:'id',autoIncrement:true});
       });
     };
-    
-    req.onsuccess = () => { db = req.result; resolve(db); };
-    req.onerror = () => reject(req.error);
+    r.onsuccess=()=>{db=r.result;res(db)};
+    r.onerror=()=>rej(r.error);
   });
 }
+const tx=(s,m='readonly')=>db.transaction(s,m).objectStore(s);
+const dbAll=s=>new Promise((res,rej)=>{const q=tx(s).getAll();q.onsuccess=()=>res(q.result||[]);q.onerror=()=>rej(q.error)});
+const dbGet=(s,id)=>new Promise((res,rej)=>{const q=tx(s).get(id);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)});
+const dbPut=(s,o)=>new Promise((res,rej)=>{const q=tx(s,'readwrite').put(o);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)});
+const dbDel=(s,id)=>new Promise((res,rej)=>{const q=tx(s,'readwrite').delete(id);q.onsuccess=()=>res();q.onerror=()=>rej(q.error)});
 
-function tx(store, mode = 'readonly'){
-  return db.transaction(store, mode).objectStore(store);
-}
+/* ═══════════ أدوات ═══════════ */
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const cleanText=v=>String(v??'').trim().replace(/\s+/g,' ');
+const cleanPhone=v=>{if(!v)return '';let s=String(v).trim().replace(/\.0+$/,'').replace(/[\s\-\(\)\u200f\u200e]/g,'');if(s.startsWith('+963'))s='0'+s.slice(4);return s};
+const today=()=>new Date().toISOString().slice(0,10);
+const debounce=(fn,d=250)=>{let t;return (...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),d)}};
 
-function dbAll(store){
-  return new Promise((res, rej) => {
-    const q = tx(store).getAll();
-    q.onsuccess = () => res(q.result || []);
-    q.onerror = () => rej(q.error);
-  });
-}
-
-function dbGet(store, id){
-  return new Promise((res, rej) => {
-    const q = tx(store).get(id);
-    q.onsuccess = () => res(q.result);
-    q.onerror = () => rej(q.error);
-  });
-}
-
-function dbPut(store, obj){
-  return new Promise((res, rej) => {
-    const q = tx(store, 'readwrite').put(obj);
-    q.onsuccess = () => res(q.result);
-    q.onerror = () => rej(q.error);
-  });
-}
-
-function dbDel(store, id){
-  return new Promise((res, rej) => {
-    const q = tx(store, 'readwrite').delete(id);
-    q.onsuccess = () => res();
-    q.onerror = () => rej(q.error);
-  });
-}
-
-function dbClear(store){
-  return new Promise((res, rej) => {
-    const q = tx(store, 'readwrite').clear();
-    q.onsuccess = () => res();
-    q.onerror = () => rej(q.error);
-  });
-}
-
-/* ═══════════════════════════════════════════════════════
-   🛠️ الأدوات العامة
-   ═══════════════════════════════════════════════════════ */
-
-const $ = id => document.getElementById(id);
-const $$ = sel => document.querySelectorAll(sel);
-
-/* تهريب HTML */
-const esc = v => String(v ?? '')
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&#39;');
-
-/* تنظيف النص */
-const cleanText = v => String(v ?? '').trim().replace(/\s+/g, ' ');
-
-/* تطبيع النص العربي (للمقارنة) */
-const normAr = v => String(v ?? '').toLowerCase().trim()
-  .replace(/[أإآ]/g, 'ا')
-  .replace(/ة/g, 'ه')
-  .replace(/[ىي]/g, 'ي')
-  .replace(/[ًٌٍَُِّْـ]/g, '');
-
-/* تنظيف رقم الهاتف */
-function cleanPhone(v){
-  if(!v) return '';
-  let s = String(v).trim().replace(/\.0+$/, '').replace(/[\s\-\(\)\u200f\u200e]/g, '');
-  if(s.startsWith('+963')) s = '0' + s.slice(4);
-  return s;
-}
-
-/* تنسيق التاريخ */
-function fmtDate(d){
-  if(!d) return '—';
-  try{
-    return new Date(d).toLocaleDateString('ar-EG', {
-      year: 'numeric', month: 'short', day: 'numeric'
-    });
-  } catch(e){ return d; }
-}
-
-/* تاريخ اليوم YYYY-MM-DD */
-function today(){
-  return new Date().toISOString().slice(0, 10);
-}
-
-/* تحويل التاريخ من Excel */
-function toDate(v){
-  if(!v) return '';
-  if(typeof v === 'string' && v.trim().startsWith('=')) return '';
-  if(v instanceof Date && !isNaN(v)) return v.toISOString().slice(0, 10);
-  if(typeof v === 'number'){
-    const d = new Date((v - 25569) * 86400000);
-    return isNaN(d) ? '' : d.toISOString().slice(0, 10);
-  }
-  const s = String(v).trim();
-  const m1 = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s]|$)/);
-  if(m1) return `${m1[1]}-${m1[2].padStart(2,'0')}-${m1[3].padStart(2,'0')}`;
-  const m2 = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);
-  if(m2) return `${m2[3]}-${m2[2].padStart(2,'0')}-${m2[1].padStart(2,'0')}`;
-  const d = new Date(s);
-  if(!isNaN(d) && d.getFullYear() > 1900 && d.getFullYear() < 2100){
-    return d.toISOString().slice(0, 10);
-  }
-  return '';
-}
-
-/* حساب العمر */
-function calcAge(birthDate){
-  if(!birthDate) return '';
-  const b = new Date(birthDate);
-  if(isNaN(b)) return '';
-  const now = new Date();
-  let age = now.getFullYear() - b.getFullYear();
-  if(now.getMonth() < b.getMonth() ||
-     (now.getMonth() === b.getMonth() && now.getDate() < b.getDate())){
-    age--;
-  }
-  return age >= 0 ? age : '';
-}
-
-/* تنسيق الأرقام */
-function fmtNum(n){
-  if(!n && n !== 0) return '0';
-  return Number(n).toLocaleString('en-US');
-}
-
-/* تنسيق المبلغ مع العملة */
-function fmtMoney(n){
-  if(!n && n !== 0) return '0 ل.س';
-  return fmtNum(n) + ' ل.س';
-}
-
-/* اختصار الرقم (1000 → 1K، 1000000 → 1M) */
-function fmtShort(n){
-  if(!n) return '0';
-  const num = Number(n);
-  if(num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-  if(num >= 1000) return (num / 1000).toFixed(1) + 'K';
-  return String(num);
-}
-
-/* معرف فريد قصير */
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-
-/* Debounce */
-const debounce = (fn, delay = 250) => {
-  let t;
-  return (...args) => {
-    clearTimeout(t);
-    t = setTimeout(() => fn(...args), delay);
-  };
-};
-
-/* ═══════════════════════════════════════════════════════
-   🍞 TOAST — الإشعارات
-   ═══════════════════════════════════════════════════════ */
-function toast(msg, type = 'success', duration = 2800){
-  const el = document.createElement('div');
-  el.className = 'toast ' + type;
-  el.textContent = msg;
+function toast(msg,type='success',dur=2800){
+  const el=document.createElement('div');
+  el.className='toast '+type;
+  el.textContent=msg;
   $('toasts').appendChild(el);
-  setTimeout(() => {
-    el.style.opacity = '0';
-    el.style.transition = '.3s';
-    setTimeout(() => el.remove(), 300);
-  }, duration);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='.3s';setTimeout(()=>el.remove(),300)},dur);
 }
+function showLoad(v){$('loader').classList.toggle('on',v)}
 
-/* ═══════════════════════════════════════════════════════
-   ⏳ LOADER — شاشة التحميل
-   ═══════════════════════════════════════════════════════ */
-function showLoad(v){
-  $('loader').classList.toggle('on', v);
-}
-
-/* ═══════════════════════════════════════════════════════
-   📋 SHEET — النوافذ المنبثقة السفلية
-   ═══════════════════════════════════════════════════════ */
-function openSheet(title, bodyHTML, footHTML = '', opts = {}){
-  $('sheetTitle').textContent = title;
-  $('sheetBody').innerHTML = bodyHTML;
-  $('sheetFoot').innerHTML = footHTML;
-  $('sheetFoot').style.display = footHTML ? 'flex' : 'none';
+function openSheet(title,bodyHTML,footHTML='',opts={}){
+  $('sheetTitle').textContent=title;
+  $('sheetBody').innerHTML=bodyHTML;
+  $('sheetFoot').innerHTML=footHTML;
+  $('sheetFoot').style.display=footHTML?'flex':'none';
   $('sheetBack').classList.add('on');
   $('sheet').classList.add('on');
-  if(opts.wide) $('sheet').classList.add('wide');
-  else $('sheet').classList.remove('wide');
-  document.body.style.overflow = 'hidden';
-  
-  if(opts.focus){
-    setTimeout(() => {
-      const el = $(opts.focus);
-      if(el) el.focus();
-    }, 250);
-  }
+  if(opts.wide)$('sheet').classList.add('wide');else $('sheet').classList.remove('wide');
+  document.body.style.overflow='hidden';
+  if(opts.focus)setTimeout(()=>{const el=$(opts.focus);if(el)el.focus()},250);
 }
-
 function closeSheet(){
   $('sheetBack').classList.remove('on');
   $('sheet').classList.remove('on');
-  document.body.style.overflow = '';
-  S.editing = null;
-  S.pendingWorkbook = null;
+  document.body.style.overflow='';
+  S.editing=null;
 }
-
-/* ═══════════════════════════════════════════════════════
-   🌓 THEME — الوضع الليلي
-   ═══════════════════════════════════════════════════════ */
 function toggleTheme(){
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('zt_fund', next);
-  toast(next === 'dark' ? '🌙 الوضع الليلي' : '☀️ الوضع النهاري', 'info', 1500);
+  const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  localStorage.setItem('zt_fund',t);
 }
 
-function loadTheme(){
-  const saved = localStorage.getItem('zt_fund');
-  if(saved) document.documentElement.setAttribute('data-theme', saved);
-}
-
-/* ═══════════════════════════════════════════════════════
-   🧭 NAVIGATION — التنقل بين الشاشات
-   ═══════════════════════════════════════════════════════ */
 function go(page){
-  S.page = page;
-  
-  // إخفاء الكل
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  
-  // إظهار المطلوب
-  const target = $(page);
-  if(target) target.classList.add('active');
-  
-  // تحديث شريط التنقل
-  document.querySelectorAll('.bnav button').forEach(b => {
-    b.classList.toggle('on', b.dataset.pg === page);
-  });
-  
-  // اسحب لأعلى
-  window.scrollTo(0, 0);
-  
-  // إظهار/إخفاء FAB
-  $('fab').style.display = (page === 'pg-home') ? 'none' : 'flex';
-  
-  // استدعاء دوال العرض
-  if(typeof onPageChange === 'function') onPageChange(page);
+  S.page=page;
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===page));
+  document.querySelectorAll('.bnav button').forEach(b=>b.classList.toggle('on',b.dataset.pg===page));
+  window.scrollTo(0,0);
+  $('fab').style.display=(page==='pg-home')?'none':'flex';
 }
-
-/* ما يفعله FAB حسب الصفحة */
 function handleFab(){
-  switch(S.page){
-    case 'pg-people':   openPersonSheet(); break;
-    case 'pg-payments': openAssocPaymentSheet(); break;
-    default:            openQuickActionsSheet();
-  }
+  toast('قيد التطوير','info');
 }
-
-/* شاشة الإجراءات السريعة (احتياطية) */
-function openQuickActionsSheet(){
-  const body = `
-    <div class="quick-actions">
-      <div class="quick-btn assoc" onclick="closeSheet();openAssocPaymentSheet()">
-        <div class="ico">💰</div>
-        <div class="lbl">دفعة جمعية</div>
-      </div>
-      <div class="quick-btn death" onclick="closeSheet();openDeathPaymentSheet()">
-        <div class="ico">⚰️</div>
-        <div class="lbl">دفعة وفاة</div>
-      </div>
-      <div class="quick-btn donation" onclick="closeSheet();openDonationSheet()">
-        <div class="ico">💚</div>
-        <div class="lbl">تسجيل تبرع</div>
-      </div>
-      <div class="quick-btn" onclick="closeSheet();openPersonSheet()">
-        <div class="ico">👤</div>
-        <div class="lbl">إضافة فرد</div>
-      </div>
-    </div>
+function openSettingsSheet(){
+  const body=`
+    <button class="btn primary block" style="margin-bottom:8px" onclick="closeSheet();openAdminsSheet()">👥 إدارة الإداريين</button>
+    <button class="btn ghost block" style="margin-bottom:8px" onclick="toggleTheme()">🌓 تبديل الوضع</button>
+    <button class="btn danger block" onclick="closeSheet();logout()">🚪 تسجيل الخروج</button>
   `;
-  openSheet('⚡ إجراءات سريعة', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>');
+  openSheet('⚙️ الإعدادات',body,'<button class="btn ghost" onclick="closeSheet()">إغلاق</button>');
 }
 
-/* ═══════════════════════════════════════════════════════
-   🔍 SEARCH — البحث الشامل
-   ═══════════════════════════════════════════════════════ */
-const globalSearch = debounce(q => {
-  S.search = q;
-  $('searchClear').style.display = q ? 'block' : 'none';
-  
-  if(S.page === 'pg-people') renderPeople();
-  else if(S.page === 'pg-payments') renderPayments();
-  else if(S.page === 'pg-home') renderHome();
-}, 250);
+const globalSearch=debounce(q=>{
+  S.search=q;
+  $('searchClear').style.display=q?'block':'none';
+});
+function clearSearch(){$('globalSearch').value='';globalSearch('')}
 
-function clearSearch(){
-  $('globalSearch').value = '';
-  globalSearch('');
+/* ═══════════ الجلسة ═══════════ */
+function saveCurrentUser(u){
+  S.currentUser=u;
+  if(u)localStorage.setItem('zt_fund_user',JSON.stringify({id:u.id,name:u.name,role:u.role,sectorId:u.sectorId||null}));
+  else localStorage.removeItem('zt_fund_user');
 }
-
-/* ═══════════════════════════════════════════════════════
-   🔐 SESSION — إدارة الجلسة
-   ═══════════════════════════════════════════════════════ */
-function saveCurrentUser(user){
-  S.currentUser = user;
-  if(user){
-    localStorage.setItem('zt_fund_user', JSON.stringify({
-      id: user.id,
-      name: user.name,
-      role: user.role,
-      sectorId: user.sectorId || null
-    }));
-  } else {
-    localStorage.removeItem('zt_fund_user');
-  }
-}
-
 function restoreCurrentUser(){
-  try{
-    const saved = localStorage.getItem('zt_fund_user');
-    if(!saved) return null;
-    return JSON.parse(saved);
-  } catch(e){ return null; }
+  try{const s=localStorage.getItem('zt_fund_user');return s?JSON.parse(s):null}catch(e){return null}
+}
+function hasPerm(p){
+  if(!S.currentUser)return false;
+  const perms=PERMISSIONS[S.currentUser.role]||[];
+  return perms.includes(p);
 }
 
-/* التحقق من صلاحية */
-function hasPerm(perm){
-  if(!S.currentUser) return false;
-  const role = S.currentUser.role;
-  const perms = PERMISSIONS[role] || [];
-  return perms.includes(perm);
-}
+/* ═══════════ LOGIN ═══════════ */
+let _pinAttempt='';
+let _pinTargetUser=null;
 
-/* ═══════════════════════════════════════════════════════
-   📅 SESSION HELPERS — معلومات إضافية
-   ═══════════════════════════════════════════════════════ */
-function getConstantForYear(year){
-  return S.constants.find(c => c.year === year) || S.constants.find(c => c.year === S.currentYear) || null;
-}
-
-function getPersonById(id){
-  return S.people.find(p => p.id === id);
-}
-
-function getPersonByCode(code){
-  return S.people.find(p => p.code === code);
-}
-
-function getSectorById(id){
-  return S.sectors.find(s => s.id === id);
-}
-
-function getSectorByName(name){
-  return S.sectors.find(s => s.name === name);
-}
-
-/* ═══════════════════════════════════════════════════════
-   🎬 INIT — التشغيل
-   ═══════════════════════════════════════════════════════ */
-async function init(){
-  loadTheme();
-  
-  try{
-    await openDB();
-    
-    // تحميل كل البيانات
-    await Promise.all([
-      dbAll('people').then(d => S.people = d),
-      dbAll('sectors').then(d => S.sectors = d),
-      dbAll('admins').then(d => S.admins = d),
-      dbAll('constants').then(d => S.constants = d),
-      dbAll('subscriptions').then(d => S.subscriptions = d),
-      dbAll('assocPayments').then(d => S.assocPayments = d),
-      dbAll('deathEvents').then(d => S.deathEvents = d),
-      dbAll('deathInstallments').then(d => S.deathInstallments = d),
-      dbAll('donations').then(d => S.donations = d),
-      dbAll('expenses').then(d => S.expenses = d),
-      dbAll('handovers').then(d => S.handovers = d),
-      dbAll('auditLog').then(d => S.auditLog = d)
-    ]);
-    
-    // إعداد القطاعات الافتراضية (أول مرة فقط)
-    if(S.sectors.length === 0){
-      for(const sec of DEFAULT_SECTORS){
-        await dbPut('sectors', sec);
-      }
-      S.sectors = [...DEFAULT_SECTORS];
-      console.log('✅ تم إعداد 6 قطاعات افتراضية');
-    }
-    
-    // إعداد ثوابت افتراضية (أول مرة فقط)
-    if(S.constants.length === 0){
-      const currentY = new Date().getFullYear();
-      const defaults = [
-        { year: currentY - 1, assocYearly: 24000, deathInstallment: 5000, deathCompensation: 25000, joinAssoc: 100000, joinDeath: 50000, joinReduced: 50000 },
-        { year: currentY,     assocYearly: 24000, deathInstallment: 5000, deathCompensation: 25000, joinAssoc: 100000, joinDeath: 50000, joinReduced: 50000 }
-      ];
-      for(const c of defaults){
-        await dbPut('constants', c);
-      }
-      S.constants = [...defaults];
-      console.log('✅ تم إعداد ثوابت افتراضية');
-    }
-    
-    // استرجاع المستخدم
-    const savedUser = restoreCurrentUser();
-    if(savedUser){
-      // تحقق أنه موجود فعلاً
-      const fullUser = S.admins.find(a => a.id === savedUser.id);
-      if(fullUser){
-        S.currentUser = fullUser;
-        showMainApp();
-        console.log('✅ مرحباً', fullUser.name);
-      } else {
-        saveCurrentUser(null);
-        showLogin();
-      }
-    } else {
-      showLogin();
-    }
-    
-  } catch(e){
-    console.error('❌ خطأ في التهيئة:', e);
-    toast('خطأ في التحميل: ' + e.message, 'error', 5000);
-  }
-}
-
-/* ═══════════════════════════════════════════════════════
-   🖼️ SHOW LOGIN / MAIN
-   ═══════════════════════════════════════════════════════ */
-function showLogin(){
-  $('loginScreen').classList.add('on');
-  $('appHeader').style.display = 'none';
-  $('userBanner').style.display = 'none';
-  $('searchWrap').style.display = 'none';
-  $('appMain').style.display = 'none';
-  $('appNav').style.display = 'none';
-  $('fab').style.display = 'none';
-  
-  // استدعاء دالة شاشة الدخول (من Part 4)
-  if(typeof renderLoginScreen === 'function') renderLoginScreen();
-}
-
-function showMainApp(){
-  $('loginScreen').classList.remove('on');
-  $('appHeader').style.display = 'flex';
-  $('userBanner').style.display = 'flex';
-  $('searchWrap').style.display = 'block';
-  $('appMain').style.display = 'block';
-  $('appNav').style.display = 'flex';
-  
-  // عرض معلومات المستخدم
-  const u = S.currentUser;
-  if(u){
-    $('currentUserName').textContent = u.name;
-    const roleInfo = ROLES[u.role] || { name: 'مستخدم', icon: '👤', color: 'collector' };
-    $('currentUserRole').textContent = roleInfo.icon + ' ' + roleInfo.name;
-    $('currentUserRole').className = 'role-badge ' + roleInfo.color;
-  }
-  
-  $('hdrYear').textContent = 'السنة ' + S.currentYear;
-  
-  // عرض الصفحة الرئيسية
-  go('pg-home');
-  
-  // استدعاء الدالة الرئيسية (من Part 4)
-  if(typeof onAppReady === 'function') onAppReady();
-}
-
-function logout(){
-  if(!confirm('هل تريد تسجيل الخروج؟')) return;
-  saveCurrentUser(null);
-  S.currentUser = null;
-  showLogin();
-  toast('تم الخروج', 'info', 2000);
-}
-
-/* ═══════════════════════════════════════════════════════
-   🚀 تشغيل التطبيق
-   ═══════════════════════════════════════════════════════ */
-   
-/* ═══════════════════════════════════════════════════════
-   🔐 LOGIN SCREEN — شاشة تسجيل الدخول
-   ═══════════════════════════════════════════════════════ */
-
-/* حالة تسجيل الدخول المؤقتة */
-let _pinAttempt = '';
-let _pinTargetUser = null;
-
-/* ──────────────── عرض شاشة الدخول ──────────────── */
 function renderLoginScreen(){
-  _pinAttempt = '';
-  _pinTargetUser = null;
+  _pinAttempt='';
+  _pinTargetUser=null;
+  $('loginUsers').style.display='block';
+  $('loginPin').style.display='none';
+  const list=$('loginUsersList');
   
-  $('loginUsers').style.display = 'block';
-  $('loginPin').style.display = 'none';
-  
-  const list = $('loginUsersList');
-  
-  // لا يوجد مستخدمون → زر إعداد أول مرة
-  if(S.admins.length === 0){
-    list.innerHTML = `
+  if(S.admins.length===0){
+    list.innerHTML=`
       <div style="text-align:center;padding:24px 12px">
         <div style="font-size:52px;margin-bottom:12px">🏘️</div>
         <div style="font-weight:800;font-size:15px;margin-bottom:6px">مرحباً بك</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.7">
-          هذه أول مرة يُفتح فيها التطبيق.<br>
-          ابدأ بإضافة مدير للنظام.
+          هذه أول مرة يُفتح فيها التطبيق.<br>ابدأ بإضافة مدير للنظام.
         </div>
-      </div>
-    `;
+      </div>`;
     return;
   }
   
-  // عرض المستخدمين
-  list.innerHTML = S.admins.map(u => {
-    const roleInfo = ROLES[u.role] || { name: 'مستخدم', icon: '👤', color: 'collector' };
-    const sector = u.sectorId ? getSectorById(u.sectorId) : null;
-    const sectorTxt = sector ? ' • ' + sector.name : '';
+  list.innerHTML=S.admins.map(u=>{
+    const r=ROLES[u.role]||{name:'مستخدم',icon:'👤'};
+    const sec=u.sectorId?S.sectors.find(s=>s.id===u.sectorId):null;
+    const secTxt=sec?' • '+sec.name:'';
     return `
       <div class="login-user" onclick="selectLoginUser(${u.id})">
-        <div class="av">${roleInfo.icon}</div>
+        <div class="av">${r.icon}</div>
         <div class="info">
           <div class="nm">${esc(u.name)}</div>
-          <div class="role">${roleInfo.name}${sectorTxt}</div>
+          <div class="role">${r.name}${secTxt}</div>
         </div>
-        ${u.hasPin ? '<span style="font-size:18px;color:var(--muted)">🔒</span>' : '<span style="font-size:18px;color:var(--success)">🔓</span>'}
-      </div>
-    `;
+        ${u.hasPin?'<span style="font-size:18px;color:var(--muted)">🔒</span>':'<span style="font-size:18px;color:var(--success)">🔓</span>'}
+      </div>`;
   }).join('');
 }
 
-/* ──────────────── اختيار مستخدم ──────────────── */
-function selectLoginUser(userId){
-  const user = S.admins.find(a => a.id === userId);
-  if(!user) return;
+function selectLoginUser(id){
+  const u=S.admins.find(a=>a.id===id);
+  if(!u)return;
+  _pinTargetUser=u;
+  _pinAttempt='';
+  if(!u.hasPin){doLogin(u);return}
   
-  _pinTargetUser = user;
-  _pinAttempt = '';
-  
-  // إذا لم يكن له PIN → دخول مباشر
-  if(!user.hasPin){
-    doLogin(user);
-    return;
-  }
-  
-  // عرض شاشة PIN
-  $('loginUsers').style.display = 'none';
-  $('loginPin').style.display = 'block';
-  
-  const roleInfo = ROLES[user.role] || { name: 'مستخدم', icon: '👤' };
-  $('pinAvatar').textContent = roleInfo.icon;
-  $('pinName').textContent = user.name;
-  $('pinRole').textContent = roleInfo.name;
-  $('pinError').textContent = '';
-  
+  $('loginUsers').style.display='none';
+  $('loginPin').style.display='block';
+  const r=ROLES[u.role]||{name:'مستخدم',icon:'👤'};
+  $('pinAvatar').textContent=r.icon;
+  $('pinName').textContent=u.name;
+  $('pinRole').textContent=r.name;
+  $('pinError').textContent='';
   updatePinDisplay();
 }
 
-/* ──────────────── إدخال PIN ──────────────── */
-function pinPress(digit){
-  if(_pinAttempt.length >= 4) return;
-  _pinAttempt += digit;
+function pinPress(d){
+  if(_pinAttempt.length>=4)return;
+  _pinAttempt+=d;
   updatePinDisplay();
-  
-  // التحقق التلقائي عند 4 أرقام
-  if(_pinAttempt.length === 4){
-    setTimeout(() => checkPin(), 200);
-  }
+  if(_pinAttempt.length===4)setTimeout(checkPin,200);
 }
-
-function pinBack(){
-  _pinAttempt = _pinAttempt.slice(0, -1);
-  updatePinDisplay();
-  $('pinError').textContent = '';
-}
-
-function pinBackLogin(){
-  $('loginPin').style.display = 'none';
-  $('loginUsers').style.display = 'block';
-  _pinAttempt = '';
-  _pinTargetUser = null;
-}
-
+function pinBack(){_pinAttempt=_pinAttempt.slice(0,-1);updatePinDisplay();$('pinError').textContent=''}
+function pinBackLogin(){$('loginPin').style.display='none';$('loginUsers').style.display='block';_pinAttempt='';_pinTargetUser=null}
 function updatePinDisplay(){
-  const dots = document.querySelectorAll('#pinDisplay .pin-dot');
-  dots.forEach((dot, i) => {
-    dot.classList.toggle('on', i < _pinAttempt.length);
-  });
+  document.querySelectorAll('#pinDisplay .pin-dot').forEach((d,i)=>d.classList.toggle('on',i<_pinAttempt.length));
 }
-
 function checkPin(){
-  if(!_pinTargetUser) return;
-  
-  // مقارنة PIN (نصياً - للنظام الداخلي)
-  if(_pinAttempt === String(_pinTargetUser.pin)){
-    $('pinError').textContent = '✅ صحيح';
-    $('pinError').style.color = 'var(--success)';
-    setTimeout(() => doLogin(_pinTargetUser), 400);
-  } else {
-    $('pinError').textContent = '❌ خطأ، حاول مجدداً';
-    $('pinError').style.color = 'var(--danger)';
-    _pinAttempt = '';
+  if(!_pinTargetUser)return;
+  if(_pinAttempt===String(_pinTargetUser.pin)){
+    $('pinError').textContent='✅ صحيح';
+    $('pinError').style.color='var(--success)';
+    setTimeout(()=>doLogin(_pinTargetUser),400);
+  }else{
+    $('pinError').textContent='❌ خطأ، حاول مجدداً';
+    $('pinError').style.color='var(--danger)';
+    _pinAttempt='';
     updatePinDisplay();
-    
-    // اهتزاز (إن مدعوم)
-    if(navigator.vibrate) navigator.vibrate(200);
+    if(navigator.vibrate)navigator.vibrate(200);
   }
 }
 
-/* ──────────────── تنفيذ الدخول ──────────────── */
-function doLogin(user){
-  S.currentUser = user;
-  saveCurrentUser(user);
-  
-  // تحديث آخر دخول
-  user.lastLogin = new Date().toISOString();
-  dbPut('admins', user).catch(() => {});
-  
-  // سجل التدقيق
-  logAudit('login', 'admin', user.id, { name: user.name });
-  
-  toast('👋 مرحباً ' + user.name, 'success', 2500);
+function doLogin(u){
+  S.currentUser=u;
+  saveCurrentUser(u);
+  u.lastLogin=new Date().toISOString();
+  dbPut('admins',u).catch(()=>{});
+  logAudit('login','admin',u.id,{name:u.name});
+  toast('👋 مرحباً '+u.name,'success',2500);
   showMainApp();
 }
 
-/* ═══════════════════════════════════════════════════════
-   👤 إعداد أول مدير (First Run)
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════ FIRST ADMIN ═══════════ */
 function showAddFirstAdmin(){
-  const body = `
+  const body=`
     <div style="text-align:center;padding:10px 0 18px">
       <div style="font-size:44px;margin-bottom:8px">👑</div>
       <div style="font-weight:800;font-size:15px">إنشاء مدير النظام</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px">
-        سيُمنح هذا الحساب كل الصلاحيات
-      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">سيُمنح هذا الحساب كل الصلاحيات</div>
     </div>
-    
-    <div class="fld">
-      <label>الاسم <span class="req">*</span></label>
-      <input id="firstAdminName" placeholder="مثال: أحمد" maxlength="50">
-    </div>
-    
-    <div class="fld">
-      <label>الهاتف (اختياري)</label>
-      <input id="firstAdminPhone" placeholder="09xxxxxxxx" inputmode="tel" maxlength="20">
-    </div>
-    
-    <div class="fld">
-      <label>كلمة المرور (4 أرقام) <span class="req">*</span></label>
-      <input id="firstAdminPin" type="tel" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
-      <div class="fld-hint">ستُستخدم في كل تسجيل دخول</div>
-    </div>
-    
-    <div class="fld">
-      <label>تأكيد كلمة المرور <span class="req">*</span></label>
-      <input id="firstAdminPin2" type="tel" placeholder="••••" maxlength="4" inputmode="numeric" pattern="[0-9]*">
-    </div>
+    <div class="fld"><label>الاسم <span class="req">*</span></label>
+      <input id="firstAdminName" placeholder="مثال: بسام" maxlength="50"></div>
+    <div class="fld"><label>الهاتف (اختياري)</label>
+      <input id="firstAdminPhone" placeholder="09xxxxxxxx" inputmode="tel"></div>
+    <div class="fld"><label>كلمة المرور (4 أرقام) <span class="req">*</span></label>
+      <input id="firstAdminPin" type="tel" placeholder="••••" maxlength="4" inputmode="numeric">
+      <div class="fld-hint">ستُستخدم في كل تسجيل دخول</div></div>
+    <div class="fld"><label>تأكيد كلمة المرور <span class="req">*</span></label>
+      <input id="firstAdminPin2" type="tel" placeholder="••••" maxlength="4" inputmode="numeric"></div>
   `;
-  
-  const foot = `
+  const foot=`
     <button class="btn ghost" onclick="closeSheet()">إلغاء</button>
     <button class="btn primary" onclick="saveFirstAdmin()">✅ إنشاء</button>
   `;
-  
-  openSheet('👑 إعداد أول مرة', body, foot, { focus: 'firstAdminName' });
+  openSheet('👑 إعداد أول مرة',body,foot,{focus:'firstAdminName'});
 }
 
 async function saveFirstAdmin(){
-  const name = cleanText($('firstAdminName').value);
-  const phone = cleanPhone($('firstAdminPhone').value);
-  const pin = $('firstAdminPin').value.trim();
-  const pin2 = $('firstAdminPin2').value.trim();
+  const name=cleanText($('firstAdminName').value);
+  const phone=cleanPhone($('firstAdminPhone').value);
+  const pin=$('firstAdminPin').value.trim();
+  const pin2=$('firstAdminPin2').value.trim();
   
-  // تحقق
-  if(!name){
-    toast('الاسم مطلوب', 'error');
-    return;
-  }
-  if(!/^\d{4}$/.test(pin)){
-    toast('كلمة المرور: 4 أرقام بالضبط', 'error');
-    return;
-  }
-  if(pin !== pin2){
-    toast('كلمتا المرور غير متطابقتين', 'error');
-    return;
-  }
+  if(!name){toast('الاسم مطلوب','error');return}
+  if(!/^\d{4}$/.test(pin)){toast('كلمة المرور: 4 أرقام بالضبط','error');return}
+  if(pin!==pin2){toast('كلمتا المرور غير متطابقتين','error');return}
   
   try{
-    const admin = {
-      name,
-      phone,
-      pin,
-      hasPin: true,
-      role: 'president',
-      sectorId: null,
-      createdAt: new Date().toISOString(),
-      lastLogin: null,
-      active: true
+    const admin={
+      name,phone,pin,hasPin:true,role:'president',
+      sectorId:null,
+      createdAt:new Date().toISOString(),
+      lastLogin:null,active:true
     };
-    
-    const newId = await dbPut('admins', admin);
-    admin.id = newId;
+    const newId=await dbPut('admins',admin);
+    admin.id=newId;
     S.admins.push(admin);
-    
     closeSheet();
-    toast('✅ تم إنشاء المدير بنجاح', 'success', 3000);
-    
-    // تحديث شاشة الدخول
-    setTimeout(() => {
-      renderLoginScreen();
-    }, 400);
-    
-  } catch(e){
+    toast('✅ تم إنشاء المدير بنجاح','success',3000);
+    setTimeout(renderLoginScreen,400);
+  }catch(e){
     console.error(e);
-    toast('خطأ: ' + e.message, 'error');
+    toast('خطأ: '+e.message,'error');
   }
 }
 
-/* ═══════════════════════════════════════════════════════
-   👥 إدارة الإداريين (من داخل التطبيق)
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════ ADMINS MANAGEMENT ═══════════ */
 function openAdminsSheet(){
   if(!hasPerm('admins.manage')){
-    toast('غير مصرح', 'error');
+    toast('غير مصرح','error');
     return;
   }
-  
-  const list = S.admins.map(u => {
-    const roleInfo = ROLES[u.role] || { name: 'مستخدم', icon: '👤' };
-    const sector = u.sectorId ? getSectorById(u.sectorId) : null;
-    const sectorTxt = sector ? ' • ' + sector.name : '';
-    const isMe = S.currentUser && S.currentUser.id === u.id;
+  const list=S.admins.map(u=>{
+    const r=ROLES[u.role]||{name:'مستخدم',icon:'👤'};
+    const sec=u.sectorId?S.sectors.find(s=>s.id===u.sectorId):null;
+    const secTxt=sec?' • '+sec.name:'';
+    const isMe=S.currentUser&&S.currentUser.id===u.id;
     return `
       <div class="item" style="cursor:default">
-        <div class="av">${roleInfo.icon}</div>
+        <div class="av">${r.icon}</div>
         <div class="body">
-          <div class="ttl">
-            ${esc(u.name)}
-            ${isMe ? '<span class="badge primary">أنت</span>' : ''}
-          </div>
-          <div class="sub">${roleInfo.name}${sectorTxt}${u.phone ? ' • ' + esc(u.phone) : ''}</div>
+          <div class="ttl">${esc(u.name)} ${isMe?'<span class="badge primary">أنت</span>':''}</div>
+          <div class="sub">${r.name}${secTxt}${u.phone?' • '+esc(u.phone):''}</div>
         </div>
         <button class="btn ghost sm" onclick="openEditAdminSheet(${u.id})">✏️</button>
-        ${!isMe ? `<button class="btn danger sm" onclick="deleteAdmin(${u.id})">🗑️</button>` : ''}
-      </div>
-    `;
+        ${!isMe?`<button class="btn danger sm" onclick="deleteAdmin(${u.id})">🗑️</button>`:''}
+      </div>`;
   }).join('');
   
-  const body = `
-    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
-      ${S.admins.length} مستخدم في النظام
-    </div>
-    ${S.admins.length ? `<div class="list">${list}</div>` : '<div style="text-align:center;padding:30px;color:var(--muted)">لا يوجد إداريون</div>'}
+  const body=`
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">${S.admins.length} مستخدم</div>
+    ${S.admins.length?`<div class="list">${list}</div>`:'<div style="text-align:center;padding:30px;color:var(--muted)">لا يوجد إداريون</div>'}
   `;
-  
-  const foot = `
-    <button class="btn primary" onclick="openEditAdminSheet()">➕ إضافة إداري</button>
-  `;
-  
-  openSheet('👥 إدارة الإداريين', body, foot, { wide: true });
+  const foot=`<button class="btn primary" onclick="openEditAdminSheet()">➕ إضافة إداري</button>`;
+  openSheet('👥 الإداريون',body,foot,{wide:true});
 }
 
-/* ──────────────── إضافة / تعديل إداري ──────────────── */
-function openEditAdminSheet(id = null){
-  const isNew = !id;
-  const admin = isNew ? { role: 'collector' } : S.admins.find(a => a.id === id);
-  if(!admin) return;
+function openEditAdminSheet(id=null){
+  const isNew=!id;
+  const admin=isNew?{role:'collector'}:S.admins.find(a=>a.id===id);
+  if(!admin)return;
+  S.editing={type:'admin',id:isNew?null:id};
   
-  S.editing = { type: 'admin', id: isNew ? null : id };
-  
-  const sectorOpts = S.sectors.map(s => 
-    `<option value="${s.id}" ${admin.sectorId === s.id ? 'selected' : ''}>${esc(s.name)}</option>`
-  ).join('');
-  
-  const roleOpts = Object.keys(ROLES).map(key => {
-    const r = ROLES[key];
-    return `<option value="${key}" ${admin.role === key ? 'selected' : ''}>${r.icon} ${r.name}</option>`;
+  const secOpts=S.sectors.map(s=>`<option value="${s.id}" ${admin.sectorId===s.id?'selected':''}>${esc(s.name)}</option>`).join('');
+  const roleOpts=Object.keys(ROLES).map(k=>{
+    const r=ROLES[k];
+    return `<option value="${k}" ${admin.role===k?'selected':''}>${r.icon} ${r.name}</option>`;
   }).join('');
   
-  const body = `
-    <div class="fld">
-      <label>الاسم <span class="req">*</span></label>
-      <input id="adminName" value="${esc(admin.name || '')}" placeholder="الاسم الكامل" maxlength="50">
-    </div>
-    
-    <div class="fld">
-      <label>الهاتف</label>
-      <input id="adminPhone" value="${esc(admin.phone || '')}" placeholder="09xxxxxxxx" inputmode="tel">
-    </div>
-    
-    <div class="fld">
-      <label>الدور <span class="req">*</span></label>
-      <select id="adminRole">${roleOpts}</select>
-    </div>
-    
+  const body=`
+    <div class="fld"><label>الاسم <span class="req">*</span></label>
+      <input id="adminName" value="${esc(admin.name||'')}" maxlength="50"></div>
+    <div class="fld"><label>الهاتف</label>
+      <input id="adminPhone" value="${esc(admin.phone||'')}" inputmode="tel"></div>
+    <div class="fld"><label>الدور <span class="req">*</span></label>
+      <select id="adminRole">${roleOpts}</select></div>
     <div class="fld" id="adminSectorField">
-      <label>القطاع <span style="color:var(--muted);font-weight:500">(للمعتمد فقط)</span></label>
-      <select id="adminSector">
-        <option value="">— بدون —</option>
-        ${sectorOpts}
-      </select>
-    </div>
-    
-    <div class="fld">
-      <label>كلمة المرور (4 أرقام)</label>
-      <input id="adminPin" type="tel" placeholder="${admin.hasPin ? 'اتركها فارغة للإبقاء' : '••••'}" 
-             maxlength="4" inputmode="numeric" pattern="[0-9]*">
-      <div class="fld-hint">
-        ${admin.hasPin ? '🔒 لديها PIN — اترك الحقل فارغاً للإبقاء' : '🔓 بدون PIN (دخول مباشر)'}
-      </div>
-    </div>
+      <label>القطاع <span style="color:var(--muted);font-weight:500">(للمعتمد)</span></label>
+      <select id="adminSector"><option value="">— بدون —</option>${secOpts}</select></div>
+    <div class="fld"><label>كلمة المرور (4 أرقام)</label>
+      <input id="adminPin" type="tel" placeholder="${admin.hasPin?'اتركها للإبقاء':'••••'}" maxlength="4" inputmode="numeric">
+      <div class="fld-hint">${admin.hasPin?'🔒 لديها PIN — اترك الحقل فارغاً للإبقاء':'🔓 بدون PIN'}</div></div>
   `;
+  const foot=isNew
+    ?`<button class="btn ghost" onclick="closeSheet()">إلغاء</button><button class="btn primary" onclick="saveAdmin()">💾 حفظ</button>`
+    :`<button class="btn ghost" onclick="closeSheet()">إلغاء</button><button class="btn primary" onclick="saveAdmin(${id})">💾 حفظ</button>`;
+  openSheet(isNew?'➕ إضافة إداري':'✏️ تعديل',body,foot,{focus:'adminName'});
   
-  const foot = isNew
-    ? `<button class="btn ghost" onclick="closeSheet()">إلغاء</button>
-       <button class="btn primary" onclick="saveAdmin()">💾 حفظ</button>`
-    : `<button class="btn ghost" onclick="closeSheet()">إلغاء</button>
-       <button class="btn primary" onclick="saveAdmin(${id})">💾 حفظ</button>`;
-  
-  openSheet(isNew ? '➕ إضافة إداري' : '✏️ تعديل إداري', body, foot, { focus: 'adminName' });
-  
-  // إخفاء حقل القطاع إذا لم يكن معتمد
-  const updateSectorVisibility = () => {
-    const role = $('adminRole').value;
-    $('adminSectorField').style.display = (role === 'collector') ? 'block' : 'none';
-  };
-  $('adminRole').addEventListener('change', updateSectorVisibility);
-  updateSectorVisibility();
+  const upd=()=>{$('adminSectorField').style.display=($('adminRole').value==='collector')?'block':'none'};
+  $('adminRole').addEventListener('change',upd);
+  upd();
 }
 
-/* ──────────────── حفظ إداري ──────────────── */
-async function saveAdmin(id = null){
-  const name = cleanText($('adminName').value);
-  const phone = cleanPhone($('adminPhone').value);
-  const role = $('adminRole').value;
-  const sectorId = $('adminSector').value || null;
-  const pin = $('adminPin').value.trim();
+async function saveAdmin(id=null){
+  const name=cleanText($('adminName').value);
+  const phone=cleanPhone($('adminPhone').value);
+  const role=$('adminRole').value;
+  const sectorId=$('adminSector').value||null;
+  const pin=$('adminPin').value.trim();
   
-  if(!name){
-    toast('الاسم مطلوب', 'error');
-    return;
-  }
-  
-  // تحقق من PIN إذا أدخل
-  if(pin && !/^\d{4}$/.test(pin)){
-    toast('كلمة المرور: 4 أرقام بالضبط', 'error');
-    return;
-  }
+  if(!name){toast('الاسم مطلوب','error');return}
+  if(pin&&!/^\d{4}$/.test(pin)){toast('كلمة المرور: 4 أرقام بالضبط','error');return}
   
   try{
-    const old = id ? await dbGet('admins', id) : null;
-    
-    const admin = {
-      name,
-      phone,
-      role,
-      sectorId: role === 'collector' ? sectorId : null,
-      hasPin: pin ? true : (old ? old.hasPin : false),
-      pin: pin ? pin : (old ? old.pin : null),
-      updatedAt: new Date().toISOString(),
-      createdAt: old ? old.createdAt : new Date().toISOString(),
-      lastLogin: old ? old.lastLogin : null,
-      active: old ? old.active : true
+    const old=id?await dbGet('admins',id):null;
+    const admin={
+      name,phone,role,
+      sectorId:role==='collector'?sectorId:null,
+      hasPin:pin?true:(old?old.hasPin:false),
+      pin:pin?pin:(old?old.pin:null),
+      updatedAt:new Date().toISOString(),
+      createdAt:old?old.createdAt:new Date().toISOString(),
+      lastLogin:old?old.lastLogin:null,
+      active:old?old.active:true
     };
-    
     if(id){
-      admin.id = id;
-      await dbPut('admins', admin);
-      const idx = S.admins.findIndex(a => a.id === id);
-      if(idx > -1) S.admins[idx] = admin;
-      logAudit('update', 'admin', id, { name });
+      admin.id=id;
+      await dbPut('admins',admin);
+      const i=S.admins.findIndex(a=>a.id===id);
+      if(i>-1)S.admins[i]=admin;
+      logAudit('update','admin',id,{name});
       toast('✅ تم التعديل');
-    } else {
-      const newId = await dbPut('admins', admin);
-      admin.id = newId;
+    }else{
+      const nid=await dbPut('admins',admin);
+      admin.id=nid;
       S.admins.push(admin);
-      logAudit('add', 'admin', newId, { name });
+      logAudit('add','admin',nid,{name});
       toast('✅ تمت الإضافة');
     }
-    
     closeSheet();
-    setTimeout(openAdminsSheet, 250);
-    
-    // تحديث المستخدم الحالي إذا عدّل نفسه
-    if(S.currentUser && S.currentUser.id === id){
-      S.currentUser = admin;
+    setTimeout(openAdminsSheet,250);
+    if(S.currentUser&&S.currentUser.id===id){
+      S.currentUser=admin;
       saveCurrentUser(admin);
       showMainApp();
     }
-    
-  } catch(e){
+  }catch(e){
     console.error(e);
-    toast('خطأ: ' + e.message, 'error');
+    toast('خطأ: '+e.message,'error');
   }
 }
 
-/* ──────────────── حذف إداري ──────────────── */
 async function deleteAdmin(id){
-  if(!confirm('هل تريد حذف هذا الإداري نهائياً؟')) return;
-  if(!confirm('⚠️ تأكيد أخير — لا يمكن التراجع!')) return;
-  
+  if(!confirm('حذف هذا الإداري؟'))return;
+  if(!confirm('تأكيد نهائي!'))return;
   try{
-    const admin = S.admins.find(a => a.id === id);
-    if(!admin) return;
-    
-    // لا تسمح بحذف الرئيس الأخير
-    if(admin.role === 'president'){
-      const presidents = S.admins.filter(a => a.role === 'president');
-      if(presidents.length <= 1){
-        toast('⚠️ لا يمكن حذف الرئيس الوحيد', 'error', 3500);
-        return;
-      }
+    const a=S.admins.find(x=>x.id===id);
+    if(!a)return;
+    if(a.role==='president'){
+      const presidents=S.admins.filter(x=>x.role==='president');
+      if(presidents.length<=1){toast('⚠️ لا يمكن حذف الرئيس الوحيد','error',3500);return}
     }
-    
-    await dbDel('admins', id);
-    S.admins = S.admins.filter(a => a.id !== id);
-    
-    logAudit('delete', 'admin', id, { name: admin.name });
+    await dbDel('admins',id);
+    S.admins=S.admins.filter(x=>x.id!==id);
+    logAudit('delete','admin',id,{name:a.name});
     toast('🗑️ تم الحذف');
     openAdminsSheet();
-    
-  } catch(e){
-    console.error(e);
-    toast('خطأ: ' + e.message, 'error');
-  }
+  }catch(e){toast('خطأ: '+e.message,'error')}
 }
 
-/* ═══════════════════════════════════════════════════════
-   📜 AUDIT LOG — سجل التدقيق
-   ═══════════════════════════════════════════════════════ */
-async function logAudit(action, target, targetId, details = {}){
-  const entry = {
-    timestamp: new Date().toISOString(),
-    userId: S.currentUser ? S.currentUser.id : null,
-    userName: S.currentUser ? S.currentUser.name : 'system',
-    action,
-    target,
-    targetId,
-    details
+/* ═══════════ AUDIT ═══════════ */
+async function logAudit(action,target,targetId,details={}){
+  const entry={
+    timestamp:new Date().toISOString(),
+    userId:S.currentUser?S.currentUser.id:null,
+    userName:S.currentUser?S.currentUser.name:'system',
+    action,target,targetId,details
   };
+  try{
+    const id=await dbPut('auditLog',entry);
+    entry.id=id;
+    S.auditLog.push(entry);
+    if(S.auditLog.length>10000){
+      const old=S.auditLog.slice(0,S.auditLog.length-10000);
+      for(const o of old)await dbDel('auditLog',o.id);
+      S.auditLog=S.auditLog.slice(-10000);
+    }
+  }catch(e){console.warn(e)}
+}
+
+/* ═══════════ SHOW LOGIN/MAIN ═══════════ */
+function showLogin(){
+  $('loginScreen').classList.add('on');
+  $('appHeader').style.display='none';
+  $('userBanner').style.display='none';
+  $('searchWrap').style.display='none';
+  $('appMain').style.display='none';
+  $('appNav').style.display='none';
+  $('fab').style.display='none';
+  renderLoginScreen();
+}
+
+function showMainApp(){
+  $('loginScreen').classList.remove('on');
+  $('appHeader').style.display='flex';
+  $('userBanner').style.display='flex';
+  $('searchWrap').style.display='block';
+  $('appMain').style.display='block';
+  $('appNav').style.display='flex';
+  
+  const u=S.currentUser;
+  if(u){
+    $('currentUserName').textContent=u.name;
+    const r=ROLES[u.role]||{name:'مستخدم',icon:'👤'};
+    $('currentUserRole').textContent=r.icon+' '+r.name;
+  }
+  $('hdrYear').textContent='السنة '+S.currentYear;
+  go('pg-home');
+  renderHome();
+}
+
+function logout(){
+  if(!confirm('هل تريد تسجيل الخروج؟'))return;
+  saveCurrentUser(null);
+  S.currentUser=null;
+  showLogin();
+  toast('تم الخروج','info',2000);
+}
+
+/* ═══════════ RENDER HOME (مبدئي) ═══════════ */
+function renderHome(){
+  $('homeStats').innerHTML=`
+    <div class="stat"><div class="val">${S.people.length}</div><div class="lbl">👥 الأفراد</div></div>
+    <div class="stat assoc"><div class="val">${S.admins.length}</div><div class="lbl">👤 الإداريون</div></div>
+    <div class="stat death"><div class="val">${S.deathEvents.length}</div><div class="lbl">⚰️ وفيات</div></div>
+    <div class="stat donation"><div class="val">${S.donations.length}</div><div class="lbl">💚 تبرعات</div></div>
+  `;
+  
+  $('fundBalances').innerHTML=`
+    <div style="padding:12px;background:var(--bg);border-radius:12px;font-size:13px;line-height:1.8">
+      <div style="display:flex;justify-content:space-between"><span class="muted">رصيد الجمعية:</span><b>0 ل.س</b></div>
+      <div style="display:flex;justify-content:space-between"><span class="muted">رصيد الوفاة:</span><b>0 ل.س</b></div>
+      <div style="display:flex;justify-content:space-between"><span class="muted">إجمالي التبرعات:</span><b>0 ل.س</b></div>
+    </div>
+  `;
+  
+  $('recentOps').innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">لا توجد عمليات بعد</div>';
+}
+
+/* ═══════════ INIT ═══════════ */
+async function init(){
+  const saved=localStorage.getItem('zt_fund');
+  if(saved)document.documentElement.setAttribute('data-theme',saved);
   
   try{
-    const id = await dbPut('auditLog', entry);
-    entry.id = id;
-    S.auditLog.push(entry);
+    await openDB();
     
-    // حد أقصى 10,000 سجل
-    if(S.auditLog.length > 10000){
-      const oldest = S.auditLog.slice(0, S.auditLog.length - 10000);
-      for(const old of oldest){
-        await dbDel('auditLog', old.id);
-      }
-      S.auditLog = S.auditLog.slice(-10000);
+    await Promise.all([
+      dbAll('people').then(d=>S.people=d),
+      dbAll('sectors').then(d=>S.sectors=d),
+      dbAll('admins').then(d=>S.admins=d),
+      dbAll('constants').then(d=>S.constants=d),
+      dbAll('subscriptions').then(d=>S.subscriptions=d),
+      dbAll('assocPayments').then(d=>S.assocPayments=d),
+      dbAll('deathEvents').then(d=>S.deathEvents=d),
+      dbAll('deathInstallments').then(d=>S.deathInstallments=d),
+      dbAll('donations').then(d=>S.donations=d),
+      dbAll('expenses').then(d=>S.expenses=d),
+      dbAll('handovers').then(d=>S.handovers=d),
+      dbAll('auditLog').then(d=>S.auditLog=d)
+    ]);
+    
+    // قطاعات افتراضية
+    if(S.sectors.length===0){
+      for(const s of DEFAULT_SECTORS)await dbPut('sectors',s);
+      S.sectors=[...DEFAULT_SECTORS];
     }
-  } catch(e){
-    console.warn('تعذر تسجيل التدقيق:', e);
+    
+    // ثوابت افتراضية
+    if(S.constants.length===0){
+      const y=new Date().getFullYear();
+      const defs=[
+        {year:y-1,assocYearly:24000,deathInstallment:5000,deathCompensation:25000,joinAssoc:100000,joinDeath:50000,joinReduced:50000},
+        {year:y,assocYearly:24000,deathInstallment:5000,deathCompensation:25000,joinAssoc:100000,joinDeath:50000,joinReduced:50000}
+      ];
+      for(const c of defs)await dbPut('constants',c);
+      S.constants=[...defs];
+    }
+    
+    // المستخدم
+    const su=restoreCurrentUser();
+    if(su){
+      const full=S.admins.find(a=>a.id===su.id);
+      if(full){S.currentUser=full;showMainApp();return}
+      saveCurrentUser(null);
+    }
+    showLogin();
+    
+  }catch(e){
+    console.error('❌',e);
+    toast('خطأ: '+e.message,'error',5000);
   }
 }
 
-/* ═══════════════════════════════════════════════════════
-   🎯 دالة مساعدة للاختبار — تخطي تسجيل الدخول
-   ═══════════════════════════════════════════════════════ */
-/* استخدمها في Console فقط للاختبار */
-window.debugSkipLogin = function(){
-  if(S.admins.length === 0){
-    console.log('❌ لا يوجد إداريون');
-    return;
-  }
-  const admin = S.admins[0];
-  S.currentUser = admin;
-  saveCurrentUser(admin);
-  showMainApp();
-  console.log('✅ دخلت كـ ' + admin.name);
-};
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded',init);
 </script>
-
 </body>
 </html>
