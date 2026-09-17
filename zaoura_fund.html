@@ -304,13 +304,14 @@ main{max-width:900px;margin:0 auto;padding:12px}
 <script>
 'use strict';
 
-/* ═══════════════════════════════════════════════════════
-   صندوق زعورة — JavaScript
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   📌 القسم [1/8] — النواة والثوابت
+   ═══════════════════════════════════════════════════════════════ */
 
 const DB_NAME = 'zaoura_v6';
 const DB_VERSION = 1;
-const STORE_NAMES = ['members','payments','deaths','incomes','expenses','deliveries','storeItems','storeMovements','meetings','constants','users','auditLog'];
+const STORE_NAMES = ['members','payments','deaths','incomes','expenses','deliveries','storeItems','storeMovements','meetings','constants','users','auditLog','customFields'];
+const BASE_YEAR = 2025;
 
 const ROLES = {
   president:      { name:'رئيس اللجنة',   icon:'👑' },
@@ -318,15 +319,17 @@ const ROLES = {
   assocTreasurer: { name:'أمين الجمعية', icon:'💰' },
   deathTreasurer: { name:'أمين الوفاة',  icon:'⚰️' },
   collector:      { name:'معتمد',         icon:'👤' },
+  member:         { name:'مشترك',         icon:'👥' },
   auditor:        { name:'مدقق',          icon:'👁️' }
 };
 
 const PERMISSIONS = {
-  president:      ['payment.add','death.add','donation.add','income.add','expense.add','handover.receive','handover.send','member.manage','constants.manage','users.manage','store.manage','meetings.manage','reports.all','audit.view','payment.edit'],
-  manager:        ['payment.add','death.add','donation.add','income.add','expense.add','handover.receive','handover.send','member.manage','constants.manage','users.manage','store.manage','meetings.manage','reports.all','audit.view','payment.edit'],
+  president:      ['payment.add','death.add','donation.add','income.add','expense.add','handover.receive','handover.send','member.manage','constants.manage','users.manage','store.manage','meetings.manage','reports.all','audit.view','payment.edit','customfields.manage'],
+  manager:        ['payment.add','death.add','donation.add','income.add','expense.add','handover.receive','handover.send','member.manage','constants.manage','users.manage','store.manage','meetings.manage','reports.all','audit.view','payment.edit','customfields.manage'],
   assocTreasurer: ['payment.add','donation.add','income.add','expense.add','handover.receive','handover.send','store.manage','payment.edit'],
   deathTreasurer: ['payment.add','death.add','income.add','expense.add','handover.receive','handover.send','payment.edit'],
   collector:      ['payment.add','handover.send'],
+  member:         [],
   auditor:        ['audit.view','reports.all']
 };
 
@@ -335,17 +338,14 @@ const DEFAULT_SECTORS = ['الجبل','الحارة1','الحارة2','الوا�
 const S = {
   members:[], payments:[], deaths:[], incomes:[], expenses:[],
   deliveries:[], storeItems:[], storeMovements:[], meetings:[],
-  constants:[], users:[], auditLog:[],
+  constants:[], users:[], auditLog:[], customFields:[],
   currentUser:null, currentYear:2026,
   page:'pg-home', search:'', editing:null,
   filters:{ members:'all', membersSector:'all', payments:'all' }
 };
 
-/* ═══════════════════════════════════════════════════════
-   INDEXEDDB
-   ═══════════════════════════════════════════════════════ */
+/* ═══ IndexedDB ═══ */
 let db = null;
-
 function openDB(){
   return new Promise((res, rej) => {
     const r = indexedDB.open(DB_NAME, DB_VERSION);
@@ -359,16 +359,13 @@ function openDB(){
     r.onerror = () => rej(r.error);
   });
 }
-
 const tx = (s, m = 'readonly') => db.transaction(s, m).objectStore(s);
 const dbAll = s => new Promise((res, rej) => { const q = tx(s).getAll(); q.onsuccess = () => res(q.result||[]); q.onerror = () => rej(q.error); });
 const dbGet = (s, id) => new Promise((res, rej) => { const q = tx(s).get(id); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
 const dbPut = (s, o) => new Promise((res, rej) => { const q = tx(s,'readwrite').put(o); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
 const dbDel = (s, id) => new Promise((res, rej) => { const q = tx(s,'readwrite').delete(id); q.onsuccess = () => res(); q.onerror = () => rej(q.error); });
 
-/* ═══════════════════════════════════════════════════════
-   أدوات
-   ═══════════════════════════════════════════════════════ */
+/* ═══ أدوات ═══ */
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const cleanText = v => String(v ?? '').trim().replace(/\s+/g,' ');
@@ -382,7 +379,6 @@ function fmtDate(d){
   try { return new Date(d).toLocaleDateString('ar-EG', { year:'numeric', month:'short', day:'numeric' }); }
   catch(e) { return d; }
 }
-
 function toDate(v){
   if(!v) return '';
   if(typeof v === 'string' && v.trim().startsWith('=')) return '';
@@ -397,7 +393,6 @@ function toDate(v){
   if(!isNaN(d) && d.getFullYear() > 1900 && d.getFullYear() < 2100) return d.toISOString().slice(0,10);
   return '';
 }
-
 function fmtNum(n){
   if(n === null || n === undefined || n === '') return '0';
   const num = Number(n); if(isNaN(num)) return '0';
@@ -409,14 +404,6 @@ function fmtShort(n){
   if(num >= 1000000) return (num/1000000).toFixed(1) + 'M';
   if(num >= 1000) return (num/1000).toFixed(1) + 'K';
   return String(num);
-}
-function calcAge(birth){
-  if(!birth) return '';
-  const b = new Date(birth); if(isNaN(b)) return '';
-  const now = new Date();
-  let age = now.getFullYear() - b.getFullYear();
-  if(now.getMonth() < b.getMonth() || (now.getMonth() === b.getMonth() && now.getDate() < b.getDate())) age--;
-  return age >= 0 ? age : '';
 }
 
 function toast(msg, type = 'success', dur = 2800){
@@ -451,6 +438,7 @@ function toggleTheme(){
   localStorage.setItem('zt_theme', t);
 }
 
+/* ═══ التنقل ═══ */
 function go(page){
   S.page = page;
   document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === page));
@@ -464,13 +452,11 @@ function go(page){
   if(page === 'pg-reports') renderReports();
   if(page === 'pg-admin') renderAdminMenu();
 }
-
 function handleFab(){
   if(S.page === 'pg-members') openMemberSheet();
   else if(S.page === 'pg-payments') openPaymentSheet();
   else openQuickActionsSheet();
 }
-
 function openQuickActionsSheet(){
   const body = `
     <div class="quick-actions">
@@ -482,7 +468,6 @@ function openQuickActionsSheet(){
   `;
   openSheet('⚡ إجراءات سريعة', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>');
 }
-
 const globalSearch = debounce(q => {
   S.search = q;
   $('searchClear').style.display = q ? 'block' : 'none';
@@ -491,9 +476,7 @@ const globalSearch = debounce(q => {
 });
 function clearSearch(){ $('globalSearch').value = ''; globalSearch(''); }
 
-/* ═══════════════════════════════════════════════════════
-   الجلسة والصلاحيات
-   ═══════════════════════════════════════════════════════ */
+/* ═══ الجلسة ═══ */
 function saveCurrentUser(u){
   S.currentUser = u;
   if(u) localStorage.setItem('zt_user', JSON.stringify({ id:u.id, name:u.name, role:u.role }));
@@ -508,11 +491,9 @@ function hasPerm(p){
 }
 const getMemberById = id => S.members.find(m => m.id === id);
 
-/* ═══════════════════════════════════════════════════════
-   ⭐⭐ الحسابات — القلب النابض للنظام ⭐⭐
-   ═══════════════════════════════════════════════════════ */
-
-const BASE_YEAR = 2025;
+/* ═══════════════════════════════════════════════════════════════
+   📌 القسم [2/8] — الحسابات (القلب النابض) ⭐
+   ═══════════════════════════════════════════════════════════════ */
 
 function getConstants(year){
   const c = S.constants.find(x => x.year === year);
@@ -521,35 +502,60 @@ function getConstants(year){
   return sorted[0] || null;
 }
 
+/* ✅ حساب مستحقات عضو لسنة — مع تفصيل كامل */
 function computeMemberYear(member, year){
   const c = getConstants(year);
-  if(!c) return { assoc:{ req:0, paid:0, rem:0 }, death:{ req:0, paid:0, rem:0 } };
+  const empty = { year, assoc:{ yearlyReq:0, joinReq:0, req:0, paid:0, rem:0 }, death:{ installReq:0, joinReq:0, req:0, paid:0, rem:0 } };
+  if(!c) return empty;
 
-  const assocFees = (member.memberType === 'مخفض' && c.assocYearlyReduced) ? c.assocYearlyReduced : c.assocYearly;
-  const joinAssocFee = (member.memberType === 'مخفض' && c.joinAssocFeeReduced) ? c.joinAssocFeeReduced : c.joinAssocFee;
+  // حالة العضو — منسحب/متوقف لا مستحقات عليه من سنة التوقف
+  const status = member.memberStatus || 'نشط';
+  const stopYear = member.stopYear || member.withdrawYear;
+  if((status === 'منسحب' || status === 'متوقف') && stopYear && year >= stopYear){
+    return { ...empty, skipped:true, reason: status };
+  }
+
+  const isReduced = member.memberType === 'مخفض';
+  const assocYearlyFee = (isReduced && c.assocYearlyReduced) ? c.assocYearlyReduced : c.assocYearly;
+  const joinAssocFee = (isReduced && c.joinAssocFeeReduced) ? c.joinAssocFeeReduced : c.joinAssocFee;
+  const joinDeathFee = (isReduced && c.joinDeathFeeReduced) ? c.joinDeathFeeReduced : c.joinDeathFee;
 
   const result = {
     year,
-    assoc: { req: 0, paid: 0, rem: 0 },
-    death: { req: 0, paid: 0, rem: 0 }
+    assoc: { yearlyReq:0, joinReq:0, req:0, paid:0, rem:0 },
+    death: { installReq:0, joinReq:0, req:0, paid:0, rem:0 }
   };
 
-  if(member.assocStartYear && year >= member.assocStartYear && year >= BASE_YEAR){
-    result.assoc.req += assocFees;
+  // 💰 الجمعية
+  if(member.assocStartYear && year >= member.assocStartYear && year >= BASE_YEAR && !member.assocExempt){
+    // اشتراك سنوي
+    result.assoc.yearlyReq += assocYearlyFee;
+    // رسوم انضمام (مرة واحدة عند أول سنة ≥ 2025)
     if(year === member.assocStartYear && member.assocStartYear >= BASE_YEAR){
-      result.assoc.req += joinAssocFee;
+      result.assoc.joinReq += joinAssocFee;
     }
   }
 
-  if(member.deathStartYear && year >= member.deathStartYear && year >= BASE_YEAR){
+  // ⚰️ الوفاة
+  if(member.deathStartYear && year >= member.deathStartYear && year >= BASE_YEAR && !member.deathExempt){
+    // رسوم انضمام (مرة واحدة)
     if(year === member.deathStartYear && member.deathStartYear >= BASE_YEAR){
-      result.death.req += ((member.memberType === 'مخفض' && c.joinDeathFeeReduced) ? c.joinDeathFeeReduced : c.joinDeathFee);
+      result.death.joinReq += joinDeathFee;
     }
+    // أقساط الوفيات لهذه السنة
     const yearDeaths = S.deaths.filter(d => d.year === year);
-    result.death.req += yearDeaths.length * c.deathInstallment;
+    result.death.installReq += yearDeaths.length * c.deathInstallment;
   }
 
-  const memberPayments = S.payments.filter(p => p.memberId === member.id);
+  result.assoc.req = result.assoc.yearlyReq + result.assoc.joinReq;
+  result.death.req = result.death.installReq + result.death.joinReq;
+
+  // ✅ فلترة الدفعات بدقة حسب السنة
+  const memberPayments = S.payments.filter(p =>
+    p.memberId === member.id &&
+    (Number(p.forYear) === year || Number(p.year) === year)
+  );
+
   result.assoc.paid = memberPayments
     .filter(p => p.fund === 'assoc')
     .reduce((s,p) => s + (Number(p.amount) || 0), 0);
@@ -557,15 +563,21 @@ function computeMemberYear(member, year){
     .filter(p => p.fund === 'death')
     .reduce((s,p) => s + (Number(p.amount) || 0), 0);
 
+  result.assoc.rem = result.assoc.req - result.assoc.paid;
+  result.death.rem = result.death.req - result.death.paid;
+
   return result;
 }
 
+/* ✅ حساب كل سنوات العضو */
 function computeMemberFull(memberId){
   const member = getMemberById(memberId);
   if(!member) return null;
 
   const starts = [member.assocStartYear, member.deathStartYear].filter(x => x);
-  if(!starts.length) return { member, years: [], total:{ assocReq:0, assocPaid:0, assocRem:0, deathReq:0, deathPaid:0, deathRem:0, totalRem:0, totalReq:0, totalPaid:0 } };
+  if(!starts.length){
+    return { member, years: [], total:{ assocReq:0, assocPaid:0, assocRem:0, assocYearlyReq:0, assocJoinReq:0, deathReq:0, deathPaid:0, deathRem:0, deathInstallReq:0, deathJoinReq:0, totalRem:0, totalReq:0, totalPaid:0 } };
+  }
 
   const firstYear = Math.max(BASE_YEAR, Math.min(...starts));
   const years = [];
@@ -576,59 +588,73 @@ function computeMemberFull(memberId){
   }
 
   const total = years.reduce((acc, y) => ({
-    assocReq:  acc.assocReq  + y.assoc.req,
-    assocPaid: acc.assocPaid + y.assoc.paid,
-    assocRem:  acc.assocRem  + (y.assoc.req - y.assoc.paid),
-    deathReq:  acc.deathReq  + y.death.req,
-    deathPaid: acc.deathPaid + y.death.paid,
-    deathRem:  acc.deathRem  + (y.death.req - y.death.paid)
-  }), { assocReq:0, assocPaid:0, assocRem:0, deathReq:0, deathPaid:0, deathRem:0 });
+    assocReq:       acc.assocReq + y.assoc.req,
+    assocPaid:      acc.assocPaid + y.assoc.paid,
+    assocRem:       acc.assocRem + (y.assoc.req - y.assoc.paid),
+    assocYearlyReq: acc.assocYearlyReq + y.assoc.yearlyReq,
+    assocJoinReq:   acc.assocJoinReq + y.assoc.joinReq,
+    deathReq:       acc.deathReq + y.death.req,
+    deathPaid:      acc.deathPaid + y.death.paid,
+    deathRem:       acc.deathRem + (y.death.req - y.death.paid),
+    deathInstallReq:acc.deathInstallReq + y.death.installReq,
+    deathJoinReq:   acc.deathJoinReq + y.death.joinReq
+  }), { assocReq:0, assocPaid:0, assocRem:0, assocYearlyReq:0, assocJoinReq:0, deathReq:0, deathPaid:0, deathRem:0, deathInstallReq:0, deathJoinReq:0 });
 
-  total.totalReq = total.assocReq + total.deathReq;
+  total.totalReq  = total.assocReq + total.deathReq;
   total.totalPaid = total.assocPaid + total.deathPaid;
-  total.totalRem = total.totalReq - total.totalPaid;
+  total.totalRem  = total.totalReq - total.totalPaid;
 
   return { member, years, total };
 }
 
+/* ✅ إحصائيات الأعضاء */
 function getMembersStats(year){
   const y = year || S.currentYear;
   let onlyAssoc = 0, onlyDeath = 0, both = 0, none = 0, late = 0;
-  let lateTotal = 0;
+  let lateTotal = 0, active = 0, stopped = 0, withdrawn = 0, deceased = 0, exemptCount = 0, frozen = 0;
 
   for(const m of S.members){
-    const hasAssoc = m.assocStartYear && m.assocStartYear <= y;
-    const hasDeath = m.deathStartYear && m.deathStartYear <= y;
+    const st = m.memberStatus || 'نشط';
+    if(st === 'نشط') active++;
+    else if(st === 'منسحب') withdrawn++;
+    else if(st === 'متوقف') frozen++;
+    else if(st === 'متوفى') deceased++;
+    else if(st === 'معفى') exemptCount++;
+
+    const hasAssoc = m.assocStartYear && m.assocStartYear <= y && !m.assocExempt;
+    const hasDeath = m.deathStartYear && m.deathStartYear <= y && !m.deathExempt;
     if(hasAssoc && hasDeath) both++;
     else if(hasAssoc) onlyAssoc++;
     else if(hasDeath) onlyDeath++;
     else none++;
-  }
 
-  for(const m of S.members){
-    if(!m.assocStartYear && !m.deathStartYear) continue;
-    const full = computeMemberFull(m.id);
-    if(full && full.total.totalRem > 0){ late++; lateTotal += full.total.totalRem; }
+    if(m.assocStartYear || m.deathStartYear){
+      const full = computeMemberFull(m.id);
+      if(full && full.total.totalRem > 0){ late++; lateTotal += full.total.totalRem; }
+    }
+    if(['منسحب','متوقف'].includes(st)) stopped++;
   }
-
-  return { year:y, total:S.members.length, onlyAssoc, onlyDeath, both, none, late, lateTotal };
+  return { year:y, total:S.members.length, onlyAssoc, onlyDeath, both, none, late, lateTotal,
+           active, stopped, withdrawn, deceased, exempt: exemptCount, frozen };
 }
 
+/* ✅ أرصدة الصناديق */
 function getFundBalances(year){
   const y = year || S.currentYear;
+  const sum = (arr, key='amount') => arr.reduce((s,x) => s + (Number(x[key])||0), 0);
 
-  const assocPayments = S.payments.filter(p => p.year === y && p.fund === 'assoc').reduce((s,p) => s + (Number(p.amount)||0), 0);
-  const assocIncomes = S.incomes.filter(i => i.year === y && i.fund === 'assoc').reduce((s,i) => s + (Number(i.amount)||0), 0);
-  const assocExpenses = S.expenses.filter(e => e.year === y && e.fund === 'assoc').reduce((s,e) => s + (Number(e.amount)||0), 0);
+  const assocPayments = sum(S.payments.filter(p => Number(p.year) === y && p.fund === 'assoc'));
+  const assocIncomes = sum(S.incomes.filter(i => Number(i.year) === y && i.fund === 'assoc'));
+  const assocExpenses = sum(S.expenses.filter(e => Number(e.year) === y && e.fund === 'assoc'));
   const assocBalance = assocPayments + assocIncomes - assocExpenses;
 
-  const deathPayments = S.payments.filter(p => p.year === y && p.fund === 'death').reduce((s,p) => s + (Number(p.amount)||0), 0);
-  const deathIncomes = S.incomes.filter(i => i.year === y && i.fund === 'death').reduce((s,i) => s + (Number(i.amount)||0), 0);
-  const deathExpenses = S.expenses.filter(e => e.year === y && e.fund === 'death').reduce((s,e) => s + (Number(e.amount)||0), 0);
-  const deathCompensations = S.deaths.filter(d => d.year === y).reduce((s,d) => s + (Number(d.compensation)||0), 0);
+  const deathPayments = sum(S.payments.filter(p => Number(p.year) === y && p.fund === 'death'));
+  const deathIncomes = sum(S.incomes.filter(i => Number(i.year) === y && i.fund === 'death'));
+  const deathExpenses = sum(S.expenses.filter(e => Number(e.year) === y && e.fund === 'death'));
+  const deathCompensations = sum(S.deaths.filter(d => Number(d.year) === y), 'compensation');
   const deathBalance = deathPayments + deathIncomes - deathExpenses - deathCompensations;
 
-  const donations = S.payments.filter(p => p.year === y && p.fund === 'donation').reduce((s,p) => s + (Number(p.amount)||0), 0);
+  const donations = sum(S.payments.filter(p => Number(p.year) === y && p.fund === 'donation'));
 
   return {
     year: y,
@@ -639,16 +665,17 @@ function getFundBalances(year){
   };
 }
 
+/* ✅ عهدة المستخدم */
 function getUserCustody(userId){
-  const payments = S.payments.filter(p => p.collectorId === userId).reduce((s,p) => s + (Number(p.amount)||0), 0);
+  const collected = S.payments.filter(p => p.collectorId === userId).reduce((s,p) => s + (Number(p.amount)||0), 0);
   const delivered = S.deliveries.filter(d => d.fromUserId === userId).reduce((s,d) => s + (Number(d.amount)||0), 0);
-  const received = S.deliveries.filter(d => d.toUserId === userId).reduce((s,d) => s + (Number(d.amount)||0), 0);
-  return { collected: payments, delivered, received, balance: payments - delivered + received };
+  const received  = S.deliveries.filter(d => d.toUserId   === userId).reduce((s,d) => s + (Number(d.amount)||0), 0);
+  return { collected, delivered, received, balance: collected - delivered + received };
 }
 
-/* ═══════════════════════════════════════════════════════
-   تسجيل الدخول
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   📌 القسم [3/8] — تسجيل الدخول
+   ═══════════════════════════════════════════════════════════════ */
 let _pinAttempt = '';
 let _pinTargetUser = null;
 
@@ -670,7 +697,6 @@ function renderLogin(){
     </div>`;
   }).join('');
 }
-
 function selectLoginUser(id){
   const u = S.users.find(a => a.id === id);
   if(!u) return;
@@ -708,7 +734,6 @@ function doLogin(u){
   toast('👋 مرحباً ' + u.name, 'success', 2000);
   showMain();
 }
-
 function showAddFirstAdmin(){
   const body = `
     <div class="fld"><label>الاسم <span class="req">*</span></label><input id="fName" placeholder="بسام" maxlength="50"></div>
@@ -719,7 +744,6 @@ function showAddFirstAdmin(){
   const foot = `<button class="btn ghost" onclick="closeSheet()">إلغاء</button><button class="btn primary" onclick="saveFirstAdmin()">✅ إنشاء</button>`;
   openSheet('👑 إعداد أول مرة', body, foot, { focus:'fName' });
 }
-
 async function saveFirstAdmin(){
   const name = cleanText($('fName').value);
   const pin = $('fPin').value.trim();
@@ -737,7 +761,6 @@ async function saveFirstAdmin(){
     setTimeout(renderLogin, 400);
   } catch(e){ toast('خطأ: ' + e.message, 'error'); }
 }
-
 function showLogin(){
   $('loginScreen').classList.add('on');
   $('appHeader').style.display = 'none';
@@ -771,9 +794,7 @@ function logout(){
   showLogin();
 }
 
-/* ═══════════════════════════════════════════════════════
-   نظام السنة
-   ═══════════════════════════════════════════════════════ */
+/* ═══ نظام السنة ═══ */
 function changeYear(y){
   S.currentYear = Number(y);
   localStorage.setItem('zt_year', y);
@@ -801,9 +822,9 @@ function openYearPicker(){
   openSheet('📅 السنة', body, '<button class="btn ghost" onclick="closeSheet()">إلغاء</button>');
 }
 
-/* ═══════════════════════════════════════════════════════
-   الرئيسية
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   📌 القسم [4/8] — الرئيسية
+   ═══════════════════════════════════════════════════════════════ */
 function renderHome(){
   const y = S.currentYear;
   const stats = getMembersStats(y);
@@ -817,6 +838,14 @@ function renderHome(){
       <div class="stat green"><div class="val">${fmtShort(custody.collected)}</div><div class="lbl">📥 حصّلت</div></div>
       <div class="stat orange"><div class="val">${fmtShort(custody.delivered)}</div><div class="lbl">📤 سلّمت</div></div>
       <div class="stat"><div class="val">${S.members.length}</div><div class="lbl">👥 الأعضاء</div></div>
+    `;
+  } else if(S.currentUser.role === 'member'){
+    const full = S.currentUser.memberId ? computeMemberFull(S.currentUser.memberId) : null;
+    statsHTML = `
+      <div class="stat red"><div class="val">${fmtShort(full?.total.totalRem || 0)}</div><div class="lbl">💰 متبقي عليّ</div></div>
+      <div class="stat green"><div class="val">${fmtShort(full?.total.totalPaid || 0)}</div><div class="lbl">✅ دفعت</div></div>
+      <div class="stat assoc"><div class="val">${fmtShort(full?.total.assocRem || 0)}</div><div class="lbl">💰 جمعية</div></div>
+      <div class="stat death"><div class="val">${fmtShort(full?.total.deathRem || 0)}</div><div class="lbl">⚰️ وفاة</div></div>
     `;
   } else {
     statsHTML = `
@@ -876,9 +905,36 @@ function renderHome(){
     </div>`).join('')}</div>` : '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">لا توجد عمليات</div>';
 }
 
-/* ═══════════════════════════════════════════════════════
-   الأعضاء
-   ═══════════════════════════════════════════════════════ */
+/* ═══ التحميل ═══ */
+async function loadAll(){
+  const r = await Promise.all([
+    dbAll('members'), dbAll('payments'), dbAll('deaths'), dbAll('incomes'), dbAll('expenses'),
+    dbAll('deliveries'), dbAll('storeItems'), dbAll('storeMovements'), dbAll('meetings'),
+    dbAll('constants'), dbAll('users'), dbAll('auditLog'), dbAll('customFields')
+  ]);
+  S.members = r[0]; S.payments = r[1]; S.deaths = r[2]; S.incomes = r[3]; S.expenses = r[4];
+  S.deliveries = r[5]; S.storeItems = r[6]; S.storeMovements = r[7]; S.meetings = r[8];
+  S.constants = r[9]; S.users = r[10]; S.auditLog = r[11]; S.customFields = r[12];
+}
+
+/* ═══ سجل التدقيق ═══ */
+async function logAudit(action, target, targetId, details = {}){
+  try{
+    const entry = {
+      timestamp: new Date().toISOString(),
+      userId: S.currentUser ? S.currentUser.id : null,
+      userName: S.currentUser ? S.currentUser.name : 'system',
+      action, target, targetId, details
+    };
+    await dbPut('auditLog', entry);
+    S.auditLog.push(entry);
+  } catch(e){ console.warn(e); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   📌 القسم [5/8] — الأعضاء ⭐ (مع فلترة "كليهما" في الصندوقين)
+   ═══════════════════════════════════════════════════════════════ */
+
 function setMembersFilter(k){ S.filters.members = k; renderMembers(); }
 function setMembersSector(k){ S.filters.membersSector = k; renderMembers(); }
 
@@ -887,27 +943,31 @@ function renderMembers(){
   const stats = getMembersStats(y);
 
   $('membersStats').innerHTML = `
-    <div class="stat assoc"><div class="val">${stats.onlyAssoc}</div><div class="lbl">💰 جمعية فقط</div></div>
-    <div class="stat death"><div class="val">${stats.onlyDeath}</div><div class="lbl">⚰️ وفاة فقط</div></div>
+    <div class="stat assoc"><div class="val">${stats.onlyAssoc + stats.both}</div><div class="lbl">💰 مشتركو الجمعية</div></div>
+    <div class="stat death"><div class="val">${stats.onlyDeath + stats.both}</div><div class="lbl">⚰️ مشتركو الوفاة</div></div>
     <div class="stat green"><div class="val">${stats.both}</div><div class="lbl">✅ كليهما</div></div>
     <div class="stat red"><div class="val">${stats.late}</div><div class="lbl">⚠️ متأخرون</div></div>
   `;
 
   const chips = [
-    { k:'all', l:'الكل' },
-    { k:'assoc', l:'💰 جمعية فقط' },
-    { k:'death', l:'⚰️ وفاة فقط' },
-    { k:'both', l:'✅ كليهما' },
-    { k:'late', l:'⚠️ متأخرون' },
-    { k:'none', l:'⚪ غير مشتركين' }
+    { k:'all', l:`📋 الكل (${stats.total})` },
+    { k:'assoc', l:`💰 جمعية (${stats.onlyAssoc + stats.both})` },
+    { k:'death', l:`⚰️ وفاة (${stats.onlyDeath + stats.both})` },
+    { k:'both', l:`✅ كليهما (${stats.both})` },
+    { k:'assocOnly', l:`💰 جمعية فقط (${stats.onlyAssoc})` },
+    { k:'deathOnly', l:`⚰️ وفاة فقط (${stats.onlyDeath})` },
+    { k:'late', l:`⚠️ متأخرون (${stats.late})` },
+    { k:'none', l:`⚪ غير مشتركين (${stats.none})` },
+    { k:'stopped', l:`🚪 متوقفون (${stats.stopped})` }
   ];
   $('membersChips').innerHTML = chips.map(c => 
     `<button class="chip ${S.filters.members === c.k ? 'on' : ''}" onclick="setMembersFilter('${c.k}')">${c.l}</button>`
   ).join('');
 
-  const sectorChips = [{k:'all',l:'كل القطاعات'}, ...DEFAULT_SECTORS.map(s => ({k:s, l:s}))];
+  const sectorsInUse = [...new Set(S.members.map(m => m.sector).filter(Boolean))].sort();
+  const sectorChips = [{k:'all',l:'📍 كل القطاعات'}, ...sectorsInUse.map(s => ({k:s, l:s}))];
   $('membersSectorChips').innerHTML = sectorChips.map(c => 
-    `<button class="chip ${S.filters.membersSector === c.k ? 'on' : ''}" onclick="setMembersSector('${c.k}')">${c.l}</button>`
+    `<button class="chip ${S.filters.membersSector === c.k ? 'on' : ''}" onclick="setMembersSector('${c.k.replace(/'/g,"\\'")}')">${c.l}</button>`
   ).join('');
 
   // فلترة
@@ -916,31 +976,31 @@ function renderMembers(){
     return { member: m, full };
   });
 
-  // ⭐⭐ قيود المعتمد — يرى فقط المشتركين في صندوقه/قطاعه ⭐⭐
+  // قيود المعتمد
   if(S.currentUser && S.currentUser.role === 'collector'){
     const cf = S.currentUser.collectFund;
-    if(cf === 'assoc'){
-      list = list.filter(x => x.member.assocStartYear);
-    } else if(cf === 'death'){
-      list = list.filter(x => x.member.deathStartYear);
-    } else {
-      list = list.filter(x => x.member.assocStartYear || x.member.deathStartYear);
-    }
-    const sec = S.currentUser.sector;
-    if(sec) list = list.filter(x => x.member.sector === sec);
+    if(cf === 'assoc')      list = list.filter(x => x.member.assocStartYear);
+    else if(cf === 'death') list = list.filter(x => x.member.deathStartYear);
+    else                    list = list.filter(x => x.member.assocStartYear || x.member.deathStartYear);
+    if(S.currentUser.sector) list = list.filter(x => x.member.sector === S.currentUser.sector);
   }
 
-  if(S.filters.members === 'assoc') list = list.filter(x => x.member.assocStartYear && !x.member.deathStartYear);
-  if(S.filters.members === 'death') list = list.filter(x => x.member.deathStartYear && !x.member.assocStartYear);
-  if(S.filters.members === 'both') list = list.filter(x => x.member.assocStartYear && x.member.deathStartYear);
-  if(S.filters.members === 'late') list = list.filter(x => x.full && x.full.total.totalRem > 0);
-  if(S.filters.members === 'none') list = list.filter(x => !x.member.assocStartYear && !x.member.deathStartYear);
+  // ✅ "كليهما" يظهر في جمعية والوفاة — نستخدم منطق OR
+  const f = S.filters.members;
+  if(f === 'assoc')      list = list.filter(x => x.member.assocStartYear);        // يشمل كليهما
+  if(f === 'death')      list = list.filter(x => x.member.deathStartYear);        // يشمل كليهما
+  if(f === 'both')       list = list.filter(x => x.member.assocStartYear && x.member.deathStartYear);
+  if(f === 'assocOnly')  list = list.filter(x => x.member.assocStartYear && !x.member.deathStartYear);
+  if(f === 'deathOnly')  list = list.filter(x => x.member.deathStartYear && !x.member.assocStartYear);
+  if(f === 'late')       list = list.filter(x => x.full && x.full.total.totalRem > 0);
+  if(f === 'none')       list = list.filter(x => !x.member.assocStartYear && !x.member.deathStartYear);
+  if(f === 'stopped')    list = list.filter(x => ['منسحب','متوقف'].includes(x.member.memberStatus));
 
   if(S.filters.membersSector !== 'all') list = list.filter(x => x.member.sector === S.filters.membersSector);
 
   if(S.search){
     const s = normAr(S.search);
-    list = list.filter(x => normAr(`${x.member.name} ${x.member.code || ''} ${x.member.phone || ''}`).includes(s));
+    list = list.filter(x => normAr(`${x.member.name} ${x.member.code || ''} ${x.member.phone || ''} ${x.member.familyCode || ''}`).includes(s));
   }
 
   list.sort((a,b) => {
@@ -953,17 +1013,23 @@ function renderMembers(){
   const el = $('membersContent');
   if(!list.length){ el.innerHTML = `<div class="empty"><span class="ico">👥</span><h3>لا يوجد أعضاء</h3><p>أضف عضواً أو استورد ملف Excel</p></div>`; return; }
 
-  el.innerHTML = `<div class="list">${list.slice(0, 300).map(({member, full}) => {
+  el.innerHTML = `<div class="list">${list.slice(0, 500).map(({member, full}) => {
     const icons = [];
     if(member.assocStartYear) icons.push('💰');
     if(member.deathStartYear) icons.push('⚰️');
     const rem = full?.total.totalRem || 0;
     const hasUnpaid = rem > 0;
+    const st = member.memberStatus || 'نشط';
+    let statusBadge = '';
+    if(st === 'متوفى')  statusBadge = '<span class="badge danger">⚰️ متوفى</span>';
+    else if(st === 'منسحب') statusBadge = '<span class="badge muted">🚪 منسحب</span>';
+    else if(st === 'متوقف') statusBadge = '<span class="badge warning">⏸️ متوقف</span>';
+    else if(st === 'معفى')  statusBadge = '<span class="badge info">🎗️ معفى</span>';
 
     return `<div class="item" onclick="openMemberDetail(${member.id})">
       <div class="av ${hasUnpaid ? 'red' : 'green'}">${icons.join('') || '⭐'}</div>
       <div class="body">
-        <div class="ttl">${esc(member.name)}${member.memberType === 'مخفض' ? ' 🎓' : ''}</div>
+        <div class="ttl">${esc(member.name)}${member.memberType === 'مخفض' ? ' 🎓' : ''} ${statusBadge}</div>
         <div class="sub">${esc(member.code||'')} • ${esc(member.sector||'')} ${hasUnpaid ? '• متبقي ' + fmtShort(rem) : '• ✅'}</div>
       </div>
       <div style="text-align:left">
@@ -973,18 +1039,28 @@ function renderMembers(){
   }).join('')}</div>`;
 }
 
+/* ═══ كشف حساب عضو — مفصّل بالكامل ═══ */
 function openMemberDetail(id){
   const full = computeMemberFull(id);
   if(!full) return;
   const m = full.member;
+  const st = m.memberStatus || 'نشط';
 
+  // شريط الحالة
+  let statusBar = '';
+  if(st === 'متوفى')  statusBar = '<div style="padding:6px;background:#fee2e2;color:#991b1b;border-radius:8px;font-size:11px;font-weight:800;text-align:center;margin-bottom:10px">⚰️ متوفى' + (m.deathDate ? ' — ' + fmtDate(m.deathDate) : '') + '</div>';
+  else if(st === 'منسحب') statusBar = '<div style="padding:6px;background:#f1f5f9;color:#475569;border-radius:8px;font-size:11px;font-weight:800;text-align:center;margin-bottom:10px">🚪 منسحب — توقف من ' + (m.stopYear||'?') + '</div>';
+  else if(st === 'متوقف') statusBar = '<div style="padding:6px;background:#fef3c7;color:#92400e;border-radius:8px;font-size:11px;font-weight:800;text-align:center;margin-bottom:10px">⏸️ متوقف — من ' + (m.stopYear||'?') + '</div>';
+  else if(st === 'معفى')  statusBar = '<div style="padding:6px;background:#dbeafe;color:#1e40af;border-radius:8px;font-size:11px;font-weight:800;text-align:center;margin-bottom:10px">🎗️ معفى من الرسوم</div>';
+
+  // تفصيل المستحقات الكامل
   const body = `
     <div style="padding:16px;background:linear-gradient(135deg, var(--primary), var(--primary-2));color:#fff;border-radius:14px;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:12px">
         <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">${m.gender === 'أنثى' ? '👩' : '👨'}</div>
         <div style="flex:1;min-width:0">
           <div style="font-weight:800;font-size:17px">${esc(m.name)}</div>
-          <div style="font-size:12px;opacity:.9;margin-top:3px">${esc(m.code||'')} • ${esc(m.sector||'')}</div>
+          <div style="font-size:12px;opacity:.9;margin-top:3px">${esc(m.code||'')} • ${esc(m.sector||'')}${m.familyCode ? ' • 👨‍👩‍👧 ' + esc(m.familyCode) : ''}</div>
           <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
             ${m.assocStartYear ? `<span style="background:rgba(255,255,255,.25);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800">💰 منذ ${m.assocStartYear}</span>` : ''}
             ${m.deathStartYear ? `<span style="background:rgba(255,255,255,.25);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800">⚰️ منذ ${m.deathStartYear}</span>` : ''}
@@ -994,43 +1070,103 @@ function openMemberDetail(id){
       </div>
     </div>
 
+    ${statusBar}
+
+    <!-- ملخص الإجمالي -->
     <div style="padding:14px;background:var(--bg);border-radius:12px;margin-bottom:14px;text-align:center">
       <div style="font-size:11px;color:var(--muted);font-weight:700">إجمالي المتبقي</div>
       <div style="font-size:28px;font-weight:800;color:${full.total.totalRem > 0 ? 'var(--danger)' : 'var(--success)'};margin-top:4px">${fmtNum(full.total.totalRem)} ل.س</div>
       <div style="font-size:11px;color:var(--muted);margin-top:4px">دُفع ${fmtNum(full.total.totalPaid)} من ${fmtNum(full.total.totalReq)}</div>
     </div>
 
+    <!-- ⭐ كشف المستحقات المفصّل -->
+    <div style="font-weight:800;font-size:14px;margin-bottom:10px">📋 تفصيل المستحقات (المدمجة)</div>
+    <div class="balance-block" style="border-right:4px solid var(--assoc)">
+      <div style="font-weight:800;color:var(--assoc);margin-bottom:8px">💰 الجمعية</div>
+      ${full.total.assocYearlyReq > 0 ? `
+        <div class="balance-row"><span class="lbl">📅 اشتراكات سنوية</span><span class="val">${fmtNum(full.total.assocYearlyReq)}</span></div>
+      ` : ''}
+      ${full.total.assocJoinReq > 0 ? `
+        <div class="balance-row"><span class="lbl">🎫 رسوم انضمام (مرة واحدة)</span><span class="val orange">${fmtNum(full.total.assocJoinReq)}</span></div>
+      ` : ''}
+      <div class="balance-row" style="border-top:1px dashed var(--border);margin-top:4px">
+        <span style="font-weight:700">إجمالي المطلوب</span><span class="val">${fmtNum(full.total.assocReq)}</span>
+      </div>
+      <div class="balance-row"><span class="lbl">✅ دُفع</span><span class="val green">${fmtNum(full.total.assocPaid)}</span></div>
+      <div class="balance-row" style="border-top:2px solid var(--assoc);padding-top:6px">
+        <span style="font-weight:800">💰 المتبقي</span>
+        <span class="val" style="color:${full.total.assocRem > 0 ? 'var(--danger)' : 'var(--success)'}">${fmtNum(full.total.assocRem)}</span>
+      </div>
+    </div>
+
+    <div class="balance-block" style="border-right:4px solid var(--death)">
+      <div style="font-weight:800;color:var(--death);margin-bottom:8px">⚰️ الوفاة</div>
+      ${full.total.deathJoinReq > 0 ? `
+        <div class="balance-row"><span class="lbl">🎫 رسوم انضمام (مرة واحدة)</span><span class="val orange">${fmtNum(full.total.deathJoinReq)}</span></div>
+      ` : ''}
+      ${full.total.deathInstallReq > 0 ? `
+        <div class="balance-row"><span class="lbl">📊 أقساط الوفيات</span><span class="val">${fmtNum(full.total.deathInstallReq)}</span></div>
+      ` : ''}
+      <div class="balance-row" style="border-top:1px dashed var(--border);margin-top:4px">
+        <span style="font-weight:700">إجمالي المطلوب</span><span class="val">${fmtNum(full.total.deathReq)}</span>
+      </div>
+      <div class="balance-row"><span class="lbl">✅ دُفع</span><span class="val green">${fmtNum(full.total.deathPaid)}</span></div>
+      <div class="balance-row" style="border-top:2px solid var(--death);padding-top:6px">
+        <span style="font-weight:800">⚰️ المتبقي</span>
+        <span class="val" style="color:${full.total.deathRem > 0 ? 'var(--danger)' : 'var(--success)'}">${fmtNum(full.total.deathRem)}</span>
+      </div>
+    </div>
+
+    <!-- أزرار الدفع -->
     ${hasPerm('payment.add') ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      ${m.assocStartYear ? `<button class="btn assoc" onclick="closeSheet();setTimeout(()=>openPaymentSheet(${id},'assoc'),150)">💰 دفعة جمعية</button>` : ''}
-      ${m.deathStartYear ? `<button class="btn death" onclick="closeSheet();setTimeout(()=>openPaymentSheet(${id},'death'),150)">⚰️ دفعة وفاة</button>` : ''}
+      ${m.assocStartYear && !m.assocExempt ? `<button class="btn assoc" onclick="closeSheet();setTimeout(()=>openPaymentSheet(${id},'assoc'),150)">💰 دفعة جمعية</button>` : ''}
+      ${m.deathStartYear && !m.deathExempt ? `<button class="btn death" onclick="closeSheet();setTimeout(()=>openPaymentSheet(${id},'death'),150)">⚰️ دفعة وفاة</button>` : ''}
     </div>` : ''}
 
-    <div style="font-weight:800;font-size:14px;margin:16px 0 10px">📊 سجل الالتزامات</div>
-    ${full.years.map(yr => `
-      <div style="padding:12px;background:var(--bg);border-radius:12px;margin-bottom:10px">
-        <div style="font-weight:800;font-size:14px;margin-bottom:8px">📅 ${yr.year}</div>
-        ${yr.assoc.req > 0 ? `
-          <div style="padding:8px;background:var(--card);border-radius:8px;margin-bottom:6px">
-            <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--assoc);margin-bottom:4px"><span>💰 الجمعية</span><span>${fmtNum(yr.assoc.paid)} / ${fmtNum(yr.assoc.req)}</span></div>
-            <div class="progress assoc"><div style="width:${yr.assoc.req > 0 ? Math.min(100, Math.round(yr.assoc.paid/yr.assoc.req*100)) : 0}%"></div></div>
-            ${yr.assoc.req - yr.assoc.paid > 0 ? `<div style="font-size:11px;color:var(--danger);margin-top:4px">متبقي: ${fmtNum(yr.assoc.req - yr.assoc.paid)}</div>` : '<div style="font-size:11px;color:var(--success);margin-top:4px">✅ مسدَّد</div>'}
-          </div>
-        ` : ''}
-        ${yr.death.req > 0 ? `
-          <div style="padding:8px;background:var(--card);border-radius:8px">
-            <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--death);margin-bottom:4px"><span>⚰️ الوفاة</span><span>${fmtNum(yr.death.paid)} / ${fmtNum(yr.death.req)}</span></div>
-            <div class="progress death"><div style="width:${yr.death.req > 0 ? Math.min(100, Math.round(yr.death.paid/yr.death.req*100)) : 0}%"></div></div>
-            ${yr.death.req - yr.death.paid > 0 ? `<div style="font-size:11px;color:var(--danger);margin-top:4px">متبقي: ${fmtNum(yr.death.req - yr.death.paid)}</div>` : '<div style="font-size:11px;color:var(--success);margin-top:4px">✅ مسدَّد</div>'}
-          </div>
-        ` : ''}
-        ${!yr.assoc.req && !yr.death.req ? '<div style="font-size:12px;color:var(--muted);text-align:center">لا توجد التزامات</div>' : ''}
-      </div>
-    `).join('')}
+    <!-- كشف الحساب السنوي -->
+    <div style="font-weight:800;font-size:14px;margin:16px 0 10px">📊 كشف الحساب السنوي</div>
+    ${full.years.map(yr => {
+      if(yr.skipped){
+        return `<div style="padding:10px;background:var(--bg);border-radius:10px;margin-bottom:8px;opacity:.6">
+          <div style="font-weight:800;font-size:13px">📅 ${yr.year} <span class="badge muted">${yr.reason}</span></div>
+        </div>`;
+      }
+      const hasAny = yr.assoc.req > 0 || yr.death.req > 0;
+      if(!hasAny) return '';
+      return `
+        <div style="padding:12px;background:var(--bg);border-radius:12px;margin-bottom:10px">
+          <div style="font-weight:800;font-size:14px;margin-bottom:10px">📅 سنة ${yr.year}</div>
+          ${yr.assoc.req > 0 ? `
+            <div style="padding:10px;background:var(--card);border-radius:8px;margin-bottom:6px;border-right:3px solid var(--assoc)">
+              <div style="font-weight:800;color:var(--assoc);font-size:12px;margin-bottom:6px">💰 الجمعية</div>
+              ${yr.assoc.yearlyReq > 0 ? `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0"><span>اشتراك سنوي</span><b>${fmtNum(yr.assoc.yearlyReq)}</b></div>` : ''}
+              ${yr.assoc.joinReq > 0 ? `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;color:var(--warning)"><span>🎫 رسوم انضمام</span><b>${fmtNum(yr.assoc.joinReq)}</b></div>` : ''}
+              <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px dashed var(--border);margin-top:2px"><span style="font-weight:700">المطلوب</span><b>${fmtNum(yr.assoc.req)}</b></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0"><span>✅ دُفع</span><b style="color:var(--success)">${fmtNum(yr.assoc.paid)}</b></div>
+              <div class="progress assoc" style="margin-top:6px"><div style="width:${yr.assoc.req > 0 ? Math.min(100, Math.round(yr.assoc.paid/yr.assoc.req*100)) : 0}%"></div></div>
+              ${yr.assoc.rem > 0 ? `<div style="font-size:11px;color:var(--danger);margin-top:6px;font-weight:700">متبقي: ${fmtNum(yr.assoc.rem)}</div>` : '<div style="font-size:11px;color:var(--success);margin-top:6px">✅ مسدَّد</div>'}
+            </div>
+          ` : ''}
+          ${yr.death.req > 0 ? `
+            <div style="padding:10px;background:var(--card);border-radius:8px;border-right:3px solid var(--death)">
+              <div style="font-weight:800;color:var(--death);font-size:12px;margin-bottom:6px">⚰️ الوفاة</div>
+              ${yr.death.joinReq > 0 ? `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;color:var(--warning)"><span>🎫 رسوم انضمام</span><b>${fmtNum(yr.death.joinReq)}</b></div>` : ''}
+              ${yr.death.installReq > 0 ? `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0"><span>📊 أقساط الوفيات</span><b>${fmtNum(yr.death.installReq)}</b></div>` : ''}
+              <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px dashed var(--border);margin-top:2px"><span style="font-weight:700">المطلوب</span><b>${fmtNum(yr.death.req)}</b></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0"><span>✅ دُفع</span><b style="color:var(--success)">${fmtNum(yr.death.paid)}</b></div>
+              <div class="progress death" style="margin-top:6px"><div style="width:${yr.death.req > 0 ? Math.min(100, Math.round(yr.death.paid/yr.death.req*100)) : 0}%"></div></div>
+              ${yr.death.rem > 0 ? `<div style="font-size:11px;color:var(--danger);margin-top:6px;font-weight:700">متبقي: ${fmtNum(yr.death.rem)}</div>` : '<div style="font-size:11px;color:var(--success);margin-top:6px">✅ مسدَّد</div>'}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('')}
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
       <button class="btn ghost block" onclick="closeSheet();setTimeout(()=>openMemberSheet(${id}),150)">📝 بيانات العضو</button>
       <button class="btn ghost block" onclick="showMemberPayments(${id})">📜 سجل دفعاته</button>
     </div>
+    <button class="btn info block" style="margin-top:8px" onclick="printMemberStatement(${id})">🖨️ طباعة / واتساب كشف الحساب</button>
   `;
   openSheet('👤 ' + m.name, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
 }
@@ -1040,22 +1176,76 @@ function showMemberPayments(memberId){
   const list = S.payments.filter(p => p.memberId === memberId).sort((a,b) => (b.date||'').localeCompare(a.date||''));
 
   const body = list.length ? `<div class="list">${list.map(p => `
-    <div class="item" style="cursor:default">
+    <div class="item" style="cursor:default" onclick="closeSheet();setTimeout(()=>openPaymentDetail(${p.id}),150)">
       <div class="av ${p.fund === 'death' ? 'red' : p.fund === 'donation' ? 'green' : 'blue'}">${p.fund === 'death' ? '⚰️' : p.fund === 'donation' ? '💚' : '💰'}</div>
-      <div class="body"><div class="ttl">${fmtNum(p.amount)} ل.س</div><div class="sub">${p.fund === 'death' ? 'وفاة' : p.fund === 'donation' ? 'تبرع' : 'جمعية'} • ${fmtDate(p.date)} • ${esc(p.collectorName || '')}</div></div>
+      <div class="body"><div class="ttl">${fmtNum(p.amount)} ل.س</div><div class="sub">${p.fund === 'death' ? 'وفاة' : p.fund === 'donation' ? 'تبرع' : 'جمعية'} • ${fmtDate(p.date)} • سنة ${p.forYear || p.year} • ${esc(p.collectorName || '')}</div></div>
+      <span class="trail">›</span>
     </div>
   `).join('')}</div>` : '<div style="text-align:center;padding:30px;color:var(--muted)">لا توجد دفعات</div>';
 
   openSheet('📜 دفعات ' + m.name, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
 }
 
+/* ═══ طباعة كشف حساب العضو ═══ */
+function printMemberStatement(id){
+  const full = computeMemberFull(id);
+  if(!full) return;
+  const m = full.member;
+  let txt = `👤 *كشف حساب: ${m.name}*\n`;
+  txt += `الكود: ${m.code || '—'} • القطاع: ${m.sector || '—'}\n`;
+  txt += `النوع: ${m.memberType || 'عادي'} • الحالة: ${m.memberStatus || 'نشط'}\n\n`;
+  txt += `📊 *الملخص:*\n`;
+  txt += `• إجمالي المطلوب: ${fmtNum(full.total.totalReq)}\n`;
+  txt += `• دُفع: ${fmtNum(full.total.totalPaid)}\n`;
+  txt += `• المتبقي: ${fmtNum(full.total.totalRem)}\n\n`;
+  if(full.total.assocReq > 0){
+    txt += `💰 *الجمعية:*\n`;
+    if(full.total.assocYearlyReq > 0) txt += `  - اشتراكات سنوية: ${fmtNum(full.total.assocYearlyReq)}\n`;
+    if(full.total.assocJoinReq > 0) txt += `  - رسوم انضمام: ${fmtNum(full.total.assocJoinReq)}\n`;
+    txt += `  - دُفع: ${fmtNum(full.total.assocPaid)} • المتبقي: ${fmtNum(full.total.assocRem)}\n\n`;
+  }
+  if(full.total.deathReq > 0){
+    txt += `⚰️ *الوفاة:*\n`;
+    if(full.total.deathJoinReq > 0) txt += `  - رسوم انضمام: ${fmtNum(full.total.deathJoinReq)}\n`;
+    if(full.total.deathInstallReq > 0) txt += `  - أقساط وفيات: ${fmtNum(full.total.deathInstallReq)}\n`;
+    txt += `  - دُفع: ${fmtNum(full.total.deathPaid)} • المتبقي: ${fmtNum(full.total.deathRem)}\n\n`;
+  }
+  txt += `📅 *تفصيل السنوات:*\n`;
+  full.years.forEach(yr => {
+    if(yr.assoc.req > 0 || yr.death.req > 0){
+      const aRem = yr.assoc.req - yr.assoc.paid;
+      const dRem = yr.death.req - yr.death.paid;
+      txt += `• ${yr.year}: `;
+      const parts = [];
+      if(yr.assoc.req > 0) parts.push(`💰${fmtNum(yr.assoc.paid)}/${fmtNum(yr.assoc.req)}`);
+      if(yr.death.req > 0) parts.push(`⚰️${fmtNum(yr.death.paid)}/${fmtNum(yr.death.req)}`);
+      txt += parts.join(' | ');
+      if(aRem + dRem > 0) txt += ` ⚠️ متبقي ${fmtNum(aRem + dRem)}`;
+      txt += `\n`;
+    }
+  });
+  txt += `\n_صندوق زعورة_`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+/* ═══ نموذج العضو ═══ */
 function openMemberSheet(id = null){
   if(!hasPerm('member.manage')){ toast('غير مصرح','error'); return; }
   const isNew = !id;
-  const m = isNew ? { gender:'ذكر', status:'حي', relation:'رب أسرة', memberType:'عادي' } : S.members.find(x => x.id === id);
+  const m = isNew ? { gender:'ذكر', status:'حي', relation:'رب أسرة', memberType:'عادي', memberStatus:'نشط' } : S.members.find(x => x.id === id);
   if(!m) return;
 
   const sectorOpts = DEFAULT_SECTORS.map(s => `<option value="${s}" ${m.sector === s ? 'selected' : ''}>${s}</option>`).join('');
+  const statusVal = m.memberStatus || 'نشط';
+
+  // الحقول المخصصة
+  const customFieldsHTML = (S.customFields || []).map(cf => {
+    const v = (m.custom && m.custom[cf.key]) || '';
+    return `<div class="fld">
+      <label>${esc(cf.label)}${cf.required ? ' <span class="req">*</span>' : ''}</label>
+      <input id="cf_${cf.key}" value="${esc(v)}" placeholder="${esc(cf.hint||'')}">
+    </div>`;
+  }).join('');
 
   const body = `
     <div class="fld-row">
@@ -1065,7 +1255,7 @@ function openMemberSheet(id = null){
     <div class="fld"><label>الاسم الكامل <span class="req">*</span></label><input id="mName" value="${esc(m.name||'')}"></div>
     <div class="fld-row">
       <div class="fld"><label>الجنس</label><select id="mGender"><option ${m.gender === 'ذكر' ? 'selected' : ''}>ذكر</option><option ${m.gender === 'أنثى' ? 'selected' : ''}>أنثى</option></select></div>
-      <div class="fld"><label>الحالة</label><select id="mStatus">${['حي','متوفى','مسافر','غير معروف'].map(s => `<option ${m.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+      <div class="fld"><label>الحياة</label><select id="mStatus">${['حي','متوفى','مسافر','غير معروف'].map(s => `<option ${m.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
     </div>
     <div class="fld-row">
       <div class="fld"><label>الميلاد</label><input id="mBirth" type="date" value="${esc(m.birth||'')}"></div>
@@ -1076,10 +1266,41 @@ function openMemberSheet(id = null){
       <div class="fld"><label>الهاتف</label><input id="mPhone" value="${esc(m.phone||'')}" inputmode="tel"></div>
     </div>
 
+    <div style="background:#fef3c7;padding:12px;border-radius:12px;margin:14px 0">
+      <div style="font-weight:800;font-size:13px;color:#92400e;margin-bottom:10px">🎭 حالة العضوية</div>
+      <div class="fld"><label>الحالة</label>
+        <select id="mMemberStatus" onchange="toggleMemberStatus()">
+          <option value="نشط" ${statusVal === 'نشط' ? 'selected' : ''}>✅ نشط (يدفع كل الرسوم)</option>
+          <option value="منسحب" ${statusVal === 'منسحب' ? 'selected' : ''}>🚪 منسحب (توقف الاشتراك)</option>
+          <option value="متوقف" ${statusVal === 'متوقف' ? 'selected' : ''}>⏸️ متوقف مؤقتاً</option>
+          <option value="معفى" ${statusVal === 'معفى' ? 'selected' : ''}>🎗️ معفى (لا رسوم)</option>
+          <option value="متوفى" ${statusVal === 'متوفى' ? 'selected' : ''}>⚰️ متوفى</option>
+        </select>
+      </div>
+      <div class="fld" id="mStopYearField" style="display:${['منسحب','متوقف'].includes(statusVal) ? 'block' : 'none'}">
+        <label>سنة التوقف/الانسحاب</label>
+        <input id="mStopYear" type="tel" inputmode="numeric" maxlength="4" value="${m.stopYear || m.withdrawYear || ''}" placeholder="2026">
+      </div>
+      <div class="fld" id="mDeathDateField" style="display:${statusVal === 'متوفى' ? 'block' : 'none'}">
+        <label>تاريخ الوفاة</label>
+        <input id="mDeathDate" type="date" value="${esc(m.deathDate||'')}">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <label style="flex:1;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:8px;background:var(--card);border-radius:8px;cursor:pointer">
+          <input type="checkbox" id="mAssocExempt" ${m.assocExempt ? 'checked' : ''} style="width:auto">
+          🎗️ معفى من الجمعية
+        </label>
+        <label style="flex:1;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:8px;background:var(--card);border-radius:8px;cursor:pointer">
+          <input type="checkbox" id="mDeathExempt" ${m.deathExempt ? 'checked' : ''} style="width:auto">
+          🎗️ معفى من الوفاة
+        </label>
+      </div>
+    </div>
+
     <div style="background:var(--assoc-soft);padding:12px;border-radius:12px;margin:14px 0">
       <div style="font-weight:800;font-size:13px;color:var(--assoc);margin-bottom:10px">💰 اشتراك الجمعية</div>
       <div class="fld-row">
-        <div class="fld"><label>سنة بدء الاشتراك</label><input id="mAssocYear" type="tel" inputmode="numeric" value="${m.assocStartYear||''}" placeholder="اتركه فارغاً = غير مشترك" maxlength="4"></div>
+        <div class="fld"><label>سنة بدء الاشتراك</label><input id="mAssocYear" type="tel" inputmode="numeric" value="${m.assocStartYear||''}" placeholder="فارغ = غير مشترك" maxlength="4"></div>
         <div class="fld"><label>الحالة</label>
           <select id="mAssocActive" onchange="toggleAssocYear()">
             <option value="no" ${!m.assocStartYear ? 'selected' : ''}>غير مشترك</option>
@@ -1092,7 +1313,7 @@ function openMemberSheet(id = null){
     <div style="background:var(--death-soft);padding:12px;border-radius:12px;margin:14px 0">
       <div style="font-weight:800;font-size:13px;color:var(--death);margin-bottom:10px">⚰️ اشتراك الوفاة</div>
       <div class="fld-row">
-        <div class="fld"><label>سنة بدء الاشتراك</label><input id="mDeathYear" type="tel" inputmode="numeric" value="${m.deathStartYear||''}" placeholder="اتركه فارغاً = غير مشترك" maxlength="4"></div>
+        <div class="fld"><label>سنة بدء الاشتراك</label><input id="mDeathYear" type="tel" inputmode="numeric" value="${m.deathStartYear||''}" placeholder="فارغ = غير مشترك" maxlength="4"></div>
         <div class="fld"><label>الحالة</label>
           <select id="mDeathActive" onchange="toggleDeathYear()">
             <option value="no" ${!m.deathStartYear ? 'selected' : ''}>غير مشترك</option>
@@ -1106,6 +1327,8 @@ function openMemberSheet(id = null){
       <select id="mType"><option value="عادي" ${m.memberType === 'عادي' ? 'selected' : ''}>عادي</option><option value="مخفض" ${m.memberType === 'مخفض' ? 'selected' : ''}>مخفض (طلاب/دخل محدود)</option></select>
     </div>
 
+    ${customFieldsHTML ? `<div style="margin:16px 0;padding:12px;background:var(--bg);border-radius:12px"><div style="font-weight:800;font-size:13px;margin-bottom:10px">📌 حقول إضافية</div>${customFieldsHTML}</div>` : ''}
+
     <div class="fld"><label>ملاحظات</label><textarea id="mNotes">${esc(m.notes||'')}</textarea></div>
   `;
 
@@ -1114,9 +1337,14 @@ function openMemberSheet(id = null){
     : `<button class="btn danger sm" onclick="deleteMember(${id})">🗑️</button><button class="btn primary" onclick="saveMember(${id})">💾 حفظ</button>`;
 
   openSheet(isNew ? '➕ عضو جديد' : '✏️ ' + esc(m.name), body, foot, { focus:'mName' });
-  setTimeout(() => { toggleAssocYear(); toggleDeathYear(); }, 50);
+  setTimeout(() => { toggleAssocYear(); toggleDeathYear(); toggleMemberStatus(); }, 50);
 }
 
+function toggleMemberStatus(){
+  const s = $('mMemberStatus').value;
+  $('mStopYearField').style.display = ['منسحب','متوقف'].includes(s) ? 'block' : 'none';
+  $('mDeathDateField').style.display = s === 'متوفى' ? 'block' : 'none';
+}
 function toggleAssocYear(){
   const active = $('mAssocActive').value === 'yes';
   $('mAssocYear').disabled = !active;
@@ -1136,9 +1364,20 @@ async function saveMember(id = null){
   const deathActive = $('mDeathActive').value === 'yes';
   const assocYear = assocActive ? Number($('mAssocYear').value) : null;
   const deathYear = deathActive ? Number($('mDeathYear').value) : null;
+  const memberStatus = $('mMemberStatus').value;
+  const stopYear = ['منسحب','متوقف'].includes(memberStatus) ? (Number($('mStopYear').value) || null) : null;
+  const deathDate = memberStatus === 'متوفى' ? ($('mDeathDate').value || '') : '';
 
   if(assocActive && (!assocYear || assocYear < 2000 || assocYear > 2100)){ toast('سنة اشتراك الجمعية غير صحيحة','error'); return; }
   if(deathActive && (!deathYear || deathYear < 2000 || deathYear > 2100)){ toast('سنة اشتراك الوفاة غير صحيحة','error'); return; }
+  if(['منسحب','متوقف'].includes(memberStatus) && !stopYear){ toast('أدخل سنة التوقف','error'); return; }
+
+  // الحقول المخصصة
+  const custom = {};
+  (S.customFields || []).forEach(cf => {
+    const el = $(`cf_${cf.key}`);
+    if(el) custom[cf.key] = cleanText(el.value);
+  });
 
   try{
     const old = id ? await dbGet('members', id) : null;
@@ -1155,6 +1394,12 @@ async function saveMember(id = null){
       assocStartYear: assocYear,
       deathStartYear: deathYear,
       memberType: $('mType').value,
+      memberStatus,
+      stopYear,
+      deathDate,
+      assocExempt: $('mAssocExempt').checked,
+      deathExempt: $('mDeathExempt').checked,
+      custom,
       notes: cleanText($('mNotes').value),
       createdAt: old ? old.createdAt : new Date().toISOString()
     };
@@ -1188,24 +1433,35 @@ async function deleteMember(id){
   } catch(e){ toast('خطأ','error'); }
 }
 
-/* ═══════════════════════════════════════════════════════
-   الدفعات
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   📌 القسم [6/8] — الدفعات
+   ═══════════════════════════════════════════════════════════════ */
+
 function setPaymentsFilter(k){ S.filters.payments = k; renderPayments(); }
 
 function renderPayments(){
   const y = S.currentYear;
-  const yearPayments = S.payments.filter(p => p.year === y);
+  let all = S.payments;
+  // قيود المعتمد
+  if(S.currentUser && S.currentUser.role === 'collector'){
+    all = all.filter(p => p.collectorId === S.currentUser.id);
+  }
+
+  // نظرة عامة
+  const totalAssoc = all.filter(p => Number(p.year) === y && p.fund === 'assoc').reduce((s,p) => s+(Number(p.amount)||0), 0);
+  const totalDeath = all.filter(p => Number(p.year) === y && p.fund === 'death').reduce((s,p) => s+(Number(p.amount)||0), 0);
+  const totalDon   = all.filter(p => Number(p.year) === y && p.fund === 'donation').reduce((s,p) => s+(Number(p.amount)||0), 0);
 
   $('paymentsStats').innerHTML = `
-    <div class="stat assoc"><div class="val">${yearPayments.filter(p => p.fund === 'assoc').length}</div><div class="lbl">💰 جمعية</div></div>
-    <div class="stat death"><div class="val">${yearPayments.filter(p => p.fund === 'death').length}</div><div class="lbl">⚰️ وفاة</div></div>
-    <div class="stat donation"><div class="val">${yearPayments.filter(p => p.fund === 'donation').length}</div><div class="lbl">💚 تبرعات</div></div>
-    <div class="stat blue"><div class="val">${yearPayments.length}</div><div class="lbl">📝 الإجمالي</div></div>
+    <div class="stat assoc"><div class="val">${fmtShort(totalAssoc)}</div><div class="lbl">💰 جمعية ${y}</div></div>
+    <div class="stat death"><div class="val">${fmtShort(totalDeath)}</div><div class="lbl">⚰️ وفاة ${y}</div></div>
+    <div class="stat donation"><div class="val">${fmtShort(totalDon)}</div><div class="lbl">💚 تبرعات</div></div>
+    <div class="stat blue"><div class="val">${all.filter(p => Number(p.year) === y).length}</div><div class="lbl">📝 عمليات ${y}</div></div>
   `;
 
   const chips = [
     { k:'all', l:'📊 الكل' },
+    { k:'year', l:`📅 سنة ${y}` },
     { k:'assoc', l:'💰 جمعية' },
     { k:'death', l:'⚰️ وفاة' },
     { k:'donation', l:'💚 تبرعات' }
@@ -1215,13 +1471,16 @@ function renderPayments(){
   ).join('');
 
   const filter = S.filters.payments || 'all';
-  let list = filter === 'all' ? yearPayments : yearPayments.filter(p => p.fund === filter);
+  let list = filter === 'year' ? all.filter(p => Number(p.year) === y) : all;
+  if(filter === 'assoc') list = all.filter(p => p.fund === 'assoc');
+  if(filter === 'death') list = all.filter(p => p.fund === 'death');
+  if(filter === 'donation') list = all.filter(p => p.fund === 'donation');
 
   if(S.search){
     const s = normAr(S.search);
     list = list.filter(p => {
       const m = p.memberId ? getMemberById(p.memberId) : null;
-      return normAr(`${m?.name || ''} ${p.notes || ''}`).includes(s);
+      return normAr(`${m?.name || ''} ${p.notes || ''} ${p.collectorName || ''}`).includes(s);
     });
   }
 
@@ -1229,7 +1488,7 @@ function renderPayments(){
   list = list.slice(0, 300);
 
   const el = $('paymentsContent');
-  if(!list.length){ el.innerHTML = `<div class="empty"><span class="ico">💰</span><h3>لا توجد دفعات في ${y}</h3></div>`; return; }
+  if(!list.length){ el.innerHTML = `<div class="empty"><span class="ico">💰</span><h3>لا توجد دفعات</h3></div>`; return; }
 
   el.innerHTML = `<div class="list">${list.map(p => {
     const m = p.memberId ? getMemberById(p.memberId) : null;
@@ -1242,7 +1501,7 @@ function renderPayments(){
       <div class="av ${color}">${icon}</div>
       <div class="body">
         <div class="ttl">${esc(name)}</div>
-        <div class="sub">${fmtNum(p.amount)} ل.س • ${fmtDate(p.date)} • ${esc(p.collectorName||'')}</div>
+        <div class="sub">${fmtNum(p.amount)} ل.س • ${fmtDate(p.date)} • سنة ${p.forYear || p.year} • ${esc(p.collectorName||'')}</div>
       </div>
       <span class="trail">›</span>
     </div>`;
@@ -1254,7 +1513,6 @@ function openPaymentDetail(id){
   if(!p) return;
   const m = p.memberId ? getMemberById(p.memberId) : null;
   const canEdit = hasPerm('payment.edit');
-  const canDelete = hasPerm('payment.edit');
 
   const fundLabel = p.fund === 'death' ? 'دفعة وفاة' : p.fund === 'donation' ? 'تبرع' : 'دفعة جمعية';
 
@@ -1267,16 +1525,17 @@ function openPaymentDetail(id){
     <div class="balance-block">
       <div class="balance-row"><span class="lbl">💰 المبلغ</span><span class="val green">${fmtNum(p.amount)} ل.س</span></div>
       <div class="balance-row"><span class="lbl">📅 التاريخ</span><span class="val">${fmtDate(p.date)}</span></div>
-      <div class="balance-row"><span class="lbl">📅 السنة</span><span class="val">${p.year}</span></div>
+      <div class="balance-row"><span class="lbl">📅 سنة الدفعة</span><span class="val">${p.forYear || p.year}</span></div>
       <div class="balance-row"><span class="lbl">👤 المعتمد</span><span class="val">${esc(p.collectorName||'—')}</span></div>
       ${p.notes ? `<div class="balance-row"><span class="lbl">📝 ملاحظات</span><span class="val">${esc(p.notes)}</span></div>` : ''}
+      ${p.editedAt ? `<div class="balance-row"><span class="lbl">✏️ عُدّلت بواسطة</span><span class="val" style="font-size:11px">${esc(p.editedBy||'')}</span></div>` : ''}
       <div class="balance-row"><span class="lbl">🕐 التسجيل</span><span class="val" style="font-size:11px">${p.createdAt ? new Date(p.createdAt).toLocaleString('ar-EG') : '—'}</span></div>
     </div>
   `;
 
   const btns = [];
   if(canEdit) btns.push(`<button class="btn warning" onclick="closeSheet();setTimeout(()=>openPaymentForm(${id}),150)">✏️ تعديل</button>`);
-  if(canDelete) btns.push(`<button class="btn danger" onclick="deletePayment(${id})">🗑️ حذف</button>`);
+  if(canEdit) btns.push(`<button class="btn danger" onclick="deletePayment(${id})">🗑️ حذف</button>`);
   btns.push(`<button class="btn ghost" onclick="closeSheet()">إغلاق</button>`);
 
   openSheet('📄 تفاصيل الدفعة', body, btns.join(''), { wide:true });
@@ -1293,7 +1552,9 @@ function openPaymentForm(id = null){
     </div>
     <div class="fld-row">
       <div class="fld"><label>التاريخ</label><input id="edDate" type="date" value="${p.date}"></div>
-      <div class="fld"><label>السنة</label><select id="edYear">${[2025,2026,2027,2028,2029].map(y => `<option value="${y}" ${y===p.year?'selected':''}>${y}</option>`).join('')}</select></div>
+      <div class="fld"><label>سنة الدفعة (المستحقة عنها)</label>
+        <select id="edForYear">${[2025,2026,2027,2028,2029].map(y => `<option value="${y}" ${y===(p.forYear||p.year)?'selected':''}>${y}</option>`).join('')}</select>
+      </div>
     </div>
     <div class="fld"><label>ملاحظات</label><textarea id="edNotes">${esc(p.notes||'')}</textarea></div>
   `;
@@ -1305,7 +1566,7 @@ function openPaymentForm(id = null){
 async function savePaymentEdit(id){
   const amount = Number($('edAmount').value);
   const date = $('edDate').value;
-  const year = Number($('edYear').value);
+  const forYear = Number($('edForYear').value);
   const notes = cleanText($('edNotes').value);
 
   if(isNaN(amount) || amount < 0){ toast('المبلغ غير صحيح','error'); return; }
@@ -1315,11 +1576,11 @@ async function savePaymentEdit(id){
     const p = S.payments.find(x => x.id === id);
     if(!p) return;
     const old = { ...p };
-    p.amount = amount; p.date = date; p.year = year; p.notes = notes;
+    p.amount = amount; p.date = date; p.forYear = forYear; p.year = forYear; p.notes = notes;
     p.editedBy = S.currentUser.name;
     p.editedAt = new Date().toISOString();
     await dbPut('payments', p);
-    await logAudit('update', 'payment', id, { old: { amount: old.amount, date: old.date }, new: { amount, date } });
+    await logAudit('update', 'payment', id, { old: { amount: old.amount, forYear: old.forYear }, new: { amount, forYear } });
     toast('✅ تم التعديل');
     closeSheet();
     renderPayments();
@@ -1343,6 +1604,7 @@ async function deletePayment(id){
   } catch(e){ toast('خطأ','error'); }
 }
 
+/* ═══ نموذج تسجيل دفعة جديدة ═══ */
 function openPaymentSheet(memberId = null, fund = null){
   if(!hasPerm('payment.add')){ toast('غير مصرح','error'); return; }
 
@@ -1375,7 +1637,6 @@ function openFundPaymentForm(fund, memberId){
   const year = S.currentYear;
   const labels = { assoc:{ icon:'💰', name:'دفعة جمعية', color:'var(--assoc)' }, death:{ icon:'⚰️', name:'دفعة وفاة', color:'var(--death)' }, donation:{ icon:'💚', name:'تبرع', color:'var(--donation)' } };
   const L = labels[fund];
-
   const showSearch = fund !== 'donation';
 
   const body = `
@@ -1404,7 +1665,7 @@ function openFundPaymentForm(fund, memberId){
     </div>
     <div class="fld-row" id="pDateRow" style="display:none">
       <div class="fld"><label>التاريخ</label><input id="pDate" type="date" value="${today()}"></div>
-      <div class="fld"><label>السنة</label><select id="pYear">${[2025,2026,2027,2028,2029].map(y => `<option value="${y}" ${y===year?'selected':''}>${y}</option>`).join('')}</select></div>
+      <div class="fld"><label>سنة الدفعة</label><select id="pForYear">${[2025,2026,2027,2028,2029].map(y => `<option value="${y}" ${y===year?'selected':''}>${y}</option>`).join('')}</select></div>
     </div>
     <div class="fld" id="pNotesField" style="display:none"><label>ملاحظات</label><input id="pNotes" placeholder="اختياري"></div>
   `;
@@ -1438,14 +1699,16 @@ function onMemberSearch(fund){
     return false;
   });
 
-  // ⭐ المعتمد يرى فقط قطاعه
-  if(S.currentUser && S.currentUser.role === 'collector' && S.currentUser.sector){
-    list = list.filter(m => m.sector === S.currentUser.sector);
+  // قيود المعتمد
+  if(S.currentUser && S.currentUser.role === 'collector'){
+    if(S.currentUser.collectFund === 'assoc') list = list.filter(m => m.assocStartYear);
+    if(S.currentUser.collectFund === 'death') list = list.filter(m => m.deathStartYear);
+    if(S.currentUser.sector) list = list.filter(m => m.sector === S.currentUser.sector);
   }
 
   if(q){
     const s = normAr(q);
-    list = list.filter(m => normAr(`${m.name} ${m.code||''} ${m.sector||''}`).includes(s));
+    list = list.filter(m => normAr(`${m.name} ${m.code||''} ${m.sector||''} ${m.familyCode||''}`).includes(s));
   }
   list = list.slice(0, 30);
 
@@ -1454,8 +1717,7 @@ function onMemberSearch(fund){
   } else {
     opts.innerHTML = list.map(m => {
       const full = computeMemberFull(m.id);
-      const data = isAssoc ? full?.total.assocRem : full?.total.deathRem;
-      const rem = data || 0;
+      const rem = isAssoc ? (full?.total.assocRem || 0) : (full?.total.deathRem || 0);
       return `<div class="option-item" onclick="selectPaymentMember(${m.id},'${esc(m.name).replace(/'/g,"&#39;")}')">
         <div style="flex:1;min-width:0"><div style="font-weight:700">${esc(m.name)}</div><div style="font-size:10px;color:var(--muted)">${esc(m.code||'')} • ${esc(m.sector||'')}</div></div>
         <small style="color:${rem > 0 ? 'var(--danger)' : 'var(--success)'};font-weight:700">${rem > 0 ? 'متبقي ' + fmtShort(rem) : '✅'}</small>
@@ -1472,6 +1734,7 @@ function selectPaymentMember(id, name){
   showMemberDuesInForm(window._currentFund, id);
 }
 
+/* ⭐ عرض تفصيل المستحقات داخل نموذج الدفع ⭐ */
 function showMemberDuesInForm(fund, memberId){
   const m = getMemberById(memberId);
   if(!m) return;
@@ -1484,6 +1747,9 @@ function showMemberDuesInForm(fund, memberId){
   const rem = isAssoc ? full.total.assocRem : full.total.deathRem;
   const req = isAssoc ? full.total.assocReq : full.total.deathReq;
   const paid = isAssoc ? full.total.assocPaid : full.total.deathPaid;
+  const yearlyReq = isAssoc ? full.total.assocYearlyReq : 0;
+  const joinReq = isAssoc ? full.total.assocJoinReq : full.total.deathJoinReq;
+  const installReq = isAssoc ? 0 : full.total.deathInstallReq;
 
   const html = `
     <div style="padding:14px;background:var(--bg);border-radius:12px;border:2px solid ${fundColor}">
@@ -1491,9 +1757,12 @@ function showMemberDuesInForm(fund, memberId){
         <div><div style="font-weight:800;font-size:15px">${esc(m.name)}</div><div style="font-size:11px;color:var(--muted)">${esc(m.code||'')} • ${esc(m.sector||'')}</div></div>
         <div style="font-size:24px">${fundIcon}</div>
       </div>
-      <div style="padding:8px;background:var(--card);border-radius:8px">
-        <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span class="muted">إجمالي المطلوب</span><b>${fmtNum(req)}</b></div>
-        <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span class="muted">المدفوع</span><b style="color:var(--success)">${fmtNum(paid)}</b></div>
+      <div style="padding:10px;background:var(--card);border-radius:8px">
+        ${yearlyReq > 0 ? `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px"><span class="muted">📅 اشتراكات سنوية</span><b>${fmtNum(yearlyReq)}</b></div>` : ''}
+        ${joinReq > 0 ? `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;color:var(--warning)"><span>🎫 رسوم انضمام</span><b>${fmtNum(joinReq)}</b></div>` : ''}
+        ${installReq > 0 ? `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px"><span>📊 أقساط وفيات</span><b>${fmtNum(installReq)}</b></div>` : ''}
+        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-top:1px dashed var(--border);margin-top:4px"><span class="muted">إجمالي المطلوب</span><b>${fmtNum(req)}</b></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px"><span class="muted">✅ المدفوع</span><b style="color:var(--success)">${fmtNum(paid)}</b></div>
         <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-top:2px solid ${fundColor};margin-top:4px"><span style="font-weight:800">المتبقي</span><b style="font-weight:800;color:${rem > 0 ? 'var(--danger)' : 'var(--success)'}">${fmtNum(rem)} ل.س</b></div>
       </div>
     </div>
@@ -1509,6 +1778,7 @@ function showMemberDuesInForm(fund, memberId){
   if(rem > 0) buttons.push(`<button onclick="$('pAmount').value=${rem}">💰 كامل ${fmtShort(rem)}</button>`);
   buttons.push(`<button onclick="$('pAmount').value=5000">5,000</button>`);
   buttons.push(`<button onclick="$('pAmount').value=10000">10,000</button>`);
+  buttons.push(`<button onclick="$('pAmount').value=25000">25,000</button>`);
   buttons.push(`<button onclick="$('pAmount').value=0">0 (معفى)</button>`);
   $('pQuickButtons').innerHTML = buttons.join('');
   $('pAmount').value = rem > 0 ? rem : '';
@@ -1519,7 +1789,7 @@ async function savePayment(fund){
   const memberId = isDonation ? null : Number($('pMemberId').value);
   const amount = Number($('pAmount').value);
   const date = $('pDate').value;
-  const year = Number($('pYear').value);
+  const forYear = Number($('pForYear').value);
   const notes = $('pNotes')?.value?.trim() || '';
   const donorName = isDonation ? ($('pDonorName')?.value?.trim() || '') : '';
 
@@ -1538,8 +1808,8 @@ async function savePayment(fund){
       fund,
       amount,
       date,
-      year,
-      forYear: year,
+      year: forYear,           // الاحتفاظ للتوافق القديم
+      forYear,                 // السنة المالية الفعلية
       notes: isDonation ? (donorName + (notes ? ' | ' + notes : '')) : notes,
       collectorId: S.currentUser.id,
       collectorName: S.currentUser.name,
@@ -1549,7 +1819,7 @@ async function savePayment(fund){
     payment.id = id;
     S.payments.push(payment);
 
-    await logAudit('add', 'payment', id, { fund, memberId, amount });
+    await logAudit('add', 'payment', id, { fund, memberId, amount, forYear });
     toast('✅ تم تسجيل الدفعة', 'success', 2500);
     closeSheet();
     if(S.page === 'pg-home') renderHome();
@@ -1559,39 +1829,11 @@ async function savePayment(fund){
   showLoad(false);
 }
 
-/* ═══════════════════════════════════════════════════════
-   سجل التدقيق
-   ═══════════════════════════════════════════════════════ */
-async function logAudit(action, target, targetId, details = {}){
-  try{
-    const entry = {
-      timestamp: new Date().toISOString(),
-      userId: S.currentUser ? S.currentUser.id : null,
-      userName: S.currentUser ? S.currentUser.name : 'system',
-      action, target, targetId, details
-    };
-    await dbPut('auditLog', entry);
-    S.auditLog.push(entry);
-  } catch(e){ console.warn(e); }
-}
+/* ═══════════════════════════════════════════════════════════════
+   📌 القسم [7/8] — الوفيات + الإيرادات + المصاريف + التسليمات
+   ═══════════════════════════════════════════════════════════════ */
 
-/* ═══════════════════════════════════════════════════════
-   تحميل البيانات
-   ═══════════════════════════════════════════════════════ */
-async function loadAll(){
-  const r = await Promise.all([
-    dbAll('members'), dbAll('payments'), dbAll('deaths'), dbAll('incomes'), dbAll('expenses'),
-    dbAll('deliveries'), dbAll('storeItems'), dbAll('storeMovements'), dbAll('meetings'),
-    dbAll('constants'), dbAll('users'), dbAll('auditLog')
-  ]);
-  S.members = r[0]; S.payments = r[1]; S.deaths = r[2]; S.incomes = r[3]; S.expenses = r[4];
-  S.deliveries = r[5]; S.storeItems = r[6]; S.storeMovements = r[7]; S.meetings = r[8];
-  S.constants = r[9]; S.users = r[10]; S.auditLog = r[11];
-}
-
-/* ═══════════════════════════════════════════════════════
-   ⚰️ أحداث الوفاة
-   ═══════════════════════════════════════════════════════ */
+/* ⚰️ الوفيات */
 function openDeathSheet(){
   if(!hasPerm('death.add')){ toast('غير مصرح','error'); return; }
   const year = S.currentYear;
@@ -1601,7 +1843,7 @@ function openDeathSheet(){
     <div style="padding:12px;background:var(--death-soft);border-radius:12px;margin-bottom:14px;font-size:12px;line-height:1.7">
       ⚰️ <b>عند إضافة وفاة جديدة:</b><br>
       • يُسجَّل التعويض المُعطى للعائلة (صادر من صندوق الوفاة)<br>
-      • تُحسب تلقائياً في مستحقات كل مشترك وفاة حسب قسط السنة
+      • تُحسب تلقائياً في مستحقات كل مشترك وفاة
     </div>
     <div class="fld"><label>اسم المتوفى <span class="req">*</span></label>
       <input id="dName" placeholder="الاسم الكامل"></div>
@@ -1672,12 +1914,12 @@ async function saveDeath(){
   if(!name){ toast('اسم المتوفى مطلوب','error'); return; }
   if(!date){ toast('التاريخ مطلوب','error'); return; }
 
-  const deathSubs = S.members.filter(m => m.deathStartYear && m.deathStartYear <= year).length;
+  const deathSubs = S.members.filter(m => m.deathStartYear && m.deathStartYear <= year && !m.deathExempt).length;
   const c = getConstants(year);
   const inst = c?.deathInstallment || 5000;
   const totalImpact = deathSubs * inst;
 
-  if(!confirm(`⚰️ تسجيل وفاة "${name}"\n\nعدد مشتركي الوفاة: ${deathSubs}\nسيُضاف قسط ${fmtNum(inst)} × ${deathSubs} = ${fmtNum(totalImpact)} ل.س على مستحقاتهم.\n\nمتابعة؟`)) return;
+  if(!confirm(`⚰️ تسجيل وفاة "${name}"\n\nعدد مشتركي الوفاة: ${deathSubs}\nسيُضاف قسط ${fmtNum(inst)} × ${deathSubs} = ${fmtNum(totalImpact)} ل.س\n\nمتابعة؟`)) return;
 
   try{
     const death = {
@@ -1704,9 +1946,7 @@ async function saveDeath(){
   } catch(e){ toast('خطأ: ' + e.message, 'error'); }
 }
 
-/* ═══════════════════════════════════════════════════════
-   📥 الإيرادات
-   ═══════════════════════════════════════════════════════ */
+/* 📥 الإيرادات */
 function openIncomeSheet(){
   if(!hasPerm('income.add')){ toast('غير مصرح','error'); return; }
   const year = S.currentYear;
@@ -1770,9 +2010,7 @@ async function saveIncome(){
   } catch(e){ toast('خطأ: ' + e.message, 'error'); }
 }
 
-/* ═══════════════════════════════════════════════════════
-   💸 المصاريف
-   ═══════════════════════════════════════════════════════ */
+/* 💸 المصاريف */
 function openExpenseSheet(id = null){
   if(!hasPerm('expense.add')){ toast('غير مصرح','error'); return; }
   const e = id ? S.expenses.find(x => x.id === id) : {};
@@ -1861,8 +2099,8 @@ async function deleteExpense(id){
 
 function openExpensesListSheet(){
   const year = S.currentYear;
-  const list = S.expenses.filter(e => e.year === year).sort((a,b) => (b.date||'').localeCompare(a.date||''));
-  const compensations = S.deaths.filter(d => d.year === year);
+  const list = S.expenses.filter(e => Number(e.year) === year).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  const compensations = S.deaths.filter(d => Number(d.year) === year);
   const totalExp = list.reduce((s,e) => s + (Number(e.amount)||0), 0);
   const totalComp = compensations.reduce((s,d) => s + (Number(d.compensation)||0), 0);
 
@@ -1896,9 +2134,7 @@ function openExpensesListSheet(){
   openSheet('📤 الصادرات — ' + year, body, foot, { wide:true });
 }
 
-/* ═══════════════════════════════════════════════════════
-   📤 التسليمات
-   ═══════════════════════════════════════════════════════ */
+/* 📤 التسليمات */
 function openDeliverySheet(){
   if(!hasPerm('handover.send')){ toast('غير مصرح','error'); return; }
 
@@ -1994,9 +2230,11 @@ function openDeliveriesList(){
   openSheet('📤 سجل التسليمات', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
 }
 
-/* ═══════════════════════════════════════════════════════
-   📦 المستودع
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   📌 القسم [8/8] — المستودع + الاجتماعات + المستخدمين + الثوابت + الحقول المخصصة
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 📦 المستودع */
 function openStoreSheet(){
   if(!hasPerm('store.manage')){ toast('غير مصرح','error'); return; }
 
@@ -2022,7 +2260,7 @@ function openStoreSheet(){
         </div>
         <span class="trail">›</span>
       </div>`;
-    }).join('')}</div>` : '<div style="text-align:center;padding:30px;color:var(--muted)">📦 المستودع فارغ<br><small>أضف موادك الخدمية (كراسي، شوادر، طبخ، تابوت، مغسل)</small></div>'}
+    }).join('')}</div>` : '<div style="text-align:center;padding:30px;color:var(--muted)">📦 المستودع فارغ<br><small>أضف موادك الخدمية</small></div>'}
   `;
 
   const foot = `
@@ -2053,8 +2291,7 @@ function openStoreItemSheet(id = null){
       <div class="fld"><label>الكمية الحالية</label>
         <input id="stiQuantity" type="tel" inputmode="numeric" value="${item.quantity||0}"></div>
       <div class="fld"><label>الإجمالي المملوك</label>
-        <input id="stiOwned" type="tel" inputmode="numeric" value="${item.totalOwned||item.quantity||0}">
-        <div class="fld-hint">للجرد</div></div>
+        <input id="stiOwned" type="tel" inputmode="numeric" value="${item.totalOwned||item.quantity||0}"></div>
     </div>
     <div class="fld"><label>الحالة</label>
       <select id="stiCondition">${['جيد','يحتاج صيانة','تالف'].map(c => `<option ${item.condition === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
@@ -2152,7 +2389,6 @@ async function saveStoreMovement(){
 
   const oldQty = Number(item.quantity) || 0;
   let newQty = oldQty;
-
   if(type === 'out' || type === 'damaged') newQty = oldQty - qty;
   else if(type === 'in' || type === 'new') newQty = oldQty + qty;
 
@@ -2215,7 +2451,7 @@ function openStoreInventory(){
     ${items.map(item => `
       <div class="fld">
         <label>${esc(item.name)} <span style="color:var(--muted);font-weight:500">(النظام: ${item.quantity} ${esc(item.unit||'')})</span></label>
-        <input id="inv_${item.id}" type="tel" inputmode="numeric" value="${item.quantity}" placeholder="الكمية الفعلية">
+        <input id="inv_${item.id}" type="tel" inputmode="numeric" value="${item.quantity}">
       </div>
     `).join('')}
   `;
@@ -2247,7 +2483,6 @@ async function saveInventory(){
     };
     await dbPut('storeMovements', movement);
     S.storeMovements.push(movement);
-
     item.quantity = actual;
     await dbPut('storeItems', item);
     changed++;
@@ -2256,9 +2491,7 @@ async function saveInventory(){
   closeSheet();
 }
 
-/* ═══════════════════════════════════════════════════════
-   📋 الاجتماعات
-   ═══════════════════════════════════════════════════════ */
+/* 📋 الاجتماعات */
 function openMeetingsSheet(){
   const list = [...S.meetings].sort((a,b) => (b.date||'').localeCompare(a.date||''));
 
@@ -2271,7 +2504,7 @@ function openMeetingsSheet(){
       </div>
       <span class="trail">›</span>
     </div>
-  `).join('')}</div>` : '<div style="text-align:center;padding:30px;color:var(--muted)">📋 لا توجد اجتماعات<br><small>وثّق قرارات اللجنة والاجتماعات العامة</small></div>';
+  `).join('')}</div>` : '<div style="text-align:center;padding:30px;color:var(--muted)">📋 لا توجد اجتماعات</div>';
 
   const foot = hasPerm('meetings.manage')
     ? '<button class="btn primary" onclick="closeSheet();setTimeout(()=>openEditMeetingSheet(),150)">➕ اجتماع جديد</button>'
@@ -2301,9 +2534,9 @@ function openEditMeetingSheet(id = null){
         <input id="mtAttendees" type="tel" inputmode="numeric" value="${m.attendeesCount||''}"></div>
     </div>
     <div class="fld"><label>جدول الأعمال</label>
-      <textarea id="mtAgenda" rows="3" placeholder="البنود المطروحة للنقاش">${esc(m.agenda||'')}</textarea></div>
+      <textarea id="mtAgenda" rows="3">${esc(m.agenda||'')}</textarea></div>
     <div class="fld"><label>✅ القرارات</label>
-      <textarea id="mtDecisions" rows="4" placeholder="مثال:&#10;1. رفع اشتراك الجمعية 2027 إلى 26,000&#10;2. تعيين محمد معتمداً للحارة1&#10;3. قبول استقالة علي">${esc(m.decisions||'')}</textarea></div>
+      <textarea id="mtDecisions" rows="4">${esc(m.decisions||'')}</textarea></div>
   `;
 
   const foot = isNew
@@ -2389,9 +2622,7 @@ function shareMeetingWA(id){
   window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
 }
 
-/* ═══════════════════════════════════════════════════════
-   👥 إدارة المستخدمين — مُعدَّلة لدعم حقول المعتمد
-   ═══════════════════════════════════════════════════════ */
+/* 👥 المستخدمون */
 function openUsersSheet(){
   if(!hasPerm('users.manage')){ toast('غير مصرح','error'); return; }
 
@@ -2400,8 +2631,11 @@ function openUsersSheet(){
     const isMe = S.currentUser && S.currentUser.id === u.id;
     let extraInfo = '';
     if(u.role === 'collector'){
-      const fundLabel = u.collectFund === 'assoc' ? '💰 جمعية' : u.collectFund === 'death' ? '⚰️ وفاة' : '💰⚰️ كلاهما';
-      extraInfo = ` • ${fundLabel}${u.sector ? ' • 📍 ' + u.sector : ''}`;
+      const fl = u.collectFund === 'assoc' ? '💰 جمعية' : u.collectFund === 'death' ? '⚰️ وفاة' : '💰⚰️ كلاهما';
+      extraInfo = ` • ${fl}${u.sector ? ' • 📍 ' + u.sector : ''}`;
+    } else if(u.role === 'member' && u.memberId){
+      const m = getMemberById(u.memberId);
+      extraInfo = m ? ` • مرتبط بـ ${esc(m.name)}` : ' • ⚠️ غير مرتبط بعضو';
     }
     return `<div class="item" style="cursor:default">
       <div class="av">${r.icon}</div>
@@ -2427,30 +2661,42 @@ function openEditUserSheet(id = null){
   const roleOpts = Object.keys(ROLES).map(k => `<option value="${k}" ${u.role === k ? 'selected' : ''}>${ROLES[k].icon} ${ROLES[k].name}</option>`).join('');
   const sectorOpts = DEFAULT_SECTORS.map(s => `<option value="${s}" ${u.sector === s ? 'selected' : ''}>${s}</option>`).join('');
 
+  // قائمة الأعضاء للمشترك
+  const memberOpts = S.members.slice(0, 500).map(m => `<option value="${m.id}" ${u.memberId === m.id ? 'selected' : ''}>${esc(m.name)}${m.code ? ' (' + esc(m.code) + ')' : ''}</option>`).join('');
+
   const body = `
     <div class="fld"><label>الاسم <span class="req">*</span></label>
       <input id="uName" value="${esc(u.name||'')}"></div>
     <div class="fld"><label>الهاتف</label>
       <input id="uPhone" value="${esc(u.phone||'')}" inputmode="tel"></div>
     <div class="fld"><label>الدور <span class="req">*</span></label>
-      <select id="uRole" onchange="toggleCollectorFields()">${roleOpts}</select></div>
+      <select id="uRole" onchange="toggleUserRoleFields()">${roleOpts}</select></div>
 
     <div id="collectorFields" style="display:${u.role === 'collector' ? 'block' : 'none'};padding:12px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px">
       <div style="font-weight:800;font-size:12px;color:var(--primary);margin-bottom:10px">👤 إعدادات المعتمد</div>
       <div class="fld"><label>صندوق التحصيل</label>
         <select id="uCollectFund">
-          <option value="both" ${!u.collectFund || u.collectFund === 'both' ? 'selected' : ''}>كلاهما (جمعية + وفاة)</option>
+          <option value="both" ${!u.collectFund || u.collectFund === 'both' ? 'selected' : ''}>كلاهما</option>
           <option value="assoc" ${u.collectFund === 'assoc' ? 'selected' : ''}>💰 جمعية فقط</option>
           <option value="death" ${u.collectFund === 'death' ? 'selected' : ''}>⚰️ وفاة فقط</option>
         </select>
-        <div class="fld-hint">يحدد الأعضاء الذين يظهرون له</div>
       </div>
       <div class="fld"><label>القطاع المسؤول عنه</label>
         <select id="uSector">
           <option value="">— كل القطاعات —</option>
           ${sectorOpts}
         </select>
-        <div class="fld-hint">اتركه فارغاً ليرى كل القطاعات</div>
+      </div>
+    </div>
+
+    <div id="memberLinkFields" style="display:${u.role === 'member' ? 'block' : 'none'};padding:12px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px">
+      <div style="font-weight:800;font-size:12px;color:var(--primary);margin-bottom:10px">👥 ربط بحساب عضو</div>
+      <div class="fld"><label>العضو المرتبط</label>
+        <select id="uMemberId">
+          <option value="">— اختر عضواً —</option>
+          ${memberOpts}
+        </select>
+        <div class="fld-hint">سيتمكن من رؤية حسابه فقط</div>
       </div>
     </div>
 
@@ -2466,9 +2712,10 @@ function openEditUserSheet(id = null){
   openSheet(isNew ? '➕ مستخدم جديد' : '✏️ تعديل', body, foot, { focus:'uName' });
 }
 
-function toggleCollectorFields(){
+function toggleUserRoleFields(){
   const role = $('uRole').value;
   $('collectorFields').style.display = role === 'collector' ? 'block' : 'none';
+  $('memberLinkFields').style.display = role === 'member' ? 'block' : 'none';
 }
 
 async function saveUser(id = null){
@@ -2480,6 +2727,9 @@ async function saveUser(id = null){
   const role = $('uRole').value;
   const collectFund = role === 'collector' ? ($('uCollectFund')?.value || 'both') : null;
   const sector = role === 'collector' ? ($('uSector')?.value || '') : '';
+  const memberId = role === 'member' ? (Number($('uMemberId')?.value) || null) : null;
+
+  if(role === 'member' && !memberId){ toast('يجب ربط المشترك بعضو','error'); return; }
 
   try{
     const old = id ? await dbGet('users', id) : null;
@@ -2489,6 +2739,7 @@ async function saveUser(id = null){
       role,
       collectFund,
       sector,
+      memberId,
       hasPin: pin ? true : (old ? old.hasPin : false),
       pin: pin ? pin : (old ? old.pin : null),
       createdAt: old ? old.createdAt : new Date().toISOString()
@@ -2527,11 +2778,9 @@ async function deleteUser(id){
   } catch(e){ toast('خطأ','error'); }
 }
 
-/* ═══════════════════════════════════════════════════════
-   ⚙️ الثوابت السنوية
-   ═══════════════════════════════════════════════════════ */
+/* ⚙️ الثوابت */
 function openConstantsSheet(){
-  if(!hasPerm('constants.manage')){ toast('غير مصرح — لرئيس اللجنة والمدير','error'); return; }
+  if(!hasPerm('constants.manage')){ toast('غير مصرح','error'); return; }
 
   const years = [];
   for(let y = BASE_YEAR; y <= BASE_YEAR + 4; y++) years.push(y);
@@ -2542,20 +2791,13 @@ function openConstantsSheet(){
       <div class="av ${c ? 'green' : 'gray'}">${c ? '✅' : '📝'}</div>
       <div class="body">
         <div class="ttl">سنة ${y}</div>
-        <div class="sub">${c ? `💰 ${fmtNum(c.assocYearly)} • ⚰️ ${fmtNum(c.deathInstallment)} • 📤 ${fmtNum(c.deathCompensation)}` : 'لم تُحدَّد بعد — اضغط للإضافة'}</div>
+        <div class="sub">${c ? `💰 ${fmtNum(c.assocYearly)} • ⚰️ ${fmtNum(c.deathInstallment)} • 📤 ${fmtNum(c.deathCompensation)}` : 'لم تُحدَّد بعد'}</div>
       </div>
       <span class="trail">›</span>
     </div>`;
   }).join('');
 
-  const body = `
-    <div style="padding:12px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px;font-size:12px;line-height:1.7">
-      💡 <b>تُحدَّد الثوابت بعد اجتماع اللجنة السنوي</b><br>
-      اضغط على السنة لتعديل الأسعار
-    </div>
-    <div class="list">${list}</div>
-  `;
-
+  const body = `<div class="list">${list}</div>`;
   openSheet('📅 الثوابت السنوية', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
 }
 
@@ -2601,7 +2843,7 @@ function openEditConstantSheet(year){
     </div>
   `;
 
-  const foot = `<button class="btn ghost" onclick="closeSheet();setTimeout(openConstantsSheet,150)">رجوع</button><button class="btn primary" onclick="saveConstant(${year})">💾 حفظ ${year}</button>`;
+  const foot = `<button class="btn ghost" onclick="closeSheet();setTimeout(openConstantsSheet,150)">رجوع</button><button class="btn primary" onclick="saveConstant(${year})">💾 حفظ</button>`;
 
   openSheet('💰 ثوابت ' + year, body, foot);
 }
@@ -2637,206 +2879,110 @@ async function saveConstant(year){
   } catch(e){ toast('خطأ','error'); }
 }
 
-/* ═══════════════════════════════════════════════════════
-   📥 الاستيراد — نسخة مُصلَحة ⭐
-   ═══════════════════════════════════════════════════════ */
-function openImportSheet(){
-  if(!hasPerm('member.manage')){ toast('غير مصرح','error'); return; }
+/* 📌 الحقول المخصصة — Custom Fields */
+function openCustomFieldsSheet(){
+  if(!hasPerm('customfields.manage')){ toast('غير مصرح','error'); return; }
+
+  const list = S.customFields.length ? S.customFields.map((cf, i) => `
+    <div class="item" style="cursor:default">
+      <div class="av">${cf.icon || '📌'}</div>
+      <div class="body">
+        <div class="ttl">${esc(cf.label)}</div>
+        <div class="sub">مفتاح: ${esc(cf.key)}${cf.required ? ' • ⚠️ إلزامي' : ''}</div>
+      </div>
+      <button class="btn ghost sm" onclick="openEditCustomFieldSheet(${i})">✏️</button>
+      <button class="btn danger sm" onclick="deleteCustomField(${i})">🗑️</button>
+    </div>
+  `).join('') : '<div style="text-align:center;padding:30px;color:var(--muted)">لا توجد حقول مخصصة</div>';
 
   const body = `
-    <div style="padding:12px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px;font-size:12px;line-height:1.8">
-      <b>📋 الأعمدة المدعومة:</b><br>
-      • رقم الفرد / كود العضو<br>
-      • الاسم الثلاثي<br>
-      • كود الأسرة<br>
-      • الجنس<br>
-      • صلة القرابة<br>
-      • القطاع<br>
-      • تاريخ الميلاد<br>
-      • تاريخ الاشتراك<br>
-      • نوع الاشتراك <span style="color:var(--warning)">(كلاهما/جمعية/وفاة/غير مشترك)</span><br>
-      • نوع العضو <span style="color:var(--warning)">(عادي/مخفض)</span><br>
-      • الجوال
+    <div style="padding:12px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px;font-size:12px;line-height:1.7">
+      📌 <b>الحقول المخصصة</b><br>
+      أضف حقولاً إضافية تظهر في ملف كل عضو حسب حاجتك<br>
+      مثال: رقم الهوية، الفصيل، حالة الصحة، ملاحظات خاصة...
     </div>
-    <div style="padding:10px;background:var(--warning);color:#fff;border-radius:10px;margin-bottom:14px;font-size:11px;line-height:1.6">
-      ⚠️ <b>ملاحظة:</b> تاريخ الاشتراك قبل 2025 → لا رسوم انضمام<br>
-      الحساب يبدأ دائماً من 2025
-    </div>
-    <div id="importLog" style="font-size:12px;line-height:1.7"></div>
-    <input type="file" id="impFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="importMembers(this)">
-    <button class="btn primary block" style="margin-top:8px" onclick="$('impFile').click()">📤 اختر ملف Excel</button>
+    <div class="list">${list}</div>
   `;
 
-  openSheet('📥 استيراد الأعضاء', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>');
+  openSheet('📌 الحقول المخصصة', body, '<button class="btn primary" onclick="closeSheet();setTimeout(()=>openEditCustomFieldSheet(),150)">➕ إضافة حقل</button>', { wide:true });
 }
 
-async function importMembers(input){
-  const file = input.files[0];
-  if(!file) return;
-  input.value = '';
+function openEditCustomFieldSheet(idx = null){
+  if(!hasPerm('customfields.manage')) return;
+  const cf = idx !== null ? S.customFields[idx] : { key:'', label:'', hint:'', required:false, icon:'📌' };
 
-  showLoad(true);
-  const log = $('importLog');
-  log.innerHTML = '<div style="color:var(--muted)">⏳ جاري القراءة…</div>';
+  const body = `
+    <div class="fld"><label>الأيقونة (اختياري)</label>
+      <input id="cfIcon" value="${esc(cf.icon||'📌')}" maxlength="4" placeholder="📌"></div>
+    <div class="fld"><label>اسم الحقل <span class="req">*</span></label>
+      <input id="cfLabel" value="${esc(cf.label||'')}" placeholder="مثال: رقم الهوية"></div>
+    <div class="fld"><label>المفتاح (بالإنجليزية بدون مسافات) <span class="req">*</span></label>
+      <input id="cfKey" value="${esc(cf.key||'')}" placeholder="nationalId"></div>
+    <div class="fld"><label>نص تلميح (اختياري)</label>
+      <input id="cfHint" value="${esc(cf.hint||'')}" placeholder="اتركه فارغاً أو اكتب تلميحاً"></div>
+    <div class="fld">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:700">
+        <input type="checkbox" id="cfRequired" ${cf.required ? 'checked' : ''} style="width:auto">
+        حقل إلزامي
+      </label>
+    </div>
+  `;
+
+  const foot = idx !== null
+    ? `<button class="btn ghost" onclick="closeSheet();setTimeout(openCustomFieldsSheet,150)">رجوع</button><button class="btn primary" onclick="saveCustomField(${idx})">💾</button>`
+    : `<button class="btn ghost" onclick="closeSheet();setTimeout(openCustomFieldsSheet,150)">رجوع</button><button class="btn primary" onclick="saveCustomField()">💾</button>`;
+
+  openSheet(idx !== null ? '✏️ تعديل حقل' : '➕ حقل جديد', body, foot, { focus:'cfLabel' });
+}
+
+async function saveCustomField(idx = null){
+  const icon = cleanText($('cfIcon').value) || '📌';
+  const label = cleanText($('cfLabel').value);
+  let key = cleanText($('cfKey').value).replace(/[^a-zA-Z0-9]/g, '');
+  const hint = cleanText($('cfHint').value);
+  const required = $('cfRequired').checked;
+
+  if(!label){ toast('اسم الحقل مطلوب','error'); return; }
+  if(!key){ toast('المفتاح مطلوب (بالإنجليزية)','error'); return; }
+
+  // التحقق من التكرار
+  const duplicate = S.customFields.some((c, i) => i !== idx && c.key === key);
+  if(duplicate){ toast('المفتاح مستخدم بالفعل','error'); return; }
 
   try{
-    const buf = await file.arrayBuffer();
-    const wb = XLSX.read(buf, { type:'array', cellDates:true });
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
-
-    if(!rows.length){
-      log.innerHTML = '<div style="color:var(--danger)">❌ الملف فارغ</div>';
-      showLoad(false);
-      return;
+    const obj = { icon, label, key, hint, required };
+    if(idx !== null){
+      obj.id = S.customFields[idx]?.id;
+      S.customFields[idx] = obj;
+      await dbPut('customFields', obj);
+      toast('✅');
+    } else {
+      const newId = await dbPut('customFields', obj);
+      obj.id = newId;
+      S.customFields.push(obj);
+      toast('✅');
     }
-
-    // 🔍 تشخيص
-    console.log('📋 أعمدة الملف:', Object.keys(rows[0]));
-    console.log('📋 أول صف:', rows[0]);
-
-    let added = 0, updated = 0, skip = 0;
-    const typeCounts = { both:0, assoc:0, death:0, none:0, unknown:0 };
-
-    const existing = new Map();
-    S.members.forEach(m => {
-      if(m.code) existing.set(String(m.code), m);
-      existing.set(normAr(m.name), m);
-    });
-
-    for(let i = 0; i < rows.length; i++){
-      const r = rows[i];
-      const name = cleanText(gv(r, 'الاسم الثلاثي','الاسم_الثلاثي','الاسم'));
-      if(!name){ skip++; continue; }
-
-      const code = cleanText(gv(r, 'رقم الفرد','رقم_الفرد','الكود','كود العضو'));
-      const subDateStr = gv(r, 'تاريخ الاشتراك','تاريخ_الاشتراك','تاريخ الانضمام');
-      const subDate = toDate(subDateStr);
-      const subYear = subDate ? new Date(subDate).getFullYear() : null;
-
-      // ⭐⭐ نوع الاشتراك — بعد التطبيع ⭐⭐
-      const subTypeRaw = gv(r, 'نوع الاشتراك','نوع_الاشتراك');
-      const subType = normAr(subTypeRaw || '');
-      const subTypeDefined = subType.length > 0;
-
-      // بعد normAr: "جمعية"→"جمعيه" | "وفاة"→"وفاه" | "كلاهما"→"كلاهما"
-      const hasAssocWord = /جمعي/.test(subType);
-      const hasDeathWord = /وفا/.test(subType);
-      const isBoth = subType.includes('كلاهما')
-                  || subType === 'كلا'
-                  || subType.includes('الاثنين')
-                  || subType.includes('الاثنان')
-                  || (hasAssocWord && hasDeathWord);
-      const isNone = subType.includes('غير') && subType.includes('مشترك');
-
-      let hasAssoc = false, hasDeath = false;
-      if(isNone){ hasAssoc = false; hasDeath = false; typeCounts.none++; }
-      else if(isBoth){ hasAssoc = true; hasDeath = true; typeCounts.both++; }
-      else if(hasAssocWord){ hasAssoc = true; typeCounts.assoc++; }
-      else if(hasDeathWord){ hasDeath = true; typeCounts.death++; }
-      else { typeCounts.unknown++; }
-
-      // ⭐ نوع العضو
-      const memberTypeRaw = gv(r, 'نوع العضو','نوع_العضو');
-      const memberTypeStr = normAr(memberTypeRaw || '');
-      const memberType = memberTypeStr.includes('مخفض') ? 'مخفض' : 'عادي';
-
-      // البحث عن موجود
-      let existingMember = null;
-      if(code && existing.has(String(code))) existingMember = existing.get(String(code));
-      else if(existing.has(normAr(name))) existingMember = existing.get(normAr(name));
-
-      if(existingMember){
-        let changed = false;
-        // إذا النوع مُعرَّف في الملف → نعيد ضبط (يشمل الحذف)
-        if(subTypeDefined && subYear){
-          const newAssoc = hasAssoc ? subYear : null;
-          const newDeath = hasDeath ? subYear : null;
-          if(existingMember.assocStartYear !== newAssoc){ existingMember.assocStartYear = newAssoc; changed = true; }
-          if(existingMember.deathStartYear !== newDeath){ existingMember.deathStartYear = newDeath; changed = true; }
-        }
-        if(memberTypeRaw && existingMember.memberType !== memberType){
-          existingMember.memberType = memberType; changed = true;
-        }
-        if(changed){ await dbPut('members', existingMember); updated++; } else skip++;
-        continue;
-      }
-
-      try{
-        const member = {
-          code, name,
-          familyCode: cleanText(gv(r, 'كود الأسرة','كود_الأسرة')),
-          gender: gv(r, 'الجنس') || 'ذكر',
-          status: gv(r, 'الحالة') || 'حي',
-          relation: gv(r, 'صلة القرابة','صلة_القرابة') || 'رب أسرة',
-          birth: toDate(gv(r, 'تاريخ الميلاد','تاريخ_الميلاد')),
-          sector: gv(r, 'القطاع'),
-          phone: cleanPhone(gv(r, 'الجوال','الهاتف')),
-          assocStartYear: hasAssoc ? subYear : null,
-          deathStartYear: hasDeath ? subYear : null,
-          memberType,
-          notes: cleanText(gv(r, 'ملاحظات')),
-          createdAt: new Date().toISOString()
-        };
-        const newId = await dbPut('members', member);
-        member.id = newId;
-        S.members.push(member);
-        if(code) existing.set(String(code), member);
-        existing.set(normAr(name), member);
-        added++;
-      } catch(e){ console.warn('صف', i+2, e); skip++; }
-    }
-
-    log.innerHTML = `
-      <div style="padding:12px;background:#f0fdf4;border-radius:12px;color:#166534">
-        <div style="font-weight:800;margin-bottom:6px">📊 النتيجة</div>
-        <div>➕ أُضيف: <b>${added}</b></div>
-        <div>✏️ حُدّث: <b>${updated}</b></div>
-        <div>⏭️ تُخطّي: <b>${skip}</b></div>
-      </div>
-      <div style="padding:12px;background:#eff6ff;border-radius:12px;color:#1e40af;margin-top:10px">
-        <div style="font-weight:800;margin-bottom:6px">🔍 قراءة نوع الاشتراك:</div>
-        <div>✅ كليهما: <b>${typeCounts.both}</b></div>
-        <div>💰 جمعية: <b>${typeCounts.assoc}</b></div>
-        <div>⚰️ وفاة: <b>${typeCounts.death}</b></div>
-        <div>⚪ غير مشترك: <b>${typeCounts.none}</b></div>
-        <div style="color:#b91c1c">❓ لم يُعرَّف: <b>${typeCounts.unknown}</b></div>
-      </div>
-    `;
-    toast(`✅ أُضيف ${added} | حُدّث ${updated}`, 'success', 4000);
-    await loadAll();
-    renderMembers();
-    if(S.page === 'pg-home') renderHome();
-  } catch(e){
-    console.error(e);
-    log.innerHTML = `<div style="color:var(--danger)">❌ ${esc(e.message)}</div>`;
-    toast('خطأ: ' + e.message, 'error');
-  }
-  showLoad(false);
+    closeSheet();
+    setTimeout(openCustomFieldsSheet, 250);
+  } catch(e){ toast('خطأ','error'); }
 }
 
-function gv(row, ...aliases){
-  if(!row) return '';
-  const normalized = {};
-  for(const k of Object.keys(row)){
-    normalized[normAr(k).replace(/[^\u0621-\u064Aa-z0-9]/g,'')] = row[k];
-  }
-  for(const a of aliases){
-    const key = normAr(a).replace(/[^\u0621-\u064Aa-z0-9]/g,'');
-    if(key in normalized){
-      const v = normalized[key];
-      if(v === null || v === undefined) continue;
-      const s = String(v).trim();
-      if(!s || s.startsWith('=') || s.includes('openpyxl')) continue;
-      return s;
-    }
-  }
-  return '';
+async function deleteCustomField(idx){
+  if(!confirm('حذف هذا الحقل؟ (لن تُحذف البيانات المحفوظة)')) return;
+  try{
+    const cf = S.customFields[idx];
+    if(cf?.id) await dbDel('customFields', cf.id);
+    S.customFields.splice(idx, 1);
+    toast('🗑️');
+    closeSheet();
+    setTimeout(openCustomFieldsSheet, 250);
+  } catch(e){ toast('خطأ','error'); }
 }
 
-/* ═══════════════════════════════════════════════════════
-   📊 التقارير
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   📌 القسم [9] — التقارير
+   ═══════════════════════════════════════════════════════════════ */
+
 function renderReports(){
   const y = S.currentYear;
   const container = $('reportsContent');
@@ -2851,6 +2997,8 @@ function renderReports(){
         <button class="btn warning sm" onclick="openYearPicker()">📅 ${y}</button>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn primary" style="grid-column:1/-1" onclick="openComprehensiveReport()">📊 التقرير الشامل (كل شيء)</button>
+        <button class="btn info" onclick="openFamilyReport()">👨‍👩‍👧 العائلات</button>
         <button class="btn warning" onclick="openLatePayersReport()">⏰ المتأخرون</button>
         <button class="btn assoc" onclick="openAssocReport()">💰 تقرير الجمعية</button>
         <button class="btn death" onclick="openDeathReport()">⚰️ تقرير الوفاة</button>
@@ -2880,7 +3028,7 @@ function renderReports(){
       <div class="card-head"><h2 style="color:var(--death)">⚰️ صندوق الوفاة</h2></div>
       <div class="balance-block">
         <div class="balance-row"><span class="lbl">👥 مشتركون</span><span class="val">${stats.onlyDeath + stats.both}</span></div>
-        <div class="balance-row"><span class="lbl">🪦 وفيات السنة</span><span class="val red">${S.deaths.filter(d => d.year === y).length}</span></div>
+        <div class="balance-row"><span class="lbl">🪦 وفيات السنة</span><span class="val red">${S.deaths.filter(d => Number(d.year) === y).length}</span></div>
         <div class="balance-row"><span class="lbl">📥 أقساط</span><span class="val green">${fmtNum(balances.death.payments)}</span></div>
         <div class="balance-row"><span class="lbl">📤 تعويضات</span><span class="val red">-${fmtNum(balances.death.compensations)}</span></div>
         <div class="balance-row" style="border-top:2px solid var(--death);margin-top:6px;padding-top:8px">
@@ -2892,6 +3040,268 @@ function renderReports(){
   `;
 }
 
+/* 📊 التقرير الشامل */
+function openComprehensiveReport(){
+  const y = S.currentYear;
+  const stats = getMembersStats(y);
+  const balances = getFundBalances(y);
+  const deaths = S.deaths.filter(d => Number(d.year) === y);
+  const totalComp = deaths.reduce((s,d) => s + (Number(d.compensation)||0), 0);
+
+  const lateList = S.members.map(m => {
+    const full = computeMemberFull(m.id);
+    return { m, rem: full?.total.totalRem || 0 };
+  }).filter(x => x.rem > 0).sort((a,b) => b.rem - a.rem).slice(0, 5);
+
+  const topPayers = S.members.map(m => {
+    const full = computeMemberFull(m.id);
+    return { m, paid: full?.total.totalPaid || 0 };
+  }).filter(x => x.paid > 0).sort((a,b) => b.paid - a.paid).slice(0, 5);
+
+  const custodyTotal = S.users
+    .filter(u => ['collector','assocTreasurer','deathTreasurer'].includes(u.role))
+    .reduce((s,u) => s + getUserCustody(u.id).balance, 0);
+
+  const body = `
+    <div style="text-align:center;padding:14px;background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff;border-radius:14px;margin-bottom:14px">
+      <div style="font-size:32px">📊</div>
+      <div style="font-weight:800;font-size:16px;margin-top:6px">التقرير الشامل</div>
+      <div style="font-size:12px;opacity:.85;margin-top:4px">كل شيء عن السنة ${y}</div>
+    </div>
+
+    <div style="font-weight:800;font-size:14px;color:var(--primary);margin-bottom:10px">1️⃣ ملخص العضوية</div>
+    <div class="balance-block">
+      <div class="balance-row"><span class="lbl">👥 إجمالي الأعضاء</span><span class="val">${stats.total}</span></div>
+      <div class="balance-row"><span class="lbl">✅ نشط</span><span class="val green">${stats.active}</span></div>
+      <div class="balance-row"><span class="lbl">⏸️ متوقف</span><span class="val orange">${stats.frozen}</span></div>
+      <div class="balance-row"><span class="lbl">🚪 منسحب</span><span class="val red">${stats.withdrawn}</span></div>
+      <div class="balance-row"><span class="lbl">🎗️ معفى</span><span class="val">${stats.exempt}</span></div>
+      <div class="balance-row"><span class="lbl">⚰️ متوفى</span><span class="val red">${stats.deceased}</span></div>
+    </div>
+
+    <div style="font-weight:800;font-size:14px;color:var(--primary);margin:16px 0 10px">2️⃣ المشتركون</div>
+    <div class="balance-block">
+      <div class="balance-row"><span class="lbl">💰 جمعية فقط</span><span class="val">${stats.onlyAssoc}</span></div>
+      <div class="balance-row"><span class="lbl">⚰️ وفاة فقط</span><span class="val">${stats.onlyDeath}</span></div>
+      <div class="balance-row"><span class="lbl">✅ كليهما</span><span class="val green">${stats.both}</span></div>
+      <div class="balance-row"><span class="lbl">⚪ غير مشتركين</span><span class="val">${stats.none}</span></div>
+    </div>
+
+    <div style="font-weight:800;font-size:14px;color:var(--primary);margin:16px 0 10px">3️⃣ الأرصدة المالية</div>
+    <div class="balance-block">
+      <div class="balance-row"><span class="lbl">💰 رصيد الجمعية</span><span class="val" style="color:var(--assoc)">${fmtNum(balances.assoc.balance)}</span></div>
+      <div class="balance-row"><span class="lbl">⚰️ رصيد الوفاة</span><span class="val" style="color:var(--death)">${fmtNum(balances.death.balance)}</span></div>
+      <div class="balance-row"><span class="lbl">💚 تبرعات</span><span class="val green">${fmtNum(balances.donations)}</span></div>
+      <div class="balance-row" style="font-weight:800;border-top:2px solid var(--primary);padding-top:8px">
+        <span>🟣 الصافي</span><span style="color:var(--primary);font-size:16px">${fmtNum(balances.total)}</span>
+      </div>
+    </div>
+
+    <div style="font-weight:800;font-size:14px;color:var(--primary);margin:16px 0 10px">4️⃣ الوفيات والتعويضات</div>
+    <div class="balance-block">
+      <div class="balance-row"><span class="lbl">🪦 عدد الوفيات</span><span class="val red">${deaths.length}</span></div>
+      <div class="balance-row"><span class="lbl">📤 إجمالي التعويضات</span><span class="val red">${fmtNum(totalComp)}</span></div>
+    </div>
+
+    <div style="font-weight:800;font-size:14px;color:var(--primary);margin:16px 0 10px">5️⃣ المتأخرات والعهدات</div>
+    <div class="balance-block">
+      <div class="balance-row"><span class="lbl">⚠️ عدد المتأخرين</span><span class="val red">${stats.late}</span></div>
+      <div class="balance-row"><span class="lbl">💰 إجمالي المتأخرات</span><span class="val red">${fmtNum(stats.lateTotal)}</span></div>
+      <div class="balance-row"><span class="lbl">💼 إجمالي العهدات</span><span class="val orange">${fmtNum(custodyTotal)}</span></div>
+    </div>
+
+    ${lateList.length ? `
+      <div style="font-weight:800;font-size:14px;color:var(--danger);margin:16px 0 10px">⚠️ أكثر المتأخرين</div>
+      <div class="list">
+        ${lateList.map(({m, rem}, i) => `
+          <div class="item" onclick="closeSheet();setTimeout(()=>openMemberDetail(${m.id}),150)">
+            <div class="av red">${i+1}</div>
+            <div class="body"><div class="ttl">${esc(m.name)}</div><div class="sub">${esc(m.code||'')} • ${esc(m.sector||'')}</div></div>
+            <div style="font-weight:800;color:var(--danger);font-size:13px">${fmtShort(rem)}</div>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+
+    ${topPayers.length ? `
+      <div style="font-weight:800;font-size:14px;color:var(--success);margin:16px 0 10px">🏆 أعلى الدافعين</div>
+      <div class="list">
+        ${topPayers.map(({m, paid}, i) => `
+          <div class="item" onclick="closeSheet();setTimeout(()=>openMemberDetail(${m.id}),150)">
+            <div class="av green">${i+1}</div>
+            <div class="body"><div class="ttl">${esc(m.name)}</div><div class="sub">${esc(m.code||'')} • ${esc(m.sector||'')}</div></div>
+            <div style="font-weight:800;color:var(--success);font-size:13px">${fmtShort(paid)}</div>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn ghost block" onclick="window.print()">🖨️ طباعة</button>
+      <button class="btn primary block" onclick="shareComprehensiveReport()">📱 واتساب</button>
+    </div>
+  `;
+
+  openSheet('📊 التقرير الشامل', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
+}
+
+function shareComprehensiveReport(){
+  const y = S.currentYear;
+  const stats = getMembersStats(y);
+  const balances = getFundBalances(y);
+  let txt = `📊 *التقرير الشامل — ${y}*\n\n`;
+  txt += `👥 *العضوية:* ${stats.total}\n`;
+  txt += `✅ نشط: ${stats.active} • ⏸️ متوقف: ${stats.frozen}\n`;
+  txt += `🚪 منسحب: ${stats.withdrawn} • ⚰️ متوفى: ${stats.deceased}\n\n`;
+  txt += `💰 *الجمعية:* ${fmtNum(balances.assoc.balance)}\n`;
+  txt += `⚰️ *الوفاة:* ${fmtNum(balances.death.balance)}\n`;
+  txt += `🟣 *الصافي:* ${fmtNum(balances.total)}\n\n`;
+  txt += `⚠️ متأخرون: ${stats.late} (${fmtShort(stats.lateTotal)})\n\n`;
+  txt += `_صندوق زعورة_`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+/* 👨‍👩‍👧 تقرير العائلات */
+function openFamilyReport(){
+  const families = {};
+  S.members.forEach(m => {
+    const key = m.familyCode || 'بدون كود';
+    if(!families[key]) families[key] = { code: key, members: [] };
+    families[key].members.push(m);
+  });
+
+  for(const key in families){
+    const f = families[key];
+    f.totalPaid = 0; f.totalRem = 0; f.paidCount = 0;
+    f.members.forEach(m => {
+      const full = computeMemberFull(m.id);
+      if(full){
+        f.totalPaid += full.total.totalPaid;
+        f.totalRem += full.total.totalRem;
+        if(full.total.totalPaid > 0) f.paidCount++;
+      }
+    });
+  }
+
+  const list = Object.values(families).sort((a,b) => b.members.length - a.members.length);
+
+  const body = `
+    <div style="padding:14px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px;text-align:center">
+      <div style="font-size:12px;color:var(--muted)">عدد الأسر</div>
+      <div style="font-size:28px;font-weight:800;color:var(--primary)">${list.length}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">${S.members.length} عضو</div>
+    </div>
+    <div style="margin-bottom:12px">
+      <input id="familySearch" placeholder="🔍 ابحث عن عائلة..." oninput="filterFamilyList(this.value)" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:12px;background:var(--bg)">
+    </div>
+    <div class="list" id="familyList">
+      ${list.map(f => `
+        <div class="item" onclick="openFamilyDetail('${esc(f.code).replace(/'/g,"\\'")}')">
+          <div class="av">👨‍👩‍👧</div>
+          <div class="body">
+            <div class="ttl">عائلة ${esc(f.code)} <span class="badge primary">${f.members.length}</span></div>
+            <div class="sub">${f.paidCount} دافع • دُفع ${fmtShort(f.totalPaid)}${f.totalRem > 0 ? ' • متبقي ' + fmtShort(f.totalRem) : ' • ✅'}</div>
+          </div>
+          <span class="trail">›</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  openSheet('👨‍👩‍👧 تقرير العائلات', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
+}
+
+let _familiesCache = null;
+function filterFamilyList(q){
+  if(!_familiesCache){
+    _familiesCache = {};
+    S.members.forEach(m => {
+      const key = m.familyCode || 'بدون كود';
+      if(!_familiesCache[key]) _familiesCache[key] = [];
+      _familiesCache[key].push(m);
+    });
+  }
+  const s = normAr(q);
+  const list = $('familyList');
+  const filtered = Object.entries(_familiesCache).filter(([code, members]) => {
+    if(!q) return true;
+    return normAr(code).includes(s) || members.some(m => normAr(m.name).includes(s));
+  });
+  list.innerHTML = filtered.map(([code, members]) => {
+    let totalPaid = 0, totalRem = 0, paidCount = 0;
+    members.forEach(m => {
+      const full = computeMemberFull(m.id);
+      if(full){
+        totalPaid += full.total.totalPaid;
+        totalRem += full.total.totalRem;
+        if(full.total.totalPaid > 0) paidCount++;
+      }
+    });
+    return `<div class="item" onclick="openFamilyDetail('${esc(code).replace(/'/g,"\\'")}')">
+      <div class="av">👨‍👩‍👧</div>
+      <div class="body">
+        <div class="ttl">عائلة ${esc(code)} <span class="badge primary">${members.length}</span></div>
+        <div class="sub">${paidCount} دافع • دُفع ${fmtShort(totalPaid)}${totalRem > 0 ? ' • متبقي ' + fmtShort(totalRem) : ' • ✅'}</div>
+      </div>
+      <span class="trail">›</span>
+    </div>`;
+  }).join('');
+}
+
+function openFamilyDetail(familyCode){
+  const members = S.members.filter(m => (m.familyCode || 'بدون كود') === familyCode);
+  if(!members.length) return;
+
+  let totalPaid = 0, totalReq = 0, totalRem = 0;
+  members.forEach(m => {
+    const full = computeMemberFull(m.id);
+    if(full){
+      totalPaid += full.total.totalPaid;
+      totalReq += full.total.totalReq;
+      totalRem += full.total.totalRem;
+    }
+  });
+
+  const body = `
+    <div style="padding:14px;background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff;border-radius:14px;margin-bottom:14px;text-align:center">
+      <div style="font-size:28px">👨‍👩‍👧</div>
+      <div style="font-weight:800;font-size:16px;margin-top:6px">عائلة ${esc(familyCode)}</div>
+      <div style="font-size:12px;opacity:.9;margin-top:4px">${members.length} عضو</div>
+    </div>
+
+    <div class="balance-block">
+      <div class="balance-row"><span class="lbl">إجمالي المطلوب</span><span class="val">${fmtNum(totalReq)}</span></div>
+      <div class="balance-row"><span class="lbl">إجمالي المدفوع</span><span class="val green">${fmtNum(totalPaid)}</span></div>
+      <div class="balance-row" style="border-top:2px solid var(--primary);padding-top:8px">
+        <span style="font-weight:800">المتبقي</span>
+        <span class="val" style="color:${totalRem > 0 ? 'var(--danger)' : 'var(--success)'};font-size:15px">${fmtNum(totalRem)}</span>
+      </div>
+    </div>
+
+    <div style="font-weight:800;font-size:14px;margin:16px 0 10px">👥 أعضاء الأسرة</div>
+    <div class="list">
+      ${members.map(m => {
+        const full = computeMemberFull(m.id);
+        const rem = full?.total.totalRem || 0;
+        const icons = [];
+        if(m.assocStartYear) icons.push('💰');
+        if(m.deathStartYear) icons.push('⚰️');
+        return `<div class="item" onclick="closeSheet();setTimeout(()=>openMemberDetail(${m.id}),150)">
+          <div class="av ${rem > 0 ? 'red' : 'green'}">${icons.join('') || '👤'}</div>
+          <div class="body">
+            <div class="ttl">${esc(m.name)}</div>
+            <div class="sub">${esc(m.relation||'')} • ${esc(m.memberType||'')}${m.memberStatus && m.memberStatus !== 'نشط' ? ' • ' + m.memberStatus : ''}</div>
+          </div>
+          <div style="text-align:left">
+            ${rem > 0 ? `<div style="font-weight:800;color:var(--danger);font-size:12px">${fmtShort(rem)}</div>` : '<div style="color:var(--success);font-size:14px">✅</div>'}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+  openSheet('👨‍👩‍👧 عائلة ' + familyCode, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
+}
+
+/* ⏰ المتأخرون */
 function openLatePayersReport(){
   const y = S.currentYear;
   const list = [];
@@ -2947,9 +3357,10 @@ function shareLatePayers(){
   window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
 }
 
+/* 💰 تقرير الجمعية */
 function openAssocReport(){
   const y = S.currentYear;
-  const payments = S.payments.filter(p => p.year === y && p.fund === 'assoc');
+  const payments = S.payments.filter(p => Number(p.year) === y && p.fund === 'assoc');
   const total = payments.reduce((s,p) => s + (Number(p.amount)||0), 0);
   const balances = getFundBalances(y);
 
@@ -2975,12 +3386,13 @@ function openAssocReport(){
   openSheet('💰 تقرير الجمعية', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
 }
 
+/* ⚰️ تقرير الوفاة */
 function openDeathReport(){
   const y = S.currentYear;
-  const deaths = S.deaths.filter(d => d.year === y);
+  const deaths = S.deaths.filter(d => Number(d.year) === y);
   const totalComp = deaths.reduce((s,d) => s + (Number(d.compensation)||0), 0);
   const balances = getFundBalances(y);
-  const payments = S.payments.filter(p => p.year === y && p.fund === 'death');
+  const payments = S.payments.filter(p => Number(p.year) === y && p.fund === 'death');
   const totalPaid = payments.reduce((s,p) => s + (Number(p.amount)||0), 0);
 
   const body = `
@@ -3012,6 +3424,7 @@ function openDeathReport(){
   openSheet('⚰️ تقرير الوفاة', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
 }
 
+/* 💼 العهدات */
 function openCustodyReport(){
   const users = S.users.filter(u => ['collector','assocTreasurer','deathTreasurer'].includes(u.role));
   if(!users.length){ toast('لا يوجد معتمدون','warning'); return; }
@@ -3043,17 +3456,17 @@ function openCustodyReport(){
   openSheet('💼 العهدات', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
 }
 
+/* 📅 التقرير السنوي */
 function openYearlyReport(){
   const y = S.currentYear;
   const balances = getFundBalances(y);
-  const deaths = S.deaths.filter(d => d.year === y);
+  const deaths = S.deaths.filter(d => Number(d.year) === y);
 
   const body = `
     <div style="text-align:center;padding:14px 0 18px">
       <div style="font-size:44px;font-weight:800;color:var(--primary)">${y}</div>
       <div style="font-size:12px;color:var(--muted)">التقرير السنوي</div>
     </div>
-
     <div style="font-weight:800;font-size:14px;color:var(--assoc);margin-bottom:8px">💰 صندوق الجمعية</div>
     <div class="balance-block">
       <div class="balance-row"><span class="lbl">اشتراكات</span><span class="val green">${fmtNum(balances.assoc.payments)}</span></div>
@@ -3064,7 +3477,6 @@ function openYearlyReport(){
         <span class="val" style="color:${balances.assoc.balance >= 0 ? 'var(--success)' : 'var(--danger)'};font-size:15px">${fmtNum(balances.assoc.balance)}</span>
       </div>
     </div>
-
     <div style="font-weight:800;font-size:14px;color:var(--death);margin:16px 0 8px">⚰️ صندوق الوفاة</div>
     <div class="balance-block">
       <div class="balance-row"><span class="lbl">وفيات</span><span class="val red">${deaths.length}</span></div>
@@ -3075,7 +3487,6 @@ function openYearlyReport(){
         <span class="val" style="color:${balances.death.balance >= 0 ? 'var(--success)' : 'var(--danger)'};font-size:15px">${fmtNum(balances.death.balance)}</span>
       </div>
     </div>
-
     <div class="balance-block" style="background:var(--primary-soft);margin-top:16px">
       <div class="balance-row" style="border:0">
         <span style="font-weight:800;font-size:15px">🟣 الصافي الإجمالي</span>
@@ -3086,11 +3497,12 @@ function openYearlyReport(){
   openSheet('📅 التقرير السنوي', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
 }
 
+/* 📋 تقرير الاجتماع */
 function openAssemblyReport(){
   const y = S.currentYear;
   const stats = getMembersStats(y);
   const balances = getFundBalances(y);
-  const deaths = S.deaths.filter(d => d.year === y);
+  const deaths = S.deaths.filter(d => Number(d.year) === y);
 
   const body = `
     <div style="text-align:center;padding:14px 0 18px;background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff;border-radius:14px;margin-bottom:16px">
@@ -3148,7 +3560,7 @@ function shareAssemblyReport(){
   const y = S.currentYear;
   const stats = getMembersStats(y);
   const balances = getFundBalances(y);
-  const deaths = S.deaths.filter(d => d.year === y).length;
+  const deaths = S.deaths.filter(d => Number(d.year) === y).length;
 
   let txt = `📋 *تقرير الاجتماع العمومي — ${y}*\n\n`;
   txt += `👥 *العضوية:*\n`;
@@ -3165,9 +3577,7 @@ function shareAssemblyReport(){
   window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
 }
 
-/* ═══════════════════════════════════════════════════════
-   📜 سجل التدقيق
-   ═══════════════════════════════════════════════════════ */
+/* 📜 سجل التدقيق */
 function openAuditSheet(){
   if(!hasPerm('audit.view')){ toast('غير مصرح','error'); return; }
 
@@ -3187,9 +3597,7 @@ function openAuditSheet(){
   openSheet('📜 سجل التدقيق', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
 }
 
-/* ═══════════════════════════════════════════════════════
-   📊 الإحصائيات السريعة
-   ═══════════════════════════════════════════════════════ */
+/* 📊 الإحصائيات السريعة */
 function openStatsSheet(){
   const y = S.currentYear;
   const stats = getMembersStats(y);
@@ -3230,15 +3638,17 @@ function openStatsSheet(){
   openSheet('📊 الإحصائيات', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
 }
 
-/* ═══════════════════════════════════════════════════════
-   ⚙️ الإدارة
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   📌 القسم [10] — الإدارة + الإعدادات
+   ═══════════════════════════════════════════════════════════════ */
+
 function renderAdminMenu(){
   const btns = [];
 
   if(hasPerm('users.manage')) btns.push(`<button class="btn primary block" style="margin-bottom:8px" onclick="openUsersSheet()">👥 المستخدمون</button>`);
   if(hasPerm('constants.manage')) btns.push(`<button class="btn warning block" style="margin-bottom:8px" onclick="openConstantsSheet()">📅 الثوابت السنوية</button>`);
-  if(hasPerm('member.manage')) btns.push(`<button class="btn success block" style="margin-bottom:8px" onclick="openImportSheet()">📥 استيراد الأعضاء</button>`);
+  if(hasPerm('customfields.manage')) btns.push(`<button class="btn info block" style="margin-bottom:8px" onclick="openCustomFieldsSheet()">📌 الحقول المخصصة</button>`);
+  if(hasPerm('member.manage')) btns.push(`<button class="btn success block" style="margin-bottom:8px" onclick="openImportSheet()">📥 استيراد من Excel</button>`);
   if(hasPerm('store.manage')) btns.push(`<button class="btn info block" style="margin-bottom:8px" onclick="openStoreSheet()">📦 المستودع</button>`);
   if(hasPerm('meetings.manage')) btns.push(`<button class="btn primary block" style="margin-bottom:8px" onclick="openMeetingsSheet()">📋 الاجتماعات</button>`);
   if(hasPerm('expense.add')) btns.push(`<button class="btn warning block" style="margin-bottom:8px" onclick="openExpensesListSheet()">💸 الصادرات</button>`);
@@ -3251,8 +3661,8 @@ function renderAdminMenu(){
       👥 الأعضاء: <b>${S.members.length}</b><br>
       👤 المستخدمون: <b>${S.users.length}</b><br>
       📅 الثوابت: <b>${S.constants.length} سنة</b><br>
-      📦 المستودع: <b>${S.storeItems.length} مادة</b><br>
-      📋 الاجتماعات: <b>${S.meetings.length}</b>
+      📌 الحقول المخصصة: <b>${S.customFields.length}</b><br>
+      📦 المستودع: <b>${S.storeItems.length} مادة</b>
     </div>
     <div style="height:1px;background:var(--border);margin:16px 0"></div>
     <button class="btn info block" style="margin-bottom:8px" onclick="exportBackup()">💾 نسخة احتياطية</button>
@@ -3268,7 +3678,7 @@ function openSettingsSheet(){
   const btns = [];
   if(hasPerm('users.manage')) btns.push(`<button class="btn primary block" style="margin-bottom:8px" onclick="closeSheet();setTimeout(openUsersSheet,150)">👥 المستخدمون</button>`);
   if(hasPerm('constants.manage')) btns.push(`<button class="btn warning block" style="margin-bottom:8px" onclick="closeSheet();setTimeout(openConstantsSheet,150)">📅 الثوابت</button>`);
-  if(hasPerm('member.manage')) btns.push(`<button class="btn success block" style="margin-bottom:8px" onclick="closeSheet();setTimeout(openImportSheet,150)">📥 استيراد الأعضاء</button>`);
+  if(hasPerm('member.manage')) btns.push(`<button class="btn success block" style="margin-bottom:8px" onclick="closeSheet();setTimeout(openImportSheet,150)">📥 استيراد Excel</button>`);
   btns.push(`<button class="btn info block" style="margin-bottom:8px" onclick="closeSheet();setTimeout(openStatsSheet,150)">📊 الإحصائيات</button>`);
 
   btns.push(`
@@ -3283,9 +3693,522 @@ function openSettingsSheet(){
   openSheet('⚙️ الإعدادات', btns.join(''), '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>');
 }
 
-/* ═══════════════════════════════════════════════════════
-   💾 النسخ الاحتياطي
-   ═══════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   📌 القسم [11] — الاستيراد من Excel (شامل)
+   ═══════════════════════════════════════════════════════════════ */
+
+function openImportSheet(){
+  if(!hasPerm('member.manage')){ toast('غير مصرح','error'); return; }
+
+  const body = `
+    <div style="padding:12px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px;font-size:12px;line-height:1.8">
+      <b>📥 اختر نوع الاستيراد:</b>
+    </div>
+    <div style="display:grid;gap:10px">
+      <button class="quick-btn assoc" style="padding:18px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:right" onclick="closeSheet();setTimeout(()=>openImportMembersSheet(),150)">
+        <div style="font-size:32px">👥</div><div style="flex:1"><div style="font-weight:800;font-size:14px;color:var(--assoc)">استيراد الأعضاء</div><div style="font-size:11px;color:var(--muted)">أفراد.xlsx — مع نوع الاشتراك</div></div>
+      </button>
+      <button class="quick-btn death" style="padding:18px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:right" onclick="closeSheet();setTimeout(()=>openImportDeathsSheet(),150)">
+        <div style="font-size:32px">⚰️</div><div style="flex:1"><div style="font-weight:800;font-size:14px;color:var(--death)">استيراد الوفيات</div><div style="font-size:11px;color:var(--muted)">أسماء المتوفين + التعويضات</div></div>
+      </button>
+      <button class="quick-btn donation" style="padding:18px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:right" onclick="closeSheet();setTimeout(()=>openImportPaymentsSheet(),150)">
+        <div style="font-size:32px">💰</div><div style="flex:1"><div style="font-weight:800;font-size:14px;color:var(--donation)">استيراد الدفعات</div><div style="font-size:11px;color:var(--muted)">دفعات أعضاء سابقة (تتطلب كود العضو)</div></div>
+      </button>
+      <button class="quick-btn" style="padding:18px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:right;border-color:var(--warning)" onclick="closeSheet();setTimeout(()=>openImportFinanceSheet(),150)">
+        <div style="font-size:32px">📊</div><div style="flex:1"><div style="font-weight:800;font-size:14px;color:var(--warning)">استيراد وارد/صادر</div><div style="font-size:11px;color:var(--muted)">إيرادات ومصاريف</div></div>
+      </button>
+    </div>
+  `;
+  openSheet('📥 استيراد من Excel', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
+}
+
+/* ═══ استيراد الأعضاء ═══ */
+function openImportMembersSheet(){
+  const body = `
+    <div style="padding:12px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px;font-size:12px;line-height:1.8">
+      <b>📋 الأعمدة المدعومة:</b><br>
+      • رقم الفرد / كود العضو<br>
+      • الاسم الثلاثي<br>
+      • كود الأسرة<br>
+      • الجنس • صلة القرابة • القطاع<br>
+      • تاريخ الميلاد • تاريخ الاشتراك<br>
+      • نوع الاشتراك <span style="color:var(--warning)">(كلاهما/جمعية/وفاة/غير مشترك)</span><br>
+      • نوع العضو <span style="color:var(--warning)">(عادي/مخفض)</span>
+    </div>
+    <div id="importLog" style="font-size:12px;line-height:1.7"></div>
+    <input type="file" id="impFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="importMembers(this)">
+    <button class="btn primary block" style="margin-top:8px" onclick="$('impFile').click()">📤 اختر ملف الأعضاء</button>
+  `;
+  openSheet('👥 استيراد الأعضاء', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
+}
+
+async function importMembers(input){
+  const file = input.files[0];
+  if(!file) return;
+  input.value = '';
+
+  showLoad(true);
+  const log = $('importLog');
+  log.innerHTML = '<div style="color:var(--muted)">⏳ جاري القراءة…</div>';
+
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type:'array', cellDates:true });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
+
+    if(!rows.length){
+      log.innerHTML = '<div style="color:var(--danger)">❌ الملف فارغ</div>';
+      showLoad(false);
+      return;
+    }
+
+    console.log('📋 أعمدة الملف:', Object.keys(rows[0]));
+
+    let added = 0, updated = 0, skip = 0;
+    const typeCounts = { both:0, assoc:0, death:0, none:0, unknown:0 };
+
+    const existing = new Map();
+    S.members.forEach(m => {
+      if(m.code) existing.set(String(m.code), m);
+      existing.set(normAr(m.name), m);
+    });
+
+    for(let i = 0; i < rows.length; i++){
+      const r = rows[i];
+      const name = cleanText(gv(r, 'الاسم الثلاثي','الاسم_الثلاثي','الاسم'));
+      if(!name){ skip++; continue; }
+
+      const code = cleanText(gv(r, 'رقم الفرد','رقم_الفرد','الكود','كود العضو'));
+      const subDateStr = gv(r, 'تاريخ الاشتراك','تاريخ_الاشتراك','تاريخ الانضمام');
+      const subDate = toDate(subDateStr);
+      const subYear = subDate ? new Date(subDate).getFullYear() : null;
+
+      const subTypeRaw = gv(r, 'نوع الاشتراك','نوع_الاشتراك');
+      const subType = normAr(subTypeRaw || '');
+      const subTypeDefined = subType.length > 0;
+
+      // بعد normAr: "جمعية"→"جمعيه" | "وفاة"→"وفاه"
+      const hasAssocWord = /جمعي/.test(subType);
+      const hasDeathWord = /وفا/.test(subType);
+      const isBoth = subType.includes('كلاهما')
+                  || subType === 'كلا'
+                  || subType.includes('الاثنين')
+                  || (hasAssocWord && hasDeathWord);
+      const isNone = subType.includes('غير') && subType.includes('مشترك');
+
+      let hasAssoc = false, hasDeath = false;
+      if(isNone){ typeCounts.none++; }
+      else if(isBoth){ hasAssoc = true; hasDeath = true; typeCounts.both++; }
+      else if(hasAssocWord){ hasAssoc = true; typeCounts.assoc++; }
+      else if(hasDeathWord){ hasDeath = true; typeCounts.death++; }
+      else { typeCounts.unknown++; }
+
+      const memberTypeRaw = gv(r, 'نوع العضو','نوع_العضو');
+      const memberTypeStr = normAr(memberTypeRaw || '');
+      const memberType = memberTypeStr.includes('مخفض') ? 'مخفض' : 'عادي';
+
+      let existingMember = null;
+      if(code && existing.has(String(code))) existingMember = existing.get(String(code));
+      else if(existing.has(normAr(name))) existingMember = existing.get(normAr(name));
+
+      if(existingMember){
+        let changed = false;
+        if(subTypeDefined && subYear){
+          const newAssoc = hasAssoc ? subYear : null;
+          const newDeath = hasDeath ? subYear : null;
+          if(existingMember.assocStartYear !== newAssoc){ existingMember.assocStartYear = newAssoc; changed = true; }
+          if(existingMember.deathStartYear !== newDeath){ existingMember.deathStartYear = newDeath; changed = true; }
+        }
+        if(memberTypeRaw && existingMember.memberType !== memberType){
+          existingMember.memberType = memberType; changed = true;
+        }
+        if(changed){ await dbPut('members', existingMember); updated++; } else skip++;
+        continue;
+      }
+
+      try{
+        const member = {
+          code, name,
+          familyCode: cleanText(gv(r, 'كود الأسرة','كود_الأسرة')),
+          gender: gv(r, 'الجنس') || 'ذكر',
+          status: gv(r, 'الحالة') || 'حي',
+          relation: gv(r, 'صلة القرابة','صلة_القرابة') || 'رب أسرة',
+          birth: toDate(gv(r, 'تاريخ الميلاد','تاريخ_الميلاد')),
+          sector: gv(r, 'القطاع'),
+          phone: cleanPhone(gv(r, 'الجوال','الهاتف')),
+          assocStartYear: hasAssoc ? subYear : null,
+          deathStartYear: hasDeath ? subYear : null,
+          memberType,
+          memberStatus: 'نشط',
+          assocExempt: false,
+          deathExempt: false,
+          custom: {},
+          notes: cleanText(gv(r, 'ملاحظات')),
+          createdAt: new Date().toISOString()
+        };
+        const newId = await dbPut('members', member);
+        member.id = newId;
+        S.members.push(member);
+        if(code) existing.set(String(code), member);
+        existing.set(normAr(name), member);
+        added++;
+      } catch(e){ console.warn('صف', i+2, e); skip++; }
+    }
+
+    log.innerHTML = `
+      <div style="padding:12px;background:#f0fdf4;border-radius:12px;color:#166534">
+        <div style="font-weight:800;margin-bottom:6px">📊 النتيجة</div>
+        <div>➕ أُضيف: <b>${added}</b></div>
+        <div>✏️ حُدّث: <b>${updated}</b></div>
+        <div>⏭️ تُخطّي: <b>${skip}</b></div>
+      </div>
+      <div style="padding:12px;background:#eff6ff;border-radius:12px;color:#1e40af;margin-top:10px">
+        <div style="font-weight:800;margin-bottom:6px">🔍 قراءة نوع الاشتراك:</div>
+        <div>✅ كليهما: <b>${typeCounts.both}</b></div>
+        <div>💰 جمعية: <b>${typeCounts.assoc}</b></div>
+        <div>⚰️ وفاة: <b>${typeCounts.death}</b></div>
+        <div>⚪ غير مشترك: <b>${typeCounts.none}</b></div>
+        <div style="color:#b91c1c">❓ لم يُعرَّف: <b>${typeCounts.unknown}</b></div>
+      </div>
+    `;
+    toast(`✅ أُضيف ${added} | حُدّث ${updated}`, 'success', 4000);
+    await loadAll();
+    renderMembers();
+    if(S.page === 'pg-home') renderHome();
+  } catch(e){
+    console.error(e);
+    log.innerHTML = `<div style="color:var(--danger)">❌ ${esc(e.message)}</div>`;
+    toast('خطأ: ' + e.message, 'error');
+  }
+  showLoad(false);
+}
+
+/* ═══ استيراد الوفيات ═══ */
+function openImportDeathsSheet(){
+  const body = `
+    <div style="padding:12px;background:var(--death-soft);border-radius:12px;margin-bottom:14px;font-size:12px;line-height:1.8">
+      <b>📋 الأعمدة المدعومة:</b><br>
+      • اسم المتوفى <span style="color:var(--danger)">*</span><br>
+      • تاريخ الوفاة<br>
+      • السنة<br>
+      • التعويض<br>
+      • مَن استلم التعويض<br>
+      • ملاحظات
+    </div>
+    <div id="importDeathsLog" style="font-size:12px;line-height:1.7"></div>
+    <input type="file" id="impDeathsFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="importDeaths(this)">
+    <button class="btn death block" style="margin-top:8px" onclick="$('impDeathsFile').click()">⚰️ اختر ملف الوفيات</button>
+  `;
+  openSheet('⚰️ استيراد الوفيات', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
+}
+
+async function importDeaths(input){
+  const file = input.files[0];
+  if(!file) return;
+  input.value = '';
+
+  showLoad(true);
+  const log = $('importDeathsLog');
+  log.innerHTML = '<div style="color:var(--muted)">⏳ جاري القراءة…</div>';
+
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type:'array', cellDates:true });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
+
+    console.log('📋 أعمدة الوفيات:', Object.keys(rows[0]||{}));
+
+    let added = 0, skip = 0;
+    const c = getConstants(S.currentYear);
+
+    for(let i = 0; i < rows.length; i++){
+      const r = rows[i];
+      const name = cleanText(gv(r, 'اسم المتوفى','اسم_المتوفى','الاسم','المتوفى'));
+      if(!name){ skip++; continue; }
+
+      const date = toDate(gv(r, 'تاريخ الوفاة','تاريخ_الوفاة','التاريخ'));
+      const year = Number(gv(r, 'السنة','سنة')) || (date ? new Date(date).getFullYear() : S.currentYear);
+      const comp = Number(gv(r, 'التعويض','قيمة التعويض','تعويض')) || (c?.deathCompensation || 25000);
+      const recipient = cleanText(gv(r, 'مَن استلم','المستلم','استلم'));
+      const notes = cleanText(gv(r, 'ملاحظات'));
+
+      try{
+        const death = {
+          deceasedName: name,
+          memberId: null,
+          deathDate: date || today(),
+          year,
+          compensation: comp,
+          recipient,
+          notes,
+          recordedBy: S.currentUser.id,
+          recordedByName: S.currentUser.name + ' (استيراد)',
+          createdAt: new Date().toISOString()
+        };
+        const newId = await dbPut('deaths', death);
+        death.id = newId;
+        S.deaths.push(death);
+        added++;
+      } catch(e){ console.warn('صف', i+2, e); skip++; }
+    }
+
+    log.innerHTML = `
+      <div style="padding:12px;background:#f0fdf4;border-radius:12px;color:#166534">
+        <div style="font-weight:800;margin-bottom:6px">📊 النتيجة</div>
+        <div>➕ أُضيف: <b>${added}</b></div>
+        <div>⏭️ تُخطّي: <b>${skip}</b></div>
+      </div>
+    `;
+    toast(`✅ أُضيفت ${added} وفاة`, 'success', 4000);
+    await loadAll();
+    if(S.page === 'pg-home') renderHome();
+  } catch(e){
+    console.error(e);
+    log.innerHTML = `<div style="color:var(--danger)">❌ ${esc(e.message)}</div>`;
+    toast('خطأ: ' + e.message, 'error');
+  }
+  showLoad(false);
+}
+
+/* ═══ استيراد الدفعات ═══ */
+function openImportPaymentsSheet(){
+  const body = `
+    <div style="padding:12px;background:var(--donation-soft);border-radius:12px;margin-bottom:14px;font-size:12px;line-height:1.8">
+      <b>📋 الأعمدة المدعومة:</b><br>
+      • اسم العضو (أو كود العضو) <span style="color:var(--danger)">*</span><br>
+      • المبلغ <span style="color:var(--danger)">*</span><br>
+      • النوع <span style="color:var(--warning)">(جمعية/وفاة/تبرع)</span><br>
+      • السنة (المستحقة عنها)<br>
+      • التاريخ<br>
+      • ملاحظات
+    </div>
+    <div style="padding:10px;background:var(--warning);color:#fff;border-radius:10px;margin-bottom:14px;font-size:11px;line-height:1.6">
+      ⚠️ يجب أن يكون العضو موجوداً مسبقاً
+    </div>
+    <div id="importPayLog" style="font-size:12px;line-height:1.7"></div>
+    <input type="file" id="impPayFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="importPayments(this)">
+    <button class="btn donation block" style="margin-top:8px" onclick="$('impPayFile').click()">💰 اختر ملف الدفعات</button>
+  `;
+  openSheet('💰 استيراد الدفعات', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
+}
+
+async function importPayments(input){
+  const file = input.files[0];
+  if(!file) return;
+  input.value = '';
+
+  showLoad(true);
+  const log = $('importPayLog');
+  log.innerHTML = '<div style="color:var(--muted)">⏳ جاري القراءة…</div>';
+
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type:'array', cellDates:true });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
+
+    console.log('📋 أعمدة الدفعات:', Object.keys(rows[0]||{}));
+
+    // خريطة الأعضاء للبحث السريع
+    const memberMap = new Map();
+    S.members.forEach(m => {
+      if(m.code) memberMap.set(String(m.code), m);
+      memberMap.set(normAr(m.name), m);
+    });
+
+    let added = 0, skip = 0, notFound = 0;
+
+    for(let i = 0; i < rows.length; i++){
+      const r = rows[i];
+      const nameOrCode = cleanText(gv(r, 'العضو','اسم العضو','كود العضو','الاسم'));
+      const amount = Number(gv(r, 'المبلغ','القيمة','Amount'));
+      if(!nameOrCode || !amount){ skip++; continue; }
+
+      // البحث عن العضو
+      let member = memberMap.get(nameOrCode) || memberMap.get(normAr(nameOrCode));
+      if(!member){
+        // بحث جزئي
+        const s = normAr(nameOrCode);
+        member = S.members.find(m => normAr(m.name).includes(s));
+      }
+      if(!member){ notFound++; skip++; continue; }
+
+      const typeStr = normAr(gv(r, 'النوع','نوع الدفعة','الفئة','الصندوق') || '');
+      let fund = 'assoc';
+      if(/وفا/.test(typeStr)) fund = 'death';
+      else if(/تبرع|صدقه|هبه/.test(typeStr)) fund = 'donation';
+      else if(/جمعي/.test(typeStr)) fund = 'assoc';
+
+      const date = toDate(gv(r, 'التاريخ','تاريخ','التاريخ الهجري')) || today();
+      const forYear = Number(gv(r, 'السنة','سنة','سنة الدفعة')) || (date ? new Date(date).getFullYear() : S.currentYear);
+      const notes = cleanText(gv(r, 'ملاحظات'));
+
+      try{
+        const payment = {
+          memberId: member.id,
+          fund, amount,
+          date, year: forYear, forYear,
+          notes,
+          collectorId: S.currentUser.id,
+          collectorName: S.currentUser.name + ' (استيراد)',
+          createdAt: new Date().toISOString()
+        };
+        const newId = await dbPut('payments', payment);
+        payment.id = newId;
+        S.payments.push(payment);
+        added++;
+      } catch(e){ console.warn('صف', i+2, e); skip++; }
+    }
+
+    log.innerHTML = `
+      <div style="padding:12px;background:#f0fdf4;border-radius:12px;color:#166534">
+        <div style="font-weight:800;margin-bottom:6px">📊 النتيجة</div>
+        <div>➕ أُضيفت: <b>${added}</b></div>
+        <div>⏭️ تُخطّي: <b>${skip}</b></div>
+        <div style="color:#b91c1c">❓ أعضاء غير موجودين: <b>${notFound}</b></div>
+      </div>
+    `;
+    toast(`✅ أُضيفت ${added} دفعة`, 'success', 4000);
+    await loadAll();
+    if(S.page === 'pg-home') renderHome();
+    if(S.page === 'pg-payments') renderPayments();
+  } catch(e){
+    console.error(e);
+    log.innerHTML = `<div style="color:var(--danger)">❌ ${esc(e.message)}</div>`;
+    toast('خطأ: ' + e.message, 'error');
+  }
+  showLoad(false);
+}
+
+/* ═══ استيراد وارد/صادر ═══ */
+function openImportFinanceSheet(){
+  const body = `
+    <div style="padding:12px;background:#fef3c7;border-radius:12px;margin-bottom:14px;font-size:12px;line-height:1.8">
+      <b>📋 الأعمدة المدعومة:</b><br>
+      • النوع <span style="color:var(--warning)">(وارد/صادر)</span> <span style="color:var(--danger)">*</span><br>
+      • الصندوق <span style="color:var(--warning)">(جمعية/وفاة)</span><br>
+      • الفئة (إيجار/صيانة/مساعدات...)<br>
+      • المبلغ <span style="color:var(--danger)">*</span><br>
+      • الوصف/المصدر<br>
+      • السنة • التاريخ • ملاحظات
+    </div>
+    <div id="importFinLog" style="font-size:12px;line-height:1.7"></div>
+    <input type="file" id="impFinFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="importFinance(this)">
+    <button class="btn warning block" style="margin-top:8px" onclick="$('impFinFile').click()">📊 اختر ملف الوارد/الصادر</button>
+  `;
+  openSheet('📊 استيراد وارد/صادر', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
+}
+
+async function importFinance(input){
+  const file = input.files[0];
+  if(!file) return;
+  input.value = '';
+
+  showLoad(true);
+  const log = $('importFinLog');
+  log.innerHTML = '<div style="color:var(--muted)">⏳ جاري القراءة…</div>';
+
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type:'array', cellDates:true });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
+
+    console.log('📋 أعمدة الوارد/الصادر:', Object.keys(rows[0]||{}));
+
+    let incAdded = 0, expAdded = 0, skip = 0;
+
+    for(let i = 0; i < rows.length; i++){
+      const r = rows[i];
+      const typeStr = normAr(gv(r, 'النوع','نوع الحركة','نوع') || '');
+      const amount = Number(gv(r, 'المبلغ','القيمة','Amount'));
+      if(!amount){ skip++; continue; }
+
+      const fundStr = normAr(gv(r, 'الصندوق','صندوق') || '');
+      let fund = 'assoc';
+      if(/وفا/.test(fundStr)) fund = 'death';
+
+      const category = cleanText(gv(r, 'الفئة','التصنيف','النوع الفرعي')) || (typeStr.includes('وارد') ? 'إيراد' : 'مصروف');
+      const description = cleanText(gv(r, 'الوصف','البيان','المصدر','التفاصيل')) || category;
+      const date = toDate(gv(r, 'التاريخ','تاريخ')) || today();
+      const year = Number(gv(r, 'السنة','سنة')) || (date ? new Date(date).getFullYear() : S.currentYear);
+      const notes = cleanText(gv(r, 'ملاحظات'));
+
+      const isIncome = /وارد|ايراد|إيراد|دخل/.test(typeStr);
+
+      try{
+        if(isIncome){
+          const obj = {
+            fund, category, amount, date, year,
+            notes: description + (notes ? ' | ' + notes : ''),
+            recordedBy: S.currentUser.id,
+            recordedByName: S.currentUser.name + ' (استيراد)',
+            createdAt: new Date().toISOString()
+          };
+          const newId = await dbPut('incomes', obj);
+          obj.id = newId;
+          S.incomes.push(obj);
+          incAdded++;
+        } else {
+          const obj = {
+            fund, category, description, amount, date, year, notes,
+            createdBy: S.currentUser.id,
+            recordedByName: S.currentUser.name + ' (استيراد)',
+            createdAt: new Date().toISOString()
+          };
+          const newId = await dbPut('expenses', obj);
+          obj.id = newId;
+          S.expenses.push(obj);
+          expAdded++;
+        }
+      } catch(e){ console.warn('صف', i+2, e); skip++; }
+    }
+
+    log.innerHTML = `
+      <div style="padding:12px;background:#f0fdf4;border-radius:12px;color:#166534">
+        <div style="font-weight:800;margin-bottom:6px">📊 النتيجة</div>
+        <div>📥 واردات: <b>${incAdded}</b></div>
+        <div>📤 مصاريف: <b>${expAdded}</b></div>
+        <div>⏭️ تُخطّي: <b>${skip}</b></div>
+      </div>
+    `;
+    toast(`✅ واردات ${incAdded} | مصاريف ${expAdded}`, 'success', 4000);
+    await loadAll();
+    if(S.page === 'pg-home') renderHome();
+  } catch(e){
+    console.error(e);
+    log.innerHTML = `<div style="color:var(--danger)">❌ ${esc(e.message)}</div>`;
+    toast('خطأ: ' + e.message, 'error');
+  }
+  showLoad(false);
+}
+
+/* دالة مساعدة لقراءة القيم من صف Excel */
+function gv(row, ...aliases){
+  if(!row) return '';
+  const normalized = {};
+  for(const k of Object.keys(row)){
+    normalized[normAr(k).replace(/[^\u0621-\u064Aa-z0-9]/g,'')] = row[k];
+  }
+  for(const a of aliases){
+    const key = normAr(a).replace(/[^\u0621-\u064Aa-z0-9]/g,'');
+    if(key in normalized){
+      const v = normalized[key];
+      if(v === null || v === undefined) continue;
+      const s = String(v).trim();
+      if(!s || s.startsWith('=') || s.includes('openpyxl')) continue;
+      return s;
+    }
+  }
+  return '';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   📌 القسم [12] — النسخ الاحتياطي + التشغيل
+   ═══════════════════════════════════════════════════════════════ */
+
 function exportBackup(){
   try{
     const data = {
@@ -3301,7 +4224,8 @@ function exportBackup(){
       storeMovements: S.storeMovements,
       meetings: S.meetings,
       constants: S.constants,
-      users: S.users
+      users: S.users,
+      customFields: S.customFields
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
     const a = document.createElement('a');
@@ -3329,7 +4253,7 @@ async function importBackup(input){
       await new Promise((res) => { const q = store.clear(); q.onsuccess = res; q.onerror = res; });
     }
 
-    const toRestore = ['members','payments','deaths','incomes','expenses','deliveries','storeItems','storeMovements','meetings','constants','users'];
+    const toRestore = ['members','payments','deaths','incomes','expenses','deliveries','storeItems','storeMovements','meetings','constants','users','customFields'];
     for(const key of toRestore){
       if(Array.isArray(data[key])){
         for(const item of data[key]){ delete item.id; await dbPut(key, item); }
@@ -3343,9 +4267,7 @@ async function importBackup(input){
   } catch(e){ toast('خطأ: ' + e.message, 'error'); }
 }
 
-/* ═══════════════════════════════════════════════════════
-   تهيئة الثوابت الافتراضية
-   ═══════════════════════════════════════════════════════ */
+/* ═══ تهيئة الثوابت الافتراضية ═══ */
 async function ensureDefaultConstants(){
   const years = [];
   for(let y = BASE_YEAR; y <= BASE_YEAR + 4; y++) years.push(y);
@@ -3370,9 +4292,7 @@ async function ensureDefaultConstants(){
   if(added > 0) console.log(`✅ تم إضافة ${added} سنة`);
 }
 
-/* ═══════════════════════════════════════════════════════
-   🚀 التشغيل
-   ═══════════════════════════════════════════════════════ */
+/* ═══ التشغيل ═══ */
 async function init(){
   const savedTheme = localStorage.getItem('zt_theme');
   if(savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
