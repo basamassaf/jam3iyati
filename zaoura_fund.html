@@ -3721,7 +3721,33 @@ function openImportSheet(){
   `;
   openSheet('📥 استيراد من Excel', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
 }
+function openImportSheet(){
+  if(!hasPerm('member.manage')){ toast('غير مصرح','error'); return; }
 
+  const body = `
+    <div style="padding:12px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px;font-size:12px;line-height:1.8">
+      <b>📥 اختر نوع الاستيراد:</b>
+    </div>
+    <div style="display:grid;gap:10px">
+      <button class="quick-btn assoc" style="padding:18px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:right" onclick="closeSheet();setTimeout(()=>openImportMembersSheet(),150)">
+        <div style="font-size:32px">👥</div><div style="flex:1"><div style="font-weight:800;font-size:14px;color:var(--assoc)">استيراد الأعضاء</div><div style="font-size:11px;color:var(--muted)">قاعدة_الأعضاء</div></div>
+      </button>
+      <button class="quick-btn donation" style="padding:18px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:right" onclick="closeSheet();setTimeout(()=>openImportPaymentsSheet(),150)">
+        <div style="font-size:32px">💰</div><div style="flex:1"><div style="font-weight:800;font-size:14px;color:var(--donation)">استيراد الدفعات</div><div style="font-size:11px;color:var(--muted)">مع اسم المعتمد</div></div>
+      </button>
+      <button class="quick-btn death" style="padding:18px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:right" onclick="closeSheet();setTimeout(()=>openImportDeathsSheet(),150)">
+        <div style="font-size:32px">⚰️</div><div style="flex:1"><div style="font-weight:800;font-size:14px;color:var(--death)">استيراد الوفيات</div><div style="font-size:11px;color:var(--muted)">سجل_الوفيات</div></div>
+      </button>
+      <button class="quick-btn" style="padding:18px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:right;border-color:var(--warning)" onclick="closeSheet();setTimeout(()=>openImportFinanceSheet(),150)">
+        <div style="font-size:32px">📊</div><div style="flex:1"><div style="font-weight:800;font-size:14px;color:var(--warning)">استيراد وارد/صادر</div><div style="font-size:11px;color:var(--muted)">الحركات_المالية (يتجاهل التعويضات)</div></div>
+      </button>
+      <button class="quick-btn" style="padding:18px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:right;border-color:var(--info)" onclick="closeSheet();setTimeout(()=>openImportDeliveriesSheet(),150)">
+        <div style="font-size:32px">📤</div><div style="flex:1"><div style="font-weight:800;font-size:14px;color:var(--info)">استيراد التسليمات</div><div style="font-size:11px;color:var(--muted)">حركات_التسليم</div></div>
+      </button>
+    </div>
+  `;
+  openSheet('📥 استيراد من Excel', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
+}
 /* ═══ استيراد الأعضاء ═══ */
 function openImportMembersSheet(){
   const body = `
@@ -3971,7 +3997,74 @@ async function importDeaths(input){
   }
   showLoad(false);
 }
+async function importDeaths(input){
+  const file = input.files[0];
+  if(!file) return;
+  input.value = '';
 
+  showLoad(true);
+  const log = $('importDeathsLog');
+  log.innerHTML = '<div style="color:var(--muted)">⏳ جاري القراءة…</div>';
+
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type:'array', cellDates:true });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
+
+    let added = 0, skip = 0;
+
+    for(let i = 0; i < rows.length; i++){
+      const r = rows[i];
+      const name = cleanText(gv(r, 'اسم المتوفى','اسم_المتوفى','الاسم','المتوفى'));
+      if(!name){ skip++; continue; }
+
+      const date = toDate(gv(r, 'تاريخ الوفاة','تاريخ_الوفاة','التاريخ'));
+      const yearStr = String(gv(r, 'السنة','سنة') || '').replace(/[^\d]/g,'');
+      const year = Number(yearStr) || (date ? new Date(date).getFullYear() : S.currentYear);
+      
+      const compStr = String(gv(r, 'التعويض','قيمة التعويض','تعويض') || '').replace(/[,،\s]/g,'');
+      const comp = compStr ? Number(compStr) : 0;
+      
+      const recipient = cleanText(gv(r, 'مَن استلم','المستلم','استلم')) || '';
+      const notes = cleanText(gv(r, 'ملاحظات')) || '';
+
+      try{
+        const death = {
+          deceasedName: name,
+          memberId: null,
+          deathDate: date || today(),
+          year, compensation: comp,
+          recipient, notes,
+          recordedBy: S.currentUser.id,
+          recordedByName: S.currentUser.name + ' (استيراد)',
+          imported: true,
+          createdAt: new Date().toISOString()
+        };
+        const newId = await dbPut('deaths', death);
+        death.id = newId;
+        S.deaths.push(death);
+        added++;
+      } catch(e){ console.warn('صف', i+2, e); skip++; }
+    }
+
+    log.innerHTML = `
+      <div style="padding:12px;background:#f0fdf4;border-radius:12px;color:#166534">
+        <div style="font-weight:800;margin-bottom:6px">📊 النتيجة</div>
+        <div>➕ أُضيف: <b>${added}</b></div>
+        <div>⏭️ تُخطّي: <b>${skip}</b></div>
+      </div>
+    `;
+    toast(`✅ أُضيفت ${added} وفاة`, 'success', 4000);
+    await loadAll();
+    if(S.page === 'pg-home') renderHome();
+  } catch(e){
+    console.error(e);
+    log.innerHTML = `<div style="color:var(--danger)">❌ ${esc(e.message)}</div>`;
+    toast('خطأ: ' + e.message, 'error');
+  }
+  showLoad(false);
+}
 /* ═══ استيراد الدفعات ═══ */
 function openImportPaymentsSheet(){
   const body = `
@@ -4081,7 +4174,109 @@ async function importPayments(input){
   }
   showLoad(false);
 }
+async function importPayments(input){
+  const file = input.files[0];
+  if(!file) return;
+  input.value = '';
 
+  showLoad(true);
+  const log = $('importPayLog');
+  log.innerHTML = '<div style="color:var(--muted)">⏳ جاري القراءة…</div>';
+
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type:'array', cellDates:true });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
+
+    console.log('📋 أعمدة الدفعات:', Object.keys(rows[0]||{}));
+
+    const memberMap = new Map();
+    S.members.forEach(m => {
+      if(m.code) memberMap.set(String(m.code), m);
+      if(m.name) memberMap.set(normAr(m.name), m);
+    });
+
+    let added = 0, skip = 0, notFound = 0;
+    const notFoundNames = [];
+
+    for(let i = 0; i < rows.length; i++){
+      const r = rows[i];
+      const memberName = cleanText(gv(r, 'اسم المشترك','اسم العضو','العضو','المشترك','الاسم','كود العضو'));
+      if(!memberName){ skip++; continue; }
+
+      const amountStr = String(gv(r, 'المبلغ','القيمة','Amount') || '').replace(/[,،\s]/g,'');
+      const amount = Number(amountStr);
+      if(!amount){ skip++; continue; }
+
+      let member = memberMap.get(memberName) || memberMap.get(normAr(memberName));
+      if(!member){
+        const s = normAr(memberName);
+        member = S.members.find(m => {
+          const n = normAr(m.name);
+          return n === s || n.includes(s) || s.includes(n);
+        });
+      }
+      if(!member){ notFound++; notFoundNames.push(memberName); skip++; continue; }
+
+      const typeStr = normAr(gv(r, 'نوع القسط','النوع','نوع الدفعة','الصندوق') || '');
+      let fund = 'assoc';
+      if(/وفا/.test(typeStr)) fund = 'death';
+      else if(/تبرع|صدقه/.test(typeStr)) fund = 'donation';
+
+      const date = toDate(gv(r, 'التاريخ','تاريخ')) || today();
+      const yearStr = String(gv(r, 'السنة','سنة','سنة الدفعة','العام') || '').replace(/[^\d]/g,'');
+      const forYear = Number(yearStr) || (date ? new Date(date).getFullYear() : S.currentYear);
+
+      // ⭐ اسم المعتمد — من عمود "اسم المعتمد"
+      const collectorName = cleanText(gv(r, 'اسم المعتمد','المعتمد','المحصل','الجباة')) || 'استيراد سابق';
+      const status = cleanText(gv(r, 'الحالة','حالة')) || '';
+      const notes = cleanText(gv(r, 'ملاحظات')) || '';
+
+      try{
+        const payment = {
+          memberId: member.id,
+          fund, amount, date,
+          year: forYear, forYear,
+          status, notes,
+          collectorId: null,
+          collectorName,
+          imported: true,
+          createdAt: new Date().toISOString()
+        };
+        const newId = await dbPut('payments', payment);
+        payment.id = newId;
+        S.payments.push(payment);
+        added++;
+      } catch(e){ console.warn('صف', i+2, e); skip++; }
+    }
+
+    const notFoundHTML = notFoundNames.length ? 
+      `<div style="margin-top:8px;padding:8px;background:#fef2f2;border-radius:8px;color:#991b1b;font-size:11px;max-height:120px;overflow:auto">
+        <b>أول 10 أسماء غير موجودة:</b><br>
+        ${notFoundNames.slice(0,10).map(n => '• ' + esc(n)).join('<br>')}
+      </div>` : '';
+
+    log.innerHTML = `
+      <div style="padding:12px;background:#f0fdf4;border-radius:12px;color:#166534">
+        <div style="font-weight:800;margin-bottom:6px">📊 النتيجة</div>
+        <div>➕ أُضيفت: <b>${added}</b></div>
+        <div>⏭️ تُخطّي: <b>${skip}</b></div>
+        <div style="color:#b91c1c">❓ أعضاء غير موجودين: <b>${notFound}</b></div>
+        ${notFoundHTML}
+      </div>
+    `;
+    toast(`✅ أُضيفت ${added} دفعة`, 'success', 4000);
+    await loadAll();
+    if(S.page === 'pg-home') renderHome();
+    if(S.page === 'pg-payments') renderPayments();
+  } catch(e){
+    console.error(e);
+    log.innerHTML = `<div style="color:var(--danger)">❌ ${esc(e.message)}</div>`;
+    toast('خطأ: ' + e.message, 'error');
+  }
+  showLoad(false);
+}
 /* ═══ استيراد وارد/صادر ═══ */
 function openImportFinanceSheet(){
   const body = `
@@ -4177,6 +4372,197 @@ async function importFinance(input){
     toast(`✅ واردات ${incAdded} | مصاريف ${expAdded}`, 'success', 4000);
     await loadAll();
     if(S.page === 'pg-home') renderHome();
+  } catch(e){
+    console.error(e);
+    log.innerHTML = `<div style="color:var(--danger)">❌ ${esc(e.message)}</div>`;
+    toast('خطأ: ' + e.message, 'error');
+  }
+  showLoad(false);
+}
+async function importFinance(input){
+  const file = input.files[0];
+  if(!file) return;
+  input.value = '';
+
+  showLoad(true);
+  const log = $('importFinLog');
+  log.innerHTML = '<div style="color:var(--muted)">⏳ جاري القراءة…</div>';
+
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type:'array', cellDates:true });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
+
+    console.log('📋 أعمدة الحركات المالية:', Object.keys(rows[0]||{}));
+
+    let incAdded = 0, expAdded = 0, skip = 0, skippedComp = 0;
+
+    for(let i = 0; i < rows.length; i++){
+      const r = rows[i];
+      
+      const typeStr = normAr(gv(r, 'النوع','نوع الحركة','نوع') || '');
+      
+      const amountStr = String(gv(r, 'المبلغ','القيمة','Amount') || '').replace(/[,،\s]/g,'');
+      const amount = Number(amountStr);
+      if(!amount){ skip++; continue; }
+
+      const fundStr = normAr(gv(r, 'نوع الصندوق','الصندوق','صندوق') || '');
+      let fund = 'assoc';
+      if(/وفا/.test(fundStr)) fund = 'death';
+      else if(/تبرع/.test(fundStr)) fund = 'donation';
+
+      const category = cleanText(gv(r, 'التصنيف','الفئة')) || (typeStr.includes('وارد') ? 'إيراد' : 'مصروف');
+      
+      // ⭐ تخطي التعويضات (لأنها في جدول الوفيات)
+      if(/تعويض/.test(normAr(category))){
+        skippedComp++;
+        continue;
+      }
+      
+      const description = cleanText(gv(r, 'البيان','الوصف','التفاصيل','المصدر')) || category;
+      
+      const date = toDate(gv(r, 'التاريخ','تاريخ')) || today();
+      const yearStr = String(gv(r, 'العام','السنة','سنة') || '').replace(/[^\d]/g,'');
+      const year = Number(yearStr) || (date ? new Date(date).getFullYear() : S.currentYear);
+      
+      const notes = cleanText(gv(r, 'ملاحظات')) || '';
+
+      const isIncome = /وارد|ايراد|إيراد|دخل/.test(typeStr);
+
+      try{
+        if(isIncome){
+          const obj = {
+            fund, category, amount, date, year,
+            notes: description + (notes ? ' | ' + notes : ''),
+            recordedBy: S.currentUser.id,
+            recordedByName: S.currentUser.name + ' (استيراد)',
+            imported: true,
+            createdAt: new Date().toISOString()
+          };
+          const newId = await dbPut('incomes', obj);
+          obj.id = newId;
+          S.incomes.push(obj);
+          incAdded++;
+        } else {
+          const obj = {
+            fund, category, description, amount, date, year, notes,
+            createdBy: S.currentUser.id,
+            recordedByName: S.currentUser.name + ' (استيراد)',
+            imported: true,
+            createdAt: new Date().toISOString()
+          };
+          const newId = await dbPut('expenses', obj);
+          obj.id = newId;
+          S.expenses.push(obj);
+          expAdded++;
+        }
+      } catch(e){ console.warn('صف', i+2, e); skip++; }
+    }
+
+    log.innerHTML = `
+      <div style="padding:12px;background:#f0fdf4;border-radius:12px;color:#166534">
+        <div style="font-weight:800;margin-bottom:6px">📊 النتيجة</div>
+        <div>📥 واردات: <b>${incAdded}</b></div>
+        <div>📤 مصاريف: <b>${expAdded}</b></div>
+        <div style="color:#92400e">⏭️ تعويضات (تجاهُل): <b>${skippedComp}</b></div>
+        <div>⏭️ تُخطّي: <b>${skip}</b></div>
+      </div>
+    `;
+    toast(`✅ واردات ${incAdded} | مصاريف ${expAdded}`, 'success', 4000);
+    await loadAll();
+    if(S.page === 'pg-home') renderHome();
+  } catch(e){
+    console.error(e);
+    log.innerHTML = `<div style="color:var(--danger)">❌ ${esc(e.message)}</div>`;
+    toast('خطأ: ' + e.message, 'error');
+  }
+  showLoad(false);
+}
+/* 🆕 استيراد حركات التسليم */
+function openImportDeliveriesSheet(){
+  const body = `
+    <div style="padding:12px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px;font-size:12px;line-height:1.8">
+      <b>📋 الأعمدة المدعومة:</b><br>
+      • اسم المعتمد <span style="color:var(--danger)">*</span><br>
+      • المبلغ المراد تسليمه <span style="color:var(--danger)">*</span><br>
+      • نوع القسط (جمعية/وفاة)<br>
+      • التاريخ • الحالة
+    </div>
+    <div id="importDelivLog" style="font-size:12px;line-height:1.7"></div>
+    <input type="file" id="impDelivFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="importDeliveries(this)">
+    <button class="btn primary block" style="margin-top:8px" onclick="$('impDelivFile').click()">📤 اختر ملف التسليمات</button>
+  `;
+  openSheet('📤 استيراد حركات التسليم', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
+}
+
+async function importDeliveries(input){
+  const file = input.files[0];
+  if(!file) return;
+  input.value = '';
+
+  showLoad(true);
+  const log = $('importDelivLog');
+  log.innerHTML = '<div style="color:var(--muted)">⏳ جاري القراءة…</div>';
+
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, { type:'array', cellDates:true });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
+
+    console.log('📋 أعمدة التسليمات:', Object.keys(rows[0]||{}));
+
+    let added = 0, skip = 0;
+
+    for(let i = 0; i < rows.length; i++){
+      const r = rows[i];
+      
+      const collectorName = cleanText(gv(r, 'اسم المعتمد','المعتمد','من','من المعتمد','المحصل'));
+      const amountStr = String(gv(r, 'المبلغ المراد تسليمه','المبلغ','القيمة') || '').replace(/[,،\s]/g,'');
+      const amount = Number(amountStr);
+      
+      if(!collectorName || !amount){ skip++; continue; }
+
+      const date = toDate(gv(r, 'التاريخ','تاريخ')) || today();
+      const typeStr = normAr(gv(r, 'نوع القسط','النوع','الصندوق') || '');
+      let fund = 'assoc';
+      if(/وفا/.test(typeStr)) fund = 'death';
+      
+      const status = cleanText(gv(r, 'الحالة','حالة')) || '';
+      const transactionId = cleanText(gv(r, 'رقم الحركة','ID','المعرف')) || '';
+
+      const notes = [
+        transactionId ? 'حركة: ' + transactionId : '',
+        status
+      ].filter(Boolean).join(' | ');
+
+      try{
+        const delivery = {
+          fromUserId: null,
+          fromUserName: collectorName,
+          toUserId: null,
+          toUserName: 'أمين الصندوق (استيراد)',
+          fund, amount, notes, date,
+          imported: true,
+          createdAt: new Date().toISOString()
+        };
+        const newId = await dbPut('deliveries', delivery);
+        delivery.id = newId;
+        S.deliveries.push(delivery);
+        added++;
+      } catch(e){ console.warn('صف', i+2, e); skip++; }
+    }
+
+    log.innerHTML = `
+      <div style="padding:12px;background:#f0fdf4;border-radius:12px;color:#166534">
+        <div style="font-weight:800;margin-bottom:6px">📊 النتيجة</div>
+        <div>➕ أُضيفت: <b>${added}</b></div>
+        <div>⏭️ تُخطّي: <b>${skip}</b></div>
+      </div>
+    `;
+    toast(`✅ أُضيفت ${added} تسليمة`, 'success', 4000);
+    await loadAll();
   } catch(e){
     console.error(e);
     log.innerHTML = `<div style="color:var(--danger)">❌ ${esc(e.message)}</div>`;
