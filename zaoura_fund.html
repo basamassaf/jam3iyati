@@ -3809,6 +3809,943 @@ window.getFinancialSummary = getFinancialSummary;
 window.getSubscribersCount = getSubscribersCount;
 
 console.log('✅ Part 9 — نموذج البيانات والأدوات تم تحميله');
+
+/* ═══════════════════════════════════════════════════════
+   💰 PART 10 — نموذج الدفع + شاشة المشترك
+   ═══════════════════════════════════════════════════════ */
+
+/* ─────────── 1. تحديث: بطاقة المشترك في القائمة ─────────── */
+function renderSubscribersV2(){
+  const year = S.currentYear;
+  const filter = S.filters.subscribers || 'all';
+  const sectorFilter = S.filters.subscriberSector || 'all';
+  
+  // إحصائيات
+  const subs = S.subscriptions.filter(s => s.year === year);
+  const counts = getSubscribersCount(year);
+  
+  $('subStats').innerHTML = `
+    <div class="stat"><div class="val">${counts.assoc.active}</div><div class="lbl">💰 جمعية</div></div>
+    <div class="stat red"><div class="val">${counts.death.active}</div><div class="lbl">⚰️ وفاة</div></div>
+    <div class="stat green"><div class="val">${counts.bothActive}</div><div class="lbl">✅ كليهما</div></div>
+    <div class="stat blue"><div class="val">${counts.total}</div><div class="lbl">👥 سكان</div></div>
+  `;
+  
+  // فلاتر
+  const chips = [
+    { k:'all', l:'الكل' },
+    { k:'assoc', l:'💰 جمعية' },
+    { k:'death', l:'⚰️ وفاة' },
+    { k:'both', l:'✅ كليهما' },
+    { k:'late', l:'⚠️ متأخرون' },
+    { k:'new', l:'🆕 جدد' }
+  ];
+  $('subChips').innerHTML = chips.map(c =>
+    `<button class="chip ${filter === c.k ? 'on' : ''}" onclick="setSubsFilter('${c.k}')">${c.l}</button>`
+  ).join('');
+  
+  // فلاتر القطاعات
+  const sectorChips = [
+    { k:'all', l:'كل القطاعات' },
+    ...S.sectors.map(s => ({ k:s.name, l:s.name }))
+  ];
+  $('subSectorChips').innerHTML = sectorChips.map(c =>
+    `<button class="chip ${sectorFilter === c.k ? 'on' : ''}" onclick="setSubsSector('${c.k}')">${c.l}</button>`
+  ).join('');
+  
+  // قائمة
+  let list = subs.map(sub => {
+    const person = getPersonById(sub.personId);
+    if(!person) return null;
+    const dues = computeMemberDues(sub.personId, year);
+    return { person, sub, dues };
+  }).filter(Boolean);
+  
+  // فلترة
+  if(filter === 'assoc') list = list.filter(x => x.sub.assocStatus === 'active');
+  if(filter === 'death') list = list.filter(x => x.sub.deathStatus === 'active');
+  if(filter === 'both') list = list.filter(x => x.sub.assocStatus === 'active' && x.sub.deathStatus === 'active');
+  if(filter === 'late') list = list.filter(x => x.dues && x.dues.total.remaining > 0);
+  if(filter === 'new') list = list.filter(x => getMemberClassification(x.person) === 'new');
+  
+  if(sectorFilter !== 'all') list = list.filter(x => x.person.sector === sectorFilter);
+  
+  // بحث
+  const q = S.search;
+  if(q){
+    const s = normAr(q);
+    list = list.filter(x => normAr(`${x.person.name} ${x.person.code||''} ${x.person.sector||''}`).includes(s));
+  }
+  
+  // ترتيب: متأخرون أولاً
+  list.sort((a, b) => {
+    const aRem = a.dues ? a.dues.total.remaining : 0;
+    const bRem = b.dues ? b.dues.total.remaining : 0;
+    if(aRem !== bRem) return bRem - aRem;
+    return String(a.person.name).localeCompare(String(b.person.name), 'ar');
+  });
+  
+  const el = $('subContent');
+  if(!list.length){
+    el.innerHTML = `<div class="empty"><span class="ico">⭐</span><h3>لا يوجد مشتركون</h3><p>جرّب فلتراً آخر</p></div>`;
+    return;
+  }
+  
+  el.innerHTML = `<div class="list">${list.slice(0, 200).map(({person, sub, dues}) => {
+    const icons = [];
+    if(sub.assocStatus === 'active') icons.push('💰');
+    if(sub.deathStatus === 'active') icons.push('⚰️');
+    
+    const hasUnpaid = dues && dues.total.remaining > 0;
+    const isNew = getMemberClassification(person) === 'new';
+    
+    // تفاصيل المستحق
+    const details = [];
+    if(dues && dues.assoc.remaining > 0) details.push(`💰 ${fmtShort(dues.assoc.remaining)}`);
+    if(dues && dues.death.remaining > 0) details.push(`⚰️ ${fmtShort(dues.death.remaining)}`);
+    if(dues && (dues.assoc.joinFeeRemaining > 0 || dues.death.joinFeeRemaining > 0)) {
+      const joinRem = (dues.assoc.joinFeeRemaining || 0) + (dues.death.joinFeeRemaining || 0);
+      details.push(`📋 ${fmtShort(joinRem)}`);
+    }
+    
+    return `<div class="item" onclick="openSubscriberDetailV2(${person.id})">
+      <div class="av ${hasUnpaid ? 'red' : 'green'}">${icons.join('') || '⭐'}</div>
+      <div class="body">
+        <div class="ttl">
+          ${esc(person.name)}
+          ${isNew ? '<span class="badge warning">🆕 جديد</span>' : ''}
+          ${person.memberType === 'مخفض' ? '<span class="badge info">🎓 مخفض</span>' : ''}
+        </div>
+        <div class="sub">
+          ${esc(person.code||'')} • ${esc(person.sector||'')}
+          ${details.length ? ' • ' + details.join(' | ') : ' • ✅ مسدَّد'}
+        </div>
+      </div>
+      <div style="text-align:left">
+        ${hasUnpaid 
+          ? `<div style="font-weight:800;color:var(--danger);font-size:13px">${fmtShort(dues.total.remaining)}</div>
+             <div style="font-size:10px;color:var(--muted)">متبقي</div>`
+          : `<div style="font-weight:800;color:var(--success);font-size:13px">✅</div>
+             <div style="font-size:10px;color:var(--muted)">مسدَّد</div>`}
+      </div>
+    </div>`;
+  }).join('')}</div>
+  ${list.length > 200 ? `<div style="text-align:center;padding:14px;font-size:12px;color:var(--muted)">عرض أول 200 من ${list.length}</div>` : ''}`;
+}
+
+/* ─────────── 2. تفاصيل المشترك الشاملة ─────────── */
+function openSubscriberDetailV2(personId){
+  const year = S.currentYear;
+  const fullHistory = computeMemberFullHistory(personId);
+  if(!fullHistory) return;
+  
+  const { person, classification, history, grandTotal } = fullHistory;
+  const currentDues = history.find(h => h.year === year);
+  
+  const isOld = classification === 'old';
+  const isNew = classification === 'new';
+  
+  const body = `
+    <!-- بطاقة المشترك -->
+    <div style="padding:16px;background:linear-gradient(135deg, var(--primary), var(--primary-2));color:#fff;border-radius:14px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">
+          ${person.gender === 'أنثى' ? '👩' : '👨'}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:17px">${esc(person.name)}</div>
+          <div style="font-size:12px;opacity:.9;margin-top:3px">
+            ${esc(person.code||'')} • ${esc(person.sector||'')}
+          </div>
+          <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+            <span style="background:rgba(255,255,255,.25);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800">
+              ${isOld ? '🟢 عضو قديم' : '🆕 عضو جديد'}
+            </span>
+            ${person.memberType === 'مخفض' ? '<span style="background:rgba(255,255,255,.25);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800">🎓 مخفض</span>' : ''}
+            <span style="background:rgba(255,255,255,.25);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800">${esc(person.relation||'')}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- الرصيد الإجمالي -->
+    <div style="padding:14px;background:var(--bg);border-radius:12px;margin-bottom:14px;text-align:center">
+      <div style="font-size:11px;color:var(--muted);font-weight:700">إجمالي المتبقي على العضو (كل السنوات)</div>
+      <div style="font-size:28px;font-weight:800;color:${grandTotal.remaining > 0 ? 'var(--danger)' : 'var(--success)'};margin-top:4px">
+        ${fmtNum(grandTotal.remaining)} ل.س
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">
+        دُفع ${fmtNum(grandTotal.paid)} من أصل ${fmtNum(grandTotal.required)}
+      </div>
+    </div>
+    
+    <!-- أزرار الدفع السريع -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <button class="btn assoc" onclick="closeSheet();setTimeout(()=>openFundPaymentSheetV2('assoc', ${personId}), 150)">
+        💰 دفعة جمعية
+      </button>
+      <button class="btn death" onclick="closeSheet();setTimeout(()=>openFundPaymentSheetV2('death', ${personId}), 150)">
+        ⚰️ دفعة وفاة
+      </button>
+    </div>
+    
+    <!-- رسوم الانضمام (إذا جديدة) -->
+    ${isNew && (currentDues?.assoc.joinFeeRemaining > 0 || currentDues?.death.joinFeeRemaining > 0) ? `
+      <div style="padding:14px;background:var(--warning);color:#fff;border-radius:12px;margin-bottom:14px">
+        <div style="font-weight:800;font-size:14px;margin-bottom:8px">📋 رسوم الانضمام</div>
+        ${currentDues.assoc.joinFeeRemaining > 0 ? `
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span>انضمام الجمعية</span>
+            <b>${fmtNum(currentDues.assoc.joinFeeRemaining)} ل.س</b>
+          </div>
+          <button class="btn ghost block sm" style="background:rgba(255,255,255,.2);color:#fff;border:0" onclick="closeSheet();setTimeout(()=>openFundPaymentSheetV2('joinAssoc', ${personId}), 150)">
+            📋 دفع رسوم انضمام الجمعية
+          </button>
+        ` : ''}
+        ${currentDues.death.joinFeeRemaining > 0 ? `
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin:8px 0 6px">
+            <span>انضمام الوفاة</span>
+            <b>${fmtNum(currentDues.death.joinFeeRemaining)} ل.س</b>
+          </div>
+          <button class="btn ghost block sm" style="background:rgba(255,255,255,.2);color:#fff;border:0" onclick="closeSheet();setTimeout(()=>openFundPaymentSheetV2('joinDeath', ${personId}), 150)">
+            📋 دفع رسوم انضمام الوفاة
+          </button>
+        ` : ''}
+      </div>
+    ` : ''}
+    
+    <!-- السجل الكامل -->
+    <div style="font-weight:800;font-size:14px;margin:16px 0 10px">📊 السجل الكامل</div>
+    ${history.map(h => {
+      const subStatus = h.subs.assoc === 'active' ? '🟢' : 
+                       h.subs.assoc === 'exemptTemp' ? '⏸️' :
+                       h.subs.assoc === 'exemptPerm' ? '🚫' :
+                       h.subs.assoc === 'withdrawn' ? '↩️' : '⚪';
+      
+      return `
+        <div style="padding:12px;background:var(--bg);border-radius:12px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-weight:800;font-size:14px">📅 ${h.year}</div>
+            <div style="font-size:11px;color:var(--muted)">${subStatus} ${STATUS[h.subs.assoc]?.label || 'غير محدد'}</div>
+          </div>
+          
+          ${h.assoc.required > 0 || h.assoc.paid > 0 ? `
+            <div style="padding:8px;background:var(--card);border-radius:8px;margin-bottom:6px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--assoc);margin-bottom:4px">
+                <span>💰 الجمعية</span>
+                <span>${fmtNum(h.assoc.paid)} / ${fmtNum(h.assoc.required)}</span>
+              </div>
+              <div class="progress assoc"><div style="width:${h.assoc.percent}%"></div></div>
+              ${h.assoc.remaining > 0 
+                ? `<div style="font-size:11px;color:var(--danger);margin-top:4px">متبقي: ${fmtNum(h.assoc.remaining)} ل.س</div>` 
+                : h.assoc.required > 0 ? `<div style="font-size:11px;color:var(--success);margin-top:4px">✅ مسدَّد</div>` : ''}
+              ${h.assoc.joinFee > 0 ? `
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--border)">
+                  <span>📋 رسوم الانضمام</span>
+                  <span style="color:${h.assoc.joinFeeRemaining > 0 ? 'var(--danger)' : 'var(--success)'};font-weight:700">
+                    ${h.assoc.joinFeeRemaining > 0 ? fmtNum(h.assoc.joinFeeRemaining) + ' متبقي' : '✅ مدفوعة'}
+                  </span>
+                </div>
+              ` : ''}
+            </div>
+          ` : ''}
+          
+          ${h.death.installments.length > 0 ? `
+            <div style="padding:8px;background:var(--card);border-radius:8px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--death);margin-bottom:4px">
+                <span>⚰️ الوفاة (${h.death.installments.length} قسط)</span>
+                <span>${fmtNum(h.death.paid)} / ${fmtNum(h.death.required)}</span>
+              </div>
+              <div class="progress death"><div style="width:${h.death.percent}%"></div></div>
+              ${h.death.remaining > 0 
+                ? `<div style="font-size:11px;color:var(--danger);margin-top:4px">متبقي: ${fmtNum(h.death.remaining)} ل.س</div>` 
+                : `<div style="font-size:11px;color:var(--success);margin-top:4px">✅ مسدَّد</div>`}
+              ${h.death.joinFee > 0 ? `
+                <div style="display:flex;justify-content:space-between;font-size:11px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--border)">
+                  <span>📋 رسوم الانضمام</span>
+                  <span style="color:${h.death.joinFeeRemaining > 0 ? 'var(--danger)' : 'var(--success)'};font-weight:700">
+                    ${h.death.joinFeeRemaining > 0 ? fmtNum(h.death.joinFeeRemaining) + ' متبقي' : '✅ مدفوعة'}
+                  </span>
+                </div>
+              ` : ''}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('')}
+    
+    <!-- أزرار إضافية -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
+      <button class="btn ghost block" onclick="closeSheet();setTimeout(()=>openPersonSheet(${personId}), 150)">
+        📝 تعديل البيانات
+      </button>
+      <button class="btn ghost block" onclick="showMemberPaymentsLog(${personId})">
+        📜 سجل الدفعات
+      </button>
+    </div>
+  `;
+  
+  openSheet('👤 ' + person.name, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
+}
+
+/* ─────────── 3. عرض سجل الدفعات الكامل ─────────── */
+function showMemberPaymentsLog(personId){
+  const person = getPersonById(personId);
+  if(!person) return;
+  
+  const allPayments = [];
+  
+  // دفعات الجمعية
+  S.assocPayments.filter(p => p.personId === personId).forEach(p => {
+    allPayments.push({
+      type: 'assoc',
+      fund: p.fund || 'assoc',
+      amount: p.amount,
+      date: p.date,
+      year: p.year,
+      collectorName: p.collectorName,
+      notes: p.notes,
+      createdAt: p.createdAt
+    });
+  });
+  
+  // التبرعات
+  S.donations.filter(d => d.personId === personId).forEach(d => {
+    allPayments.push({
+      type: 'donation',
+      fund: 'donation',
+      amount: d.amount,
+      date: d.date,
+      year: d.year,
+      collectorName: d.collectorName,
+      notes: d.notes,
+      createdAt: d.createdAt
+    });
+  });
+  
+  // مرتب حسب التاريخ
+  allPayments.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  
+  const fundLabels = {
+    'assoc': '💰 دفعة جمعية',
+    'joinAssoc': '📋 انضمام جمعية',
+    'death': '⚰️ دفعة وفاة',
+    'joinDeath': '📋 انضمام وفاة',
+    'donation': '💚 تبرع'
+  };
+  
+  const fundIcons = {
+    'assoc': '💰', 'joinAssoc': '📋', 'death': '⚰️', 'joinDeath': '📋', 'donation': '💚'
+  };
+  
+  const body = `
+    <div style="padding:12px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px">
+      <div style="font-weight:800">${esc(person.name)}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">
+        ${allPayments.length} دفعة مسجلة
+      </div>
+    </div>
+    
+    ${allPayments.length ? `
+      <div class="list">
+        ${allPayments.map(p => `
+          <div class="item" style="cursor:default;padding:12px 14px">
+            <div class="av ${p.type === 'assoc' ? 'blue' : p.type === 'death' ? 'red' : 'green'}">
+              ${fundIcons[p.fund] || '💰'}
+            </div>
+            <div class="body">
+              <div class="ttl" style="font-size:13px">${fundLabels[p.fund] || p.fund}</div>
+              <div class="sub">${fmtDate(p.date)} • ${p.year} • ${esc(p.collectorName || '')}</div>
+              ${p.notes ? `<div style="font-size:10px;color:var(--muted);margin-top:2px">📝 ${esc(p.notes)}</div>` : ''}
+            </div>
+            <div style="text-align:left">
+              <div style="font-weight:800;font-size:14px;color:${p.type === 'assoc' ? 'var(--assoc)' : p.type === 'death' ? 'var(--death)' : 'var(--donation)'}">
+                ${fmtNum(p.amount)}
+              </div>
+              <div style="font-size:10px;color:var(--muted)">ل.س</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    ` : '<div style="text-align:center;padding:40px;color:var(--muted)">لا توجد دفعات</div>'}
+  `;
+  
+  openSheet('📜 سجل الدفعات — ' + person.name, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
+}
+
+/* ─────────── 4. نموذج الدفع الموحّد (شاشة أولى) ─────────── */
+function openPaymentSheetV2(personId = null){
+  const body = `
+    <div style="text-align:center;padding:14px 0 18px">
+      <div style="font-size:44px;margin-bottom:8px">💰</div>
+      <div style="font-weight:800;font-size:15px">اختر نوع الدفعة</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">ثم اختر المشترك</div>
+    </div>
+    
+    <div style="display:grid;gap:10px">
+      <button class="quick-btn assoc" style="padding:18px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:right" onclick="closeSheet();setTimeout(()=>openFundPaymentSheetV2('assoc', ${personId || 'null'}), 150)">
+        <div style="font-size:32px">💰</div>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:14px;color:var(--assoc)">دفعة جمعية</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">الاشتراك السنوي الثابت</div>
+        </div>
+        <div style="font-size:20px;color:var(--muted)">›</div>
+      </button>
+      
+      <button class="quick-btn death" style="padding:18px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:right" onclick="closeSheet();setTimeout(()=>openFundPaymentSheetV2('death', ${personId || 'null'}), 150)">
+        <div style="font-size:32px">⚰️</div>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:14px;color:var(--death)">دفعة وفاة</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">تسديد أقساط الوفيات</div>
+        </div>
+        <div style="font-size:20px;color:var(--muted)">›</div>
+      </button>
+      
+      <button class="quick-btn donation" style="padding:18px;flex-direction:row;justify-content:flex-start;gap:14px;text-align:right" onclick="closeSheet();setTimeout(()=>openFundPaymentSheetV2('donation', ${personId || 'null'}), 150)">
+        <div style="font-size:32px">💚</div>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:14px;color:var(--donation)">تبرع</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">تبرع اختياري</div>
+        </div>
+        <div style="font-size:20px;color:var(--muted)">›</div>
+      </button>
+    </div>
+  `;
+  
+  openSheet('💰 تسجيل دفعة', body, '<button class="btn ghost" onclick="closeSheet()">إلغاء</button>');
+}
+
+/* ─────────── 5. نموذج الدفع الفعلي (Fund-First) ─────────── */
+function openFundPaymentSheetV2(fund, personId){
+  const year = S.currentYear;
+  
+  // معلومات الصندوق
+  const fundInfo = {
+    'assoc': {
+      label: 'دفعة جمعية',
+      icon: '💰',
+      color: 'var(--assoc)',
+      softColor: 'var(--assoc-soft)',
+      btnClass: 'assoc'
+    },
+    'death': {
+      label: 'دفعة وفاة',
+      icon: '⚰️',
+      color: 'var(--death)',
+      softColor: 'var(--death-soft)',
+      btnClass: 'death'
+    },
+    'donation': {
+      label: 'تبرع',
+      icon: '💚',
+      color: 'var(--donation)',
+      softColor: 'var(--donation-soft)',
+      btnClass: 'donation'
+    },
+    'joinAssoc': {
+      label: 'انضمام جمعية',
+      icon: '📋',
+      color: 'var(--assoc)',
+      softColor: 'var(--assoc-soft)',
+      btnClass: 'assoc'
+    },
+    'joinDeath': {
+      label: 'انضمام وفاة',
+      icon: '📋',
+      color: 'var(--death)',
+      softColor: 'var(--death-soft)',
+      btnClass: 'death'
+    }
+  }[fund];
+  
+  const showPersonSearch = fund !== 'donation';
+  
+  const body = `
+    <div style="padding:14px;background:${fundInfo.softColor};border-radius:14px;margin-bottom:14px;text-align:center;border:2px solid ${fundInfo.color}">
+      <div style="font-size:32px">${fundInfo.icon}</div>
+      <div style="font-size:15px;font-weight:800;color:${fundInfo.color};margin-top:4px">${fundInfo.label}</div>
+      <div style="font-size:11px;color:var(--muted)">سنة ${year}</div>
+    </div>
+    
+    ${showPersonSearch ? `
+      <div class="fld" style="position:relative">
+        <label>${fund === 'donation' ? 'المتبرع' : 'المشترك'} <span class="req">*</span></label>
+        <input id="pfPersonInput" placeholder="اكتب اسم..." oninput="onPFPersonInput('${fund}')" onfocus="onPFPersonInput('${fund}')" autocomplete="off">
+        <input type="hidden" id="pfPersonId" value="${personId || ''}">
+        <div class="options-list" id="pfPersonOptions"></div>
+      </div>
+    ` : `
+      <div class="fld">
+        <label>اسم المتبرع</label>
+        <input id="pfDonorName" placeholder="اختياري — يُقبل فارغاً للمتبرع المجهول">
+      </div>
+    `}
+    
+    <div id="pfDuesBox" style="display:none;margin-bottom:14px"></div>
+    
+    <div class="fld" id="pfAmountField" style="display:none">
+      <label>المبلغ <span class="req">*</span></label>
+      <div class="amount-input" style="border-color:${fundInfo.color}">
+        <input id="pfAmount" type="tel" inputmode="numeric" placeholder="0" style="color:${fundInfo.color}">
+        <span class="currency">ل.س</span>
+      </div>
+      <div class="amount-quick" id="pfQuickButtons"></div>
+    </div>
+    
+    <div class="fld-row" id="pfDateRow" style="display:none">
+      <div class="fld"><label>التاريخ</label>
+        <input id="pfDate" type="date" value="${today()}"></div>
+      <div class="fld"><label>السنة</label>
+        <select id="pfYear">
+          ${[2025,2026,2027,2028].map(y => `<option value="${y}" ${y===year?'selected':''}>${y}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    
+    <div class="fld" id="pfNotesField" style="display:none">
+      <label>ملاحظات</label>
+      <input id="pfNotes" placeholder="اختياري">
+    </div>
+  `;
+  
+  const foot = `
+    <button class="btn ghost" onclick="closeSheet()">إلغاء</button>
+    <button class="btn ${fundInfo.btnClass}" onclick="saveFundPaymentV2('${fund}')">💾 حفظ + واتساب</button>
+  `;
+  
+  openSheet(`${fundInfo.icon} ${fundInfo.label}`, body, foot, { focus: showPersonSearch ? 'pfPersonInput' : 'pfDonorName' });
+  
+  window._currentFundV2 = fund;
+  
+  if(fund === 'donation'){
+    // للمتبرعين — إظهار المبلغ مباشرة
+    $('pfAmountField').style.display = 'block';
+    $('pfDateRow').style.display = 'grid';
+    $('pfNotesField').style.display = 'block';
+    $('pfQuickButtons').innerHTML = `
+      <button onclick="$('pfAmount').value=5000">5,000</button>
+      <button onclick="$('pfAmount').value=10000">10,000</button>
+      <button onclick="$('pfAmount').value=50000">50,000</button>
+      <button onclick="$('pfAmount').value=100000">100,000</button>
+    `;
+  } else if(personId){
+    const p = getPersonById(personId);
+    if(p){
+      $('pfPersonInput').value = p.name;
+      $('pfPersonId').value = p.id;
+      showPFDuesV2(fund, p.id);
+    }
+  }
+}
+
+/* ─────────── 6. البحث عن مشتركين (فقط المشتركين) ─────────── */
+function onPFPersonInput(fund){
+  const input = $('pfPersonInput');
+  const opts = $('pfPersonOptions');
+  if(!input || !opts) return;
+  
+  const q = input.value.trim();
+  const year = S.currentYear;
+  
+  // تحديد الصندوق المطلوب
+  const fundForSub = (fund === 'joinAssoc') ? 'assoc' : (fund === 'joinDeath') ? 'death' : fund;
+  const isAssoc = fundForSub === 'assoc';
+  const isDeath = fundForSub === 'death';
+  
+  // ⭐ فقط المشتركين في الصندوق المطلوب
+  let list = S.people.filter(p => {
+    const sub = S.subscriptions.find(s => s.personId === p.id && s.year === year);
+    if(!sub) return false;
+    if(isAssoc) return sub.assocStatus === 'active';
+    if(isDeath) return sub.deathStatus === 'active';
+    return false;
+  });
+  
+  if(q){
+    const s = normAr(q);
+    list = list.filter(p => normAr(`${p.name} ${p.code||''} ${p.sector||''}`).includes(s));
+  }
+  
+  list = list.slice(0, 30);
+  
+  if(!list.length){
+    opts.innerHTML = `<div style="padding:12px;color:var(--muted);font-size:13px;text-align:center">
+      ${q ? '⚠️ لا نتائج' : '⚠️ اكتب اسماً للبحث'}
+    </div>`;
+  } else {
+    opts.innerHTML = list.map(p => {
+      const dues = computeMemberDues(p.id, year);
+      let remaining = 0;
+      if(fundForSub === 'assoc') remaining = dues ? (dues.assoc.remaining + dues.assoc.joinFeeRemaining) : 0;
+      else if(fundForSub === 'death') remaining = dues ? (dues.death.remaining + dues.death.joinFeeRemaining) : 0;
+      
+      return `<div class="option-item" onclick="selectPFPersonV2(${p.id},'${esc(p.name).replace(/'/g, "&#39;")}')">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700">${esc(p.name)}</div>
+          <div style="font-size:10px;color:var(--muted)">${esc(p.code||'')} • ${esc(p.sector||'')}</div>
+        </div>
+        <small style="color:${remaining > 0 ? 'var(--danger)' : 'var(--success)'};font-weight:700;flex-shrink:0">
+          ${remaining > 0 ? 'متبقي ' + fmtShort(remaining) : '✅'}
+        </small>
+      </div>`;
+    }).join('');
+  }
+  opts.classList.add('on');
+}
+
+function selectPFPersonV2(id, name){
+  $('pfPersonInput').value = name;
+  $('pfPersonId').value = id;
+  $('pfPersonOptions').classList.remove('on');
+  showPFDuesV2(window._currentFundV2, id);
+}
+
+/* ─────────── 7. عرض مستحقات المشترك ─────────── */
+function showPFDuesV2(fund, personId){
+  const person = getPersonById(personId);
+  if(!person) return;
+  
+  const year = Number($('pfYear')?.value) || S.currentYear;
+  const dues = computeMemberDues(personId, year);
+  if(!dues) return;
+  
+  const fundForSub = (fund === 'joinAssoc') ? 'assoc' : (fund === 'joinDeath') ? 'death' : fund;
+  const isAssoc = fundForSub === 'assoc';
+  const fundColor = isAssoc ? 'var(--assoc)' : 'var(--death)';
+  const fundIcon = isAssoc ? '💰' : '⚰️';
+  
+  let duesHTML = '';
+  
+  if(fundForSub === 'assoc'){
+    duesHTML = `
+      <div style="padding:14px;background:var(--bg);border-radius:12px;border:2px solid ${fundColor}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div>
+            <div style="font-weight:800;font-size:15px">${esc(person.name)}</div>
+            <div style="font-size:11px;color:var(--muted)">
+              ${esc(person.code||'')} • ${esc(person.sector||'')}${person.memberType === 'مخفض' ? ' • 🎓 مخفض' : ''}
+            </div>
+          </div>
+          <div style="font-size:24px">${fundIcon}</div>
+        </div>
+        
+        <div style="padding:8px;background:var(--card);border-radius:8px;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:6px">💰 الاشتراك السنوي ${year}</div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px">
+            <span class="muted">المطلوب</span><b>${fmtNum(dues.assoc.required)}</b>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px">
+            <span class="muted">المدفوع</span><b style="color:var(--success)">${fmtNum(dues.assoc.paid)}</b>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-top:2px solid ${fundColor};margin-top:4px">
+            <span style="font-weight:800">المتبقي</span>
+            <b style="font-weight:800;color:${dues.assoc.remaining > 0 ? 'var(--danger)' : 'var(--success)'}">${fmtNum(dues.assoc.remaining)} ل.س</b>
+          </div>
+          <div class="progress assoc" style="margin-top:8px"><div style="width:${dues.assoc.percent}%"></div></div>
+        </div>
+        
+        ${dues.assoc.joinFee > 0 ? `
+          <div style="padding:8px;background:var(--card);border-radius:8px">
+            <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:6px">📋 رسوم الانضمام</div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px">
+              <span class="muted">المطلوب</span><b>${fmtNum(dues.assoc.joinFee)}</b>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px">
+              <span class="muted">المدفوع</span><b style="color:var(--success)">${fmtNum(dues.assoc.joinFeePaid)}</b>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-top:1px dashed var(--border);margin-top:4px">
+              <span style="font-weight:800">المتبقي</span>
+              <b style="color:${dues.assoc.joinFeeRemaining > 0 ? 'var(--danger)' : 'var(--success)'}">${fmtNum(dues.assoc.joinFeeRemaining)} ل.س</b>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  } else if(fundForSub === 'death'){
+    duesHTML = `
+      <div style="padding:14px;background:var(--bg);border-radius:12px;border:2px solid ${fundColor}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div>
+            <div style="font-weight:800;font-size:15px">${esc(person.name)}</div>
+            <div style="font-size:11px;color:var(--muted)">
+              ${esc(person.code||'')} • ${esc(person.sector||'')}
+            </div>
+          </div>
+          <div style="font-size:24px">${fundIcon}</div>
+        </div>
+        
+        <div style="padding:8px;background:var(--card);border-radius:8px;margin-bottom:8px">
+          <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:6px">⚰️ أقساط الوفاة ${year}</div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px">
+            <span class="muted">عدد الأقساط</span><b>${dues.death.installments.length}</b>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px">
+            <span class="muted">المطلوب</span><b>${fmtNum(dues.death.required)}</b>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px">
+            <span class="muted">المدفوع</span><b style="color:var(--success)">${fmtNum(dues.death.paid)}</b>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-top:2px solid ${fundColor};margin-top:4px">
+            <span style="font-weight:800">المتبقي</span>
+            <b style="font-weight:800;color:${dues.death.remaining > 0 ? 'var(--danger)' : 'var(--success)'}">${fmtNum(dues.death.remaining)} ل.س</b>
+          </div>
+          <div class="progress death" style="margin-top:8px"><div style="width:${dues.death.percent}%"></div></div>
+        </div>
+        
+        ${dues.death.installments.length > 0 ? `
+          <div style="padding:8px;background:var(--card);border-radius:8px">
+            <div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:6px">📋 تفاصيل الأقساط</div>
+            ${dues.death.installments.map(i => `
+              <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px">
+                <span>${esc(i.eventName || 'وفاة')}</span>
+                <span style="color:${i.status === 'paid' ? 'var(--success)' : 'var(--danger)'};font-weight:700">
+                  ${i.status === 'paid' ? '✅' : '⏳'} ${fmtNum(i.amount)}
+                </span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+  
+  const box = $('pfDuesBox');
+  if(box){
+    box.innerHTML = duesHTML;
+    box.style.display = 'block';
+  }
+  
+  // إظهار الحقول
+  $('pfAmountField').style.display = 'block';
+  $('pfDateRow').style.display = 'grid';
+  $('pfNotesField').style.display = 'block';
+  
+  // أزرار سريعة
+  let suggestedAmount = 0;
+  if(fundForSub === 'assoc'){
+    suggestedAmount = dues.assoc.remaining + dues.assoc.joinFeeRemaining;
+  } else if(fundForSub === 'death'){
+    suggestedAmount = dues.death.remaining + dues.death.joinFeeRemaining;
+  }
+  
+  const buttons = [];
+  if(suggestedAmount > 0){
+    buttons.push(`<button onclick="$('pfAmount').value=${suggestedAmount}">💰 كامل ${fmtShort(suggestedAmount)}</button>`);
+    buttons.push(`<button onclick="$('pfAmount').value=${Math.round(suggestedAmount / 2)}">نصف</button>`);
+  }
+  buttons.push(`<button onclick="$('pfAmount').value=5000">5000</button>`);
+  buttons.push(`<button onclick="$('pfAmount').value=10000">10,000</button>`);
+  $('pfQuickButtons').innerHTML = buttons.join('');
+  
+  $('pfAmount').value = suggestedAmount > 0 ? suggestedAmount : '';
+}
+
+/* ─────────── 8. حفظ الدفعة ─────────── */
+async function saveFundPaymentV2(fund){
+  const isDonation = fund === 'donation';
+  const personId = isDonation ? null : Number($('pfPersonId').value);
+  const amount = Number($('pfAmount').value);
+  const date = $('pfDate').value;
+  const year = Number($('pfYear').value);
+  const notes = $('pfNotes')?.value?.trim() || '';
+  const donorName = isDonation ? ($('pfDonorName')?.value?.trim() || '') : '';
+  
+  if(!isDonation && !personId){ toast('اختر المشترك', 'error'); return; }
+  if(!amount || amount <= 0){ toast('المبلغ مطلوب', 'error'); return; }
+  if(!date){ toast('التاريخ مطلوب', 'error'); return; }
+  
+  showLoad(true);
+  
+  try{
+    let person = personId ? getPersonById(personId) : null;
+    let paymentInfo = null;
+    
+    if(isDonation){
+      // تبرع
+      const record = {
+        donorName: donorName || 'متبرع مجهول',
+        personId: null,
+        amount, date, year, notes,
+        fund: 'donation',
+        collectorId: S.currentUser.id,
+        collectorName: S.currentUser.name,
+        method: 'نقدي',
+        createdAt: new Date().toISOString()
+      };
+      const id = await dbPut('donations', record);
+      record.id = id;
+      S.donations.push(record);
+      
+      paymentInfo = {
+        personName: record.donorName,
+        personCode: '',
+        fund: 'donation',
+        amount, year, date,
+        collectorName: S.currentUser.name,
+        notes
+      };
+      
+    } else if(fund === 'assoc' || fund === 'joinAssoc'){
+      // دفعة جمعية
+      const record = {
+        personId,
+        fund, // 'assoc' أو 'joinAssoc'
+        amount, date, year, notes,
+        method: 'نقدي',
+        collectorId: S.currentUser.id,
+        collectorName: S.currentUser.name,
+        createdAt: new Date().toISOString()
+      };
+      const id = await dbPut('assocPayments', record);
+      record.id = id;
+      S.assocPayments.push(record);
+      
+      paymentInfo = {
+        personName: person.name,
+        personCode: person.code,
+        fund,
+        amount, year, date,
+        collectorName: S.currentUser.name,
+        notes
+      };
+      
+    } else if(fund === 'death' || fund === 'joinDeath'){
+      if(fund === 'joinDeath'){
+        // رسوم انضمام وفاة
+        const record = {
+          personId,
+          fund: 'joinDeath',
+          amount, date, year, notes,
+          method: 'نقدي',
+          collectorId: S.currentUser.id,
+          collectorName: S.currentUser.name,
+          createdAt: new Date().toISOString()
+        };
+        const id = await dbPut('assocPayments', record);
+        record.id = id;
+        S.assocPayments.push(record);
+        
+        paymentInfo = {
+          personName: person.name,
+          personCode: person.code,
+          fund: 'joinDeath',
+          amount, year, date,
+          collectorName: S.currentUser.name,
+          notes
+        };
+        
+      } else {
+        // دفعة وفاة — توزيع على الأقساط
+        const distribution = await distributeDeathPayment(personId, year, amount, date, notes);
+        
+        // سجل عام للدفعة
+        const record = {
+          personId,
+          fund: 'death',
+          amount, date, year, notes,
+          method: 'نقدي',
+          distribution,
+          collectorId: S.currentUser.id,
+          collectorName: S.currentUser.name,
+          createdAt: new Date().toISOString()
+        };
+        const id = await dbPut('assocPayments', record);
+        record.id = id;
+        S.assocPayments.push(record);
+        
+        paymentInfo = {
+          personName: person.name,
+          personCode: person.code,
+          fund: 'death',
+          amount, year, date,
+          collectorName: S.currentUser.name,
+          notes,
+          distribution
+        };
+        
+        if(!distribution.success){
+          toast(distribution.message || 'فشل التوزيع', 'warning', 3000);
+        }
+      }
+    }
+    
+    logAudit('add', 'payment', null, { fund, personId, amount });
+    
+    // رسالة نجاح
+    if(paymentInfo.distribution?.paidCount > 0){
+      toast(`✅ تم دفع ${paymentInfo.distribution.paidCount} قسط`, 'success', 3000);
+    } else {
+      toast('✅ تم تسجيل الدفعة', 'success', 3000);
+    }
+    
+    closeSheet();
+    renderHome();
+    if(S.page === 'pg-subscribers') renderSubscribersV2();
+    if(S.page === 'pg-payments') renderPayments();
+    
+    // واتساب تلقائي — بعد ثانية
+    setTimeout(() => {
+      if(confirm('📱 هل تريد إرسال إيصال واتساب؟')) {
+        sendReceiptWA(paymentInfo);
+      }
+    }, 400);
+    
+  } catch(e){
+    console.error(e);
+    toast('خطأ: ' + e.message, 'error');
+  }
+  
+  showLoad(false);
+}
+
+/* ─────────── 9. تحديث التنقل ─────────── */
+const _origGo10 = window.go;
+window.go = function(page){
+  _origGo10(page);
+  if(page === 'pg-subscribers') renderSubscribersV2();
+};
+
+/* ─────────── 10. تحديث FAB ─────────── */
+const _origFab10 = window.handleFab;
+window.handleFab = function(){
+  if(S.page === 'pg-subscribers'){
+    openPaymentSheetV2();
+  } else if(S.page === 'pg-payments'){
+    openPaymentSheetV2();
+  } else {
+    _origFab10();
+  }
+};
+
+/* ─────────── 11. تحديث بطاقة "إجراءات سريعة" ─────────── */
+const _origRenderHome10 = window.renderHome;
+window.renderHome = function(){
+  _origRenderHome10();
+  
+  const quickBox = $('homeQuickActions');
+  if(!quickBox) return;
+  
+  const canPay = hasPerm('payment.add');
+  
+  quickBox.innerHTML = `
+    ${canPay ? `
+      <div class="quick-btn assoc" onclick="openPaymentSheetV2()" style="grid-column:1/-1">
+        <div class="ico">💰</div>
+        <div class="lbl">تسجيل دفعة</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">جمعية / وفاة / تبرع</div>
+      </div>
+    ` : ''}
+    <div class="quick-btn" onclick="openPersonSheet()"><div class="ico">👤</div><div class="lbl">إضافة فرد</div></div>
+    <div class="quick-btn" onclick="openSubscribersList()"><div class="ico">⭐</div><div class="lbl">المشتركون</div></div>
+  `;
+};
+
+function openSubscribersList(){
+  go('pg-subscribers');
+}
+
+console.log('✅ Part 10 — نموذج الدفع + شاشة المشترك تم تحميله');
+
 document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
