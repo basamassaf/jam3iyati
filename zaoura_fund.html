@@ -4231,26 +4231,29 @@ async function importPayments(input){
       // ⭐ اسم المعتمد — من عمود "اسم المعتمد"
       const collectorName = cleanText(gv(r, 'اسم المعتمد','المعتمد','المحصل','الجباة')) || 'استيراد سابق';
       const status = cleanText(gv(r, 'الحالة','حالة')) || '';
-      const notes = cleanText(gv(r, 'ملاحظات')) || '';
+const notes = cleanText(gv(r, 'ملاحظات')) || '';
 
-      try{
-        const payment = {
-          memberId: member.id,
-          fund, amount, date,
-          year: forYear, forYear,
-          status, notes,
-          collectorId: null,
-          collectorName,
-          imported: true,
-          createdAt: new Date().toISOString()
-        };
-        const newId = await dbPut('payments', payment);
-        payment.id = newId;
-        S.payments.push(payment);
-        added++;
-      } catch(e){ console.warn('صف', i+2, e); skip++; }
-    }
+// ⭐ فحص التكرار
+const isDuplicate = S.payments.some(p =>
+  p.memberId === member.id &&
+  Number(p.amount) === amount &&
+  p.date === date &&
+  Number(p.forYear || p.year) === forYear &&
+  p.fund === fund
+);
+if(isDuplicate){ skip++; continue; }
 
+try{
+  const payment = {
+    memberId: member.id,
+    fund, amount, date,
+    year: forYear, forYear,
+    status, notes,
+    collectorId: null,
+    collectorName,
+    imported: true,
+    createdAt: new Date().toISOString()
+  };
     const notFoundHTML = notFoundNames.length ? 
       `<div style="margin-top:8px;padding:8px;background:#fef2f2;border-radius:8px;color:#991b1b;font-size:11px;max-height:120px;overflow:auto">
         <b>أول 10 أسماء غير موجودة:</b><br>
