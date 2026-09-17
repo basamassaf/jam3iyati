@@ -305,8 +305,7 @@ main{max-width:900px;margin:0 auto;padding:12px}
 'use strict';
 
 /* ═══════════════════════════════════════════════════════
-   صندوق زعورة — JavaScript الجزء 1
-   الأساس + الحسابات + الأعضاء + الدفعات
+   صندوق زعورة — JavaScript
    ═══════════════════════════════════════════════════════ */
 
 const DB_NAME = 'zaoura_v6';
@@ -513,19 +512,15 @@ const getMemberById = id => S.members.find(m => m.id === id);
    ⭐⭐ الحسابات — القلب النابض للنظام ⭐⭐
    ═══════════════════════════════════════════════════════ */
 
-/* السنة الأساسية للنظام */
 const BASE_YEAR = 2025;
 
-/* جلب ثوابت سنة معينة (أو الأقرب) */
 function getConstants(year){
   const c = S.constants.find(x => x.year === year);
   if(c) return c;
-  // إذا لم تُحدَّد السنة، ارجع للثوابت الأحدث
   const sorted = [...S.constants].sort((a,b) => b.year - a.year);
   return sorted[0] || null;
 }
 
-/* حساب مستحقات عضو لسنة معينة */
 function computeMemberYear(member, year){
   const c = getConstants(year);
   if(!c) return { assoc:{ req:0, paid:0, rem:0 }, death:{ req:0, paid:0, rem:0 } };
@@ -539,31 +534,21 @@ function computeMemberYear(member, year){
     death: { req: 0, paid: 0, rem: 0 }
   };
 
-  // ═══ الجمعية ═══
-  // يبدأ الاشتراك إذا: العضو مشترك في الجمعية + السنة ≥ سنة الانضمام + السنة ≥ 2025
   if(member.assocStartYear && year >= member.assocStartYear && year >= BASE_YEAR){
-    // اشتراك سنوي
     result.assoc.req += assocFees;
-
-    // رسوم انضمام مرة واحدة (فقط إذا كانت سنة الانضمام ≥ 2025)
     if(year === member.assocStartYear && member.assocStartYear >= BASE_YEAR){
       result.assoc.req += joinAssocFee;
     }
   }
 
-  // ═══ الوفاة ═══
   if(member.deathStartYear && year >= member.deathStartYear && year >= BASE_YEAR){
-    // رسوم انضمام وفاة مرة واحدة (فقط إذا كانت سنة الانضمام ≥ 2025)
     if(year === member.deathStartYear && member.deathStartYear >= BASE_YEAR){
       result.death.req += ((member.memberType === 'مخفض' && c.joinDeathFeeReduced) ? c.joinDeathFeeReduced : c.joinDeathFee);
     }
-
-    // عدد الوفيات في هذه السنة
     const yearDeaths = S.deaths.filter(d => d.year === year);
     result.death.req += yearDeaths.length * c.deathInstallment;
   }
 
-  // ═══ المدفوع ═══
   const memberPayments = S.payments.filter(p => p.memberId === member.id);
   result.assoc.paid = memberPayments
     .filter(p => p.fund === 'assoc')
@@ -575,12 +560,10 @@ function computeMemberYear(member, year){
   return result;
 }
 
-/* حساب كل سنوات العضو */
 function computeMemberFull(memberId){
   const member = getMemberById(memberId);
   if(!member) return null;
 
-  // نطاق السنوات: من max(2025, firstStartYear) إلى currentYear
   const starts = [member.assocStartYear, member.deathStartYear].filter(x => x);
   if(!starts.length) return { member, years: [], total:{ assocReq:0, assocPaid:0, assocRem:0, deathReq:0, deathPaid:0, deathRem:0, totalRem:0, totalReq:0, totalPaid:0 } };
 
@@ -608,9 +591,6 @@ function computeMemberFull(memberId){
   return { member, years, total };
 }
 
-/* ═══════════════════════════════════════════════════════
-   ⭐⭐ الإحصائيات العامة ⭐⭐
-   ═══════════════════════════════════════════════════════ */
 function getMembersStats(year){
   const y = year || S.currentYear;
   let onlyAssoc = 0, onlyDeath = 0, both = 0, none = 0, late = 0;
@@ -625,7 +605,6 @@ function getMembersStats(year){
     else none++;
   }
 
-  // المتأخرون
   for(const m of S.members){
     if(!m.assocStartYear && !m.deathStartYear) continue;
     const full = computeMemberFull(m.id);
@@ -635,26 +614,20 @@ function getMembersStats(year){
   return { year:y, total:S.members.length, onlyAssoc, onlyDeath, both, none, late, lateTotal };
 }
 
-/* ═══════════════════════════════════════════════════════
-   الأرصدة المالية
-   ═══════════════════════════════════════════════════════ */
 function getFundBalances(year){
   const y = year || S.currentYear;
 
-  // صندوق الجمعية
   const assocPayments = S.payments.filter(p => p.year === y && p.fund === 'assoc').reduce((s,p) => s + (Number(p.amount)||0), 0);
   const assocIncomes = S.incomes.filter(i => i.year === y && i.fund === 'assoc').reduce((s,i) => s + (Number(i.amount)||0), 0);
   const assocExpenses = S.expenses.filter(e => e.year === y && e.fund === 'assoc').reduce((s,e) => s + (Number(e.amount)||0), 0);
   const assocBalance = assocPayments + assocIncomes - assocExpenses;
 
-  // صندوق الوفاة
   const deathPayments = S.payments.filter(p => p.year === y && p.fund === 'death').reduce((s,p) => s + (Number(p.amount)||0), 0);
   const deathIncomes = S.incomes.filter(i => i.year === y && i.fund === 'death').reduce((s,i) => s + (Number(i.amount)||0), 0);
   const deathExpenses = S.expenses.filter(e => e.year === y && e.fund === 'death').reduce((s,e) => s + (Number(e.amount)||0), 0);
   const deathCompensations = S.deaths.filter(d => d.year === y).reduce((s,d) => s + (Number(d.compensation)||0), 0);
   const deathBalance = deathPayments + deathIncomes - deathExpenses - deathCompensations;
 
-  // التبرعات
   const donations = S.payments.filter(p => p.year === y && p.fund === 'donation').reduce((s,p) => s + (Number(p.amount)||0), 0);
 
   return {
@@ -666,7 +639,6 @@ function getFundBalances(year){
   };
 }
 
-/* عهدة المستخدم (كم في يده) */
 function getUserCustody(userId){
   const payments = S.payments.filter(p => p.collectorId === userId).reduce((s,p) => s + (Number(p.amount)||0), 0);
   const delivered = S.deliveries.filter(d => d.fromUserId === userId).reduce((s,d) => s + (Number(d.amount)||0), 0);
@@ -838,10 +810,8 @@ function renderHome(){
   const balances = getFundBalances(y);
   const custody = getUserCustody(S.currentUser.id);
 
-  // بطاقات علوية
   let statsHTML = '';
   if(S.currentUser.role === 'collector'){
-    // المعتمد يرى عهدته
     statsHTML = `
       <div class="stat blue"><div class="val">${fmtShort(custody.balance)}</div><div class="lbl">💼 عهدتي</div></div>
       <div class="stat green"><div class="val">${fmtShort(custody.collected)}</div><div class="lbl">📥 حصّلت</div></div>
@@ -858,7 +828,6 @@ function renderHome(){
   }
   $('homeStats').innerHTML = statsHTML;
 
-  // أزرار سريعة
   const btns = [];
   if(hasPerm('payment.add')) btns.push(`<div class="quick-btn assoc" onclick="openPaymentSheet()"><div class="ico">💰</div><div class="lbl">دفعة</div></div>`);
   if(hasPerm('death.add')) btns.push(`<div class="quick-btn death" onclick="openDeathSheet()"><div class="ico">⚰️</div><div class="lbl">وفاة</div></div>`);
@@ -866,7 +835,6 @@ function renderHome(){
   if(hasPerm('handover.send')) btns.push(`<div class="quick-btn" onclick="openDeliverySheet()"><div class="ico">📤</div><div class="lbl">تسليم</div></div>`);
   $('homeQuickActions').innerHTML = btns.join('') || '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:20px">لا توجد إجراءات متاحة</div>';
 
-  // أرصدة
   $('fundBalances').innerHTML = `
     <div class="balance-block" style="border-right:4px solid var(--assoc)">
       <div style="font-weight:800;font-size:14px;color:var(--assoc);margin-bottom:8px">💰 صندوق الجمعية</div>
@@ -890,7 +858,6 @@ function renderHome(){
     </div>
   `;
 
-  // آخر العمليات
   const ops = [];
   S.payments.slice(-20).forEach(p => {
     const m = p.memberId ? getMemberById(p.memberId) : null;
@@ -949,6 +916,20 @@ function renderMembers(){
     return { member: m, full };
   });
 
+  // ⭐⭐ قيود المعتمد — يرى فقط المشتركين في صندوقه/قطاعه ⭐⭐
+  if(S.currentUser && S.currentUser.role === 'collector'){
+    const cf = S.currentUser.collectFund;
+    if(cf === 'assoc'){
+      list = list.filter(x => x.member.assocStartYear);
+    } else if(cf === 'death'){
+      list = list.filter(x => x.member.deathStartYear);
+    } else {
+      list = list.filter(x => x.member.assocStartYear || x.member.deathStartYear);
+    }
+    const sec = S.currentUser.sector;
+    if(sec) list = list.filter(x => x.member.sector === sec);
+  }
+
   if(S.filters.members === 'assoc') list = list.filter(x => x.member.assocStartYear && !x.member.deathStartYear);
   if(S.filters.members === 'death') list = list.filter(x => x.member.deathStartYear && !x.member.assocStartYear);
   if(S.filters.members === 'both') list = list.filter(x => x.member.assocStartYear && x.member.deathStartYear);
@@ -962,7 +943,6 @@ function renderMembers(){
     list = list.filter(x => normAr(`${x.member.name} ${x.member.code || ''} ${x.member.phone || ''}`).includes(s));
   }
 
-  // ترتيب: متأخرون أولاً
   list.sort((a,b) => {
     const ra = a.full?.total.totalRem || 0;
     const rb = b.full?.total.totalRem || 0;
@@ -1069,9 +1049,6 @@ function showMemberPayments(memberId){
   openSheet('📜 دفعات ' + m.name, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide:true });
 }
 
-/* ═══════════════════════════════════════════════════════
-   نموذج العضو
-   ═══════════════════════════════════════════════════════ */
 function openMemberSheet(id = null){
   if(!hasPerm('member.manage')){ toast('غير مصرح','error'); return; }
   const isNew = !id;
@@ -1137,6 +1114,7 @@ function openMemberSheet(id = null){
     : `<button class="btn danger sm" onclick="deleteMember(${id})">🗑️</button><button class="btn primary" onclick="saveMember(${id})">💾 حفظ</button>`;
 
   openSheet(isNew ? '➕ عضو جديد' : '✏️ ' + esc(m.name), body, foot, { focus:'mName' });
+  setTimeout(() => { toggleAssocYear(); toggleDeathYear(); }, 50);
 }
 
 function toggleAssocYear(){
@@ -1287,7 +1265,7 @@ function openPaymentDetail(id){
       <div style="font-size:12px;color:var(--muted);margin-top:4px">${fundLabel}</div>
     </div>
     <div class="balance-block">
-      <div class="balance-row"><span class="lbl">💰 المبلغ</div><span class="val green">${fmtNum(p.amount)} ل.س</span></div>
+      <div class="balance-row"><span class="lbl">💰 المبلغ</span><span class="val green">${fmtNum(p.amount)} ل.س</span></div>
       <div class="balance-row"><span class="lbl">📅 التاريخ</span><span class="val">${fmtDate(p.date)}</span></div>
       <div class="balance-row"><span class="lbl">📅 السنة</span><span class="val">${p.year}</span></div>
       <div class="balance-row"><span class="lbl">👤 المعتمد</span><span class="val">${esc(p.collectorName||'—')}</span></div>
@@ -1365,19 +1343,14 @@ async function deletePayment(id){
   } catch(e){ toast('خطأ','error'); }
 }
 
-/* ═══════════════════════════════════════════════════════
-   نموذج تسجيل دفعة
-   ═══════════════════════════════════════════════════════ */
 function openPaymentSheet(memberId = null, fund = null){
   if(!hasPerm('payment.add')){ toast('غير مصرح','error'); return; }
 
   if(fund && memberId){
-    // فتح مباشر
     openFundPaymentForm(fund, memberId);
     return;
   }
 
-  // اختيار النوع أولاً
   const body = `
     <div style="text-align:center;padding:14px 0 18px">
       <div style="font-size:44px;margin-bottom:8px">💰</div>
@@ -1465,6 +1438,11 @@ function onMemberSearch(fund){
     return false;
   });
 
+  // ⭐ المعتمد يرى فقط قطاعه
+  if(S.currentUser && S.currentUser.role === 'collector' && S.currentUser.sector){
+    list = list.filter(m => m.sector === S.currentUser.sector);
+  }
+
   if(q){
     const s = normAr(q);
     list = list.filter(m => normAr(`${m.name} ${m.code||''} ${m.sector||''}`).includes(s));
@@ -1549,7 +1527,6 @@ async function savePayment(fund){
   if(isNaN(amount) || amount < 0){ toast('المبلغ غير صحيح','error'); return; }
   if(!date){ toast('التاريخ مطلوب','error'); return; }
 
-  // تأكيد الدفع بالصفر
   if(amount === 0){
     if(!confirm('هل أنت متأكد من تسجيل دفعة بقيمة 0؟ (للأعضاء المعفيين)')) return;
   }
@@ -1611,22 +1588,6 @@ async function loadAll(){
   S.deliveries = r[5]; S.storeItems = r[6]; S.storeMovements = r[7]; S.meetings = r[8];
   S.constants = r[9]; S.users = r[10]; S.auditLog = r[11];
 }
-
-/* ═══════════════════════════════════════════════════════
-   placeholder — يُكمَل في الجزء 3
-   ═══════════════════════════════════════════════════════ */
-function renderReports(){}
-function renderAdminMenu(){}
-function openStatsSheet(){}
-function openSettingsSheet(){}
-function openDeathSheet(){}
-function openIncomeSheet(){}
-function openDeliverySheet(){}
-
-/* ═══════════════════════════════════════════════════════
-   الجزء 3 — الوفاة + الإيرادات + المصاريف + التسليمات
-   المستودع + الاجتماعات + التقارير + الإدارة + التشغيل
-   ═══════════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════════
    ⚰️ أحداث الوفاة
@@ -1711,7 +1672,6 @@ async function saveDeath(){
   if(!name){ toast('اسم المتوفى مطلوب','error'); return; }
   if(!date){ toast('التاريخ مطلوب','error'); return; }
 
-  // كم عدد مشتركي الوفاة
   const deathSubs = S.members.filter(m => m.deathStartYear && m.deathStartYear <= year).length;
   const c = getConstants(year);
   const inst = c?.deathInstallment || 5000;
@@ -1745,7 +1705,7 @@ async function saveDeath(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   📥 الإيرادات الأخرى (إيجار، بيع، تبرع، ...)
+   📥 الإيرادات
    ═══════════════════════════════════════════════════════ */
 function openIncomeSheet(){
   if(!hasPerm('income.add')){ toast('غير مصرح','error'); return; }
@@ -1811,7 +1771,7 @@ async function saveIncome(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   💸 المصاريف (صادرات)
+   💸 المصاريف
    ═══════════════════════════════════════════════════════ */
 function openExpenseSheet(id = null){
   if(!hasPerm('expense.add')){ toast('غير مصرح','error'); return; }
@@ -1913,7 +1873,7 @@ function openExpensesListSheet(){
       <div style="font-size:11px;color:var(--muted);margin-top:4px">💸 مصاريف: ${fmtNum(totalExp)} • ⚰️ تعويضات: ${fmtNum(totalComp)}</div>
     </div>
 
-    <div style="font-weight:800;font-size:14px;color:var(--death);margin-bottom:10px">⚰️ تعويضات الوفاة (صادر من صندوق الوفاة)</div>
+    <div style="font-weight:800;font-size:14px;color:var(--death);margin-bottom:10px">⚰️ تعويضات الوفاة</div>
     ${compensations.length ? `<div class="list" style="margin-bottom:16px">${compensations.map(c => `
       <div class="item" style="cursor:default">
         <div class="av red">🪦</div>
@@ -1937,7 +1897,7 @@ function openExpensesListSheet(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   📤 التسليمات (من معتمد لأمين)
+   📤 التسليمات
    ═══════════════════════════════════════════════════════ */
 function openDeliverySheet(){
   if(!hasPerm('handover.send')){ toast('غير مصرح','error'); return; }
@@ -2005,7 +1965,6 @@ async function saveDelivery(){
     await logAudit('add', 'delivery', id, { amount, to: toUser.name });
     toast('📤 تم تسجيل التسليم', 'success', 2500);
 
-    // واتساب
     setTimeout(() => {
       if(confirm('📱 إرسال توثيق واتساب؟')){
         const txt = `📤 *توثيق تسليم*\n\nمن: ${S.currentUser.name}\nإلى: ${toUser.name}\nالمبلغ: ${fmtNum(amount)} ل.س\nالصندوق: ${fund === 'assoc' ? '💰 الجمعية' : '⚰️ الوفاة'}\nالتاريخ: ${today()}\n${notes ? 'ملاحظات: ' + notes : ''}\n\n_صندوق زعورة_`;
@@ -2036,7 +1995,7 @@ function openDeliveriesList(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   📦 المستودع (خدمي — لا توزيعي)
+   📦 المستودع
    ═══════════════════════════════════════════════════════ */
 function openStoreSheet(){
   if(!hasPerm('store.manage')){ toast('غير مصرح','error'); return; }
@@ -2195,8 +2154,7 @@ async function saveStoreMovement(){
   let newQty = oldQty;
 
   if(type === 'out' || type === 'damaged') newQty = oldQty - qty;
-  else if(type === 'in') newQty = oldQty + qty;
-  else if(type === 'new') newQty = oldQty + qty;
+  else if(type === 'in' || type === 'new') newQty = oldQty + qty;
 
   if(newQty < 0){ toast('الكمية غير كافية','error'); return; }
 
@@ -2432,7 +2390,7 @@ function shareMeetingWA(id){
 }
 
 /* ═══════════════════════════════════════════════════════
-   👥 إدارة المستخدمين
+   👥 إدارة المستخدمين — مُعدَّلة لدعم حقول المعتمد
    ═══════════════════════════════════════════════════════ */
 function openUsersSheet(){
   if(!hasPerm('users.manage')){ toast('غير مصرح','error'); return; }
@@ -2440,11 +2398,16 @@ function openUsersSheet(){
   const list = S.users.map(u => {
     const r = ROLES[u.role] || { name:'مستخدم', icon:'👤' };
     const isMe = S.currentUser && S.currentUser.id === u.id;
+    let extraInfo = '';
+    if(u.role === 'collector'){
+      const fundLabel = u.collectFund === 'assoc' ? '💰 جمعية' : u.collectFund === 'death' ? '⚰️ وفاة' : '💰⚰️ كلاهما';
+      extraInfo = ` • ${fundLabel}${u.sector ? ' • 📍 ' + u.sector : ''}`;
+    }
     return `<div class="item" style="cursor:default">
       <div class="av">${r.icon}</div>
       <div class="body">
         <div class="ttl">${esc(u.name)} ${isMe ? '<span class="badge primary">أنت</span>' : ''}</div>
-        <div class="sub">${r.name}${u.phone ? ' • ' + esc(u.phone) : ''}</div>
+        <div class="sub">${r.name}${u.phone ? ' • ' + esc(u.phone) : ''}${extraInfo}</div>
       </div>
       <button class="btn ghost sm" onclick="openEditUserSheet(${u.id})">✏️</button>
       ${!isMe ? `<button class="btn danger sm" onclick="deleteUser(${u.id})">🗑️</button>` : ''}
@@ -2462,6 +2425,7 @@ function openEditUserSheet(id = null){
   if(!u) return;
 
   const roleOpts = Object.keys(ROLES).map(k => `<option value="${k}" ${u.role === k ? 'selected' : ''}>${ROLES[k].icon} ${ROLES[k].name}</option>`).join('');
+  const sectorOpts = DEFAULT_SECTORS.map(s => `<option value="${s}" ${u.sector === s ? 'selected' : ''}>${s}</option>`).join('');
 
   const body = `
     <div class="fld"><label>الاسم <span class="req">*</span></label>
@@ -2469,7 +2433,27 @@ function openEditUserSheet(id = null){
     <div class="fld"><label>الهاتف</label>
       <input id="uPhone" value="${esc(u.phone||'')}" inputmode="tel"></div>
     <div class="fld"><label>الدور <span class="req">*</span></label>
-      <select id="uRole">${roleOpts}</select></div>
+      <select id="uRole" onchange="toggleCollectorFields()">${roleOpts}</select></div>
+
+    <div id="collectorFields" style="display:${u.role === 'collector' ? 'block' : 'none'};padding:12px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px">
+      <div style="font-weight:800;font-size:12px;color:var(--primary);margin-bottom:10px">👤 إعدادات المعتمد</div>
+      <div class="fld"><label>صندوق التحصيل</label>
+        <select id="uCollectFund">
+          <option value="both" ${!u.collectFund || u.collectFund === 'both' ? 'selected' : ''}>كلاهما (جمعية + وفاة)</option>
+          <option value="assoc" ${u.collectFund === 'assoc' ? 'selected' : ''}>💰 جمعية فقط</option>
+          <option value="death" ${u.collectFund === 'death' ? 'selected' : ''}>⚰️ وفاة فقط</option>
+        </select>
+        <div class="fld-hint">يحدد الأعضاء الذين يظهرون له</div>
+      </div>
+      <div class="fld"><label>القطاع المسؤول عنه</label>
+        <select id="uSector">
+          <option value="">— كل القطاعات —</option>
+          ${sectorOpts}
+        </select>
+        <div class="fld-hint">اتركه فارغاً ليرى كل القطاعات</div>
+      </div>
+    </div>
+
     <div class="fld"><label>كلمة المرور (4 أرقام)</label>
       <input id="uPin" type="tel" maxlength="4" inputmode="numeric" placeholder="${u.hasPin ? 'اتركها للإبقاء' : '••••'}">
       <div class="fld-hint">${u.hasPin ? '🔒 لديه PIN' : '🔓 بدون PIN'}</div></div>
@@ -2482,18 +2466,29 @@ function openEditUserSheet(id = null){
   openSheet(isNew ? '➕ مستخدم جديد' : '✏️ تعديل', body, foot, { focus:'uName' });
 }
 
+function toggleCollectorFields(){
+  const role = $('uRole').value;
+  $('collectorFields').style.display = role === 'collector' ? 'block' : 'none';
+}
+
 async function saveUser(id = null){
   const name = cleanText($('uName').value);
   const pin = $('uPin').value.trim();
   if(!name){ toast('الاسم مطلوب','error'); return; }
   if(pin && !/^\d{4}$/.test(pin)){ toast('كلمة المرور: 4 أرقام','error'); return; }
 
+  const role = $('uRole').value;
+  const collectFund = role === 'collector' ? ($('uCollectFund')?.value || 'both') : null;
+  const sector = role === 'collector' ? ($('uSector')?.value || '') : '';
+
   try{
     const old = id ? await dbGet('users', id) : null;
     const obj = {
       name,
       phone: cleanPhone($('uPhone').value),
-      role: $('uRole').value,
+      role,
+      collectFund,
+      sector,
       hasPin: pin ? true : (old ? old.hasPin : false),
       pin: pin ? pin : (old ? old.pin : null),
       createdAt: old ? old.createdAt : new Date().toISOString()
@@ -2503,6 +2498,7 @@ async function saveUser(id = null){
       await dbPut('users', obj);
       const i = S.users.findIndex(x => x.id === id);
       if(i > -1) S.users[i] = obj;
+      if(S.currentUser && S.currentUser.id === id) S.currentUser = obj;
       toast('✅');
     } else {
       const newId = await dbPut('users', obj);
@@ -2605,9 +2601,7 @@ function openEditConstantSheet(year){
     </div>
   `;
 
-  const foot = isNew
-    ? `<button class="btn ghost" onclick="closeSheet();setTimeout(openConstantsSheet,150)">رجوع</button><button class="btn primary" onclick="saveConstant(${year})">💾 حفظ ${year}</button>`
-    : `<button class="btn ghost" onclick="closeSheet();setTimeout(openConstantsSheet,150)">رجوع</button><button class="btn primary" onclick="saveConstant(${year})">💾 حفظ</button>`;
+  const foot = `<button class="btn ghost" onclick="closeSheet();setTimeout(openConstantsSheet,150)">رجوع</button><button class="btn primary" onclick="saveConstant(${year})">💾 حفظ ${year}</button>`;
 
   openSheet('💰 ثوابت ' + year, body, foot);
 }
@@ -2644,7 +2638,7 @@ async function saveConstant(year){
 }
 
 /* ═══════════════════════════════════════════════════════
-   📥 الاستيراد من Excel
+   📥 الاستيراد — نسخة مُصلَحة ⭐
    ═══════════════════════════════════════════════════════ */
 function openImportSheet(){
   if(!hasPerm('member.manage')){ toast('غير مصرح','error'); return; }
@@ -2697,10 +2691,16 @@ async function importMembers(input){
       return;
     }
 
+    // 🔍 تشخيص
+    console.log('📋 أعمدة الملف:', Object.keys(rows[0]));
+    console.log('📋 أول صف:', rows[0]);
+
     let added = 0, updated = 0, skip = 0;
+    const typeCounts = { both:0, assoc:0, death:0, none:0, unknown:0 };
+
     const existing = new Map();
     S.members.forEach(m => {
-      if(m.code) existing.set(m.code, m);
+      if(m.code) existing.set(String(m.code), m);
       existing.set(normAr(m.name), m);
     });
 
@@ -2714,28 +2714,50 @@ async function importMembers(input){
       const subDate = toDate(subDateStr);
       const subYear = subDate ? new Date(subDate).getFullYear() : null;
 
-      // ⭐ نوع الاشتراك (كلاهما/جمعية/وفاة/غير مشترك)
-      const subType = normAr(gv(r, 'نوع الاشتراك','نوع_الاشتراك') || '');
-      let hasAssoc = false, hasDeath = false;
-      if(subType.includes('كلاهما') || subType.includes('كلا') || subType.includes('الاثنين')){ hasAssoc = true; hasDeath = true; }
-      else if(subType.includes('غير') && subType.includes('مشترك')){ hasAssoc = false; hasDeath = false; }
-      else if(subType.includes('جمعية')){ hasAssoc = true; }
-      else if(subType.includes('وفاة') || subType.includes('وفاء')){ hasDeath = true; }
+      // ⭐⭐ نوع الاشتراك — بعد التطبيع ⭐⭐
+      const subTypeRaw = gv(r, 'نوع الاشتراك','نوع_الاشتراك');
+      const subType = normAr(subTypeRaw || '');
+      const subTypeDefined = subType.length > 0;
 
-      // ⭐ نوع العضو (عادي/مخفض)
-      const memberTypeStr = normAr(gv(r, 'نوع العضو','نوع_العضو') || gv(r, 'نوع الاشتراك','نوع_الاشتراك') || '');
+      // بعد normAr: "جمعية"→"جمعيه" | "وفاة"→"وفاه" | "كلاهما"→"كلاهما"
+      const hasAssocWord = /جمعي/.test(subType);
+      const hasDeathWord = /وفا/.test(subType);
+      const isBoth = subType.includes('كلاهما')
+                  || subType === 'كلا'
+                  || subType.includes('الاثنين')
+                  || subType.includes('الاثنان')
+                  || (hasAssocWord && hasDeathWord);
+      const isNone = subType.includes('غير') && subType.includes('مشترك');
+
+      let hasAssoc = false, hasDeath = false;
+      if(isNone){ hasAssoc = false; hasDeath = false; typeCounts.none++; }
+      else if(isBoth){ hasAssoc = true; hasDeath = true; typeCounts.both++; }
+      else if(hasAssocWord){ hasAssoc = true; typeCounts.assoc++; }
+      else if(hasDeathWord){ hasDeath = true; typeCounts.death++; }
+      else { typeCounts.unknown++; }
+
+      // ⭐ نوع العضو
+      const memberTypeRaw = gv(r, 'نوع العضو','نوع_العضو');
+      const memberTypeStr = normAr(memberTypeRaw || '');
       const memberType = memberTypeStr.includes('مخفض') ? 'مخفض' : 'عادي';
 
       // البحث عن موجود
       let existingMember = null;
-      if(code && existing.has(code)) existingMember = existing.get(code);
+      if(code && existing.has(String(code))) existingMember = existing.get(String(code));
       else if(existing.has(normAr(name))) existingMember = existing.get(normAr(name));
 
       if(existingMember){
         let changed = false;
-        if(hasAssoc && !existingMember.assocStartYear && subYear){ existingMember.assocStartYear = subYear; changed = true; }
-        if(hasDeath && !existingMember.deathStartYear && subYear){ existingMember.deathStartYear = subYear; changed = true; }
-        if(memberType === 'مخفض' && existingMember.memberType !== 'مخفض'){ existingMember.memberType = 'مخفض'; changed = true; }
+        // إذا النوع مُعرَّف في الملف → نعيد ضبط (يشمل الحذف)
+        if(subTypeDefined && subYear){
+          const newAssoc = hasAssoc ? subYear : null;
+          const newDeath = hasDeath ? subYear : null;
+          if(existingMember.assocStartYear !== newAssoc){ existingMember.assocStartYear = newAssoc; changed = true; }
+          if(existingMember.deathStartYear !== newDeath){ existingMember.deathStartYear = newDeath; changed = true; }
+        }
+        if(memberTypeRaw && existingMember.memberType !== memberType){
+          existingMember.memberType = memberType; changed = true;
+        }
         if(changed){ await dbPut('members', existingMember); updated++; } else skip++;
         continue;
       }
@@ -2759,18 +2781,28 @@ async function importMembers(input){
         const newId = await dbPut('members', member);
         member.id = newId;
         S.members.push(member);
-        if(code) existing.set(code, member);
+        if(code) existing.set(String(code), member);
         existing.set(normAr(name), member);
         added++;
       } catch(e){ console.warn('صف', i+2, e); skip++; }
     }
 
-    log.innerHTML = `<div style="padding:12px;background:#f0fdf4;border-radius:12px;color:#166534">
-      <div style="font-weight:800;margin-bottom:6px">📊 النتيجة</div>
-      <div>➕ أُضيف: <b>${added}</b></div>
-      <div>✏️ حُدّث: <b>${updated}</b></div>
-      <div>⏭️ تُخطّي: <b>${skip}</b></div>
-    </div>`;
+    log.innerHTML = `
+      <div style="padding:12px;background:#f0fdf4;border-radius:12px;color:#166534">
+        <div style="font-weight:800;margin-bottom:6px">📊 النتيجة</div>
+        <div>➕ أُضيف: <b>${added}</b></div>
+        <div>✏️ حُدّث: <b>${updated}</b></div>
+        <div>⏭️ تُخطّي: <b>${skip}</b></div>
+      </div>
+      <div style="padding:12px;background:#eff6ff;border-radius:12px;color:#1e40af;margin-top:10px">
+        <div style="font-weight:800;margin-bottom:6px">🔍 قراءة نوع الاشتراك:</div>
+        <div>✅ كليهما: <b>${typeCounts.both}</b></div>
+        <div>💰 جمعية: <b>${typeCounts.assoc}</b></div>
+        <div>⚰️ وفاة: <b>${typeCounts.death}</b></div>
+        <div>⚪ غير مشترك: <b>${typeCounts.none}</b></div>
+        <div style="color:#b91c1c">❓ لم يُعرَّف: <b>${typeCounts.unknown}</b></div>
+      </div>
+    `;
     toast(`✅ أُضيف ${added} | حُدّث ${updated}`, 'success', 4000);
     await loadAll();
     renderMembers();
@@ -3156,7 +3188,7 @@ function openAuditSheet(){
 }
 
 /* ═══════════════════════════════════════════════════════
-   📊 الإحصائيات السريعة (من الرأس)
+   📊 الإحصائيات السريعة
    ═══════════════════════════════════════════════════════ */
 function openStatsSheet(){
   const y = S.currentYear;
@@ -3292,13 +3324,11 @@ async function importBackup(input){
     if(!confirm('⚠️ سيتم استبدال كل البيانات الحالية. متابعة؟')) return;
     if(!confirm('تأكيد أخير!')) return;
 
-    // مسح كل الجداول
     for(const s of STORE_NAMES){
       const store = tx(s, 'readwrite');
       await new Promise((res) => { const q = store.clear(); q.onsuccess = res; q.onerror = res; });
     }
 
-    // استعادة
     const toRestore = ['members','payments','deaths','incomes','expenses','deliveries','storeItems','storeMovements','meetings','constants','users'];
     for(const key of toRestore){
       if(Array.isArray(data[key])){
