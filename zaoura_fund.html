@@ -3165,6 +3165,650 @@ function openExpensesListSheet(){
 }
 
 console.log('✅ Part 8A تم تحميله');
+
+/* ═══════════════════════════════════════════════════════
+   🏗️ PART 9 — نموذج البيانات الموسّع + أدوات
+   ═══════════════════════════════════════════════════════ */
+
+/* ─────────── 1. تحديث قائمة المخازن (Stores) ─────────── */
+/* نسخة جديدة من STORE_NAMES */
+const STORE_NAMES_V2 = [
+  'people','sectors','admins','constants','subscriptions',
+  'assocPayments','deathEvents','deathInstallments','donations',
+  'expenses','handovers','auditLog',
+  // ⭐ جديد:
+  'storeItems',        // مواد المستودع
+  'storeMovements',    // حركات المستودع (وارد/صادر)
+  'meetings',          // الاجتماعات
+  'meetingDecisions',  // قرارات الاجتماعات
+  'customPermissions', // صلاحيات مخصصة
+  'archives'           // الأرشيف
+];
+
+/* ─────────── 2. دوال إنشاء الجداول الجديدة ─────────── */
+async function upgradeDatabaseV2(){
+  const storesToAdd = ['storeItems','storeMovements','meetings','meetingDecisions','customPermissions','archives'];
+  for(const name of storesToAdd){
+    if(!db.objectStoreNames.contains(name)){
+      // نستخدم upgrade يدوي عبر فتح نسخة جديدة
+      console.log('⚠️ يحتاج الترقية:', name);
+    }
+  }
+}
+
+/* ─────────── 3. دالة: تصنيف المشترك (قديم/جديد) ─────────── */
+function getMemberClassification(person){
+  if(!person) return 'unknown';
+  
+  // إذا كان له تاريخ اشتراك
+  if(person.subscriptionDate){
+    const year = new Date(person.subscriptionDate).getFullYear();
+    if(year < 2025) return 'old';   // قديم
+    return 'new';                    // جديد
+  }
+  
+  // إذا كان له اشتراكات في سنوات سابقة
+  const subs = S.subscriptions.filter(s => s.personId === person.id);
+  if(subs.length > 0){
+    const earliestYear = Math.min(...subs.map(s => s.year));
+    if(earliestYear < 2025) return 'old';
+    return 'new';
+  }
+  
+  // افتراضياً: جديد (يحتاج رسوم انضمام)
+  return 'new';
+}
+
+/* ─────────── 4. دالة: حساب مستحقات المشترك ─────────── */
+function computeMemberDues(personId, year){
+  const person = getPersonById(personId);
+  if(!person) return null;
+  
+  const c = S.constants.find(x => x.year === year);
+  if(!c) return null;
+  
+  const sub = S.subscriptions.find(s => s.personId === personId && s.year === year);
+  const classification = getMemberClassification(person);
+  
+  const result = {
+    person,
+    year,
+    classification,   // 'old' | 'new'
+    memberType: person.memberType || 'عادي',
+    subs: {
+      assoc: sub?.assocStatus || 'stopped',
+      death: sub?.deathStatus || 'stopped'
+    },
+    // 💰 الجمعية
+    assoc: {
+      required: 0,
+      paid: 0,
+      remaining: 0,
+      percent: 0,
+      joinFee: 0,        // رسوم الانضمام
+      joinFeePaid: 0,
+      joinFeeRemaining: 0
+    },
+    // ⚰️ الوفاة
+    death: {
+      required: 0,
+      paid: 0,
+      remaining: 0,
+      percent: 0,
+      installments: [],  // [{id, eventName, deathDate, amount, status}]
+      joinFee: 0,
+      joinFeePaid: 0,
+      joinFeeRemaining: 0
+    },
+    // 📊 الإجمالي
+    total: {
+      required: 0,
+      paid: 0,
+      remaining: 0
+    }
+  };
+  
+  // ═══ الجمعية ═══
+  if(sub?.assocStatus === 'active'){
+    // الرسوم السنوية (عادي أو مخفض)
+    result.assoc.required = getAssocFeeFor(person, year);
+    
+    // المدفوع
+    result.assoc.paid = S.assocPayments
+      .filter(p => p.personId === personId && p.year === year && (!p.fund || p.fund === 'assoc'))
+      .reduce((s, p) => s + (Number(p.amount) || 0), 0);
+    
+    result.assoc.remaining = Math.max(0, result.assoc.required - result.assoc.paid);
+    result.assoc.percent = result.assoc.required > 0 
+      ? Math.round(result.assoc.paid / result.assoc.required * 100) 
+      : 0;
+    
+    // رسوم الانضمام — للمشتركين الجدد فقط
+    if(classification === 'new'){
+      const joinFee = person.memberType === 'مخفض' 
+        ? (c.joinAssocReduced || c.joinAssoc / 2 || 50000)
+        : (c.joinAssoc || 100000);
+      result.assoc.joinFee = joinFee;
+      
+      // هل دفعها؟
+      const joinPaid = S.assocPayments
+        .filter(p => p.personId === personId && p.fund === 'joinAssoc')
+        .reduce((s, p) => s + (Number(p.amount) || 0), 0);
+      
+      result.assoc.joinFeePaid = joinPaid;
+      result.assoc.joinFeeRemaining = Math.max(0, joinFee - joinPaid);
+    }
+  }
+  
+  // ═══ الوفاة ═══
+  if(sub?.deathStatus === 'active'){
+    // الأقساط = عدد وفيات السنة × قسط الوفاة
+    const deathInstallments = S.deathInstallments
+      .filter(i => i.personId === personId && i.year === year);
+    
+    result.death.installments = deathInstallments.map(i => ({
+      id: i.id,
+      eventName: i.eventName,
+      deathDate: i.deathDate,
+      amount: Number(i.amount) || 0,
+      status: i.status,
+      paidDate: i.paidDate
+    }));
+    
+    result.death.required = deathInstallments.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+    result.death.paid = deathInstallments
+      .filter(i => i.status === 'paid')
+      .reduce((s, i) => s + (Number(i.amount) || 0), 0);
+    result.death.remaining = result.death.required - result.death.paid;
+    result.death.percent = result.death.required > 0 
+      ? Math.round(result.death.paid / result.death.required * 100) 
+      : 0;
+    
+    // رسوم انضمام الوفاة
+    if(classification === 'new'){
+      const joinFee = person.memberType === 'مخفض' 
+        ? (c.joinDeathReduced || c.joinDeath / 2 || 25000)
+        : (c.joinDeath || 50000);
+      result.death.joinFee = joinFee;
+      
+      const joinPaid = S.assocPayments
+        .filter(p => p.personId === personId && p.fund === 'joinDeath')
+        .reduce((s, p) => s + (Number(p.amount) || 0), 0);
+      
+      result.death.joinFeePaid = joinPaid;
+      result.death.joinFeeRemaining = Math.max(0, joinFee - joinPaid);
+    }
+  }
+  
+  // ═══ الإجمالي ═══
+  result.total.required = result.assoc.required + result.assoc.joinFee 
+                        + result.death.required + result.death.joinFee;
+  result.total.paid = result.assoc.paid + result.assoc.joinFeePaid 
+                    + result.death.paid + result.death.joinFeePaid;
+  result.total.remaining = result.total.required - result.total.paid;
+  
+  return result;
+}
+
+/* ─────────── 5. دالة: حساب مستحقات كل سنوات المشترك ─────────── */
+function computeMemberFullHistory(personId){
+  const person = getPersonById(personId);
+  if(!person) return null;
+  
+  const currentYear = S.currentYear;
+  const startYear = person.subscriptionDate 
+    ? new Date(person.subscriptionDate).getFullYear() 
+    : 2025;
+  
+  const history = [];
+  for(let y = startYear; y <= currentYear; y++){
+    const dues = computeMemberDues(personId, y);
+    if(dues) history.push(dues);
+  }
+  
+  // إجمالي كل السنوات
+  const grandTotal = history.reduce((acc, h) => ({
+    required: acc.required + h.total.required,
+    paid: acc.paid + h.total.paid,
+    remaining: acc.remaining + h.total.remaining
+  }), { required: 0, paid: 0, remaining: 0 });
+  
+  return {
+    person,
+    classification: getMemberClassification(person),
+    history,
+    grandTotal,
+    yearsActive: history.length
+  };
+}
+
+/* ─────────── 6. دالة: توزيع دفعة وفاة على الأقساط ─────────── */
+async function distributeDeathPayment(personId, year, amount, date, notes){
+  // الأقساط المعلقة (الأقدم أولاً)
+  const pending = S.deathInstallments
+    .filter(i => i.personId === personId && i.year === year && i.status === 'pending')
+    .sort((a, b) => (a.deathDate || '').localeCompare(b.deathDate || ''));
+  
+  if(!pending.length){
+    return { success: false, message: 'لا توجد أقساط معلقة' };
+  }
+  
+  const totalPending = pending.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  
+  if(amount >= totalPending){
+    // دفع كامل
+    for(const inst of pending){
+      inst.status = 'paid';
+      inst.paidDate = date;
+      inst.collectorId = S.currentUser.id;
+      inst.collectorName = S.currentUser.name;
+      inst.notes = notes;
+      inst.updatedAt = new Date().toISOString();
+      await dbPut('deathInstallments', inst);
+    }
+    logAudit('add', 'deathPayment', null, { personId, year, amount, count: pending.length, type: 'full' });
+    return { 
+      success: true, 
+      type: 'full', 
+      paidCount: pending.length, 
+      remaining: 0 
+    };
+  } else {
+    // دفع جزئي — يُوزع على الأقدم
+    let remaining = amount;
+    let paidCount = 0;
+    let partialAmount = 0;
+    
+    for(const inst of pending){
+      if(remaining <= 0) break;
+      const instAmount = Number(inst.amount) || 0;
+      
+      if(remaining >= instAmount){
+        inst.status = 'paid';
+        inst.paidDate = date;
+        inst.collectorId = S.currentUser.id;
+        inst.collectorName = S.currentUser.name;
+        inst.notes = notes;
+        inst.updatedAt = new Date().toISOString();
+        await dbPut('deathInstallments', inst);
+        remaining -= instAmount;
+        paidCount++;
+      } else {
+        // دفع جزئي للقسط التالي
+        inst.paidAmount = (inst.paidAmount || 0) + remaining;
+        inst.notes = (inst.notes || '') + ` | دفعة جزئية ${remaining}`;
+        inst.updatedAt = new Date().toISOString();
+        await dbPut('deathInstallments', inst);
+        partialAmount = remaining;
+        remaining = 0;
+        break;
+      }
+    }
+    
+    logAudit('add', 'deathPayment', null, { personId, year, amount, paidCount, partialAmount, type: 'partial' });
+    return { 
+      success: true, 
+      type: 'partial', 
+      paidCount, 
+      partialAmount,
+      remaining: totalPending - amount 
+    };
+  }
+}
+
+/* ─────────── 7. دالة: تسجيل دفعة شاملة ─────────── */
+async function recordPayment({
+  personId,
+  fund,          // 'assoc' | 'death' | 'donation' | 'joinAssoc' | 'joinDeath'
+  amount,
+  year,
+  date,
+  notes = '',
+  method = 'نقدي'  // 'نقدي' | 'حوالة' | 'شيك'
+}){
+  if(!hasPerm('payment.add')){
+    return { success: false, message: 'غير مصرح' };
+  }
+  
+  const person = getPersonById(personId);
+  if(!person) return { success: false, message: 'المشترك غير موجود' };
+  
+  if(!amount || amount <= 0) return { success: false, message: 'المبلغ غير صحيح' };
+  
+  try{
+    let record = null;
+    
+    if(fund === 'assoc' || fund === 'joinAssoc'){
+      // دفعة جمعية عادية أو رسوم انضمام
+      record = {
+        personId,
+        fund,  // 'assoc' أو 'joinAssoc'
+        amount,
+        date,
+        year,
+        collectorId: S.currentUser.id,
+        collectorName: S.currentUser.name,
+        notes,
+        method,
+        createdAt: new Date().toISOString()
+      };
+      const id = await dbPut('assocPayments', record);
+      record.id = id;
+      S.assocPayments.push(record);
+      logAudit('add', 'assocPayment', id, { personId, fund, amount });
+      
+      return { success: true, message: '✅ تم تسجيل الدفعة', record };
+    }
+    
+    if(fund === 'death' || fund === 'joinDeath'){
+      if(fund === 'joinDeath'){
+        // رسوم انضمام وفاة = تُسجل كدفعة عادية
+        record = {
+          personId,
+          fund: 'joinDeath',
+          amount,
+          date,
+          year,
+          collectorId: S.currentUser.id,
+          collectorName: S.currentUser.name,
+          notes,
+          method,
+          createdAt: new Date().toISOString()
+        };
+        const id = await dbPut('assocPayments', record);
+        record.id = id;
+        S.assocPayments.push(record);
+        logAudit('add', 'joinDeathPayment', id, { personId, amount });
+        return { success: true, message: '✅ تم تسجيل رسوم الانضمام', record };
+      }
+      
+      // دفعة وفاة = توزيع على الأقساط
+      const dist = await distributeDeathPayment(personId, year, amount, date, notes);
+      
+      // سجل الدفعة أيضاً
+      record = {
+        personId,
+        fund: 'death',
+        amount,
+        date,
+        year,
+        collectorId: S.currentUser.id,
+        collectorName: S.currentUser.name,
+        notes,
+        method,
+        distribution: dist,
+        createdAt: new Date().toISOString()
+      };
+      const id = await dbPut('assocPayments', record);
+      record.id = id;
+      S.assocPayments.push(record);
+      
+      return { 
+        success: true, 
+        message: dist.success 
+          ? `✅ تم دفع ${dist.paidCount} قسط${dist.partialAmount ? ' + جزئي' : ''}`
+          : dist.message,
+        record,
+        distribution: dist
+      };
+    }
+    
+    if(fund === 'donation'){
+      record = {
+        donorName: person.name,
+        personId,
+        amount,
+        date,
+        year,
+        notes,
+        method,
+        collectorId: S.currentUser.id,
+        collectorName: S.currentUser.name,
+        createdAt: new Date().toISOString()
+      };
+      const id = await dbPut('donations', record);
+      record.id = id;
+      S.donations.push(record);
+      logAudit('add', 'donation', id, { personId, amount });
+      return { success: true, message: '💚 تم تسجيل التبرع', record };
+    }
+    
+    return { success: false, message: 'نوع الدفعة غير معروف' };
+    
+  } catch(e){
+    console.error(e);
+    return { success: false, message: 'خطأ: ' + e.message };
+  }
+}
+
+/* ─────────── 8. دالة: إيصال واتساب ─────────── */
+function generateReceiptWA(paymentInfo){
+  const { 
+    personName, personCode, fund, amount, year, date, 
+    collectorName, notes, distribution 
+  } = paymentInfo;
+  
+  const fundLabels = {
+    'assoc': '💰 دفعة جمعية',
+    'death': '⚰️ دفعة وفاة',
+    'donation': '💚 تبرع',
+    'joinAssoc': '📋 رسوم انضمام جمعية',
+    'joinDeath': '📋 رسوم انضمام وفاة'
+  };
+  
+  let txt = `✅ *إيصال دفع*\n\n`;
+  txt += `👤 *الاسم:* ${personName}\n`;
+  if(personCode) txt += `🔖 *الكود:* ${personCode}\n`;
+  txt += `📋 *البند:* ${fundLabels[fund] || fund}\n`;
+  txt += `💰 *المبلغ:* ${fmtNum(amount)} ل.س\n`;
+  txt += `📅 *السنة:* ${year}\n`;
+  txt += `🗓️ *التاريخ:* ${fmtDate(date)}\n`;
+  txt += `👤 *المعتمد:* ${collectorName}\n`;
+  
+  if(distribution && distribution.success){
+    if(distribution.paidCount > 0){
+      txt += `\n📊 *تفاصيل:*\n`;
+      txt += `• تم دفع ${distribution.paidCount} قسط\n`;
+      if(distribution.partialAmount){
+        txt += `• جزئي: ${fmtNum(distribution.partialAmount)} ل.س\n`;
+      }
+      if(distribution.remaining > 0){
+        txt += `• المتبقي: ${fmtNum(distribution.remaining)} ل.س\n`;
+      }
+    }
+  }
+  
+  if(notes) txt += `\n📝 *ملاحظات:* ${notes}\n`;
+  
+  txt += `\n_صندوق زعورة_\n`;
+  txt += `🕐 ${new Date().toLocaleString('ar-EG')}`;
+  
+  return txt;
+}
+
+function sendReceiptWA(paymentInfo){
+  const txt = generateReceiptWA(paymentInfo);
+  window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+/* ─────────── 9. دالة: إيصال QR للتحقق ─────────── */
+function generateReceiptQR(paymentInfo){
+  const data = JSON.stringify({
+    t: 'payment',
+    d: paymentInfo.date,
+    a: paymentInfo.amount,
+    p: paymentInfo.personCode || paymentInfo.personName,
+    f: paymentInfo.fund,
+    c: paymentInfo.collectorName,
+    ts: Date.now()
+  });
+  
+  // هوية قصيرة للتحقق
+  const hash = simpleHash(data);
+  return `ZR-${paymentInfo.year}-${hash}`;
+}
+
+function simpleHash(str){
+  let hash = 0;
+  for(let i = 0; i < str.length; i++){
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(36).slice(0, 8).toUpperCase();
+}
+
+/* ─────────── 10. دالة: تصنيف دفعات المشترك ─────────── */
+function getMemberPayments(personId, year){
+  const assocPayments = S.assocPayments
+    .filter(p => p.personId === personId && p.year === year)
+    .map(p => ({
+      id: p.id,
+      fund: p.fund || 'assoc',
+      amount: Number(p.amount) || 0,
+      date: p.date,
+      collectorName: p.collectorName,
+      notes: p.notes,
+      createdAt: p.createdAt
+    }));
+  
+  return assocPayments.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+}
+
+/* ─────────── 11. دالة: ملخص مالي شامل ─────────── */
+function getFinancialSummary(year){
+  const y = year || S.currentYear;
+  
+  // 💰 الجمعية
+  const assocIncome = S.assocPayments
+    .filter(p => p.year === y && (!p.fund || p.fund === 'assoc'))
+    .reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  
+  const joinAssocIncome = S.assocPayments
+    .filter(p => p.year === y && p.fund === 'joinAssoc')
+    .reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  
+  const donationsIncome = S.donations
+    .filter(d => d.year === y)
+    .reduce((s, d) => s + (Number(d.amount) || 0), 0);
+  
+  const assocExpenses = S.expenses
+    .filter(e => e.year === y)
+    .reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  
+  const assocBalance = assocIncome + joinAssocIncome + donationsIncome - assocExpenses;
+  
+  // ⚰️ الوفاة
+  const deathIncome = S.assocPayments
+    .filter(p => p.year === y && p.fund === 'death')
+    .reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  
+  const joinDeathIncome = S.assocPayments
+    .filter(p => p.year === y && p.fund === 'joinDeath')
+    .reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  
+  const deathCompensations = S.deathEvents
+    .filter(e => e.year === y)
+    .reduce((s, e) => s + (Number(e.compensation) || 0), 0);
+  
+  const deathBalance = deathIncome + joinDeathIncome - deathCompensations;
+  
+  return {
+    year: y,
+    assoc: {
+      income: assocIncome,
+      joins: joinAssocIncome,
+      donations: donationsIncome,
+      expenses: assocExpenses,
+      balance: assocBalance,
+      totalIncome: assocIncome + joinAssocIncome + donationsIncome
+    },
+    death: {
+      income: deathIncome,
+      joins: joinDeathIncome,
+      compensations: deathCompensations,
+      balance: deathBalance,
+      totalIncome: deathIncome + joinDeathIncome
+    },
+    total: {
+      income: assocIncome + joinAssocIncome + donationsIncome + deathIncome + joinDeathIncome,
+      outcome: assocExpenses + deathCompensations,
+      balance: assocBalance + deathBalance
+    }
+  };
+}
+
+/* ─────────── 12. دالة: عدد المشتركين حسب الصندوق ─────────── */
+function getSubscribersCount(year){
+  const y = year || S.currentYear;
+  const subs = S.subscriptions.filter(s => s.year === y);
+  
+  const assocActive = subs.filter(s => s.assocStatus === 'active');
+  const deathActive = subs.filter(s => s.deathStatus === 'active');
+  const bothActive = subs.filter(s => s.assocStatus === 'active' && s.deathStatus === 'active');
+  
+  return {
+    year: y,
+    total: S.people.length,
+    subsTotal: subs.length,
+    assoc: {
+      active: assocActive.length,
+      exemptTemp: subs.filter(s => s.assocStatus === 'exemptTemp').length,
+      exemptPerm: subs.filter(s => s.assocStatus === 'exemptPerm').length,
+      withdrawn: subs.filter(s => s.assocStatus === 'withdrawn').length,
+      stopped: subs.filter(s => s.assocStatus === 'stopped').length
+    },
+    death: {
+      active: deathActive.length,
+      exemptTemp: subs.filter(s => s.deathStatus === 'exemptTemp').length,
+      exemptPerm: subs.filter(s => s.deathStatus === 'exemptPerm').length,
+      withdrawn: subs.filter(s => s.deathStatus === 'withdrawn').length,
+      stopped: subs.filter(s => s.deathStatus === 'stopped').length
+    },
+    bothActive: bothActive.length
+  };
+}
+
+/* ─────────── 13. تهيئة الجداول الجديدة (للمرة الأولى) ─────────── */
+async function initNewStores(){
+  // التحقق من الجداول الجديدة — إذا فشلت، نُنبّه المستخدم
+  const newStores = ['storeItems','storeMovements','meetings','meetingDecisions','customPermissions','archives'];
+  const missing = newStores.filter(s => !db.objectStoreNames.contains(s));
+  
+  if(missing.length > 0){
+    console.warn('⚠️ جداول ناقصة:', missing);
+    console.warn('💡 سيتم إنشاؤها عند إعادة تشغيل التطبيق');
+    
+    // رسالة للمستخدم
+    const shouldReload = confirm(
+      '🔄 يحتاج التطبيق لإعادة التحميل مرة واحدة لإضافة جداول جديدة (المستودع، الاجتماعات، إلخ).\n\n' +
+      'هل تريد التحديث الآن؟\n\n' +
+      '⚠️ لا تحذف بياناتك — راح تُحفظ'
+    );
+    
+    if(shouldReload){
+      // نُحدّث رقم الإصدار
+      localStorage.setItem('db_upgrade_v9', 'pending');
+      location.reload();
+    }
+    return false;
+  }
+  return true;
+}
+
+/* ─────────── 14. تصدير دوال مساعدة عالمياً ─────────── */
+window.getMemberClassification = getMemberClassification;
+window.computeMemberDues = computeMemberDues;
+window.computeMemberFullHistory = computeMemberFullHistory;
+window.distributeDeathPayment = distributeDeathPayment;
+window.recordPayment = recordPayment;
+window.generateReceiptWA = generateReceiptWA;
+window.sendReceiptWA = sendReceiptWA;
+window.generateReceiptQR = generateReceiptQR;
+window.getFinancialSummary = getFinancialSummary;
+window.getSubscribersCount = getSubscribersCount;
+
+console.log('✅ Part 9 — نموذج البيانات والأدوات تم تحميله');
 document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
