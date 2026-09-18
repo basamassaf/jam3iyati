@@ -6929,6 +6929,1638 @@ async function saveDeliveryNew(){
 }
 
 /* ═══ نهاية الإصلاح 5 ═══ */
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 6 — شاشة المحصّلين (لكل من يحصّل)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ⭐ إنشاء الصفحة ديناميكياً */
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    if(!document.getElementById('pg-collectors')){
+      const main = document.getElementById('appMain');
+      if(main){
+        const section = document.createElement('section');
+        section.id = 'pg-collectors';
+        section.className = 'page';
+        main.appendChild(section);
+      }
+    }
+  }, 100);
+});
+
+/* 📊 جلب كل من حصّل فعلاً */
+function getAllCollectors(year){
+  const y = year || S.currentYear;
+  
+  const matchUserToName = (id, name) => {
+    let user = id ? S.users.find(u => u.id === id) : null;
+    if(!user && name){
+      const n = normAr(name);
+      user = S.users.find(u => normAr(u.name) === n);
+      if(!user){
+        user = S.users.find(u => {
+          const un = normAr(u.name);
+          return un.includes(n) || n.includes(un);
+        });
+      }
+    }
+    return user;
+  };
+  
+  const collectorMap = new Map();
+  
+  const addCollector = (id, name) => {
+    const user = matchUserToName(id, name);
+    const key = user ? `id:${user.id}` : `name:${normAr(name || '')}`;
+    if(!collectorMap.has(key)){
+      collectorMap.set(key, {
+        id: user ? user.id : null,
+        name: user ? user.name : (name || 'غير محدد'),
+        user: user
+      });
+    }
+  };
+  
+  S.payments.forEach(p => {
+    const py = Number(p.forYear) || Number(p.year);
+    if(py !== y) return;
+    addCollector(p.collectorId, p.collectorName);
+  });
+  
+  S.deliveries.forEach(d => {
+    if(!d.date) return;
+    const dy = new Date(d.date).getFullYear();
+    if(dy !== y) return;
+    addCollector(d.fromUserId, d.fromUserName);
+  });
+  
+  const list = [];
+  collectorMap.forEach((c, key) => {
+    const matchPayment = p => {
+      const py = Number(p.forYear) || Number(p.year);
+      if(py !== y) return false;
+      if(c.user){
+        if(p.collectorId === c.user.id) return true;
+        if(!p.collectorId && p.collectorName){
+          return normAr(p.collectorName) === normAr(c.user.name);
+        }
+        return false;
+      }
+      if(p.collectorId) return false;
+      return normAr(p.collectorName || '') === normAr(c.name);
+    };
+    
+    const matchDelivery = d => {
+      if(!d.date) return false;
+      const dy = new Date(d.date).getFullYear();
+      if(dy !== y) return false;
+      if(c.user){
+        if(d.fromUserId === c.user.id) return true;
+        if(!d.fromUserId && d.fromUserName){
+          return normAr(d.fromUserName) === normAr(c.user.name);
+        }
+        return false;
+      }
+      if(d.fromUserId) return false;
+      return normAr(d.fromUserName || '') === normAr(c.name);
+    };
+    
+    const payments = S.payments.filter(matchPayment);
+    const deliveries = S.deliveries.filter(matchDelivery);
+    
+    const byFund = fund => {
+      const p = payments.filter(x => x.fund === fund)
+        .reduce((s,x) => s + (Number(x.amount)||0), 0);
+      const d = deliveries.filter(x => x.fund === fund && x.receivedAt)
+        .reduce((s,x) => s + (Number(x.amount)||0), 0);
+      const pend = deliveries.filter(x => x.fund === fund && !x.receivedAt && !x.rejectedAt)
+        .reduce((s,x) => s + (Number(x.amount)||0), 0);
+      return { collected: p, delivered: d, pending: pend };
+    };
+    
+    const assoc = byFund('assoc');
+    const death = byFund('death');
+    const donation = byFund('donation');
+    
+    const total = {
+      collected: assoc.collected + death.collected + donation.collected,
+      delivered: assoc.delivered + death.delivered + donation.delivered,
+      pending: assoc.pending + death.pending + donation.pending
+    };
+    total.rem = total.collected - total.delivered;
+    
+    if(total.collected === 0 && total.delivered === 0) return;
+    
+    list.push({
+      id: c.id,
+      name: c.name,
+      user: c.user,
+      role: c.user ? c.user.role : null,
+      assoc, death, donation, total,
+      paymentCount: payments.length,
+      deliveryCount: deliveries.length
+    });
+  });
+  
+  list.sort((a,b) => b.total.pending - a.total.pending || b.total.collected - a.total.collected);
+  return list;
+}
+
+/* 🎨 عرض شاشة المحصّلين */
+function renderCollectorsPage(){
+  const y = S.currentYear;
+  const list = getAllCollectors(y);
+  
+  // فلتر
+  const filter = S.filters.collectors || 'all';
+  let displayList = list;
+  if(filter === 'pending') displayList = list.filter(c => c.total.pending > 0);
+  if(filter === 'settled') displayList = list.filter(c => c.total.pending === 0);
+  
+  // بحث
+  if(S.search){
+    const s = normAr(S.search);
+    displayList = displayList.filter(c => normAr(c.name).includes(s));
+  }
+  
+  const totalCollected = list.reduce((s,c) => s + c.total.collected, 0);
+  const totalDelivered = list.reduce((s,c) => s + c.total.delivered, 0);
+  const totalPending = list.reduce((s,c) => s + c.total.pending, 0);
+  
+  $('pg-collectors').innerHTML = `
+    <div class="stats-scroll">
+      <div class="stat green"><div class="val">${fmtShort(totalCollected)}</div><div class="lbl">📥 حصّلوا</div></div>
+      <div class="stat blue"><div class="val">${fmtShort(totalDelivered)}</div><div class="lbl">✅ استُلم</div></div>
+      <div class="stat orange"><div class="val">${fmtShort(totalPending)}</div><div class="lbl">⏳ معلّق</div></div>
+      <div class="stat"><div class="val">${list.length}</div><div class="lbl">👥 عدد المحصّلين</div></div>
+    </div>
+
+    <div class="card" style="padding:12px">
+      <div class="chips">
+        <button class="chip ${filter === 'all' ? 'on' : ''}" onclick="setCollectorFilterNew('all')">📋 الكل (${list.length})</button>
+        <button class="chip ${filter === 'pending' ? 'on' : ''}" onclick="setCollectorFilterNew('pending')">⏳ معلّق (${list.filter(c => c.total.pending > 0).length})</button>
+        <button class="chip ${filter === 'settled' ? 'on' : ''}" onclick="setCollectorFilterNew('settled')">✅ مسوّى (${list.filter(c => c.total.pending === 0).length})</button>
+      </div>
+    </div>
+
+    ${displayList.length ? `<div class="list">
+      ${displayList.map(c => renderCollectorRow(c, y)).join('')}
+    </div>` : `
+      <div class="empty">
+        <span class="ico">👥</span>
+        <h3>لا يوجد محصّلون</h3>
+        <p>${S.search ? 'لا نتائج للبحث' : 'لم يسجّل أحد تحصيلات بعد'}</p>
+      </div>
+    `}
+  `;
+}
+
+function renderCollectorRow(c, year){
+  const roleIcon = c.role ? ROLES[c.role]?.icon || '👤' : '👤';
+  const roleName = c.role ? ROLES[c.role]?.name || '' : '';
+  const hasPending = c.total.pending > 0;
+  
+  return `
+    <div class="item" onclick="openCollectorDetailSheet('${c.id ? 'id:' + c.id : 'name:' + esc(c.name)}', ${year})">
+      <div class="av ${hasPending ? 'orange' : 'green'}">${roleIcon}</div>
+      <div class="body">
+        <div class="ttl">${esc(c.name)}${roleName ? ' <span class="badge primary">' + roleName + '</span>' : ''}</div>
+        <div class="sub">
+          📥 ${fmtShort(c.total.collected)}
+          • ✅ ${fmtShort(c.total.delivered)}
+          ${hasPending ? '• ⏳ <span style="color:var(--warning);font-weight:800">' + fmtShort(c.total.pending) + '</span>' : '• ✅ مسوّى'}
+        </div>
+      </div>
+      <span class="trail">›</span>
+    </div>
+  `;
+}
+
+function setCollectorFilterNew(f){
+  S.filters.collectors = f;
+  renderCollectorsPage();
+}
+
+/* 📄 تفاصيل محصّل واحد */
+function openCollectorDetailSheet(key, year){
+  const y = year || S.currentYear;
+  
+  let isId = false, targetId = null, targetName = '', targetUser = null;
+  if(key.startsWith('id:')){
+    isId = true;
+    targetId = Number(key.slice(3));
+    targetUser = S.users.find(u => u.id === targetId);
+  } else {
+    targetName = key.slice(5);
+  }
+  
+  const matchPayment = p => {
+    const py = Number(p.forYear) || Number(p.year);
+    if(py !== y) return false;
+    if(targetUser){
+      if(p.collectorId === targetUser.id) return true;
+      if(!p.collectorId && p.collectorName){
+        return normAr(p.collectorName) === normAr(targetUser.name);
+      }
+      return false;
+    }
+    if(p.collectorId) return false;
+    return normAr(p.collectorName || '') === normAr(targetName);
+  };
+  
+  const matchDelivery = d => {
+    if(!d.date) return false;
+    const dy = new Date(d.date).getFullYear();
+    if(dy !== y) return false;
+    if(targetUser){
+      if(d.fromUserId === targetUser.id) return true;
+      if(!d.fromUserId && d.fromUserName){
+        return normAr(d.fromUserName) === normAr(targetUser.name);
+      }
+      return false;
+    }
+    if(d.fromUserId) return false;
+    return normAr(d.fromUserName || '') === normAr(targetName);
+  };
+  
+  const payments = S.payments.filter(matchPayment).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  const deliveries = S.deliveries.filter(matchDelivery).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  
+  const user = targetUser;
+  const displayName = user ? user.name : (payments[0]?.collectorName || targetName || 'غير محدد');
+  const roleName = user ? (ROLES[user.role]?.name || '') : '';
+  
+  const sum = arr => arr.reduce((s,x) => s + (Number(x.amount)||0), 0);
+  const byFund = fund => {
+    const p = sum(payments.filter(x => x.fund === fund));
+    const d = sum(deliveries.filter(x => x.fund === fund && x.receivedAt));
+    const pend = sum(deliveries.filter(x => x.fund === fund && !x.receivedAt && !x.rejectedAt));
+    return { collected: p, delivered: d, pending: pend };
+  };
+  
+  const assoc = byFund('assoc');
+  const death = byFund('death');
+  const donation = byFund('donation');
+  const totalCollected = assoc.collected + death.collected + donation.collected;
+  const totalDelivered = assoc.delivered + death.delivered + donation.delivered;
+  const totalPending = assoc.pending + death.pending + donation.pending;
+  
+  const isManager = S.currentUser.role === 'manager';
+  
+  const body = `
+    <div style="padding:16px;background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff;border-radius:14px;margin-bottom:14px;text-align:center">
+      <div style="font-size:32px">${user ? ROLES[user.role]?.icon : '👤'}</div>
+      <div style="font-weight:800;font-size:17px;margin-top:6px">${esc(displayName)}</div>
+      ${roleName ? `<div style="font-size:12px;opacity:.9;margin-top:3px">${roleName}</div>` : ''}
+      <div style="font-size:11px;opacity:.85;margin-top:6px">📅 سنة ${y}</div>
+    </div>
+
+    <div style="padding:14px;background:var(--bg);border-radius:12px;margin-bottom:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="text-align:center;padding:10px;background:var(--card);border-radius:10px">
+          <div style="font-size:11px;color:var(--muted)">📥 حصّل</div>
+          <div style="font-size:16px;font-weight:800;color:var(--success)">${fmtNum(totalCollected)}</div>
+        </div>
+        <div style="text-align:center;padding:10px;background:var(--card);border-radius:10px">
+          <div style="font-size:11px;color:var(--muted)">✅ استُلم</div>
+          <div style="font-size:16px;font-weight:800;color:var(--assoc)">${fmtNum(totalDelivered)}</div>
+        </div>
+      </div>
+      ${totalPending > 0 ? `
+        <div style="text-align:center;padding:10px;background:#fef3c7;border-radius:10px">
+          <div style="font-size:11px;color:#92400e">⏳ معلّق</div>
+          <div style="font-size:18px;font-weight:800;color:var(--warning)">${fmtNum(totalPending)}</div>
+        </div>
+      ` : `
+        <div style="text-align:center;padding:10px;background:#dcfce7;border-radius:10px;color:#166534;font-weight:800">
+          ✅ كل التسليمات مؤكدة
+        </div>
+      `}
+    </div>
+
+    ${assoc.collected > 0 ? `
+      <div class="balance-block" style="border-right:4px solid var(--assoc)">
+        <div style="font-weight:800;color:var(--assoc);margin-bottom:8px">💰 الجمعية</div>
+        <div class="balance-row"><span class="lbl">📥 حصّل</span><span class="val">${fmtNum(assoc.collected)}</span></div>
+        <div class="balance-row"><span class="lbl">✅ استُلم</span><span class="val green">${fmtNum(assoc.delivered)}</span></div>
+        <div class="balance-row"><span class="lbl">⏳ معلّق</span><span class="val orange">${fmtNum(assoc.pending)}</span></div>
+      </div>
+    ` : ''}
+
+    ${death.collected > 0 ? `
+      <div class="balance-block" style="border-right:4px solid var(--death)">
+        <div style="font-weight:800;color:var(--death);margin-bottom:8px">⚰️ الوفاة</div>
+        <div class="balance-row"><span class="lbl">📥 حصّل</span><span class="val">${fmtNum(death.collected)}</span></div>
+        <div class="balance-row"><span class="lbl">✅ استُلم</span><span class="val green">${fmtNum(death.delivered)}</span></div>
+        <div class="balance-row"><span class="lbl">⏳ معلّق</span><span class="val orange">${fmtNum(death.pending)}</span></div>
+      </div>
+    ` : ''}
+
+    ${donation.collected > 0 ? `
+      <div class="balance-block" style="border-right:4px solid var(--donation)">
+        <div style="font-weight:800;color:var(--donation);margin-bottom:8px">💚 التبرعات</div>
+        <div class="balance-row"><span class="lbl">📥 حصّل</span><span class="val">${fmtNum(donation.collected)}</span></div>
+        <div class="balance-row"><span class="lbl">✅ استُلم</span><span class="val green">${fmtNum(donation.delivered)}</span></div>
+        <div class="balance-row"><span class="lbl">⏳ معلّق</span><span class="val orange">${fmtNum(donation.pending)}</span></div>
+      </div>
+    ` : ''}
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+      <button class="btn info block" onclick="closeSheet();setTimeout(()=>openCollectorPaymentsList('${key}', ${y}),150)">
+        📜 الدفعات (${payments.length})
+      </button>
+      <button class="btn warning block" onclick="closeSheet();setTimeout(()=>openCollectorDeliveriesList('${key}', ${y}),150)">
+        📤 التسليمات (${deliveries.length})
+      </button>
+    </div>
+
+    ${isManager && user ? `
+      <button class="btn primary block" style="margin-top:12px" onclick="closeSheet();setTimeout(()=>impersonateUser(${user.id}),150)">
+        🔑 الدخول بهذا الحساب
+      </button>
+    ` : ''}
+  `;
+  
+  openSheet('👤 ' + displayName, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+/* 📜 قائمة دفعات محصّل معيّن */
+function openCollectorPaymentsList(key, year){
+  const y = year || S.currentYear;
+  
+  let targetUser = null, targetName = '';
+  if(key.startsWith('id:')){
+    const id = Number(key.slice(3));
+    targetUser = S.users.find(u => u.id === id);
+  } else {
+    targetName = key.slice(5);
+  }
+  
+  const payments = S.payments.filter(p => {
+    const py = Number(p.forYear) || Number(p.year);
+    if(py !== y) return false;
+    if(targetUser){
+      if(p.collectorId === targetUser.id) return true;
+      if(!p.collectorId && p.collectorName){
+        return normAr(p.collectorName) === normAr(targetUser.name);
+      }
+      return false;
+    }
+    if(p.collectorId) return false;
+    return normAr(p.collectorName || '') === normAr(targetName);
+  }).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  
+  const isManager = S.currentUser.role === 'manager';
+  
+  const body = payments.length ? `<div class="list">
+    ${payments.map(p => {
+      const m = p.memberId ? getMemberById(p.memberId) : null;
+      const fundIcon = p.fund === 'assoc' ? '💰' : p.fund === 'death' ? '⚰️' : '💚';
+      const fundColor = p.fund === 'assoc' ? 'blue' : p.fund === 'death' ? 'red' : 'green';
+      return `
+        <div class="item" ${isManager ? `onclick="closeSheet();setTimeout(()=>openPaymentDetail(${p.id}),150)"` : 'style="cursor:default"'}>
+          <div class="av ${fundColor}">${fundIcon}</div>
+          <div class="body">
+            <div class="ttl">${esc(m?.name || p.notes || 'دفعة')}</div>
+            <div class="sub">${fmtDate(p.date)} • ${p.fund === 'assoc' ? 'جمعية' : p.fund === 'death' ? 'وفاة' : 'تبرع'}</div>
+          </div>
+          <div style="font-weight:800;color:var(--success);font-size:13px">${fmtNum(p.amount)}</div>
+          ${isManager ? '<span class="trail">›</span>' : ''}
+        </div>
+      `;
+    }).join('')}
+  </div>` : '<div class="empty"><p>لا توجد دفعات</p></div>';
+  
+  openSheet('📜 الدفعات — ' + payments.length, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+/* 📤 قائمة تسليمات محصّل معيّن */
+function openCollectorDeliveriesList(key, year){
+  const y = year || S.currentYear;
+  
+  let targetUser = null, targetName = '';
+  if(key.startsWith('id:')){
+    const id = Number(key.slice(3));
+    targetUser = S.users.find(u => u.id === id);
+  } else {
+    targetName = key.slice(5);
+  }
+  
+  const deliveries = S.deliveries.filter(d => {
+    if(!d.date) return false;
+    const dy = new Date(d.date).getFullYear();
+    if(dy !== y) return false;
+    if(targetUser){
+      if(d.fromUserId === targetUser.id) return true;
+      if(!d.fromUserId && d.fromUserName){
+        return normAr(d.fromUserName) === normAr(targetUser.name);
+      }
+      return false;
+    }
+    if(d.fromUserId) return false;
+    return normAr(d.fromUserName || '') === normAr(targetName);
+  }).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  
+  const body = deliveries.length ? `<div class="list">
+    ${deliveries.map(d => {
+      const isPending = !d.receivedAt && !d.rejectedAt;
+      const statusIcon = d.receivedAt ? '✅' : d.rejectedAt ? '❌' : '⏳';
+      return `
+        <div class="item" onclick="closeSheet();setTimeout(()=>openDeliveryDetail(${d.id}),150)">
+          <div class="av ${d.fund === 'death' ? 'red' : 'blue'}">${statusIcon}</div>
+          <div class="body">
+            <div class="ttl">${esc(d.toUserName || 'أمين')}</div>
+            <div class="sub">${fmtDate(d.date)} • ${d.fund === 'assoc' ? '💰 جمعية' : d.fund === 'death' ? '⚰️ وفاة' : '💚 تبرع'}</div>
+          </div>
+          <div style="font-weight:800;color:var(--success);font-size:13px">${fmtNum(d.amount)}</div>
+          <span class="trail">›</span>
+        </div>
+      `;
+    }).join('')}
+  </div>` : '<div class="empty"><p>لا توجد تسليمات</p></div>';
+  
+  openSheet('📤 التسليمات — ' + deliveries.length, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+/* 🎯 ربط الصفحة بـ go() */
+const _origRenderers = {
+  'pg-collectors': renderCollectorsPage
+};
+const _origGoCollectors = go;
+go = function(page){
+  _origGoCollectors(page);
+  if(page === 'pg-collectors'){
+    renderCollectorsPage();
+  }
+};
+
+/* 🔧 إضافة تبويب "المحصّلون" في القوائم */
+NAV_BY_ROLE.manager = [
+  { pg:'pg-home',       i:'🏠', l:'الرئيسية' },
+  { pg:'pg-members',    i:'👥', l:'الأعضاء' },
+  { pg:'pg-collectors', i:'💼', l:'المحصّلون' },
+  { pg:'pg-funds',      i:'📊', l:'الصناديق' },
+  { pg:'pg-reports',    i:'📈', l:'التقارير' },
+  { pg:'pg-admin',      i:'⚙️', l:'الإدارة' }
+];
+
+NAV_BY_ROLE.assocTreasurer = [
+  { pg:'pg-home',       i:'🏠', l:'صندوقي' },
+  { pg:'pg-collect',    i:'💰', l:'التحصيل' },
+  { pg:'pg-collectors', i:'💼', l:'المحصّلون' },
+  { pg:'pg-inbox',      i:'📬', l:'الواردة' },
+  { pg:'pg-inout',      i:'📥', l:'وارد/صادر' },
+  { pg:'pg-reports',    i:'📊', l:'تقاريري' }
+];
+
+NAV_BY_ROLE.deathTreasurer = [
+  { pg:'pg-home',       i:'🏠', l:'صندوقي' },
+  { pg:'pg-collect',    i:'💰', l:'التحصيل' },
+  { pg:'pg-collectors', i:'💼', l:'المحصّلون' },
+  { pg:'pg-inbox',      i:'📬', l:'الواردة' },
+  { pg:'pg-inout',      i:'📥', l:'وارد/صادر' },
+  { pg:'pg-reports',    i:'📊', l:'تقاريري' }
+];
+
+NAV_BY_ROLE.president = [
+  { pg:'pg-home',       i:'🏠', l:'الرئيسية' },
+  { pg:'pg-members',    i:'👥', l:'الأعضاء' },
+  { pg:'pg-collectors', i:'💼', l:'المحصّلون' },
+  { pg:'pg-funds',      i:'📊', l:'الصناديق' },
+  { pg:'pg-reports',    i:'📈', l:'التقارير' },
+  { pg:'pg-archive',    i:'📚', l:'الأرشيف' }
+];
+
+/* 🎨 ضبط حجم الأزرار عند 6 تبويبات */
+const _origBuildNav6 = buildBottomNav;
+buildBottomNav = function(){
+  _origBuildNav6();
+  const u = S.currentUser;
+  if(u){
+    const nav = NAV_BY_ROLE[u.role] || [];
+    if(nav.length >= 6){
+      document.querySelectorAll('.bnav button').forEach(b => {
+        b.style.fontSize = '9px';
+        b.style.padding = '4px 1px';
+        const i = b.querySelector('.i');
+        if(i) i.style.fontSize = '18px';
+      });
+    }
+  }
+};
+
+/* ═══ نهاية الإصلاح 6 ═══ */
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 7 — لوحة المدير الاحترافية
+   💵 الرصيد الفعلي + 📊 جدول السنوات + 🎯 لوحة قيادة
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 💵 الرصيد الفعلي التراكمي — كل السنوات */
+function getActualFundBalance(){
+  const sumAll = (arr, key = 'amount') =>
+    arr.reduce((s,x) => s + (Number(x[key])||0), 0);
+  
+  const assocPay = sumAll(S.payments.filter(p => p.fund === 'assoc'));
+  const assocInc = sumAll(S.incomes.filter(i => i.fund === 'assoc'));
+  const assocExp = sumAll(S.expenses.filter(e => e.fund === 'assoc'));
+  const assocBal = assocPay + assocInc - assocExp;
+  
+  const deathPay = sumAll(S.payments.filter(p => p.fund === 'death'));
+  const deathInc = sumAll(S.incomes.filter(i => i.fund === 'death'));
+  const deathExp = sumAll(S.expenses.filter(e => e.fund === 'death'));
+  const deathComp = sumAll(S.deaths, 'compensation');
+  const deathBal = deathPay + deathInc - deathExp - deathComp;
+  
+  const donPay = sumAll(S.payments.filter(p => p.fund === 'donation'));
+  const donExp = sumAll(S.expenses.filter(e => e.fund === 'donation'));
+  const donBal = donPay - donExp;
+  
+  return {
+    assoc: { balance: assocBal, payments: assocPay, incomes: assocInc, expenses: assocExp },
+    death: { balance: deathBal, payments: deathPay, incomes: deathInc, expenses: deathExp, compensations: deathComp },
+    donation: { balance: donBal, payments: donPay, expenses: donExp },
+    total: assocBal + deathBal,
+    grand: assocBal + deathBal + donBal
+  };
+}
+
+/* 📊 كل السنوات — مقارنة */
+function getFundsByYears(){
+  const years = [2025, 2026, 2027, 2028, 2029];
+  const result = [];
+  let cum = { assoc: 0, death: 0, donation: 0, total: 0 };
+  
+  years.forEach(y => {
+    const sum = (arr, key = 'amount') =>
+      arr.reduce((s,x) => s + (Number(x[key])||0), 0);
+    
+    const aP = sum(S.payments.filter(p => Number(p.year) === y && p.fund === 'assoc'));
+    const aI = sum(S.incomes.filter(i => Number(i.year) === y && i.fund === 'assoc'));
+    const aE = sum(S.expenses.filter(e => Number(e.year) === y && e.fund === 'assoc'));
+    const aN = aP + aI - aE;
+    
+    const dP = sum(S.payments.filter(p => Number(p.year) === y && p.fund === 'death'));
+    const dI = sum(S.incomes.filter(i => Number(i.year) === y && i.fund === 'death'));
+    const dE = sum(S.expenses.filter(e => Number(e.year) === y && e.fund === 'death'));
+    const dC = sum(S.deaths.filter(d => Number(d.year) === y), 'compensation');
+    const dN = dP + dI - dE - dC;
+    
+    const oP = sum(S.payments.filter(p => Number(p.year) === y && p.fund === 'donation'));
+    const oE = sum(S.expenses.filter(e => Number(e.year) === y && e.fund === 'donation'));
+    const oN = oP - oE;
+    
+    cum.assoc += aN;
+    cum.death += dN;
+    cum.donation += oN;
+    cum.total = cum.assoc + cum.death + cum.donation;
+    
+    if(aN !== 0 || dN !== 0 || oN !== 0 || aP !== 0 || dP !== 0){
+      result.push({
+        year: y,
+        assoc: { collected: aP, incomes: aI, expenses: aE, net: aN },
+        death: { collected: dP, incomes: dI, expenses: dE, compensations: dC, net: dN },
+        donation: { collected: oP, expenses: oE, net: oN },
+        net: aN + dN + oN,
+        cum: { assoc: cum.assoc, death: cum.death, donation: cum.donation, total: cum.total }
+      });
+    }
+  });
+  
+  return result;
+}
+
+/* 🎯 لوحة المدير الجديدة */
+function renderHomeManager(){
+  const u = S.currentUser;
+  const y = S.currentYear;
+  const stats = getMembersStats(y);
+  const actual = getActualFundBalance();
+  const yearsData = getFundsByYears();
+  
+  // ⚠️ احسب التنبيهات
+  const pendingDeliveries = S.deliveries.filter(d => !d.receivedAt && !d.rejectedAt);
+  const pendingAmt = pendingDeliveries.reduce((s,d) => s + (Number(d.amount)||0), 0);
+  
+  const lateCount = stats.late;
+  const lateAmt = stats.lateTotal;
+  
+  const recentDeaths = S.deaths.filter(d => Number(d.year) === y).length;
+  
+  const alerts = [];
+  if(lateCount > 0) alerts.push({
+    icon: '⚠️',
+    text: `${lateCount} متأخر — ${fmtShort(lateAmt)} ل.س`,
+    color: 'danger',
+    action: () => { S.filters.members = 'subscribed'; go('pg-members'); }
+  });
+  if(pendingDeliveries.length > 0) alerts.push({
+    icon: '⏳',
+    text: `${pendingDeliveries.length} تسليم معلّق — ${fmtShort(pendingAmt)} ل.س`,
+    color: 'warning',
+    action: () => go('pg-collectors')
+  });
+  if(recentDeaths > 0) alerts.push({
+    icon: '⚰️',
+    text: `${recentDeaths} وفاة في ${y}`,
+    color: 'info',
+    action: () => go('pg-deaths')
+  });
+  
+  $('pg-home').innerHTML = `
+    <!-- 💵 الرصيد الفعلي -->
+    <div style="padding:20px;background:linear-gradient(135deg,#7c3aed,#4c1d95);color:#fff;border-radius:20px;margin-bottom:12px;box-shadow:0 8px 24px rgba(124,58,237,.25)">
+      <div style="font-size:11px;opacity:.85;font-weight:700">💵 الرصيد الفعلي (تراكمي)</div>
+      <div style="font-size:38px;font-weight:800;margin-top:4px;line-height:1.1">${fmtNum(actual.total)}</div>
+      <div style="font-size:12px;opacity:.85;margin-top:2px">ل.س في الصناديق الأساسية</div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:14px">
+        <div style="background:rgba(255,255,255,.15);padding:8px;border-radius:10px;text-align:center">
+          <div style="font-size:16px;font-weight:800">${fmtShort(actual.assoc.balance)}</div>
+          <div style="font-size:9px;opacity:.85;margin-top:2px">💰 جمعية</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);padding:8px;border-radius:10px;text-align:center">
+          <div style="font-size:16px;font-weight:800">${fmtShort(actual.death.balance)}</div>
+          <div style="font-size:9px;opacity:.85;margin-top:2px">⚰️ وفاة</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);padding:8px;border-radius:10px;text-align:center">
+          <div style="font-size:16px;font-weight:800">${fmtShort(actual.donation.balance)}</div>
+          <div style="font-size:9px;opacity:.85;margin-top:2px">💚 تبرعات</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🚨 يحتاج انتباهك -->
+    ${alerts.length ? `
+      <div class="card" style="border-right:4px solid var(--warning);padding:12px">
+        <div style="font-weight:800;font-size:13px;margin-bottom:8px">🚨 يحتاج انتباهك</div>
+        <div style="display:grid;gap:6px">
+          ${alerts.map((a, i) => `
+            <div onclick="alertsAction(${i})" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border-radius:10px;cursor:pointer">
+              <div style="font-size:20px">${a.icon}</div>
+              <div style="flex:1;font-size:13px;font-weight:700">${a.text}</div>
+              <div style="font-size:16px;color:var(--muted)">›</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <input type="hidden" id="alertsData" value='${JSON.stringify(alerts.map(a => a.action.toString()))}'>
+    ` : `
+      <div class="card" style="border-right:4px solid var(--success);padding:12px;text-align:center;color:#166534;font-weight:800">
+        ✅ كل شيء تحت السيطرة
+      </div>
+    `}
+
+    <!-- 🎯 لوحة القيادة -->
+    <div class="card">
+      <div class="card-head"><h2>🎯 ابدأ مهمة</h2></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <button class="quick-btn" onclick="openFundPaymentForm('assoc', null)" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">💰</div>
+          <div class="lbl" style="font-size:10px">دفعة</div>
+        </button>
+        <button class="quick-btn death" onclick="openDeathSheet()" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">⚰️</div>
+          <div class="lbl" style="font-size:10px">وفاة</div>
+        </button>
+        <button class="quick-btn" onclick="openMemberSheet()" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">👤</div>
+          <div class="lbl" style="font-size:10px">عضو</div>
+        </button>
+        <button class="quick-btn" onclick="openIncomeSheetFor('assoc')" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">📥</div>
+          <div class="lbl" style="font-size:10px">إيراد</div>
+        </button>
+        <button class="quick-btn" onclick="openExpenseSheetFor('assoc')" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">💸</div>
+          <div class="lbl" style="font-size:10px">مصروف</div>
+        </button>
+        <button class="quick-btn" onclick="go('pg-inbox')" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">📬</div>
+          <div class="lbl" style="font-size:10px">استلام</div>
+        </button>
+        <button class="quick-btn donation" onclick="openFundPaymentForm('donation', null)" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">💚</div>
+          <div class="lbl" style="font-size:10px">تبرع</div>
+        </button>
+        <button class="quick-btn" onclick="openSearchAllSheet()" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">🔍</div>
+          <div class="lbl" style="font-size:10px">بحث شامل</div>
+        </button>
+        <button class="quick-btn" onclick="openYearsComparisonSheet()" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">📊</div>
+          <div class="lbl" style="font-size:10px">السنوات</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- 📊 السنوات -->
+    <div class="card">
+      <div class="card-head">
+        <h2>📊 السنوات المالية</h2>
+        <button class="btn ghost sm" onclick="openYearsComparisonSheet()">التفاصيل ›</button>
+      </div>
+      ${yearsData.length ? `
+        <div style="display:grid;gap:6px">
+          ${yearsData.map(y => `
+            <div onclick="openYearDetailSheet(${y.year})" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border-radius:10px;cursor:pointer">
+              <div style="width:50px;font-weight:800;font-size:14px">${y.year}</div>
+              <div style="flex:1;font-size:11px;color:var(--muted)">
+                💰 ${fmtShort(y.assoc.net)} • ⚰️ ${fmtShort(y.death.net)}${y.donation.net !== 0 ? ' • 💚 ' + fmtShort(y.donation.net) : ''}
+              </div>
+              <div style="text-align:left">
+                <div style="font-weight:800;font-size:13px;color:${y.net >= 0 ? 'var(--success)' : 'var(--danger)'}">${fmtShort(y.net)}</div>
+                <div style="font-size:9px;color:var(--muted)">تراكمي: ${fmtShort(y.cum.total)}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : '<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">لا توجد بيانات بعد</div>'}
+    </div>
+
+    <!-- 👥 ملخص الأعضاء -->
+    <div class="card">
+      <div class="card-head"><h2>👥 ملخص الأعضاء</h2></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="stat green" style="min-width:auto">
+          <div class="val">${stats.onlyAssoc + stats.both}</div>
+          <div class="lbl">💰 مشتركو الجمعية</div>
+        </div>
+        <div class="stat red" style="min-width:auto">
+          <div class="val">${stats.onlyDeath + stats.both}</div>
+          <div class="lbl">⚰️ مشتركو الوفاة</div>
+        </div>
+        <div class="stat blue" style="min-width:auto">
+          <div class="val">${stats.both}</div>
+          <div class="lbl">✅ كليهما</div>
+        </div>
+        <div class="stat orange" style="min-width:auto">
+          <div class="val">${stats.late}</div>
+          <div class="lbl">⚠️ متأخرون</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* 🚨 تنفيذ التنبيهات */
+function alertsAction(idx){
+  const input = $('alertsData');
+  if(!input) return;
+  try {
+    const actions = JSON.parse(input.value);
+    if(actions[idx]){
+      const fn = new Function('return ' + actions[idx])();
+      fn();
+    }
+  } catch(e){
+    console.error(e);
+  }
+}
+
+/* 📊 شاشة مقارنة السنوات الكاملة */
+function openYearsComparisonSheet(){
+  const yearsData = getFundsByYears();
+  const actual = getActualFundBalance();
+  
+  const body = `
+    <div style="padding:16px;background:linear-gradient(135deg,#7c3aed,#4c1d95);color:#fff;border-radius:14px;margin-bottom:14px;text-align:center">
+      <div style="font-size:11px;opacity:.85">💵 الرصيد الفعلي التراكمي</div>
+      <div style="font-size:32px;font-weight:800;margin-top:4px">${fmtNum(actual.total)}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px">
+        <div style="background:rgba(255,255,255,.15);padding:6px;border-radius:8px">
+          <div style="font-size:13px;font-weight:800">${fmtShort(actual.assoc.balance)}</div>
+          <div style="font-size:9px;opacity:.85">💰 جمعية</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);padding:6px;border-radius:8px">
+          <div style="font-size:13px;font-weight:800">${fmtShort(actual.death.balance)}</div>
+          <div style="font-size:9px;opacity:.85">⚰️ وفاة</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);padding:6px;border-radius:8px">
+          <div style="font-size:13px;font-weight:800">${fmtShort(actual.donation.balance)}</div>
+          <div style="font-size:9px;opacity:.85">💚 تبرعات</div>
+        </div>
+      </div>
+    </div>
+
+    ${yearsData.length ? yearsData.map(y => `
+      <div class="balance-block" style="border-right:4px solid var(--primary)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-weight:800;font-size:16px">📅 ${y.year}</div>
+          <div style="font-weight:800;font-size:16px;color:${y.net >= 0 ? 'var(--success)' : 'var(--danger)'}">${y.net >= 0 ? '+' : ''}${fmtNum(y.net)}</div>
+        </div>
+        
+        <div style="padding:10px;background:var(--bg);border-radius:8px;margin-bottom:6px">
+          <div style="font-weight:800;color:var(--assoc);font-size:12px;margin-bottom:6px">💰 الجمعية</div>
+          <div class="balance-row" style="font-size:11px"><span class="lbl">📥 حصّل</span><span class="val">${fmtNum(y.assoc.collected)}</span></div>
+          <div class="balance-row" style="font-size:11px"><span class="lbl">💚 إيرادات</span><span class="val">${fmtNum(y.assoc.incomes)}</span></div>
+          <div class="balance-row" style="font-size:11px"><span class="lbl">💸 مصاريف</span><span class="val red">-${fmtNum(y.assoc.expenses)}</span></div>
+          <div class="balance-row" style="font-size:12px;font-weight:800;border-top:1px solid var(--border);padding-top:6px">
+            <span>صافي السنة</span>
+            <span style="color:${y.assoc.net >= 0 ? 'var(--success)' : 'var(--danger)'}">${fmtNum(y.assoc.net)}</span>
+          </div>
+        </div>
+
+        <div style="padding:10px;background:var(--bg);border-radius:8px;margin-bottom:6px">
+          <div style="font-weight:800;color:var(--death);font-size:12px;margin-bottom:6px">⚰️ الوفاة</div>
+          <div class="balance-row" style="font-size:11px"><span class="lbl">📥 أقساط</span><span class="val">${fmtNum(y.death.collected)}</span></div>
+          <div class="balance-row" style="font-size:11px"><span class="lbl">📤 تعويضات</span><span class="val red">-${fmtNum(y.death.compensations)}</span></div>
+          <div class="balance-row" style="font-size:12px;font-weight:800;border-top:1px solid var(--border);padding-top:6px">
+            <span>صافي السنة</span>
+            <span style="color:${y.death.net >= 0 ? 'var(--success)' : 'var(--danger)'}">${fmtNum(y.death.net)}</span>
+          </div>
+        </div>
+
+        ${y.donation.collected > 0 ? `
+          <div style="padding:10px;background:var(--bg);border-radius:8px;margin-bottom:6px">
+            <div style="font-weight:800;color:var(--donation);font-size:12px;margin-bottom:6px">💚 التبرعات</div>
+            <div class="balance-row" style="font-size:11px"><span class="lbl">📥 محصّل</span><span class="val">${fmtNum(y.donation.collected)}</span></div>
+            <div class="balance-row" style="font-size:12px;font-weight:800;border-top:1px solid var(--border);padding-top:6px">
+              <span>صافي السنة</span>
+              <span style="color:var(--donation)">${fmtNum(y.donation.net)}</span>
+            </div>
+          </div>
+        ` : ''}
+
+        <div style="padding:10px;background:var(--primary-soft);border-radius:8px">
+          <div class="balance-row" style="font-size:12px;font-weight:800;border:0">
+            <span>📊 الرصيد التراكمي</span>
+            <span style="color:var(--primary);font-size:14px">${fmtNum(y.cum.total)}</span>
+          </div>
+        </div>
+      </div>
+    `).join('') : '<div class="empty"><p>لا توجد بيانات</p></div>'}
+  `;
+  
+  openSheet('📊 كل السنوات', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+/* 📅 تفاصيل سنة واحدة */
+function openYearDetailSheet(year){
+  const yearsData = getFundsByYears();
+  const y = yearsData.find(x => x.year === year);
+  if(!y){ toast('لا توجد بيانات', 'warning'); return; }
+  
+  const body = `
+    <div style="text-align:center;padding:16px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px">
+      <div style="font-size:32px;font-weight:800;color:var(--primary)">${year}</div>
+      <div style="font-size:11px;color:var(--muted)">صافي السنة</div>
+      <div style="font-size:24px;font-weight:800;color:${y.net >= 0 ? 'var(--success)' : 'var(--danger)'};margin-top:4px">${fmtNum(y.net)}</div>
+    </div>
+
+    <div class="balance-block" style="border-right:4px solid var(--assoc)">
+      <div style="font-weight:800;color:var(--assoc);margin-bottom:8px">💰 الجمعية</div>
+      <div class="balance-row"><span class="lbl">📥 حصّل</span><span class="val green">${fmtNum(y.assoc.collected)}</span></div>
+      <div class="balance-row"><span class="lbl">💚 إيرادات</span><span class="val green">${fmtNum(y.assoc.incomes)}</span></div>
+      <div class="balance-row"><span class="lbl">💸 مصاريف</span><span class="val red">-${fmtNum(y.assoc.expenses)}</span></div>
+      <div class="balance-row" style="border-top:2px solid var(--assoc);padding-top:6px">
+        <span style="font-weight:800">صافي</span>
+        <span class="val" style="color:${y.assoc.net >= 0 ? 'var(--success)' : 'var(--danger)'}">${fmtNum(y.assoc.net)}</span>
+      </div>
+    </div>
+
+    <div class="balance-block" style="border-right:4px solid var(--death)">
+      <div style="font-weight:800;color:var(--death);margin-bottom:8px">⚰️ الوفاة</div>
+      <div class="balance-row"><span class="lbl">📥 أقساط</span><span class="val green">${fmtNum(y.death.collected)}</span></div>
+      <div class="balance-row"><span class="lbl">💚 إيرادات</span><span class="val green">${fmtNum(y.death.incomes)}</span></div>
+      <div class="balance-row"><span class="lbl">💸 مصاريف</span><span class="val red">-${fmtNum(y.death.expenses)}</span></div>
+      <div class="balance-row"><span class="lbl">📤 تعويضات</span><span class="val red">-${fmtNum(y.death.compensations)}</span></div>
+      <div class="balance-row" style="border-top:2px solid var(--death);padding-top:6px">
+        <span style="font-weight:800">صافي</span>
+        <span class="val" style="color:${y.death.net >= 0 ? 'var(--success)' : 'var(--danger)'}">${fmtNum(y.death.net)}</span>
+      </div>
+    </div>
+
+    ${y.donation.collected > 0 ? `
+      <div class="balance-block" style="border-right:4px solid var(--donation)">
+        <div style="font-weight:800;color:var(--donation);margin-bottom:8px">💚 التبرعات</div>
+        <div class="balance-row"><span class="lbl">📥 محصّل</span><span class="val green">${fmtNum(y.donation.collected)}</span></div>
+        ${y.donation.expenses > 0 ? `<div class="balance-row"><span class="lbl">💸 مصاريف</span><span class="val red">-${fmtNum(y.donation.expenses)}</span></div>` : ''}
+        <div class="balance-row" style="border-top:2px solid var(--donation);padding-top:6px">
+          <span style="font-weight:800">صافي</span>
+          <span class="val" style="color:var(--donation)">${fmtNum(y.donation.net)}</span>
+        </div>
+      </div>
+    ` : ''}
+  `;
+  
+  openSheet('📅 سنة ' + year, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+/* 🔍 البحث الشامل */
+function openSearchAllSheet(){
+  const body = `
+    <div class="fld">
+      <input id="searchAllInput" placeholder="🔍 ابحث عن اسم، كود، رقم..." oninput="performUniversalSearch(this.value)" autofocus>
+    </div>
+    <div id="searchAllResults"></div>
+  `;
+  openSheet('🔍 بحث شامل', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+  setTimeout(() => performUniversalSearch(''), 200);
+}
+
+function performUniversalSearch(q){
+  const container = $('searchAllResults');
+  if(!container) return;
+  
+  if(!q || q.length < 1){
+    container.innerHTML = `
+      <div style="text-align:center;padding:30px;color:var(--muted)">
+        <div style="font-size:44px;opacity:.4">🔍</div>
+        <div style="font-weight:700;margin-top:10px">اكتب للبحث</div>
+        <div style="font-size:12px;margin-top:6px">أعضاء • محصّلون • دفعات • وفيات</div>
+      </div>
+    `;
+    return;
+  }
+  
+  const s = normAr(q);
+  
+  const members = S.members.filter(m =>
+    normAr(`${m.name} ${m.code||''} ${m.phone||''}`).includes(s)
+  ).slice(0, 5);
+  
+  const collectors = S.users.filter(u =>
+    normAr(u.name).includes(s)
+  ).slice(0, 5);
+  
+  const payments = S.payments.filter(p => {
+    const m = p.memberId ? getMemberById(p.memberId) : null;
+    return normAr(`${m?.name||''} ${p.notes||''} ${p.collectorName||''}`).includes(s);
+  }).slice(0, 5);
+  
+  const deaths = S.deaths.filter(d =>
+    normAr(d.deceasedName).includes(s)
+  ).slice(0, 5);
+  
+  let html = '';
+  
+  if(members.length){
+    html += `
+      <div style="font-weight:800;font-size:12px;color:var(--muted);margin:14px 0 6px">👥 الأعضاء</div>
+      <div class="list">
+        ${members.map(m => `
+          <div class="item" onclick="closeSheet();setTimeout(()=>openMemberDetail(${m.id}),150)">
+            <div class="av">👤</div>
+            <div class="body">
+              <div class="ttl">${esc(m.name)}</div>
+              <div class="sub">${esc(m.code||'')} • ${esc(m.sector||'')}</div>
+            </div>
+            <span class="trail">›</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  
+  if(collectors.length){
+    html += `
+      <div style="font-weight:800;font-size:12px;color:var(--muted);margin:14px 0 6px">💼 المستخدمون</div>
+      <div class="list">
+        ${collectors.map(u => `
+          <div class="item" onclick="closeSheet();setTimeout(()=>openCollectorDetailSheet('id:${u.id}', ${S.currentYear}),150)">
+            <div class="av">${ROLES[u.role]?.icon||'👤'}</div>
+            <div class="body">
+              <div class="ttl">${esc(u.name)}</div>
+              <div class="sub">${ROLES[u.role]?.name||''}</div>
+            </div>
+            <span class="trail">›</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  
+  if(payments.length){
+    html += `
+      <div style="font-weight:800;font-size:12px;color:var(--muted);margin:14px 0 6px">💰 الدفعات</div>
+      <div class="list">
+        ${payments.map(p => {
+          const m = p.memberId ? getMemberById(p.memberId) : null;
+          return `
+            <div class="item" onclick="closeSheet();setTimeout(()=>openPaymentDetail(${p.id}),150)">
+              <div class="av ${p.fund === 'death' ? 'red' : 'blue'}">${p.fund === 'death' ? '⚰️' : '💰'}</div>
+              <div class="body">
+                <div class="ttl">${esc(m?.name||'دفعة')}</div>
+                <div class="sub">${fmtDate(p.date)} • ${fmtNum(p.amount)}</div>
+              </div>
+              <span class="trail">›</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+  
+  if(deaths.length){
+    html += `
+      <div style="font-weight:800;font-size:12px;color:var(--muted);margin:14px 0 6px">⚰️ الوفيات</div>
+      <div class="list">
+        ${deaths.map(d => `
+          <div class="item" onclick="closeSheet();setTimeout(()=>openDeathDetail(${d.id}),150)">
+            <div class="av red">🪦</div>
+            <div class="body">
+              <div class="ttl">${esc(d.deceasedName)}</div>
+              <div class="sub">${d.year} • ${fmtDate(d.deathDate)}</div>
+            </div>
+            <span class="trail">›</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  
+  if(!html){
+    html = `<div class="empty"><p>لا نتائج لـ "${esc(q)}"</p></div>`;
+  }
+  
+  container.innerHTML = html;
+}
+
+/* ═══ نهاية الإصلاح 7 ═══ */
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 8 — الصناديق المنفصلة + الرصيد الافتتاحي
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 💵 الرصيد الافتتاحي (قبل 2025) */
+function getOpeningBalance(){
+  const c = S.constants.find(x => x.year === 0);
+  return c || { year: 0, assoc: 0, death: 0, donation: 0 };
+}
+
+async function saveOpeningBalance(data){
+  let existing = S.constants.find(x => x.year === 0);
+  const obj = {
+    year: 0,
+    assoc: Number(data.assoc) || 0,
+    death: Number(data.death) || 0,
+    donation: Number(data.donation) || 0,
+    note: 'رصيد افتتاحي قبل 2025'
+  };
+  if(existing){
+    obj.id = existing.id;
+    await dbPut('constants', obj);
+    const i = S.constants.findIndex(x => x.year === 0);
+    S.constants[i] = obj;
+  } else {
+    const id = await dbPut('constants', obj);
+    obj.id = id;
+    S.constants.push(obj);
+  }
+  CACHE.invalidateAll();
+}
+
+/* 💰 رصيد صندوق واحد — تراكمي */
+function getFundActual(fund){
+  const opening = getOpeningBalance();
+  const openingVal = Number(opening[fund]) || 0;
+  
+  const payments = S.payments.filter(p => p.fund === fund);
+  const incomes = S.incomes.filter(i => i.fund === fund);
+  const expenses = S.expenses.filter(e => e.fund === fund);
+  const compensations = fund === 'death' ? S.deaths : [];
+  
+  const collected = payments.reduce((s,p) => s + (Number(p.amount)||0), 0);
+  const totalIncomes = incomes.reduce((s,i) => s + (Number(i.amount)||0), 0);
+  const totalExpenses = expenses.reduce((s,e) => s + (Number(e.amount)||0), 0);
+  const totalComp = compensations.reduce((s,d) => s + (Number(d.compensation)||0), 0);
+  
+  const balance = openingVal + collected + totalIncomes - totalExpenses - totalComp;
+  
+  return {
+    fund,
+    opening: openingVal,
+    collected,
+    incomes: totalIncomes,
+    expenses: totalExpenses,
+    compensations: totalComp,
+    balance
+  };
+}
+
+/* 📊 سنوات صندوق واحد — مع الرصيد التراكمي */
+function getFundYears(fund){
+  const years = [2025, 2026, 2027, 2028, 2029];
+  const opening = getOpeningBalance();
+  const openingVal = Number(opening[fund]) || 0;
+  let cum = openingVal;
+  const result = [];
+  
+  years.forEach(y => {
+    const payments = S.payments.filter(p => Number(p.year) === y && p.fund === fund);
+    const incomes = S.incomes.filter(i => Number(i.year) === y && i.fund === fund);
+    const expenses = S.expenses.filter(e => Number(e.year) === y && e.fund === fund);
+    const compensations = fund === 'death' ? S.deaths.filter(d => Number(d.year) === y) : [];
+    
+    const collected = payments.reduce((s,p) => s + (Number(p.amount)||0), 0);
+    const totalIncomes = incomes.reduce((s,i) => s + (Number(i.amount)||0), 0);
+    const totalExpenses = expenses.reduce((s,e) => s + (Number(e.amount)||0), 0);
+    const totalComp = compensations.reduce((s,d) => s + (Number(d.compensation)||0), 0);
+    
+    const net = collected + totalIncomes - totalExpenses - totalComp;
+    cum += net;
+    
+    if(collected !== 0 || totalIncomes !== 0 || totalExpenses !== 0 || totalComp !== 0){
+      result.push({
+        year: y,
+        collected, incomes: totalIncomes,
+        expenses: totalExpenses, compensations: totalComp,
+        net, cumulative: cum
+      });
+    }
+  });
+  
+  return { opening: openingVal, years: result, total: cum };
+}
+
+/* 🏠 الصفحة الرئيسية للمدير — 3 صناديق منفصلة */
+function renderHomeManager(){
+  const u = S.currentUser;
+  const y = S.currentYear;
+  const stats = getMembersStats(y);
+  
+  const assoc = getFundActual('assoc');
+  const death = getFundActual('death');
+  const donation = getFundActual('donation');
+  
+  const pendingDeliveries = S.deliveries.filter(d => !d.receivedAt && !d.rejectedAt);
+  const pendingAmt = pendingDeliveries.reduce((s,d) => s + (Number(d.amount)||0), 0);
+  const recentDeaths = S.deaths.filter(d => Number(d.year) === y).length;
+  
+  $('pg-home').innerHTML = `
+    <!-- 💰 صندوق الجمعية -->
+    <div onclick="openFundLedgerSheet('assoc')" style="padding:20px;background:linear-gradient(135deg,#2563eb,#1e40af);color:#fff;border-radius:20px;margin-bottom:12px;cursor:pointer;box-shadow:0 8px 24px rgba(37,99,235,.25)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div>
+          <div style="font-size:11px;opacity:.85;font-weight:700">💰 صندوق الجمعية — الرصيد الفعلي</div>
+        </div>
+        <div style="font-size:32px">💰</div>
+      </div>
+      <div style="font-size:32px;font-weight:800;line-height:1.1">${fmtNum(assoc.balance)}</div>
+      <div style="font-size:11px;opacity:.85;margin-top:2px">ل.س</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px">
+        <div style="background:rgba(255,255,255,.15);padding:6px;border-radius:8px;text-align:center">
+          <div style="font-size:11px;opacity:.85">حصّل</div>
+          <div style="font-size:13px;font-weight:800">${fmtShort(assoc.collected)}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);padding:6px;border-radius:8px;text-align:center">
+          <div style="font-size:11px;opacity:.85">مصروف</div>
+          <div style="font-size:13px;font-weight:800">${fmtShort(assoc.expenses)}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);padding:6px;border-radius:8px;text-align:center">
+          <div style="font-size:11px;opacity:.85">افتتاحي</div>
+          <div style="font-size:13px;font-weight:800">${fmtShort(assoc.opening)}</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:10px;font-size:11px;opacity:.85">👆 اضغط للتفاصيل والسنوات</div>
+    </div>
+
+    <!-- ⚰️ صندوق الوفاة -->
+    <div onclick="openFundLedgerSheet('death')" style="padding:20px;background:linear-gradient(135deg,#dc2626,#991b1b);color:#fff;border-radius:20px;margin-bottom:12px;cursor:pointer;box-shadow:0 8px 24px rgba(220,38,38,.25)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div>
+          <div style="font-size:11px;opacity:.85;font-weight:700">⚰️ صندوق الوفاة — الرصيد الفعلي</div>
+        </div>
+        <div style="font-size:32px">⚰️</div>
+      </div>
+      <div style="font-size:32px;font-weight:800;line-height:1.1">${fmtNum(death.balance)}</div>
+      <div style="font-size:11px;opacity:.85;margin-top:2px">ل.س</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px">
+        <div style="background:rgba(255,255,255,.15);padding:6px;border-radius:8px;text-align:center">
+          <div style="font-size:11px;opacity:.85">أقساط</div>
+          <div style="font-size:13px;font-weight:800">${fmtShort(death.collected)}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);padding:6px;border-radius:8px;text-align:center">
+          <div style="font-size:11px;opacity:.85">تعويضات</div>
+          <div style="font-size:13px;font-weight:800">${fmtShort(death.compensations)}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);padding:6px;border-radius:8px;text-align:center">
+          <div style="font-size:11px;opacity:.85">افتتاحي</div>
+          <div style="font-size:13px;font-weight:800">${fmtShort(death.opening)}</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:10px;font-size:11px;opacity:.85">👆 اضغط للتفاصيل والسنوات</div>
+    </div>
+
+    <!-- 💚 صندوق التبرعات -->
+    <div onclick="openFundLedgerSheet('donation')" style="padding:20px;background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border-radius:20px;margin-bottom:12px;cursor:pointer;box-shadow:0 8px 24px rgba(22,163,74,.25)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div>
+          <div style="font-size:11px;opacity:.85;font-weight:700">💚 صندوق التبرعات — الرصيد الفعلي</div>
+        </div>
+        <div style="font-size:32px">💚</div>
+      </div>
+      <div style="font-size:32px;font-weight:800;line-height:1.1">${fmtNum(donation.balance)}</div>
+      <div style="font-size:11px;opacity:.85;margin-top:2px">ل.س</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px">
+        <div style="background:rgba(255,255,255,.15);padding:6px;border-radius:8px;text-align:center">
+          <div style="font-size:11px;opacity:.85">تبرعات</div>
+          <div style="font-size:13px;font-weight:800">${fmtShort(donation.collected)}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);padding:6px;border-radius:8px;text-align:center">
+          <div style="font-size:11px;opacity:.85">مصروف</div>
+          <div style="font-size:13px;font-weight:800">${fmtShort(donation.expenses)}</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);padding:6px;border-radius:8px;text-align:center">
+          <div style="font-size:11px;opacity:.85">افتتاحي</div>
+          <div style="font-size:13px;font-weight:800">${fmtShort(donation.opening)}</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:10px;font-size:11px;opacity:.85">👆 اضغط للتفاصيل والسنوات</div>
+    </div>
+
+    <!-- 🚨 تنبيهات -->
+    ${(pendingDeliveries.length > 0 || recentDeaths > 0 || stats.late > 0) ? `
+      <div class="card" style="border-right:4px solid var(--warning);padding:12px">
+        <div style="font-weight:800;font-size:13px;margin-bottom:8px">🚨 يحتاج انتباهك</div>
+        <div style="display:grid;gap:6px">
+          ${stats.late > 0 ? `
+            <div onclick="S.filters.members='subscribed';go('pg-members')" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border-radius:10px;cursor:pointer">
+              <div style="font-size:20px">⚠️</div>
+              <div style="flex:1;font-size:13px;font-weight:700">${stats.late} متأخر — ${fmtShort(stats.lateTotal)} ل.س</div>
+              <div style="font-size:16px;color:var(--muted)">›</div>
+            </div>
+          ` : ''}
+          ${pendingDeliveries.length > 0 ? `
+            <div onclick="go('pg-collectors')" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border-radius:10px;cursor:pointer">
+              <div style="font-size:20px">⏳</div>
+              <div style="flex:1;font-size:13px;font-weight:700">${pendingDeliveries.length} تسليم معلّق — ${fmtShort(pendingAmt)} ل.س</div>
+              <div style="font-size:16px;color:var(--muted)">›</div>
+            </div>
+          ` : ''}
+          ${recentDeaths > 0 ? `
+            <div onclick="go('pg-deaths')" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border-radius:10px;cursor:pointer">
+              <div style="font-size:20px">⚰️</div>
+              <div style="flex:1;font-size:13px;font-weight:700">${recentDeaths} وفاة في ${y}</div>
+              <div style="font-size:16px;color:var(--muted)">›</div>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    ` : ''}
+
+    <!-- 🎯 ابدأ مهمة -->
+    <div class="card">
+      <div class="card-head"><h2>🎯 ابدأ مهمة</h2></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <button class="quick-btn" onclick="openFundPaymentForm('assoc', null)" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">💰</div>
+          <div class="lbl" style="font-size:10px">دفعة</div>
+        </button>
+        <button class="quick-btn death" onclick="openDeathSheet()" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">⚰️</div>
+          <div class="lbl" style="font-size:10px">وفاة</div>
+        </button>
+        <button class="quick-btn" onclick="openMemberSheet()" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">👤</div>
+          <div class="lbl" style="font-size:10px">عضو</div>
+        </button>
+        <button class="quick-btn" onclick="openIncomeSheetFor('assoc')" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">📥</div>
+          <div class="lbl" style="font-size:10px">إيراد</div>
+        </button>
+        <button class="quick-btn" onclick="openExpenseSheetFor('assoc')" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">💸</div>
+          <div class="lbl" style="font-size:10px">مصروف</div>
+        </button>
+        <button class="quick-btn" onclick="go('pg-inbox')" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">📬</div>
+          <div class="lbl" style="font-size:10px">استلام</div>
+        </button>
+        <button class="quick-btn donation" onclick="openFundPaymentForm('donation', null)" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">💚</div>
+          <div class="lbl" style="font-size:10px">تبرع</div>
+        </button>
+        <button class="quick-btn" onclick="openEditOpeningBalance()" style="padding:14px 6px;border-color:var(--warning)">
+          <div class="ico" style="font-size:24px">🏦</div>
+          <div class="lbl" style="font-size:10px">افتتاحي</div>
+        </button>
+        <button class="quick-btn" onclick="openSearchAllSheet()" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">🔍</div>
+          <div class="lbl" style="font-size:10px">بحث</div>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+/* 📊 دفتر صندوق واحد — تفاصيل كل السنوات */
+function openFundLedgerSheet(fund){
+  const data = getFundYears(fund);
+  const actual = getFundActual(fund);
+  
+  const name = fund === 'assoc' ? 'الجمعية' : fund === 'death' ? 'الوفاة' : 'التبرعات';
+  const icon = fund === 'assoc' ? '💰' : fund === 'death' ? '⚰️' : '💚';
+  const color = fund === 'assoc' ? 'var(--assoc)' : fund === 'death' ? 'var(--death)' : 'var(--donation)';
+  
+  const body = `
+    <div style="padding:16px;background:var(--${fund}-soft);border-radius:14px;margin-bottom:14px;text-align:center">
+      <div style="font-size:32px">${icon}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">الرصيد الفعلي الآن</div>
+      <div style="font-size:32px;font-weight:800;color:${color};margin-top:4px">${fmtNum(actual.balance)}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">ل.س</div>
+    </div>
+
+    <!-- تفصيل شامل -->
+    <div class="balance-block">
+      <div class="balance-row"><span class="lbl">🏦 رصيد افتتاحي (قبل 2025)</span><span class="val" style="color:var(--warning)">${fmtNum(actual.opening)}</span></div>
+      ${actual.opening === 0 ? `<div style="text-align:center;padding:6px;font-size:11px;color:var(--warning);background:#fef3c7;border-radius:6px;margin-top:4px">⚠️ لم يُدخل بعد — اضغط زر "🏦 افتتاحي"</div>` : ''}
+      <div class="balance-row"><span class="lbl">📥 ${fund === 'death' ? 'أقساط' : 'محصّل'}</span><span class="val green">+${fmtNum(actual.collected)}</span></div>
+      ${actual.incomes > 0 ? `<div class="balance-row"><span class="lbl">💚 إيرادات أخرى</span><span class="val green">+${fmtNum(actual.incomes)}</span></div>` : ''}
+      ${actual.expenses > 0 ? `<div class="balance-row"><span class="lbl">💸 مصاريف</span><span class="val red">-${fmtNum(actual.expenses)}</span></div>` : ''}
+      ${actual.compensations > 0 ? `<div class="balance-row"><span class="lbl">📤 تعويضات</span><span class="val red">-${fmtNum(actual.compensations)}</span></div>` : ''}
+      <div class="balance-row" style="border-top:2px solid ${color};padding-top:8px;margin-top:6px">
+        <span style="font-weight:800">💵 الرصيد الفعلي</span>
+        <span class="val" style="color:${color};font-size:16px">${fmtNum(actual.balance)}</span>
+      </div>
+    </div>
+
+    <!-- تفصيل السنوات -->
+    <div style="font-weight:800;font-size:14px;margin:16px 0 10px">📅 تفصيل السنوات</div>
+    
+    ${data.opening !== 0 ? `
+      <div style="padding:12px;background:var(--bg);border-radius:12px;margin-bottom:8px">
+        <div style="font-weight:800;font-size:13px;color:var(--warning)">🏦 رصيد افتتاحي (قبل 2025)</div>
+        <div style="font-size:18px;font-weight:800;color:var(--warning);margin-top:4px">${fmtNum(data.opening)}</div>
+      </div>
+    ` : ''}
+
+    ${data.years.length ? data.years.map(y => `
+      <div style="padding:12px;background:var(--bg);border-radius:12px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-weight:800;font-size:14px">📅 ${y.year}</div>
+          <div style="font-weight:800;color:${y.net >= 0 ? 'var(--success)' : 'var(--danger)'}">${y.net >= 0 ? '+' : ''}${fmtNum(y.net)}</div>
+        </div>
+        <div class="balance-row" style="font-size:11px"><span class="lbl">📥 محصّل</span><span class="val">${fmtNum(y.collected)}</span></div>
+        ${y.incomes > 0 ? `<div class="balance-row" style="font-size:11px"><span class="lbl">💚 إيرادات</span><span class="val">${fmtNum(y.incomes)}</span></div>` : ''}
+        ${y.expenses > 0 ? `<div class="balance-row" style="font-size:11px"><span class="lbl">💸 مصاريف</span><span class="val red">-${fmtNum(y.expenses)}</span></div>` : ''}
+        ${y.compensations > 0 ? `<div class="balance-row" style="font-size:11px"><span class="lbl">📤 تعويضات</span><span class="val red">-${fmtNum(y.compensations)}</span></div>` : ''}
+        <div class="balance-row" style="font-size:12px;font-weight:800;border-top:1px solid var(--border);padding-top:6px;margin-top:4px">
+          <span>الرصيد التراكمي</span>
+          <span style="color:${color}">${fmtNum(y.cumulative)}</span>
+        </div>
+      </div>
+    `).join('') : '<div style="text-align:center;padding:20px;color:var(--muted)">لا توجد حركات بعد</div>'}
+
+    <!-- أزرار -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+      <button class="btn success block" onclick="closeSheet();setTimeout(()=>openIncomeSheetFor('${fund}'),150)">➕ إيراد</button>
+      <button class="btn danger block" onclick="closeSheet();setTimeout(()=>openExpenseSheetFor('${fund}'),150)">➕ مصروف</button>
+    </div>
+  `;
+  
+  openSheet(icon + ' صندوق ' + name, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+/* 🏦 تعديل الرصيد الافتتاحي */
+function openEditOpeningBalance(){
+  const o = getOpeningBalance();
+  
+  const body = `
+    <div style="padding:12px;background:#fef3c7;border-radius:12px;margin-bottom:14px;font-size:12px;line-height:1.7;color:#92400e">
+      <b>🏦 الرصيد الافتتاحي</b><br>
+      الرصيد الموجود في الصندوق <b>قبل سنة 2025</b><br>
+      سيُضاف تلقائياً على الرصيد الفعلي
+    </div>
+    
+    <div class="fld">
+      <label>💰 صندوق الجمعية</label>
+      <div class="amount-input" style="border-color:var(--assoc)">
+        <input id="obAssoc" type="tel" inputmode="numeric" value="${o.assoc || 0}">
+        <span class="currency">ل.س</span>
+      </div>
+    </div>
+    
+    <div class="fld">
+      <label>⚰️ صندوق الوفاة</label>
+      <div class="amount-input" style="border-color:var(--death)">
+        <input id="obDeath" type="tel" inputmode="numeric" value="${o.death || 0}">
+        <span class="currency">ل.س</span>
+      </div>
+    </div>
+    
+    <div class="fld">
+      <label>💚 صندوق التبرعات</label>
+      <div class="amount-input" style="border-color:var(--donation)">
+        <input id="obDonation" type="tel" inputmode="numeric" value="${o.donation || 0}">
+        <span class="currency">ل.س</span>
+      </div>
+    </div>
+  `;
+  
+  const foot = `
+    <button class="btn ghost" onclick="closeSheet()">إلغاء</button>
+    <button class="btn primary" onclick="saveOpeningBalanceFromForm()">💾 حفظ</button>
+  `;
+  
+  openSheet('🏦 الرصيد الافتتاحي', body, foot);
+}
+
+async function saveOpeningBalanceFromForm(){
+  const data = {
+    assoc: Number($('obAssoc').value) || 0,
+    death: Number($('obDeath').value) || 0,
+    donation: Number($('obDonation').value) || 0
+  };
+  
+  try {
+    await saveOpeningBalance(data);
+    toast('✅ تم حفظ الرصيد الافتتاحي', 'success', 2500);
+    closeSheet();
+    go(S.page);
+  } catch(e){
+    toast('خطأ: ' + e.message, 'error');
+  }
+}
+
+/* ═══ نهاية الإصلاح 8 ═══ */
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 9 (محدث) — تصميم أنيق للصناديق
+   ═══════════════════════════════════════════════════════════════ */
+function renderFundCard(fund, data){
+  const name = fund === 'assoc' ? 'الجمعية' : fund === 'death' ? 'الوفاة' : 'التبرعات';
+  const icon = fund === 'assoc' ? '💰' : fund === 'death' ? '⚰️' : '💚';
+  const accent = fund === 'assoc' ? '#3b82f6' : fund === 'death' ? '#ef4444' : '#10b981';
+  const accentLight = fund === 'assoc' ? '#eff6ff' : fund === 'death' ? '#fef2f2' : '#ecfdf5';
+  
+  let details = '';
+  if(fund === 'assoc'){
+    details = `
+      <div style="display:flex;gap:14px;font-size:11px;justify-content:flex-end">
+        <span><span style="opacity:.6">📥</span> <b>${fmtShort(data.collected)}</b></span>
+        <span><span style="opacity:.6">💸</span> <b>${fmtShort(data.expenses)}</b></span>
+        <span><span style="opacity:.6">🏦</span> <b>${fmtShort(data.opening)}</b></span>
+      </div>
+    `;
+  } else if(fund === 'death'){
+    details = `
+      <div style="display:flex;gap:14px;font-size:11px;justify-content:flex-end">
+        <span><span style="opacity:.6">📥</span> <b>${fmtShort(data.collected)}</b></span>
+        <span><span style="opacity:.6">📤</span> <b>${fmtShort(data.compensations)}</b></span>
+        <span><span style="opacity:.6">🏦</span> <b>${fmtShort(data.opening)}</b></span>
+      </div>
+    `;
+  } else {
+    details = `
+      <div style="display:flex;gap:14px;font-size:11px;justify-content:flex-end">
+        <span><span style="opacity:.6">📥</span> <b>${fmtShort(data.collected)}</b></span>
+        <span><span style="opacity:.6">💸</span> <b>${fmtShort(data.expenses)}</b></span>
+        <span><span style="opacity:.6">🏦</span> <b>${fmtShort(data.opening)}</b></span>
+      </div>
+    `;
+  }
+  
+  return `
+    <div onclick="openFundLedgerSheet('${fund}')" style="
+      background:#ffffff;
+      border-radius:14px;
+      padding:14px 16px;
+      margin-bottom:10px;
+      cursor:pointer;
+      border:1.5px solid ${accent};
+      display:flex;
+      align-items:stretch;
+      gap:12px;
+      transition:transform .15s,box-shadow .15s;
+      box-shadow:0 1px 3px rgba(15,23,42,.04);
+    " onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform='scale(1)'">
+      
+      <!-- الأيقونة -->
+      <div style="
+        width:44px;height:44px;
+        background:${accentLight};
+        border-radius:12px;
+        display:flex;align-items:center;justify-content:center;
+        font-size:22px;flex-shrink:0;
+        align-self:center;
+      ">${icon}</div>
+      
+      <!-- المحتوى -->
+      <div style="flex:1;min-width:0;text-align:left">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="font-size:12px;font-weight:700;color:${accent}">${name}</div>
+          <div style="font-size:14px;color:#cbd5e1">›</div>
+        </div>
+        
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:8px;justify-content:flex-end;direction:rtl">
+          <span style="font-size:22px;font-weight:800;color:${accent};line-height:1;letter-spacing:-.5px">${fmtNum(data.balance)}</span>
+          <span style="font-size:10px;color:${accent};opacity:.7;font-weight:700">ل.س</span>
+        </div>
+        
+        <div style="color:#64748b;padding-top:8px;border-top:1px solid ${accentLight}">
+          ${details}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* 🏠 استبدال الشاشة الرئيسية للمدير — نسخة مضغوطة أنيقة */
+function renderHomeManager(){
+  const u = S.currentUser;
+  const y = S.currentYear;
+  const stats = getMembersStats(y);
+  
+  const assoc = getFundActual('assoc');
+  const death = getFundActual('death');
+  const donation = getFundActual('donation');
+  
+  const pendingDeliveries = S.deliveries.filter(d => !d.receivedAt && !d.rejectedAt);
+  const pendingAmt = pendingDeliveries.reduce((s,d) => s + (Number(d.amount)||0), 0);
+  const recentDeaths = S.deaths.filter(d => Number(d.year) === y).length;
+  
+  $('pg-home').innerHTML = `
+    <!-- 🏦 الصناديق — تصميم أنيق -->
+    <div style="margin-bottom:14px">
+      ${renderFundCard('assoc', assoc)}
+      ${renderFundCard('death', death)}
+      ${renderFundCard('donation', donation)}
+    </div>
+
+    <!-- 🚨 تنبيهات -->
+    ${(pendingDeliveries.length > 0 || recentDeaths > 0 || stats.late > 0) ? `
+      <div class="card" style="border-right:4px solid #f59e0b;padding:12px;margin-bottom:12px">
+        <div style="font-weight:800;font-size:13px;margin-bottom:8px;color:#475569">🚨 يحتاج انتباهك</div>
+        <div style="display:grid;gap:6px">
+          ${stats.late > 0 ? `
+            <div onclick="S.filters.members='subscribed';go('pg-members')" style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:10px;cursor:pointer">
+              <div style="font-size:18px">⚠️</div>
+              <div style="flex:1;font-size:13px;font-weight:700;color:#334155">${stats.late} متأخر — ${fmtShort(stats.lateTotal)} ل.س</div>
+              <div style="font-size:16px;color:#cbd5e1">›</div>
+            </div>
+          ` : ''}
+          ${pendingDeliveries.length > 0 ? `
+            <div onclick="go('pg-collectors')" style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:10px;cursor:pointer">
+              <div style="font-size:18px">⏳</div>
+              <div style="flex:1;font-size:13px;font-weight:700;color:#334155">${pendingDeliveries.length} تسليم معلّق — ${fmtShort(pendingAmt)} ل.س</div>
+              <div style="font-size:16px;color:#cbd5e1">›</div>
+            </div>
+          ` : ''}
+          ${recentDeaths > 0 ? `
+            <div onclick="go('pg-deaths')" style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:10px;cursor:pointer">
+              <div style="font-size:18px">⚰️</div>
+              <div style="flex:1;font-size:13px;font-weight:700;color:#334155">${recentDeaths} وفاة في ${y}</div>
+              <div style="font-size:16px;color:#cbd5e1">›</div>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    ` : `
+      <div class="card" style="border-right:4px solid #10b981;padding:12px;text-align:center;color:#065f46;font-weight:800;margin-bottom:12px">
+        ✅ كل شيء تحت السيطرة
+      </div>
+    `}
+
+    <!-- 🎯 ابدأ مهمة -->
+    <div class="card">
+      <div class="card-head"><h2>🎯 ابدأ مهمة</h2></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <button class="quick-btn" onclick="openFundPaymentForm('assoc', null)" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">💰</div>
+          <div class="lbl" style="font-size:10px">دفعة</div>
+        </button>
+        <button class="quick-btn death" onclick="openDeathSheet()" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">⚰️</div>
+          <div class="lbl" style="font-size:10px">وفاة</div>
+        </button>
+        <button class="quick-btn" onclick="openMemberSheet()" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">👤</div>
+          <div class="lbl" style="font-size:10px">عضو</div>
+        </button>
+        <button class="quick-btn" onclick="openIncomeSheetFor('assoc')" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">📥</div>
+          <div class="lbl" style="font-size:10px">إيراد</div>
+        </button>
+        <button class="quick-btn" onclick="openExpenseSheetFor('assoc')" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">💸</div>
+          <div class="lbl" style="font-size:10px">مصروف</div>
+        </button>
+        <button class="quick-btn" onclick="go('pg-inbox')" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">📬</div>
+          <div class="lbl" style="font-size:10px">استلام</div>
+        </button>
+        <button class="quick-btn donation" onclick="openFundPaymentForm('donation', null)" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">💚</div>
+          <div class="lbl" style="font-size:10px">تبرع</div>
+        </button>
+        <button class="quick-btn" onclick="openEditOpeningBalance()" style="padding:14px 6px;border-color:#f59e0b">
+          <div class="ico" style="font-size:24px">🏦</div>
+          <div class="lbl" style="font-size:10px">افتتاحي</div>
+        </button>
+        <button class="quick-btn" onclick="openSearchAllSheet()" style="padding:14px 6px">
+          <div class="ico" style="font-size:24px">🔍</div>
+          <div class="lbl" style="font-size:10px">بحث</div>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+/* ═══ نهاية الإصلاح 9 ═══ */
 </script>
+<script src="fixes.js"></script>
 </body>
 </html>
