@@ -726,7 +726,7 @@ main{max-width:900px;margin:0 auto;padding:12px}
    📌 [قسم 1] — النواة والثوابت
    ═══════════════════════════════════════════════════════════════ */
 
-const DB_NAME = 'zaoura_v7';
+const DB_NAME = 'zaoura_v8';
 const DB_VERSION = 1;
 const STORE_NAMES = [
   'members', 'payments', 'deaths', 'incomes', 'expenses',
@@ -1015,7 +1015,25 @@ function toast(msg, type = 'success', dur = 2800){
 }
 
 const showLoad = v => $('loader').classList.toggle('on', v);
-
+/* 📱 فتح واتساب في التطبيق الأصلي */
+function openWhatsApp(text){
+  const encoded = encodeURIComponent(text);
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  
+  if(isMobile){
+    // جرّب التطبيق مباشرة
+    const appUrl = `whatsapp://send?text=${encoded}`;
+    window.location.href = appUrl;
+    // احتياطي: لو التطبيق غير مثبت
+    setTimeout(() => {
+      if(!document.hidden){
+        window.open(`https://wa.me/?text=${encoded}`, '_blank');
+      }
+    }, 1500);
+  } else {
+    window.open(`https://wa.me/?text=${encoded}`, '_blank');
+  }
+}
 /* ═══ الأوراق (Sheets) ═══ */
 function openSheet(title, bodyHTML, footHTML = '', opts = {}){
   $('sheetTitle').textContent = title;
@@ -1374,26 +1392,40 @@ function getFundBalances(year){
 
 /* ✅ عهدة المستخدم (كم في يده) */
 function getUserCustody(userId, fund = 'all'){
-  let payments = S.payments.filter(p => p.collectorId === userId);
-  if(fund !== 'all') payments = payments.filter(p => p.fund === fund);
-
-  let deliveries = S.deliveries.filter(d => d.fromUserId === userId);
-  if(fund !== 'all') deliveries = deliveries.filter(d => d.fund === fund);
-
-  let received = S.deliveries.filter(d => d.toUserId === userId);
-  if(fund !== 'all') received = received.filter(d => d.fund === fund);
-
-  const collected = payments.reduce((s, p) =>
-    s + (Number(p.amount) || 0), 0);
-  const delivered = deliveries.reduce((s, d) =>
-    s + (Number(d.amount) || 0), 0);
-  const receivedSum = received.reduce((s, d) =>
-    s + (Number(d.amount) || 0), 0);
-
+  const user = S.users.find(u => u.id === userId);
+  const userName = user ? normAr(user.name) : '';
+  
+  // ⭐ مطابقة ذكية: ID أو الاسم
+  const matchName = (name) => {
+    if(!name || !userName) return false;
+    const n = normAr(name);
+    return n === userName || n.includes(userName) || userName.includes(n);
+  };
+  
+  let payments = S.payments.filter(p => 
+    p.collectorId === userId || (!p.collectorId && matchName(p.collectorName))
+  );
+  
+  let deliveries = S.deliveries.filter(d => 
+    d.fromUserId === userId || (!d.fromUserId && matchName(d.fromUserName))
+  );
+  
+  let received = S.deliveries.filter(d => 
+    d.toUserId === userId || (!d.toUserId && matchName(d.toUserName))
+  );
+  
+  if(fund !== 'all'){
+    payments = payments.filter(p => p.fund === fund);
+    deliveries = deliveries.filter(d => d.fund === fund);
+    received = received.filter(d => d.fund === fund);
+  }
+  
+  const collected = payments.reduce((s,p) => s + (Number(p.amount)||0), 0);
+  const delivered = deliveries.reduce((s,d) => s + (Number(d.amount)||0), 0);
+  const receivedSum = received.reduce((s,d) => s + (Number(d.amount)||0), 0);
+  
   return {
-    collected,
-    delivered,
-    received: receivedSum,
+    collected, delivered, received: receivedSum,
     balance: collected - delivered + receivedSum
   };
 }
@@ -1401,15 +1433,25 @@ function getUserCustody(userId, fund = 'all'){
 /* ✅ تفصيل عهدة المعتمد حسب الصندوق والسنة */
 function getCollectorBreakdown(userId, year){
   const y = year || S.currentYear;
+  const user = S.users.find(u => u.id === userId);
+  const userName = user ? normAr(user.name) : '';
+  
+  const matchName = (name) => {
+    if(!name || !userName) return false;
+    const n = normAr(name);
+    return n === userName || n.includes(userName) || userName.includes(n);
+  };
+  
   const myPayments = S.payments.filter(p =>
-    p.collectorId === userId &&
-    (Number(p.forYear) === y || Number(p.year) === y)
+    (Number(p.forYear) === y || Number(p.year) === y) &&
+    (p.collectorId === userId || (!p.collectorId && matchName(p.collectorName)))
   );
+  
   const myDeliveries = S.deliveries.filter(d =>
-    d.fromUserId === userId &&
-    new Date(d.date).getFullYear() === y
+    new Date(d.date).getFullYear() === y &&
+    (d.fromUserId === userId || (!d.fromUserId && matchName(d.fromUserName)))
   );
-
+  
   const byFund = fund => ({
     collected: myPayments
       .filter(p => p.fund === fund)
@@ -1418,11 +1460,11 @@ function getCollectorBreakdown(userId, year){
       .filter(d => d.fund === fund)
       .reduce((s, d) => s + (Number(d.amount) || 0), 0)
   });
-
+  
   const assoc = byFund('assoc');
   const death = byFund('death');
   const donation = byFund('donation');
-
+  
   return {
     year: y,
     assoc:    { ...assoc,    rem: assoc.collected - assoc.delivered },
@@ -4423,11 +4465,16 @@ function openFundReport(fund){
       ${fund === 'death' ? `<div class="balance-row"><span class="lbl">📤 التعويضات</span><span class="val red">-${fmtNum(d.compensations)}</span></div>` : ''}
     </div>
   `;
-  openSheet(fund === 'assoc' ? '💰 الجمعية' : '⚰️ الوفاة', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+  openSheet(fund === 'assoc' ? '?? الجمعية' : '⚰️ الوفاة', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
 }
 
 function openCustodyReportNew(){
-  const users = S.users.filter(u => ['collector','assocTreasurer','deathTreasurer'].includes(u.role));
+  const users = S.users.filter(u =>
+    ['collector','assocTreasurer','deathTreasurer','manager','president'].includes(u.role)
+  ).filter(u => {
+    const c = getUserCustody(u.id);
+    return c.collected > 0 || c.delivered > 0 || c.received > 0;
+  });
   const data = users.map(u => ({ u, c: getUserCustody(u.id) })).sort((a, b) => b.c.balance - a.c.balance);
   const total = data.reduce((s, x) => s + x.c.balance, 0);
 
@@ -6262,6 +6309,141 @@ function openSettingsSheet(){
 
   openSheet('⚙️ الإعدادات', btns.join(''), '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>');
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاحات النهائية — v7.1
+   ⚠️ لا تحذف هذا القسم
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 📱 فتح واتساب مباشرة في التطبيق */
+function openWhatsApp(text){
+  const encoded = encodeURIComponent(text);
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if(isMobile){
+    window.location.href = `whatsapp://send?text=${encoded}`;
+    setTimeout(() => {
+      if(!document.hidden){
+        window.open(`https://wa.me/?text=${encoded}`, '_blank');
+      }
+    }, 1500);
+  } else {
+    window.open(`https://wa.me/?text=${encoded}`, '_blank');
+  }
+}
+
+/* 📤 سجل التسليمات — النسخة الجديدة */
+function openDeliveriesArchive(){
+  const u = S.currentUser;
+  const list = [...S.deliveries]
+    .sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''))
+    .slice(0, 300);
+
+  const body = list.length ? `<div class="list">
+    ${list.map(d => {
+      const isPending = !d.receivedAt && !d.rejectedAt;
+      return `
+        <div class="item" onclick="openDeliveryDetail(${d.id})">
+          <div class="av ${d.fund === 'death' ? 'red' : 'blue'}">📤</div>
+          <div class="body">
+            <div class="ttl">${esc(d.fromUserName)} → ${esc(d.toUserName || '—')}</div>
+            <div class="sub">
+              ${fmtDate(d.date)} • ${d.fund === 'death' ? '⚰️ وفاة' : '💰 جمعية'}
+              ${d.receivedAt ? ' • ✅ مستلم' : isPending ? ' • ⏳ معلّق' : ''}
+            </div>
+          </div>
+          <div style="font-weight:800;color:var(--success);font-size:13px">${fmtNum(d.amount)}</div>
+          <span class="trail">›</span>
+        </div>
+      `;
+    }).join('')}
+  </div>` : '<div class="empty"><p>لا توجد تسليمات</p></div>';
+
+  openSheet('📤 سجل التسليمات', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+/* 📤 تفاصيل تسليم واحد */
+function openDeliveryDetail(id){
+  const d = S.deliveries.find(x => x.id === id);
+  if(!d) return;
+  
+  const u = S.currentUser;
+  const canEdit = (u.role === 'manager' || u.role === 'president' || d.fromUserId === u.id);
+  const canDelete = (u.role === 'manager') || (d.fromUserId === u.id && !d.receivedAt);
+  const canReverse = (u.role === 'manager' || u.role === 'president') && d.receivedAt;
+  
+  const body = `
+    <div style="padding:14px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px;text-align:center">
+      <div style="font-size:32px">📤</div>
+      <div style="font-weight:800;font-size:16px;margin-top:6px">${esc(d.fromUserName)} → ${esc(d.toUserName||'—')}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">${fmtDate(d.date)}</div>
+      ${d.receivedAt ? '<div class="badge success" style="margin-top:6px">✅ مستلم</div>' : '<div class="badge warning" style="margin-top:6px">⏳ معلّق</div>'}
+    </div>
+    
+    <div class="balance-block">
+      <div class="balance-row"><span class="lbl">💰 المبلغ</span><span class="val" style="color:var(--success)">${fmtNum(d.amount)} ل.س</span></div>
+      <div class="balance-row"><span class="lbl">📦 الصندوق</span><span class="val">${d.fund === 'assoc' ? '💰 جمعية' : d.fund === 'death' ? '⚰️ وفاة' : '💚 تبرع'}</span></div>
+      <div class="balance-row"><span class="lbl">👤 من</span><span class="val">${esc(d.fromUserName)}</span></div>
+      <div class="balance-row"><span class="lbl">👤 إلى</span><span class="val">${esc(d.toUserName||'—')}</span></div>
+      ${d.notes ? `<div class="balance-row"><span class="lbl">📝 ملاحظات</span><span class="val">${esc(d.notes)}</span></div>` : ''}
+      ${d.receivedAt ? `<div class="balance-row"><span class="lbl">🕐 استُلم</span><span class="val" style="font-size:11px">${new Date(d.receivedAt).toLocaleString('ar-EG')}</span></div>` : ''}
+    </div>
+    
+    ${canEdit || canDelete || canReverse ? `
+      <div style="display:grid;gap:8px;margin-top:14px">
+        ${canEdit ? `<button class="btn warning block" onclick="editDeliveryAmount(${id})">✏️ تعديل المبلغ</button>` : ''}
+        ${canReverse ? `<button class="btn info block" onclick="reverseDelivery(${id})">↩️ عكس الاستلام</button>` : ''}
+        ${canDelete ? `<button class="btn danger block" onclick="deleteDeliveryRecord(${id})">🗑️ حذف نهائي</button>` : ''}
+      </div>
+    ` : ''}
+  `;
+  
+  openSheet('📤 تفاصيل التسليم', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+async function editDeliveryAmount(id){
+  const d = S.deliveries.find(x => x.id === id);
+  if(!d) return;
+  const newAmount = prompt('المبلغ الجديد:', d.amount);
+  if(newAmount === null) return;
+  const n = Number(newAmount);
+  if(isNaN(n) || n <= 0){ toast('قيمة غير صحيحة', 'error'); return; }
+  d.amount = n;
+  d.editedAt = new Date().toISOString();
+  d.editedBy = S.currentUser.name;
+  await dbPut('deliveries', d);
+  CACHE.invalidateAll();
+  toast('✅ تم التعديل');
+  closeSheet();
+  setTimeout(() => go(S.page), 200);
+}
+
+async function reverseDelivery(id){
+  if(!confirm('عكس الاستلام؟ التسليم سيعود معلّقاً.')) return;
+  const d = S.deliveries.find(x => x.id === id);
+  if(!d) return;
+  delete d.receivedAt;
+  delete d.receivedBy;
+  d.reversedAt = new Date().toISOString();
+  d.reversedBy = S.currentUser.name;
+  await dbPut('deliveries', d);
+  CACHE.invalidateAll();
+  toast('↩️ تم العكس');
+  closeSheet();
+  setTimeout(() => go(S.page), 200);
+}
+
+async function deleteDeliveryRecord(id){
+  if(!confirm('⚠️ حذف التسليم نهائياً؟')) return;
+  if(!confirm('تأكيد أخير!')) return;
+  await dbDel('deliveries', id);
+  S.deliveries = S.deliveries.filter(x => x.id !== id);
+  CACHE.invalidateAll();
+  toast('🗑️ تم الحذف');
+  closeSheet();
+  setTimeout(() => go(S.page), 200);
+}
+
+/* ═══ نهاية الإصلاحات ═══ */
 
 </script>
 </body>
