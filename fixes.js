@@ -1,34 +1,28 @@
-/* ═══════════════════════════════════════════════════════════════
-   🔧 fixes.js — الإصلاحات والميزات الجديدة
-   📅 التحديث: 2026-09-19
-   ═══════════════════════════════════════════════════════════════
-   
-   📌 ملاحظات مهمة:
-   • هذا الملف يُحمَّل تلقائياً بعد zaoura_fund.html
-   • كل إصلاح/ميزة جديدة توضع هنا — لا في الملف الرئيسي
-   • يجب أن يبدأ بعد تحميل التطبيق (DOMContentLoaded)
-   
-   ═══════════════════════════════════════════════════════════════ */
+/* fixes.js — اختبار مرئي */
 
 (function(){
   'use strict';
   
-  console.log('🔧 fixes.js — محمّل بنجاح');
-  
-  // ⏳ انتظر تحميل التطبيق الأساسي
-  function waitForApp(callback){
-    if(typeof S !== 'undefined' && S.currentUser !== undefined){
-      callback();
+  // انتظر تحميل التطبيق
+  function waitForBody(){
+    if(document.body){
+      var banner = document.createElement('div');
+      banner.style.cssText = 
+        'position:fixed;top:70px;right:10px;z-index:99999;' +
+        'background:#10b981;color:#fff;padding:12px 18px;' +
+        'border-radius:12px;font-size:14px;font-weight:800;' +
+        'box-shadow:0 4px 16px rgba(0,0,0,.3);' +
+        'font-family:system-ui;';
+      banner.textContent = '✅ fixes.js يعمل';
+      document.body.appendChild(banner);
+      
+      // أخفِ الشارة بعد 6 ثوان
+      setTimeout(function(){ banner.remove(); }, 6000);
     } else {
-      setTimeout(() => waitForApp(callback), 100);
+      setTimeout(waitForBody, 100);
     }
   }
   
-  waitForApp(function(){
-    console.log('✅ fixes.js — متصل بالتطبيق');
-    // ⭐ كل الإصلاحات ستُضاف هنا
-  });
+  waitForBody();
   
 })();
-
-/* ═══ نهاية fixes.js ═══ */
