@@ -6677,6 +6677,258 @@ openUsersSheetNew = function(){
 };
 
 /* ═══ نهاية الإصلاح 3 ═══ */
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 4 — إرجاع getUserCustody + getCollectorBreakdown
+   ⚠️ لا تحذف هذا القسم
+   ═══════════════════════════════════════════════════════════════ */
+
+function getUserCustody(userId, fund){
+  fund = fund || 'all';
+  const user = S.users.find(u => u.id === userId);
+  const userName = user ? normAr(user.name) : '';
+  
+  const matchName = function(name){
+    if(!name || !userName) return false;
+    const n = normAr(name);
+    return n === userName || n.includes(userName) || userName.includes(n);
+  };
+  
+  var payments = S.payments.filter(function(p){
+    return p.collectorId === userId || (!p.collectorId && matchName(p.collectorName));
+  });
+  
+  var delivered = S.deliveries.filter(function(d){
+    return (d.fromUserId === userId || (!d.fromUserId && matchName(d.fromUserName))) && d.receivedAt;
+  });
+  
+  var pending = S.deliveries.filter(function(d){
+    return (d.fromUserId === userId || (!d.fromUserId && matchName(d.fromUserName))) && !d.receivedAt && !d.rejectedAt;
+  });
+  
+  var received = S.deliveries.filter(function(d){
+    return (d.toUserId === userId || (!d.toUserId && matchName(d.toUserName))) && d.receivedAt;
+  });
+  
+  if(fund !== 'all'){
+    payments = payments.filter(function(p){ return p.fund === fund; });
+    delivered = delivered.filter(function(d){ return d.fund === fund; });
+    pending = pending.filter(function(d){ return d.fund === fund; });
+    received = received.filter(function(d){ return d.fund === fund; });
+  }
+  
+  var collected = payments.reduce(function(s,p){ return s + (Number(p.amount)||0); }, 0);
+  var deliveredSum = delivered.reduce(function(s,d){ return s + (Number(d.amount)||0); }, 0);
+  var pendingSum = pending.reduce(function(s,d){ return s + (Number(d.amount)||0); }, 0);
+  var receivedSum = received.reduce(function(s,d){ return s + (Number(d.amount)||0); }, 0);
+  
+  return {
+    collected: collected,
+    delivered: deliveredSum,
+    pending: pendingSum,
+    received: receivedSum,
+    balance: collected - deliveredSum + receivedSum
+  };
+}
+
+function getCollectorBreakdown(userId, year){
+  var y = year || S.currentYear;
+  const user = S.users.find(u => u.id === userId);
+  const userName = user ? normAr(user.name) : '';
+  
+  const matchName = function(name){
+    if(!name || !userName) return false;
+    const n = normAr(name);
+    return n === userName || n.includes(userName) || userName.includes(n);
+  };
+  
+  var myPayments = S.payments.filter(function(p){
+    return (Number(p.forYear) === y || Number(p.year) === y) &&
+           (p.collectorId === userId || (!p.collectorId && matchName(p.collectorName)));
+  });
+  
+  var myDeliveries = S.deliveries.filter(function(d){
+    return new Date(d.date).getFullYear() === y &&
+           (d.fromUserId === userId || (!d.fromUserId && matchName(d.fromUserName)));
+  });
+  
+  var byFund = function(fund){
+    var collected = myPayments.filter(function(p){ return p.fund === fund; })
+      .reduce(function(s,p){ return s + (Number(p.amount)||0); }, 0);
+    var delivered = myDeliveries.filter(function(d){ return d.fund === fund && d.receivedAt; })
+      .reduce(function(s,d){ return s + (Number(d.amount)||0); }, 0);
+    var pending = myDeliveries.filter(function(d){ return d.fund === fund && !d.receivedAt && !d.rejectedAt; })
+      .reduce(function(s,d){ return s + (Number(d.amount)||0); }, 0);
+    return { collected: collected, delivered: delivered, pending: pending, rem: collected - delivered };
+  };
+  
+  var assoc = byFund('assoc');
+  var death = byFund('death');
+  var donation = byFund('donation');
+  
+  return {
+    year: y,
+    assoc: assoc,
+    death: death,
+    donation: donation,
+    total: {
+      collected: assoc.collected + death.collected + donation.collected,
+      delivered: assoc.delivered + death.delivered + donation.delivered,
+      pending: assoc.pending + death.pending + donation.pending,
+      rem: (assoc.collected + death.collected + donation.collected) -
+           (assoc.delivered + death.delivered + donation.delivered)
+    }
+  };
+}
+
+/* ═══ نهاية الإصلاح 4 ═══ */
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 5 — رسائل واتساب للتسليمات (المعتمد + الأمين)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ⭐ نسخة جديدة من receiveDelivery — مع رسالة للأمين */
+async function receiveDelivery(id){
+  const d = S.deliveries.find(x => x.id === id);
+  if(!d){ toast('التسليم غير موجود', 'error'); return; }
+  
+  if(!confirm(`استلام ${fmtNum(d.amount)} ل.س من ${d.fromUserName}؟`)) return;
+  
+  try {
+    d.toUserId = S.currentUser.id;
+    d.toUserName = S.currentUser.name;
+    d.receivedAt = new Date().toISOString();
+    d.receivedBy = S.currentUser.name;
+    await dbPut('deliveries', d);
+    CACHE.invalidateAll();
+    
+    // 📱 رسالة تأكيد تلقائية للمعتمد
+    const fundLabel = d.fund === 'assoc' ? '💰 الجمعية' : d.fund === 'death' ? '⚰️ الوفاة' : '💚 التبرعات';
+    const confirmationMsg = 
+      `✅ *تأكيد استلام*\n\n` +
+      `الأخ ${d.fromUserName}،\n` +
+      `تم استلام تسليمكم بنجاح.\n\n` +
+      `📦 *التفاصيل:*\n` +
+      `• الصندوق: ${fundLabel}\n` +
+      `• المبلغ: ${fmtNum(d.amount)} ل.س\n` +
+      `• التاريخ: ${fmtDate(d.receivedAt)}\n` +
+      `• المستلم: ${S.currentUser.name}\n\n` +
+      `شكراً لجهودكم 🌹\n` +
+      `_صندوق زعورة_`;
+    
+    // ابحث عن رقم جوال المعتمد
+    const collector = S.users.find(u => 
+      u.id === d.fromUserId || 
+      (u.name && normAr(u.name) === normAr(d.fromUserName))
+    );
+    
+    toast('✅ تم الاستلام', 'success', 2500);
+    closeSheet();
+    
+    // اعرض خيار إرسال الرسالة
+    setTimeout(() => {
+      if(collector && collector.phone){
+        if(confirm(`📱 إرسال رسالة تأكيد للأخ ${d.fromUserName}؟`)){
+          const phone = collector.phone.replace(/^0/,'').replace(/^\+963/,'');
+          const url = `https://wa.me/963${phone}?text=${encodeURIComponent(confirmationMsg)}`;
+          if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
+            window.location.href = `whatsapp://send?phone=963${phone}&text=${encodeURIComponent(confirmationMsg)}`;
+          } else {
+            window.open(url, '_blank');
+          }
+        }
+      } else {
+        // لا يوجد رقم — انسخ الرسالة
+        if(confirm('📱 لا يوجد رقم مسجل للمعتمد. نسخ الرسالة للحافظة؟')){
+          navigator.clipboard.writeText(confirmationMsg).then(() => {
+            toast('📋 تم نسخ الرسالة', 'success', 2000);
+          });
+        }
+      }
+      go(S.page);
+    }, 400);
+    
+    renderInbox();
+  } catch(e){
+    toast('خطأ: ' + e.message, 'error');
+  }
+}
+
+/* ⭐ نسخة جديدة من saveDeliveryNew — مع رسالة تلقائية للمعتمد */
+async function saveDeliveryNew(){
+  const u = S.currentUser;
+  const fund = $('delFund').value;
+  const toUserId = Number($('delTo').value);
+  const amount = Number($('delAmount').value);
+  const notes = cleanText($('delNotes').value);
+
+  if(!fund){ toast('اختر الصندوق', 'error'); return; }
+  if(!toUserId){ toast('اختر المستلم', 'error'); return; }
+  if(!amount || amount <= 0){ toast('المبلغ مطلوب', 'error'); return; }
+
+  const toUser = S.users.find(x => x.id === toUserId);
+  if(!toUser) return;
+
+  try {
+    const delivery = {
+      fromUserId: u.id,
+      fromUserName: u.name,
+      toUserId: toUserId,
+      toUserName: toUser.name,
+      fund: fund,
+      amount: amount,
+      notes: notes,
+      date: today(),
+      createdAt: new Date().toISOString()
+    };
+    const id = await dbPut('deliveries', delivery);
+    delivery.id = id;
+    S.deliveries.push(delivery);
+
+    CACHE.invalidateAll();
+    await logAudit('add', 'delivery', id, { amount: amount, to: toUser.name, fund: fund });
+
+    // 📱 رسالة للمعتمد لتوثيق التسليم
+    const fundLabel = fund === 'assoc' ? '💰 الجمعية' : fund === 'death' ? '⚰️ الوفاة' : '💚 التبرعات';
+    const message = 
+      `📤 *توثيق تسليم*\n\n` +
+      `إلى: ${toUser.name}\n` +
+      `📦 الصندوق: ${fundLabel}\n` +
+      `💰 المبلغ: ${fmtNum(amount)} ل.س\n` +
+      `📅 التاريخ: ${fmtDate(delivery.date)}\n` +
+      `👤 من: ${u.name}\n` +
+      (notes ? `📝 ملاحظات: ${notes}\n` : '') +
+      `\n_صندوق زعورة_`;
+
+    toast('📤 تم التسجيل', 'success', 2500);
+    closeSheet();
+
+    // اطلب من المعتمد إرسال الرسالة للأمين
+    setTimeout(() => {
+      if(toUser.phone){
+        const phone = toUser.phone.replace(/^0/,'').replace(/^\+963/,'');
+        if(confirm(`📱 إرسال توثيق التسليم للأمين؟`)){
+          if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
+            window.location.href = `whatsapp://send?phone=963${phone}&text=${encodeURIComponent(message)}`;
+          } else {
+            window.open(`https://wa.me/963${phone}?text=${encodeURIComponent(message)}`, '_blank');
+          }
+        }
+      } else {
+        if(confirm('📱 لا يوجد رقم للأمين. نسخ الرسالة؟')){
+          navigator.clipboard.writeText(message).then(() => {
+            toast('📋 تم النسخ', 'success', 2000);
+          });
+        }
+      }
+      go(S.page);
+    }, 400);
+  } catch(e){
+    toast('خطأ: ' + e.message, 'error');
+  }
+}
+
+/* ═══ نهاية الإصلاح 5 ═══ */
 </script>
 </body>
 </html>
