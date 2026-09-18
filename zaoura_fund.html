@@ -1391,46 +1391,6 @@ function getFundBalances(year){
 }
 
 /* ✅ عهدة المستخدم (كم في يده) */
-function getUserCustody(userId, fund = 'all'){
-  const user = S.users.find(u => u.id === userId);
-  const userName = user ? normAr(user.name) : '';
-  
-  // ⭐ مطابقة ذكية: ID أو الاسم
-  const matchName = (name) => {
-    if(!name || !userName) return false;
-    const n = normAr(name);
-    return n === userName || n.includes(userName) || userName.includes(n);
-  };
-  
-  let payments = S.payments.filter(p => 
-    p.collectorId === userId || (!p.collectorId && matchName(p.collectorName))
-  );
-  
-  let deliveries = S.deliveries.filter(d => 
-    d.fromUserId === userId || (!d.fromUserId && matchName(d.fromUserName))
-  );
-  
-  let received = S.deliveries.filter(d => 
-    d.toUserId === userId || (!d.toUserId && matchName(d.toUserName))
-  );
-  
-  if(fund !== 'all'){
-    payments = payments.filter(p => p.fund === fund);
-    deliveries = deliveries.filter(d => d.fund === fund);
-    received = received.filter(d => d.fund === fund);
-  }
-  
-  const collected = payments.reduce((s,p) => s + (Number(p.amount)||0), 0);
-  const delivered = deliveries.reduce((s,d) => s + (Number(d.amount)||0), 0);
-  const receivedSum = received.reduce((s,d) => s + (Number(d.amount)||0), 0);
-  
-  return {
-    collected, delivered, received: receivedSum,
-    balance: collected - delivered + receivedSum
-  };
-}
-
-/* ✅ تفصيل عهدة المعتمد حسب الصندوق والسنة */
 function getCollectorBreakdown(userId, year){
   const y = year || S.currentYear;
   const user = S.users.find(u => u.id === userId);
@@ -1452,14 +1412,19 @@ function getCollectorBreakdown(userId, year){
     (d.fromUserId === userId || (!d.fromUserId && matchName(d.fromUserName)))
   );
   
-  const byFund = fund => ({
-    collected: myPayments
+  const byFund = fund => {
+    const collected = myPayments
       .filter(p => p.fund === fund)
-      .reduce((s, p) => s + (Number(p.amount) || 0), 0),
-    delivered: myDeliveries
-      .filter(d => d.fund === fund)
-      .reduce((s, d) => s + (Number(d.amount) || 0), 0)
-  });
+      .reduce((s,p) => s + (Number(p.amount)||0), 0);
+    const delivered = myDeliveries
+      .filter(d => d.fund === fund && d.receivedAt)
+      .reduce((s,d) => s + (Number(d.amount)||0), 0);
+    const pending = myDeliveries
+      .filter(d => d.fund === fund && !d.receivedAt && !d.rejectedAt)
+      .reduce((s,d) => s + (Number(d.amount)||0), 0);
+    
+    return { collected, delivered, pending, rem: collected - delivered };
+  };
   
   const assoc = byFund('assoc');
   const death = byFund('death');
@@ -1473,6 +1438,7 @@ function getCollectorBreakdown(userId, year){
     total: {
       collected: assoc.collected + death.collected + donation.collected,
       delivered: assoc.delivered + death.delivered + donation.delivered,
+      pending:   assoc.pending   + death.pending   + donation.pending,
       rem: (assoc.collected + death.collected + donation.collected) -
            (assoc.delivered + death.delivered + donation.delivered)
     }
@@ -6445,6 +6411,272 @@ async function deleteDeliveryRecord(id){
 
 /* ═══ نهاية الإصلاحات ═══ */
 
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 2 — إضافة الأرشيف والوصول السريع
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 📚 صفحة الأرشيف الكاملة */
+function renderArchivePage(){
+  $('pg-archive').innerHTML = `
+    <div class="card">
+      <div class="card-head"><h2>📚 الأرشيف</h2></div>
+      <div style="display:grid;gap:10px">
+        <button class="btn info block lg" onclick="openAuditSheetNew()">
+          📜 سجل التدقيق
+        </button>
+        <button class="btn success block lg" onclick="openDeliveriesArchive()">
+          📤 سجل التسليمات الكامل
+        </button>
+        <button class="btn warning block lg" onclick="openDeathsArchive()">
+          ⚰️ سجل الوفيات الكامل
+        </button>
+        <button class="btn primary block lg" onclick="openAllPaymentsArchive()">
+          💰 سجل جميع الدفعات
+        </button>
+        <button class="btn ghost block lg" onclick="openAllExpensesArchive()">
+          💸 سجل جميع المصاريف
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+/* 💰 كل الدفعات */
+function openAllPaymentsArchive(){
+  const list = [...S.payments]
+    .sort((a,b) => (b.date||'').localeCompare(a.date||''))
+    .slice(0, 500);
+
+  const total = list.reduce((s,p) => s + (Number(p.amount)||0), 0);
+  const byFund = {
+    assoc: list.filter(p => p.fund === 'assoc').reduce((s,p) => s + (Number(p.amount)||0), 0),
+    death: list.filter(p => p.fund === 'death').reduce((s,p) => s + (Number(p.amount)||0), 0),
+    donation: list.filter(p => p.fund === 'donation').reduce((s,p) => s + (Number(p.amount)||0), 0)
+  };
+
+  const body = `
+    <div class="stats-scroll">
+      <div class="stat green"><div class="val">${fmtShort(total)}</div><div class="lbl">📊 الإجمالي</div></div>
+      <div class="stat assoc"><div class="val">${fmtShort(byFund.assoc)}</div><div class="lbl">💰 جمعية</div></div>
+      <div class="stat death"><div class="val">${fmtShort(byFund.death)}</div><div class="lbl">⚰️ وفاة</div></div>
+      <div class="stat donation"><div class="val">${fmtShort(byFund.donation)}</div><div class="lbl">💚 تبرعات</div></div>
+    </div>
+    ${list.length ? `<div class="list">${list.map(p => {
+      const m = p.memberId ? getMemberById(p.memberId) : null;
+      const isDeath = p.fund === 'death';
+      const isDon = p.fund === 'donation';
+      return `
+        <div class="item" style="cursor:default">
+          <div class="av ${isDeath ? 'red' : isDon ? 'green' : 'blue'}">${isDeath ? '⚰️' : isDon ? '💚' : '💰'}</div>
+          <div class="body">
+            <div class="ttl">${esc(m?.name || p.notes || 'دفعة')}</div>
+            <div class="sub">${fmtDate(p.date)} • سنة ${p.forYear || p.year} • ${esc(p.collectorName||'')}</div>
+          </div>
+          <div style="font-weight:800;color:var(--success)">${fmtNum(p.amount)}</div>
+        </div>
+      `;
+    }).join('')}</div>` : '<div class="empty"><p>لا توجد دفعات</p></div>'}
+  `;
+  openSheet('💰 كل الدفعات', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+/* 💸 كل المصاريف */
+function openAllExpensesArchive(){
+  const list = [...S.expenses]
+    .sort((a,b) => (b.date||'').localeCompare(a.date||''))
+    .slice(0, 500);
+
+  const total = list.reduce((s,e) => s + (Number(e.amount)||0), 0);
+
+  const body = `
+    <div style="text-align:center;padding:14px;background:#fef3c7;border-radius:12px;margin-bottom:14px">
+      <div style="font-size:11px;color:var(--muted)">إجمالي المصاريف</div>
+      <div style="font-size:26px;font-weight:800;color:var(--warning)">${fmtNum(total)}</div>
+    </div>
+    ${list.length ? `<div class="list">${list.map(e => `
+      <div class="item" style="cursor:default">
+        <div class="av red">💸</div>
+        <div class="body">
+          <div class="ttl">${esc(e.description)}</div>
+          <div class="sub">${fmtDate(e.date)} • ${esc(e.category||'')} • ${e.fund === 'death' ? '⚰️' : '💰'}</div>
+        </div>
+        <div style="font-weight:800;color:var(--danger)">-${fmtNum(e.amount)}</div>
+      </div>
+    `).join('')}</div>` : '<div class="empty"><p>لا توجد مصاريف</p></div>'}
+  `;
+  openSheet('💸 كل المصاريف', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+/* 🔧 إضافة زر الأرشيف في صفحة الإدارة */
+const _origRenderAdmin = renderAdminPage;
+renderAdminPage = function(){
+  _origRenderAdmin();
+  
+  // أضف قسم الأرشيف والوصول السريع
+  const adminCard = $('pg-admin').querySelector('.card');
+  if(!adminCard) return;
+  
+  const extraSection = document.createElement('div');
+  extraSection.className = 'card';
+  extraSection.style.cssText = 'margin-top:12px';
+  extraSection.innerHTML = `
+    <div class="card-head"><h2>📚 الأرشيف والوصول السريع</h2></div>
+    <div style="display:grid;gap:8px">
+      <button class="btn info block" onclick="go('pg-archive')">📚 الأرشيف الكامل</button>
+      <button class="btn success block" onclick="openDeliveriesArchive()">📤 سجل التسليمات</button>
+      <button class="btn warning block" onclick="openDeathsArchive()">⚰️ سجل الوفيات الكامل</button>
+      <button class="btn primary block" onclick="openAllPaymentsArchive()">💰 كل الدفعات</button>
+      <button class="btn ghost block" onclick="openAllExpensesArchive()">💸 كل المصاريف</button>
+    </div>
+  `;
+  $('pg-admin').appendChild(extraSection);
+};
+
+/* 🔧 إضافة تبويب الأرشيف للمدير في القائمة السفلية */
+const _origNavManager = NAV_BY_ROLE.manager;
+NAV_BY_ROLE.manager = [
+  { pg:'pg-home',     i:'🏠', l:'الرئيسية' },
+  { pg:'pg-members',  i:'👥', l:'الأعضاء' },
+  { pg:'pg-funds',    i:'💼', l:'الصناديق' },
+  { pg:'pg-reports',  i:'📊', l:'التقارير' },
+  { pg:'pg-archive',  i:'📚', l:'الأرشيف' },
+  { pg:'pg-admin',    i:'⚙️', l:'الإدارة' }
+];
+
+/* 🔧 تعديل القائمة — 6 أزرار تصير أضيق قليلاً */
+const _origBuildNav = buildBottomNav;
+buildBottomNav = function(){
+  _origBuildNav();
+  const u = S.currentUser;
+  if(u && u.role === 'manager'){
+    document.querySelectorAll('.bnav button').forEach(b => {
+      b.style.fontSize = '9px';
+      b.querySelector('.i').style.fontSize = '20px';
+    });
+  }
+};
+
+/* ═══ نهاية الإصلاح 2 ═══ */
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 3 — دخول المدير بحساب أي مستخدم
+   ═══════════════════════════════════════════════════════════════ */
+
+function impersonateUser(userId){
+  if(S.currentUser.role !== 'manager'){
+    toast('هذه الميزة للمدير فقط', 'error');
+    return;
+  }
+  
+  const target = S.users.find(u => u.id === userId);
+  if(!target){ toast('المستخدم غير موجود', 'error'); return; }
+  
+  if(!confirm(`🔑 الدخول بحساب "${target.name}"؟\n\nسترى التطبيق كما يراه هو تمامًا.`)) return;
+  
+  localStorage.setItem('zt_impersonator', JSON.stringify({
+    id: S.currentUser.id,
+    name: S.currentUser.name,
+    role: S.currentUser.role
+  }));
+  
+  S.currentUser = target;
+  localStorage.setItem('zt_user', JSON.stringify({
+    id: target.id, name: target.name, role: target.role
+  }));
+  
+  closeSheet();
+  toast(`🔑 أنت الآن "${target.name}"`, 'info', 3000);
+  
+  setTimeout(() => {
+    showMain();
+  }, 200);
+}
+
+function returnToManager(){
+  const saved = localStorage.getItem('zt_impersonator');
+  if(!saved){ toast('لا يوجد حساب محفوظ', 'error'); return; }
+  
+  const data = JSON.parse(saved);
+  const manager = S.users.find(u => u.id === data.id);
+  if(!manager){ toast('المدير غير موجود', 'error'); return; }
+  
+  S.currentUser = manager;
+  localStorage.setItem('zt_user', JSON.stringify({
+    id: manager.id, name: manager.name, role: manager.role
+  }));
+  localStorage.removeItem('zt_impersonator');
+  
+  toast('🔙 رجعت لحسابك', 'success', 2500);
+  setTimeout(() => showMain(), 200);
+}
+
+const _origShowMainImpersonate = showMain;
+showMain = function(){
+  _origShowMainImpersonate();
+  
+  const impersonator = localStorage.getItem('zt_impersonator');
+  const banner = document.getElementById('impersonateBanner');
+  
+  if(impersonator && !banner){
+    const data = JSON.parse(impersonator);
+    const div = document.createElement('div');
+    div.id = 'impersonateBanner';
+    div.style.cssText = `
+      position:fixed;top:0;left:0;right:0;z-index:99999;
+      background:linear-gradient(135deg,#dc2626,#991b1b);
+      color:#fff;padding:8px 14px;display:flex;
+      justify-content:space-between;align-items:center;
+      font-size:12px;font-weight:800;
+      box-shadow:0 4px 12px rgba(0,0,0,.3);
+    `;
+    div.innerHTML = `
+      <span>🔑 تتصفح كـ: <b>${esc(S.currentUser.name)}</b></span>
+      <button onclick="returnToManager()" style="
+        background:rgba(255,255,255,.25);
+        padding:6px 12px;border-radius:8px;
+        color:#fff;font-weight:800;font-size:11px;
+      ">🔙 رجوع للمدير</button>
+    `;
+    document.body.appendChild(div);
+    
+    const header = document.querySelector('.app-header');
+    if(header) header.style.marginTop = '36px';
+  }
+  
+  if(!impersonator && banner){
+    banner.remove();
+    const header = document.querySelector('.app-header');
+    if(header) header.style.marginTop = '0';
+  }
+};
+
+const _origOpenUsersImpersonate = openUsersSheetNew;
+openUsersSheetNew = function(){
+  _origOpenUsersImpersonate();
+  
+  if(S.currentUser.role !== 'manager') return;
+  
+  setTimeout(() => {
+    const items = document.querySelectorAll('#sheetBody .item');
+    items.forEach((item, idx) => {
+      const user = S.users[idx];
+      if(!user) return;
+      if(user.id === S.currentUser.id) return;
+      
+      const btn = document.createElement('button');
+      btn.className = 'btn info sm';
+      btn.style.cssText = 'margin-inline-start:4px;padding:4px 8px';
+      btn.textContent = '🔑';
+      btn.title = 'دخول مؤقت بهذا الحساب';
+      btn.onclick = (e) => { e.stopPropagation(); impersonateUser(user.id); };
+      
+      const editBtn = item.querySelector('.btn.ghost.sm');
+      if(editBtn) item.insertBefore(btn, editBtn);
+    });
+  }, 100);
+};
+
+/* ═══ نهاية الإصلاح 3 ═══ */
 </script>
 </body>
 </html>
