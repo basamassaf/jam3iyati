@@ -1,7 +1,5 @@
 <!doctype html>
-<div style="position:fixed;top:50px;left:10px;right:10px;background:red;color:white;padding:15px;z-index:999999;text-align:center;font-weight:bold;font-size:16px">
-  🟢 HTML يعمل — المشكلة في JavaScript
-</div>
+
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -1430,7 +1428,7 @@ main {
    📌 [القسم 1] — النواة والثوابت
    ═══════════════════════════════════════════════════════════════ */
 
-const DB_NAME = 'zaoura_v8';
+const DB_NAME = 'zaoura_v9';
 const DB_VERSION = 1;
 const STORE_NAMES = [
   'members', 'payments', 'deaths', 'incomes', 'expenses',
@@ -3060,6 +3058,217 @@ async function init(){
     toast('خطأ في التحميل: ' + e.message, 'error', 5000);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 34 — تعديل/حذف الدفعات
+   ═══════════════════════════════════════════════════════════════ */
+
+function openPaymentDetail(id){
+  const p = S.payments.find(x => x.id === id);
+  if(!p){ toast('الدفعة غير موجودة', 'error'); return; }
+  
+  const m = p.memberId ? getMemberById(p.memberId) : null;
+  const canEdit = hasPerm('payment.edit') || S.currentUser.role === 'manager';
+  
+  const fundLabel = p.fund === 'death' ? 'دفعة وفاة' : p.fund === 'donation' ? 'تبرع' : 'دفعة جمعية';
+  const fundIcon = p.fund === 'death' ? '⚰️' : p.fund === 'donation' ? '💚' : '💰';
+  
+  const body = `
+    <div style="padding:14px;background:var(--${p.fund}-soft);border-radius:12px;margin-bottom:14px;text-align:center">
+      <div style="font-size:32px">${fundIcon}</div>
+      <div style="font-weight:800;font-size:16px;margin-top:6px">${esc(m?.name || p.notes || 'دفعة')}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">${fundLabel}</div>
+    </div>
+    
+    <div class="balance-block">
+      ${p.receiptNumber ? `<div class="balance-row"><span class="lbl">🔢 رقم الوصل</span><span class="val" style="font-family:'SF Mono',monospace">${esc(p.receiptNumber)}</span></div>` : ''}
+      <div class="balance-row"><span class="lbl">💰 المبلغ</span><span class="val green">${fmtNum(p.amount)} ل.س</span></div>
+      <div class="balance-row"><span class="lbl">📅 التاريخ</span><span class="val">${fmtDate(p.date)}</span></div>
+      <div class="balance-row"><span class="lbl">📅 سنة الدفعة</span><span class="val">${p.forYear || p.year}</span></div>
+      <div class="balance-row"><span class="lbl">👤 المعتمد</span><span class="val">${esc(p.collectorName||'—')}</span></div>
+      ${p.notes ? `<div class="balance-row"><span class="lbl">📝 ملاحظات</span><span class="val">${esc(p.notes)}</span></div>` : ''}
+      ${p.imported ? `<div class="balance-row"><span class="lbl">📥 المصدر</span><span class="val">مستورد</span></div>` : ''}
+      ${p.editedAt ? `<div class="balance-row"><span class="lbl">✏️ عُدّلت</span><span class="val" style="font-size:11px">${fmtDateTime(p.editedAt)}</span></div>` : ''}
+    </div>
+    
+    ${canEdit ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+        ${p.memberId && m?.phone ? `<a class="btn success block" href="https://wa.me/963${m.phone.replace(/^0/,'')}?text=${encodeURIComponent('وصل رقم ' + (p.receiptNumber||'') + ': ' + fmtNum(p.amount) + ' ل.س')}" target="_blank" style="text-decoration:none">📱 إرسال وصل</a>` : ''}
+        <button class="btn info block" onclick="closeSheet();setTimeout(()=>printPaymentReceipt(${id}),150)">🖨️ طباعة</button>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <button class="btn warning block" onclick="closeSheet();setTimeout(()=>openPaymentEditSheet(${id}),150)">✏️ تعديل</button>
+        <button class="btn danger block" onclick="deletePaymentRecord(${id})">🗑️ حذف</button>
+      </div>
+    ` : ''}
+  `;
+  
+  openSheet('📄 تفاصيل الدفعة', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+function openPaymentEditSheet(id){
+  const p = S.payments.find(x => x.id === id);
+  if(!p) return;
+  const m = p.memberId ? getMemberById(p.memberId) : null;
+  
+  const body = `
+    <div style="padding:12px;background:var(--warning-soft);border-radius:12px;margin-bottom:14px;font-size:12px;color:#92400e">
+      ✏️ <b>تعديل الدفعة</b>${m ? ' لـ ' + esc(m.name) : ''}
+    </div>
+    
+    <div class="fld">
+      <label>💰 المبلغ <span class="req">*</span></label>
+      <div class="amount-input">
+        <input id="epAmount" type="tel" inputmode="numeric" value="${p.amount}">
+        <span class="currency">ل.س</span>
+      </div>
+    </div>
+    
+    <div class="fld-row">
+      <div class="fld"><label>التاريخ</label><input id="epDate" type="date" value="${p.date}"></div>
+      <div class="fld"><label>سنة الدفعة</label>
+        <select id="epForYear">${[2025,2026,2027,2028,2029].map(y => `<option value="${y}" ${y === (p.forYear || p.year) ? 'selected' : ''}>${y}</option>`).join('')}</select>
+      </div>
+    </div>
+    
+    <div class="fld"><label>ملاحظات</label><input id="epNotes" value="${esc(p.notes || '')}"></div>
+  `;
+  
+  const foot = `<button class="btn ghost" onclick="closeSheet();setTimeout(()=>openPaymentDetail(${id}),150)">رجوع</button><button class="btn primary" onclick="savePaymentEditNew(${id})">💾 حفظ</button>`;
+  openSheet('✏️ تعديل دفعة', body, foot, { wide: true, focus:'epAmount' });
+}
+
+async function savePaymentEditNew(id){
+  const amount = Number($('epAmount').value);
+  const date = $('epDate').value;
+  const forYear = Number($('epForYear').value);
+  const notes = cleanText($('epNotes').value);
+  
+  if(isNaN(amount) || amount < 0){ toast('المبلغ غير صحيح', 'error'); return; }
+  if(!date){ toast('التاريخ مطلوب', 'error'); return; }
+  
+  try {
+    const p = S.payments.find(x => x.id === id);
+    if(!p) return;
+    const old = { ...p };
+    
+    p.amount = amount; p.date = date; p.forYear = forYear; p.year = forYear; p.notes = notes;
+    p.editedBy = S.currentUser.name;
+    p.editedAt = new Date().toISOString();
+    
+    await dbPut('payments', p);
+    CACHE.invalidateAll();
+    if(p.memberId) CACHE.invalidateMember(p.memberId);
+    
+    await logAudit('update', 'payment', id, { old: { amount: old.amount }, new: { amount } });
+    
+    toast('✅ تم التعديل', 'success', 2500);
+    closeSheet();
+    go(S.page);
+  } catch(e){ toast('خطأ: ' + e.message, 'error'); }
+}
+
+async function deletePaymentRecord(id){
+  const p = S.payments.find(x => x.id === id);
+  if(!p) return;
+  const m = p.memberId ? getMemberById(p.memberId) : null;
+  
+  if(!confirm(`⚠️ حذف الدفعة؟\n\n${m ? m.name + ' — ' : ''}${fmtNum(p.amount)} ل.س`)) return;
+  if(!confirm('تأكيد أخير!')) return;
+  
+  try {
+    await dbDel('payments', id);
+    S.payments = S.payments.filter(x => x.id !== id);
+    CACHE.invalidateAll();
+    if(p.memberId) CACHE.invalidateMember(p.memberId);
+    
+    await logAudit('delete', 'payment', id, { amount: p.amount, memberId: p.memberId });
+    
+    toast('🗑️ تم الحذف', 'success', 2500);
+    closeSheet();
+    go(S.page);
+  } catch(e){ toast('خطأ: ' + e.message, 'error'); }
+}
+
+/* جعل قوائم الدفعات قابلة للنقر */
+const _origOpenMemberPaymentsList34 = openMemberPaymentsList;
+openMemberPaymentsList = function(memberId){
+  const m = getMemberById(memberId);
+  const list = S.payments.filter(p => p.memberId === memberId)
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  
+  const totalPaid = list.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  
+  const body = list.length ? `
+    <div style="padding:12px;background:var(--donation-soft);border-radius:10px;margin-bottom:12px;text-align:center">
+      <div style="font-size:11px;color:var(--muted)">إجمالي المدفوعات</div>
+      <div style="font-size:22px;font-weight:800;color:var(--success);font-family:'SF Mono',monospace">${fmtNum(totalPaid)}</div>
+      <div style="font-size:11px;color:var(--muted)">${list.length} دفعة</div>
+    </div>
+    <div class="list">
+      ${list.map(p => {
+        const fundIcon = p.fund === 'death' ? '⚰️' : p.fund === 'donation' ? '💚' : '💰';
+        const fundColor = p.fund === 'death' ? 'red' : p.fund === 'donation' ? 'green' : 'blue';
+        return `
+          <div class="item" onclick="closeSheet();setTimeout(()=>openPaymentDetail(${p.id}),150)">
+            <div class="av ${fundColor}">${fundIcon}</div>
+            <div class="body">
+              <div class="ttl">${fmtNum(p.amount)} ل.س</div>
+              <div class="sub">${p.fund === 'death' ? 'وفاة' : p.fund === 'donation' ? 'تبرع' : 'جمعية'} • ${fmtDate(p.date)} • سنة ${p.forYear || p.year}</div>
+            </div>
+            <span class="trail">›</span>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  ` : '<div class="empty"><p>لا توجد دفعات</p></div>';
+  
+  openSheet('📜 دفعات ' + m.name, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+};
+
+const _origOpenCollectorPaymentsList34 = openCollectorPaymentsList;
+openCollectorPaymentsList = function(key, year){
+  const y = year || S.currentYear;
+  let targetUser = null, targetName = '';
+  if(key.startsWith('id:')) targetUser = S.users.find(u => u.id === Number(key.slice(3)));
+  else targetName = key.slice(5);
+  
+  const payments = S.payments.filter(p => {
+    const py = Number(p.forYear) || Number(p.year);
+    if(py !== y) return false;
+    if(targetUser){
+      if(p.collectorId === targetUser.id) return true;
+      if(!p.collectorId && p.collectorName) return normAr(p.collectorName) === normAr(targetUser.name);
+      return false;
+    }
+    if(p.collectorId) return false;
+    return normAr(p.collectorName || '') === normAr(targetName);
+  }).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  
+  const body = payments.length ? `<div class="list">
+    ${payments.map(p => {
+      const m = p.memberId ? getMemberById(p.memberId) : null;
+      const fundIcon = p.fund === 'assoc' ? '💰' : p.fund === 'death' ? '⚰️' : '💚';
+      const fundColor = p.fund === 'assoc' ? 'blue' : p.fund === 'death' ? 'red' : 'green';
+      return `
+        <div class="item" onclick="closeSheet();setTimeout(()=>openPaymentDetail(${p.id}),150)">
+          <div class="av ${fundColor}">${fundIcon}</div>
+          <div class="body">
+            <div class="ttl">${esc(m?.name || p.notes || 'دفعة')}</div>
+            <div class="sub">${fmtDate(p.date)} • ${p.fund === 'assoc' ? 'جمعية' : p.fund === 'death' ? 'وفاة' : 'تبرع'}</div>
+          </div>
+          <div style="font-weight:800;color:var(--success);font-size:13px;font-family:'SF Mono',monospace">${fmtNum(p.amount)}</div>
+          <span class="trail">›</span>
+        </div>
+      `;
+    }).join('')}
+  </div>` : '<div class="empty"><p>لا توجد دفعات</p></div>';
+  
+  openSheet('📜 الدفعات — ' + payments.length, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+};
+
+/* ═══ نهاية الإصلاح 34 ═══ */
 
 document.addEventListener('DOMContentLoaded', init);
 
@@ -7099,7 +7308,7 @@ function renderAdminPage(){
   if(hasPerm('constants.manage')) btns.push(`<button class="btn warning block" style="margin-bottom:8px" onclick="openConstantsSheetNew()">📅 الثوابت السنوية</button>`);
   if(hasPerm('customfields.manage')) btns.push(`<button class="btn info block" style="margin-bottom:8px" onclick="openCustomFieldsSheetNew()">📌 الحقول المخصصة</button>`);
   if(hasPerm('import.excel')) btns.push(`<button class="btn success block" style="margin-bottom:8px" onclick="openImportSheetNew()">📥 استيراد Excel</button>`);
-  if(hasPerm('audit.view')) btns.push(`<button class="btn ghost block" style="margin-bottom:8px" onclick="openAuditSheet()">?? سجل التدقيق</button>`);
+  if(hasPerm('audit.view')) btns.push(`<button class="btn ghost block" style="margin-bottom:8px" onclick="openAuditSheet()">📜 سجل التدقيق</button>`);
   
   btns.push(`
     <div style="height:1px;background:var(--border);margin:16px 0"></div>
