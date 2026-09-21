@@ -1421,21 +1421,6 @@ main {
 
 <script>
 'use strict';
-// 🐛 كاشف الأخطاء — مؤقت للتشخيص
-window.onerror = function(msg, url, line, col, error){
-  var el = document.getElementById('jsErrBox');
-  if(!el){
-    el = document.createElement('div');
-    el.id = 'jsErrBox';
-    el.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;padding:15px;z-index:999999;font-family:monospace;font-size:12px;line-height:1.5;max-height:80vh;overflow:auto';
-    document.body.appendChild(el);
-  }
-  el.innerHTML = '❌ <b>خطأ JavaScript:</b><br><br>' + 
-                 '<b>الرسالة:</b> ' + msg + '<br><br>' + 
-                 '<b>السطر:</b> ' + line + '<br>' +
-                 '<b>العمود:</b> ' + col;
-  return false;
-};
 
 /* ═══════════════════════════════════════════════════════════════
    ⚠️ [نهاية الجزء 1] — لا تحفظ بعد
@@ -5738,17 +5723,6 @@ function openDeathSheet(){ toast('قريباً — الجزء 4', 'info'); }
    ⚠️ [نهاية الجزء 3] — لا تحفظ بعد
    ═══════════════════════════════════════════════════════════════ */
    
-   انتظر الأجزاء:
-   📦 الجزء 2: النواة + الحسابات + الدخول + التنبيهات
-   📦 الجزء 3: الأعضاء + الدفعات
-   📦 الجزء 4: الوفيات + المستودع + الاجتماعات + التسليمات
-   📦 الجزء 5: الصناديق + المحصلون + التقارير + الإدارة
-   
-   ═══════════════════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════════════════
-   ⚠️ [نهاية الجزء 3] — لا تحفظ بعد
-   ═══════════════════════════════════════════════════════════════ */
-   
 /* ═══════════════════════════════════════════════════════════════
    📌 [القسم 19] — الرئيسية (ديناميكية حسب الدور)
    ═══════════════════════════════════════════════════════════════ */
@@ -7125,7 +7099,7 @@ function renderAdminPage(){
   if(hasPerm('constants.manage')) btns.push(`<button class="btn warning block" style="margin-bottom:8px" onclick="openConstantsSheetNew()">📅 الثوابت السنوية</button>`);
   if(hasPerm('customfields.manage')) btns.push(`<button class="btn info block" style="margin-bottom:8px" onclick="openCustomFieldsSheetNew()">📌 الحقول المخصصة</button>`);
   if(hasPerm('import.excel')) btns.push(`<button class="btn success block" style="margin-bottom:8px" onclick="openImportSheetNew()">📥 استيراد Excel</button>`);
-  if(hasPerm('audit.view')) btns.push(`<button class="btn ghost block" style="margin-bottom:8px" onclick="openAuditSheet()">📜 سجل التدقيق</button>`);
+  if(hasPerm('audit.view')) btns.push(`<button class="btn ghost block" style="margin-bottom:8px" onclick="openAuditSheet()">?? سجل التدقيق</button>`);
   
   btns.push(`
     <div style="height:1px;background:var(--border);margin:16px 0"></div>
