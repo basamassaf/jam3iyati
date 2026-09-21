@@ -3060,83 +3060,59 @@ async function init(){
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   🛠️ الإصلاح 34 — تعديل/حذف الدفعات
+   🛠️ الإصلاح 34 — تعديل/حذف الدفعات (نسخة مصححة)
    ═══════════════════════════════════════════════════════════════ */
 
 function openPaymentDetail(id){
   const p = S.payments.find(x => x.id === id);
-  if(!p){ toast('الدفعة غير موجودة', 'error'); return; }
+  if(!p){ toast('غير موجودة', 'error'); return; }
   
   const m = p.memberId ? getMemberById(p.memberId) : null;
   const canEdit = hasPerm('payment.edit') || S.currentUser.role === 'manager';
-  
-  const fundLabel = p.fund === 'death' ? 'دفعة وفاة' : p.fund === 'donation' ? 'تبرع' : 'دفعة جمعية';
   const fundIcon = p.fund === 'death' ? '⚰️' : p.fund === 'donation' ? '💚' : '💰';
+  const fundName = p.fund === 'death' ? 'وفاة' : p.fund === 'donation' ? 'تبرع' : 'جمعية';
   
-  const body = `
-    <div style="padding:14px;background:var(--${p.fund}-soft);border-radius:12px;margin-bottom:14px;text-align:center">
-      <div style="font-size:32px">${fundIcon}</div>
-      <div style="font-weight:800;font-size:16px;margin-top:6px">${esc(m?.name || p.notes || 'دفعة')}</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:4px">${fundLabel}</div>
-    </div>
-    
-    <div class="balance-block">
-      ${p.receiptNumber ? `<div class="balance-row"><span class="lbl">🔢 رقم الوصل</span><span class="val" style="font-family:'SF Mono',monospace">${esc(p.receiptNumber)}</span></div>` : ''}
-      <div class="balance-row"><span class="lbl">💰 المبلغ</span><span class="val green">${fmtNum(p.amount)} ل.س</span></div>
-      <div class="balance-row"><span class="lbl">📅 التاريخ</span><span class="val">${fmtDate(p.date)}</span></div>
-      <div class="balance-row"><span class="lbl">📅 سنة الدفعة</span><span class="val">${p.forYear || p.year}</span></div>
-      <div class="balance-row"><span class="lbl">👤 المعتمد</span><span class="val">${esc(p.collectorName||'—')}</span></div>
-      ${p.notes ? `<div class="balance-row"><span class="lbl">📝 ملاحظات</span><span class="val">${esc(p.notes)}</span></div>` : ''}
-      ${p.imported ? `<div class="balance-row"><span class="lbl">📥 المصدر</span><span class="val">مستورد</span></div>` : ''}
-      ${p.editedAt ? `<div class="balance-row"><span class="lbl">✏️ عُدّلت</span><span class="val" style="font-size:11px">${fmtDateTime(p.editedAt)}</span></div>` : ''}
-    </div>
-    
-    ${canEdit ? `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
-        ${p.memberId && m?.phone ? `<a class="btn success block" href="https://wa.me/963${m.phone.replace(/^0/,'')}?text=${encodeURIComponent('وصل رقم ' + (p.receiptNumber||'') + ': ' + fmtNum(p.amount) + ' ل.س')}" target="_blank" style="text-decoration:none">📱 إرسال وصل</a>` : ''}
-        <button class="btn info block" onclick="closeSheet();setTimeout(()=>printPaymentReceipt(${id}),150)">🖨️ طباعة</button>
-      </div>
-      
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-        <button class="btn warning block" onclick="closeSheet();setTimeout(()=>openPaymentEditSheet(${id}),150)">✏️ تعديل</button>
-        <button class="btn danger block" onclick="deletePaymentRecord(${id})">🗑️ حذف</button>
-      </div>
-    ` : ''}
-  `;
+  let html = '<div style="padding:14px;background:var(--primary-soft);border-radius:12px;margin-bottom:14px;text-align:center">';
+  html += '<div style="font-size:32px">' + fundIcon + '</div>';
+  html += '<div style="font-weight:800;font-size:16px;margin-top:6px">' + esc(m ? m.name : (p.notes || 'دفعة')) + '</div>';
+  html += '<div style="font-size:12px;color:var(--muted);margin-top:4px">' + fundName + '</div></div>';
   
-  openSheet('📄 تفاصيل الدفعة', body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+  html += '<div class="balance-block">';
+  if(p.receiptNumber) html += '<div class="balance-row"><span class="lbl">🔢 رقم الوصل</span><span class="val">' + esc(p.receiptNumber) + '</span></div>';
+  html += '<div class="balance-row"><span class="lbl">💰 المبلغ</span><span class="val green">' + fmtNum(p.amount) + ' ل.س</span></div>';
+  html += '<div class="balance-row"><span class="lbl">📅 التاريخ</span><span class="val">' + fmtDate(p.date) + '</span></div>';
+  html += '<div class="balance-row"><span class="lbl">📅 السنة</span><span class="val">' + (p.forYear || p.year) + '</span></div>';
+  html += '<div class="balance-row"><span class="lbl">👤 المعتمد</span><span class="val">' + esc(p.collectorName || '—') + '</span></div>';
+  if(p.notes) html += '<div class="balance-row"><span class="lbl">📝 ملاحظات</span><span class="val">' + esc(p.notes) + '</span></div>';
+  html += '</div>';
+  
+  if(canEdit){
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">';
+    html += '<button class="btn warning block" onclick="closeSheet();setTimeout(function(){openPaymentEditSheet(' + id + ')},150)">✏️ تعديل</button>';
+    html += '<button class="btn danger block" onclick="deletePaymentRecord(' + id + ')">🗑️ حذف</button>';
+    html += '</div>';
+  }
+  
+  openSheet('📄 تفاصيل الدفعة', html, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
 }
 
 function openPaymentEditSheet(id){
   const p = S.payments.find(x => x.id === id);
   if(!p) return;
-  const m = p.memberId ? getMemberById(p.memberId) : null;
   
-  const body = `
-    <div style="padding:12px;background:var(--warning-soft);border-radius:12px;margin-bottom:14px;font-size:12px;color:#92400e">
-      ✏️ <b>تعديل الدفعة</b>${m ? ' لـ ' + esc(m.name) : ''}
-    </div>
-    
-    <div class="fld">
-      <label>💰 المبلغ <span class="req">*</span></label>
-      <div class="amount-input">
-        <input id="epAmount" type="tel" inputmode="numeric" value="${p.amount}">
-        <span class="currency">ل.س</span>
-      </div>
-    </div>
-    
-    <div class="fld-row">
-      <div class="fld"><label>التاريخ</label><input id="epDate" type="date" value="${p.date}"></div>
-      <div class="fld"><label>سنة الدفعة</label>
-        <select id="epForYear">${[2025,2026,2027,2028,2029].map(y => `<option value="${y}" ${y === (p.forYear || p.year) ? 'selected' : ''}>${y}</option>`).join('')}</select>
-      </div>
-    </div>
-    
-    <div class="fld"><label>ملاحظات</label><input id="epNotes" value="${esc(p.notes || '')}"></div>
-  `;
+  let html = '<div class="fld"><label>💰 المبلغ</label>';
+  html += '<div class="amount-input"><input id="epAmount" type="tel" inputmode="numeric" value="' + p.amount + '"><span class="currency">ل.س</span></div></div>';
+  html += '<div class="fld-row">';
+  html += '<div class="fld"><label>التاريخ</label><input id="epDate" type="date" value="' + p.date + '"></div>';
+  html += '<div class="fld"><label>السنة</label><select id="epForYear">';
+  [2025,2026,2027,2028,2029].forEach(function(y){
+    html += '<option value="' + y + '"' + (y === (p.forYear || p.year) ? ' selected' : '') + '>' + y + '</option>';
+  });
+  html += '</select></div></div>';
+  html += '<div class="fld"><label>ملاحظات</label><input id="epNotes" value="' + esc(p.notes || '') + '"></div>';
   
-  const foot = `<button class="btn ghost" onclick="closeSheet();setTimeout(()=>openPaymentDetail(${id}),150)">رجوع</button><button class="btn primary" onclick="savePaymentEditNew(${id})">💾 حفظ</button>`;
-  openSheet('✏️ تعديل دفعة', body, foot, { wide: true, focus:'epAmount' });
+  const foot = '<button class="btn ghost" onclick="closeSheet()">إلغاء</button><button class="btn primary" onclick="savePaymentEditNew(' + id + ')">💾 حفظ</button>';
+  openSheet('✏️ تعديل دفعة', html, foot, { wide: true });
 }
 
 async function savePaymentEditNew(id){
@@ -3151,17 +3127,17 @@ async function savePaymentEditNew(id){
   try {
     const p = S.payments.find(x => x.id === id);
     if(!p) return;
-    const old = { ...p };
-    
-    p.amount = amount; p.date = date; p.forYear = forYear; p.year = forYear; p.notes = notes;
-    p.editedBy = S.currentUser.name;
+    p.amount = amount;
+    p.date = date;
+    p.forYear = forYear;
+    p.year = forYear;
+    p.notes = notes;
     p.editedAt = new Date().toISOString();
+    p.editedBy = S.currentUser.name;
     
     await dbPut('payments', p);
     CACHE.invalidateAll();
     if(p.memberId) CACHE.invalidateMember(p.memberId);
-    
-    await logAudit('update', 'payment', id, { old: { amount: old.amount }, new: { amount } });
     
     toast('✅ تم التعديل', 'success', 2500);
     closeSheet();
@@ -3174,7 +3150,7 @@ async function deletePaymentRecord(id){
   if(!p) return;
   const m = p.memberId ? getMemberById(p.memberId) : null;
   
-  if(!confirm(`⚠️ حذف الدفعة؟\n\n${m ? m.name + ' — ' : ''}${fmtNum(p.amount)} ل.س`)) return;
+  if(!confirm('⚠️ حذف الدفعة؟\n\n' + (m ? m.name + ' — ' : '') + fmtNum(p.amount) + ' ل.س')) return;
   if(!confirm('تأكيد أخير!')) return;
   
   try {
@@ -3183,58 +3159,60 @@ async function deletePaymentRecord(id){
     CACHE.invalidateAll();
     if(p.memberId) CACHE.invalidateMember(p.memberId);
     
-    await logAudit('delete', 'payment', id, { amount: p.amount, memberId: p.memberId });
-    
     toast('🗑️ تم الحذف', 'success', 2500);
     closeSheet();
     go(S.page);
   } catch(e){ toast('خطأ: ' + e.message, 'error'); }
 }
 
-/* جعل قوائم الدفعات قابلة للنقر */
-const _origOpenMemberPaymentsList34 = openMemberPaymentsList;
+/* اجعل قوائم الدفعات قابلة للنقر */
+const _payListOrig = openMemberPaymentsList;
 openMemberPaymentsList = function(memberId){
   const m = getMemberById(memberId);
-  const list = S.payments.filter(p => p.memberId === memberId)
-    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  const list = S.payments.filter(p => p.memberId === memberId).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  const total = list.reduce((s,p) => s + (Number(p.amount)||0), 0);
   
-  const totalPaid = list.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  let html = '';
+  if(list.length){
+    html += '<div style="padding:12px;background:var(--donation-soft);border-radius:10px;margin-bottom:12px;text-align:center">';
+    html += '<div style="font-size:11px;color:var(--muted)">إجمالي المدفوع</div>';
+    html += '<div style="font-size:22px;font-weight:800;color:var(--success)">' + fmtNum(total) + '</div>';
+    html += '<div style="font-size:11px;color:var(--muted)">' + list.length + ' دفعة</div></div>';
+    html += '<div class="list">';
+    list.forEach(function(p){
+      const ic = p.fund === 'death' ? '⚰️' : p.fund === 'donation' ? '💚' : '💰';
+      const cl = p.fund === 'death' ? 'red' : p.fund === 'donation' ? 'green' : 'blue';
+      html += '<div class="item" onclick="closeSheet();setTimeout(function(){openPaymentDetail(' + p.id + ')},150)">';
+      html += '<div class="av ' + cl + '">' + ic + '</div>';
+      html += '<div class="body"><div class="ttl">' + fmtNum(p.amount) + ' ل.س</div>';
+      html += '<div class="sub">' + fmtDate(p.date) + ' • سنة ' + (p.forYear || p.year) + '</div></div>';
+      html += '<span class="trail">›</span></div>';
+    });
+    html += '</div>';
+  } else {
+    html = '<div class="empty"><p>لا توجد دفعات</p></div>';
+  }
   
-  const body = list.length ? `
-    <div style="padding:12px;background:var(--donation-soft);border-radius:10px;margin-bottom:12px;text-align:center">
-      <div style="font-size:11px;color:var(--muted)">إجمالي المدفوعات</div>
-      <div style="font-size:22px;font-weight:800;color:var(--success);font-family:'SF Mono',monospace">${fmtNum(totalPaid)}</div>
-      <div style="font-size:11px;color:var(--muted)">${list.length} دفعة</div>
-    </div>
-    <div class="list">
-      ${list.map(p => {
-        const fundIcon = p.fund === 'death' ? '⚰️' : p.fund === 'donation' ? '💚' : '💰';
-        const fundColor = p.fund === 'death' ? 'red' : p.fund === 'donation' ? 'green' : 'blue';
-        return `
-          <div class="item" onclick="closeSheet();setTimeout(()=>openPaymentDetail(${p.id}),150)">
-            <div class="av ${fundColor}">${fundIcon}</div>
-            <div class="body">
-              <div class="ttl">${fmtNum(p.amount)} ل.س</div>
-              <div class="sub">${p.fund === 'death' ? 'وفاة' : p.fund === 'donation' ? 'تبرع' : 'جمعية'} • ${fmtDate(p.date)} • سنة ${p.forYear || p.year}</div>
-            </div>
-            <span class="trail">›</span>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  ` : '<div class="empty"><p>لا توجد دفعات</p></div>';
-  
-  openSheet('📜 دفعات ' + m.name, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+  openSheet('📜 دفعات ' + m.name, html, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
 };
 
-const _origOpenCollectorPaymentsList34 = openCollectorPaymentsList;
-openCollectorPaymentsList = function(key, year){
+/* ═══ نهاية الإصلاح 34 ═══ */
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 35 — قوائم المحصّل (دفعات + تسليمات)
+   ═══════════════════════════════════════════════════════════════ */
+
+function openCollectorPaymentsList(key, year){
   const y = year || S.currentYear;
-  let targetUser = null, targetName = '';
-  if(key.startsWith('id:')) targetUser = S.users.find(u => u.id === Number(key.slice(3)));
-  else targetName = key.slice(5);
   
-  const payments = S.payments.filter(p => {
+  let targetUser = null, targetName = '';
+  if(key.indexOf('id:') === 0){
+    targetUser = S.users.find(function(u){ return u.id === Number(key.slice(3)); });
+  } else {
+    targetName = key.slice(5);
+  }
+  
+  const payments = S.payments.filter(function(p){
     const py = Number(p.forYear) || Number(p.year);
     if(py !== y) return false;
     if(targetUser){
@@ -3244,31 +3222,861 @@ openCollectorPaymentsList = function(key, year){
     }
     if(p.collectorId) return false;
     return normAr(p.collectorName || '') === normAr(targetName);
-  }).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  }).sort(function(a, b){ return (b.date || '').localeCompare(a.date || ''); });
   
-  const body = payments.length ? `<div class="list">
-    ${payments.map(p => {
+  const total = payments.reduce(function(s, p){ return s + (Number(p.amount) || 0); }, 0);
+  
+  let html = '';
+  if(payments.length){
+    html += '<div style="padding:12px;background:var(--donation-soft);border-radius:10px;margin-bottom:12px;text-align:center">';
+    html += '<div style="font-size:11px;color:var(--muted)">إجمالي الدفعات</div>';
+    html += '<div style="font-size:22px;font-weight:800;color:var(--success)">' + fmtNum(total) + '</div>';
+    html += '<div style="font-size:11px;color:var(--muted)">' + payments.length + ' دفعة</div></div>';
+    
+    html += '<div class="list">';
+    payments.forEach(function(p){
       const m = p.memberId ? getMemberById(p.memberId) : null;
-      const fundIcon = p.fund === 'assoc' ? '💰' : p.fund === 'death' ? '⚰️' : '💚';
-      const fundColor = p.fund === 'assoc' ? 'blue' : p.fund === 'death' ? 'red' : 'green';
-      return `
-        <div class="item" onclick="closeSheet();setTimeout(()=>openPaymentDetail(${p.id}),150)">
-          <div class="av ${fundColor}">${fundIcon}</div>
-          <div class="body">
-            <div class="ttl">${esc(m?.name || p.notes || 'دفعة')}</div>
-            <div class="sub">${fmtDate(p.date)} • ${p.fund === 'assoc' ? 'جمعية' : p.fund === 'death' ? 'وفاة' : 'تبرع'}</div>
-          </div>
-          <div style="font-weight:800;color:var(--success);font-size:13px;font-family:'SF Mono',monospace">${fmtNum(p.amount)}</div>
-          <span class="trail">›</span>
-        </div>
-      `;
-    }).join('')}
-  </div>` : '<div class="empty"><p>لا توجد دفعات</p></div>';
+      const ic = p.fund === 'assoc' ? '💰' : p.fund === 'death' ? '⚰️' : '💚';
+      const cl = p.fund === 'assoc' ? 'blue' : p.fund === 'death' ? 'red' : 'green';
+      const fundName = p.fund === 'assoc' ? 'جمعية' : p.fund === 'death' ? 'وفاة' : 'تبرع';
+      html += '<div class="item" onclick="closeSheet();setTimeout(function(){openPaymentDetail(' + p.id + ')},150)">';
+      html += '<div class="av ' + cl + '">' + ic + '</div>';
+      html += '<div class="body">';
+      html += '<div class="ttl">' + esc(m ? m.name : (p.notes || 'دفعة')) + '</div>';
+      html += '<div class="sub">' + fmtDate(p.date) + ' • ' + fundName + '</div>';
+      html += '</div>';
+      html += '<div style="font-weight:800;color:var(--success);font-size:13px">' + fmtNum(p.amount) + '</div>';
+      html += '<span class="trail">›</span></div>';
+    });
+    html += '</div>';
+  } else {
+    html = '<div class="empty"><span class="ico">📜</span><h3>لا توجد دفعات</h3></div>';
+  }
   
-  openSheet('📜 الدفعات — ' + payments.length, body, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+  openSheet('📜 الدفعات — ' + payments.length, html, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+function openCollectorDeliveriesList(key, year){
+  const y = year || S.currentYear;
+  
+  let targetUser = null, targetName = '';
+  if(key.indexOf('id:') === 0){
+    targetUser = S.users.find(function(u){ return u.id === Number(key.slice(3)); });
+  } else {
+    targetName = key.slice(5);
+  }
+  
+  const deliveries = S.deliveries.filter(function(d){
+    if(!d.date) return false;
+    const dy = new Date(d.date).getFullYear();
+    if(dy !== y) return false;
+    if(targetUser){
+      if(d.fromUserId === targetUser.id) return true;
+      if(!d.fromUserId && d.fromUserName) return normAr(d.fromUserName) === normAr(targetUser.name);
+      return false;
+    }
+    if(d.fromUserId) return false;
+    return normAr(d.fromUserName || '') === normAr(targetName);
+  }).sort(function(a, b){ return (b.date || '').localeCompare(a.date || ''); });
+  
+  let html = '';
+  if(deliveries.length){
+    html += '<div class="list">';
+    deliveries.forEach(function(d){
+      const isPending = !d.receivedAt && !d.rejectedAt;
+      const statusIcon = d.receivedAt ? '✅' : d.rejectedAt ? '❌' : '⏳';
+      const fundName = d.fund === 'assoc' ? '💰 جمعية' : d.fund === 'death' ? '⚰️ وفاة' : '💚 تبرع';
+      html += '<div class="item" onclick="closeSheet();setTimeout(function(){openDeliveryDetail(' + d.id + ')},150)">';
+      html += '<div class="av ' + (d.fund === 'death' ? 'red' : 'blue') + '">' + statusIcon + '</div>';
+      html += '<div class="body">';
+      html += '<div class="ttl">' + esc(d.toUserName || 'أمين') + '</div>';
+      html += '<div class="sub">' + fmtDate(d.date) + ' • ' + fundName + '</div>';
+      html += '</div>';
+      html += '<div style="font-weight:800;color:var(--success);font-size:13px">' + fmtNum(d.amount) + '</div>';
+      html += '<span class="trail">›</span></div>';
+    });
+    html += '</div>';
+  } else {
+    html = '<div class="empty"><span class="ico">📤</span><h3>لا توجد تسليمات</h3></div>';
+  }
+  
+  openSheet('📤 التسليمات — ' + deliveries.length, html, '<button class="btn ghost" onclick="closeSheet()">إغلاق</button>', { wide: true });
+}
+
+/* ═══ نهاية الإصلاح 35 ═══ */
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 36 — إيرادات ومصروفات (كامل)
+   ═══════════════════════════════════════════════════════════════ */
+
+window.openIncomeSheetFor = function(fund, id){
+  if(!hasPerm('income.add')){ toast('غير مصرح', 'error'); return; }
+  const ex = id ? S.incomes.find(x => x.id === id) : null;
+  const y = S.currentYear;
+  const df = (ex && ex.fund) || fund || 'assoc';
+  const cats = ['إيجار','بيع','تبرع','مستودع','أخرى'];
+  
+  let html = '<div class="fld"><label>الصندوق <span class="req">*</span></label><select id="iFund">';
+  html += '<option value="assoc"' + (df === 'assoc' ? ' selected' : '') + '>💰 الجمعية</option>';
+  html += '<option value="death"' + (df === 'death' ? ' selected' : '') + '>⚰️ الوفاة</option>';
+  html += '<option value="donation"' + (df === 'donation' ? ' selected' : '') + '>💚 التبرعات</option>';
+  html += '</select></div>';
+  
+  html += '<div class="fld"><label>الفئة</label><select id="iCategory">';
+  cats.forEach(function(c){ html += '<option' + ((ex && ex.category === c) ? ' selected' : '') + '>' + c + '</option>'; });
+  html += '</select></div>';
+  
+  html += '<div class="fld"><label>المبلغ <span class="req">*</span></label>';
+  html += '<div class="amount-input" style="border-color:var(--success)">';
+  html += '<input id="iAmount" type="tel" inputmode="numeric" placeholder="0" value="' + (ex ? ex.amount : '') + '">';
+  html += '<span class="currency">ل.س</span></div></div>';
+  
+  html += '<div class="fld-row">';
+  html += '<div class="fld"><label>التاريخ</label><input id="iDate" type="date" value="' + ((ex && ex.date) || today()) + '"></div>';
+  html += '<div class="fld"><label>السنة</label><select id="iYear">';
+  [2025,2026,2027,2028,2029].forEach(function(yy){
+    const sel = yy === ((ex && ex.year) || y) ? ' selected' : '';
+    html += '<option value="' + yy + '"' + sel + '>' + yy + '</option>';
+  });
+  html += '</select></div></div>';
+  
+  html += '<div class="fld"><label>الوصف</label><input id="iNotes" value="' + esc(ex ? (ex.notes || '') : '') + '" placeholder="اختياري"></div>';
+  
+  const foot = '<button class="btn ghost" onclick="closeSheet()">إلغاء</button><button class="btn success" onclick="saveIncomeNew(' + (id || 'null') + ')">💾 حفظ</button>';
+  openSheet(ex ? '✏️ تعديل إيراد' : '📥 تسجيل إيراد', html, foot, { focus:'iAmount' });
 };
 
-/* ═══ نهاية الإصلاح 34 ═══ */
+window.saveIncomeNew = async function(id){
+  const amount = Number($('iAmount').value);
+  if(!amount || amount <= 0){ toast('المبلغ مطلوب', 'error'); return; }
+  
+  try {
+    const old = id ? await dbGet('incomes', id) : null;
+    const obj = {
+      fund: $('iFund').value,
+      category: $('iCategory').value,
+      amount: amount,
+      date: $('iDate').value,
+      year: Number($('iYear').value),
+      notes: cleanText($('iNotes').value),
+      recordedBy: (old && old.recordedBy) || S.currentUser.id,
+      recordedByName: (old && old.recordedByName) || S.currentUser.name,
+      createdAt: (old && old.createdAt) || new Date().toISOString()
+    };
+    
+    if(id){
+      obj.id = id;
+      await dbPut('incomes', obj);
+      const i = S.incomes.findIndex(x => x.id === id);
+      if(i > -1) S.incomes[i] = obj;
+      toast('✅ تم التعديل');
+    } else {
+      const newId = await dbPut('incomes', obj);
+      obj.id = newId;
+      S.incomes.push(obj);
+      toast('✅ تم التسجيل');
+    }
+    
+    CACHE.invalidateAll();
+    await logAudit(id ? 'update' : 'add', 'income', obj.id, { fund: obj.fund, amount: amount });
+    closeSheet();
+    go(S.page);
+  } catch(e){ toast('خطأ: ' + e.message, 'error'); }
+};
+
+window.deleteIncomeRecord = async function(id){
+  if(!confirm('حذف الإيراد؟')) return;
+  try {
+    await dbDel('incomes', id);
+    S.incomes = S.incomes.filter(x => x.id !== id);
+    CACHE.invalidateAll();
+    toast('🗑️');
+    closeSheet();
+    go(S.page);
+  } catch(e){ toast('خطأ', 'error'); }
+};
+
+window.openExpenseSheetFor = function(fund, id){
+  if(!hasPerm('expense.add')){ toast('غير مصرح', 'error'); return; }
+  const ex = id ? S.expenses.find(x => x.id === id) : null;
+  const y = S.currentYear;
+  const df = (ex && ex.fund) || fund || 'assoc';
+  const cats = ['صيانة','مساعدات','لوازم','إداري','مستودع','أخرى'];
+  
+  let html = '<div class="fld"><label>الصندوق <span class="req">*</span></label><select id="eFund">';
+  html += '<option value="assoc"' + (df === 'assoc' ? ' selected' : '') + '>💰 الجمعية</option>';
+  html += '<option value="death"' + (df === 'death' ? ' selected' : '') + '>⚰️ الوفاة</option>';
+  html += '<option value="donation"' + (df === 'donation' ? ' selected' : '') + '>💚 التبرعات</option>';
+  html += '</select></div>';
+  
+  html += '<div class="fld"><label>الفئة</label><select id="eCategory">';
+  cats.forEach(function(c){ html += '<option' + ((ex && ex.category === c) ? ' selected' : '') + '>' + c + '</option>'; });
+  html += '</select></div>';
+  
+  html += '<div class="fld"><label>الوصف <span class="req">*</span></label>';
+  html += '<input id="eDesc" value="' + esc(ex ? (ex.description || '') : '') + '" placeholder="تفاصيل المصروف"></div>';
+  
+  html += '<div class="fld"><label>المبلغ <span class="req">*</span></label>';
+  html += '<div class="amount-input" style="border-color:var(--death)">';
+  html += '<input id="eAmount" type="tel" inputmode="numeric" placeholder="0" value="' + (ex ? ex.amount : '') + '" style="color:var(--death)">';
+  html += '<span class="currency">ل.س</span></div></div>';
+  
+  html += '<div class="fld-row">';
+  html += '<div class="fld"><label>التاريخ</label><input id="eDate" type="date" value="' + ((ex && ex.date) || today()) + '"></div>';
+  html += '<div class="fld"><label>السنة</label><select id="eYear">';
+  [2025,2026,2027,2028,2029].forEach(function(yy){
+    const sel = yy === ((ex && ex.year) || y) ? ' selected' : '';
+    html += '<option value="' + yy + '"' + sel + '>' + yy + '</option>';
+  });
+  html += '</select></div></div>';
+  
+  html += '<div class="fld"><label>ملاحظات</label><textarea id="eNotes">' + esc(ex ? (ex.notes || '') : '') + '</textarea></div>';
+  
+  const foot = '<button class="btn ghost" onclick="closeSheet()">إلغاء</button><button class="btn danger" onclick="saveExpenseNew(' + (id || 'null') + ')">💾 حفظ</button>';
+  openSheet(ex ? '✏️ تعديل مصروف' : '💸 تسجيل مصروف', html, foot, { focus:'eDesc' });
+};
+
+window.saveExpenseNew = async function(id){
+  const desc = cleanText($('eDesc').value);
+  const amount = Number($('eAmount').value);
+  if(!desc){ toast('الوصف مطلوب', 'error'); return; }
+  if(!amount || amount <= 0){ toast('المبلغ مطلوب', 'error'); return; }
+  
+  try {
+    const old = id ? await dbGet('expenses', id) : null;
+    const obj = {
+      fund: $('eFund').value,
+      category: $('eCategory').value,
+      description: desc,
+      amount: amount,
+      date: $('eDate').value,
+      year: Number($('eYear').value),
+      notes: cleanText($('eNotes').value),
+      createdBy: (old && old.createdBy) || S.currentUser.id,
+      recordedByName: (old && old.recordedByName) || S.currentUser.name,
+      createdAt: (old && old.createdAt) || new Date().toISOString()
+    };
+    
+    if(id){
+      obj.id = id;
+      await dbPut('expenses', obj);
+      const i = S.expenses.findIndex(x => x.id === id);
+      if(i > -1) S.expenses[i] = obj;
+      toast('✅ تم التعديل');
+    } else {
+      const newId = await dbPut('expenses', obj);
+      obj.id = newId;
+      S.expenses.push(obj);
+      toast('✅ تم التسجيل');
+    }
+    
+    CACHE.invalidateAll();
+    await logAudit(id ? 'update' : 'add', 'expense', obj.id, { amount: amount });
+    closeSheet();
+    go(S.page);
+  } catch(e){ toast('خطأ: ' + e.message, 'error'); }
+};
+
+window.deleteExpense = async function(id){
+  if(!confirm('حذف المصروف؟')) return;
+  try {
+    await dbDel('expenses', id);
+    S.expenses = S.expenses.filter(x => x.id !== id);
+    CACHE.invalidateAll();
+    toast('🗑️');
+    closeSheet();
+    go(S.page);
+  } catch(e){ toast('خطأ', 'error'); }
+};
+
+window.renderInOut = function(){
+  const u = S.currentUser;
+  const fund = u.role === 'assocTreasurer' ? 'assoc' : u.role === 'deathTreasurer' ? 'death' : 'assoc';
+  const y = S.currentYear;
+  
+  const incomes = S.incomes.filter(i => i.fund === fund && Number(i.year) === y).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  const expenses = S.expenses.filter(e => e.fund === fund && Number(e.year) === y).sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  
+  const totalInc = incomes.reduce((s, i) => s + (Number(i.amount)||0), 0);
+  const totalExp = expenses.reduce((s, e) => s + (Number(e.amount)||0), 0);
+  const tab = S.filters.inout || 'in';
+  
+  let html = '<div class="stats-scroll">';
+  html += '<div class="stat green"><div class="val">' + fmtShort(totalInc) + '</div><div class="lbl">📥 الواردات</div></div>';
+  html += '<div class="stat red"><div class="val">' + fmtShort(totalExp) + '</div><div class="lbl">💸 المصاريف</div></div>';
+  html += '<div class="stat"><div class="val">' + fmtShort(totalInc - totalExp) + '</div><div class="lbl">📊 الصافي</div></div>';
+  html += '</div>';
+  
+  html += '<div class="card" style="padding:10px;margin-bottom:8px"><div class="chips" style="margin-bottom:0">';
+  html += '<button class="chip ' + (tab === 'in' ? 'on' : '') + '" onclick="setInOutTab(\'in\')">📥 الواردات (' + incomes.length + ')</button>';
+  html += '<button class="chip ' + (tab === 'out' ? 'on' : '') + '" onclick="setInOutTab(\'out\')">💸 المصاريف (' + expenses.length + ')</button>';
+  html += '</div></div>';
+  
+  html += '<div style="display:flex;gap:8px;margin-bottom:12px">';
+  html += '<button class="btn success block" onclick="openIncomeSheetFor(\'' + fund + '\')">➕ إيراد</button>';
+  html += '<button class="btn danger block" onclick="openExpenseSheetFor(\'' + fund + '\')">➕ مصروف</button>';
+  html += '</div>';
+  
+  if(tab === 'in'){
+    if(incomes.length){
+      html += '<div class="list">';
+      incomes.forEach(function(i){
+        html += '<div class="item" onclick="closeSheet();setTimeout(function(){openIncomeSheetFor(\'' + fund + '\',' + i.id + ')},150)">';
+        html += '<div class="av green">📥</div>';
+        html += '<div class="body"><div class="ttl">' + esc(i.notes || i.category || 'إيراد') + '</div>';
+        html += '<div class="sub">' + fmtDate(i.date) + ' • ' + esc(i.category||'') + '</div></div>';
+        html += '<div style="font-weight:800;color:var(--success)">+' + fmtNum(i.amount) + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    } else html = html + '<div class="empty"><span class="ico">📥</span><h3>لا توجد واردات</h3></div>';
+  } else {
+    if(expenses.length){
+      html += '<div class="list">';
+      expenses.forEach(function(e){
+        html += '<div class="item" onclick="closeSheet();setTimeout(function(){openExpenseSheetFor(\'' + fund + '\',' + e.id + ')},150)">';
+        html += '<div class="av red">💸</div>';
+        html += '<div class="body"><div class="ttl">' + esc(e.description) + '</div>';
+        html += '<div class="sub">' + fmtDate(e.date) + ' • ' + esc(e.category||'') + '</div></div>';
+        html += '<div style="font-weight:800;color:var(--death)">-' + fmtNum(e.amount) + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    } else html = html + '<div class="empty"><span class="ico">💸</span><h3>لا توجد مصاريف</h3></div>';
+  }
+  
+  $('pg-inout').innerHTML = html;
+};
+
+window.setInOutTab = function(t){
+  S.filters.inout = t;
+  renderInOut();
+};
+
+/* ═══ نهاية الإصلاح 36 ═══ */
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 37 — QR حقيقي + Stack للتنقل
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 1️⃣ QR Code حقيقي */
+window.generateQR = function(container, data){
+  container.innerHTML = '';
+  const img = document.createElement('img');
+  const size = 220;
+  img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size + 
+            '&data=' + encodeURIComponent(data) + 
+            '&color=6d28d9&bgcolor=ffffff&margin=8';
+  img.style.cssText = 'width:200px;height:200px;border-radius:12px;display:block;margin:auto';
+  img.alt = 'QR Code';
+  img.onerror = function(){
+    container.innerHTML = '<div style="text-align:center;color:var(--death);font-size:12px;padding:20px">⚠️ لا يمكن تحميل QR<br>تحقق من الإنترنت</div>';
+  };
+  container.appendChild(img);
+};
+
+/* 2️⃣ Stack للتنقل بين الصفحات */
+window._sheetStack = window._sheetStack || [];
+
+const _origOpenSheet37 = window.openSheet || openSheet;
+window.openSheet = function(title, bodyHTML, footHTML, opts){
+  opts = opts || {};
+  
+  const sheet = $('sheet');
+  const isOpen = sheet && sheet.classList.contains('on');
+  
+  if(isOpen && !opts.noStack){
+    window._sheetStack.push({
+      title: $('sheetTitle').textContent,
+      body: $('sheetBody').innerHTML,
+      foot: $('sheetFoot').innerHTML,
+      footVisible: $('sheetFoot').style.display !== 'none',
+      wide: sheet.classList.contains('wide')
+    });
+  }
+  
+  _origOpenSheet37(title, bodyHTML, footHTML, opts);
+  
+  setTimeout(updateSheetBackBtn, 50);
+};
+
+const _origCloseSheet37 = window.closeSheet || closeSheet;
+window.closeSheet = function(){
+  if(window._sheetStack && window._sheetStack.length > 0){
+    const prev = window._sheetStack.pop();
+    
+    $('sheetTitle').textContent = prev.title;
+    $('sheetBody').innerHTML = prev.body;
+    $('sheetFoot').innerHTML = prev.foot;
+    $('sheetFoot').style.display = prev.footVisible ? 'flex' : 'none';
+    
+    if(prev.wide) $('sheet').classList.add('wide');
+    else $('sheet').classList.remove('wide');
+    
+    $('sheetBody').scrollTop = 0;
+    updateSheetBackBtn();
+    return;
+  }
+  
+  window._sheetStack = [];
+  _origCloseSheet37();
+};
+
+function updateSheetBackBtn(){
+  const sheet = $('sheet');
+  const hd = sheet && sheet.querySelector('.sheet-hd');
+  if(!hd) return;
+  
+  let backBtn = hd.querySelector('[data-back-btn]');
+  const hasStack = window._sheetStack && window._sheetStack.length > 0;
+  
+  if(hasStack && !backBtn){
+    const btn = document.createElement('button');
+    btn.setAttribute('data-back-btn', 'true');
+    btn.style.cssText = 'background:var(--primary-soft);color:var(--primary);border:0;width:36px;height:36px;border-radius:10px;font-size:16px;cursor:pointer;font-family:inherit;margin-inline-end:8px;flex-shrink:0';
+    btn.textContent = '↩️';
+    btn.title = 'رجوع';
+    btn.onclick = function(e){
+      e.stopPropagation();
+      window.closeSheet();
+    };
+    hd.insertBefore(btn, hd.firstChild);
+  } else if(!hasStack && backBtn){
+    backBtn.remove();
+  }
+}
+
+/* تنظيف stack عند تسجيل الخروج */
+const _origLogout37 = window.logout || logout;
+window.logout = function(){
+  window._sheetStack = [];
+  _origLogout37();
+};
+
+/* ═══ نهاية الإصلاح 37 ═══ */
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 38 — تبويب الدفعات المستقل
+   ═══════════════════════════════════════════════════════════════ */
+
+window._payView = window._payView || { year: null, fund: 'all', group: 'raw', search: '' };
+
+function renderPaymentsPage(){
+  const y = S.filters.payYear || S.currentYear;
+  const fund = S.filters.payFund || 'all';
+  const group = window._payView.group || 'raw';
+  
+  // إحصائيات
+  let filtered = S.payments.filter(p => {
+    const py = Number(p.forYear) || Number(p.year);
+    if(py !== y) return false;
+    if(fund !== 'all' && p.fund !== fund) return false;
+    return true;
+  });
+  
+  const sumByFund = f => filtered.filter(p => p.fund === f).reduce((s,p) => s + (Number(p.amount)||0), 0);
+  const totalAssoc = sumByFund('assoc');
+  const totalDeath = sumByFund('death');
+  const totalDon = sumByFund('donation');
+  const total = totalAssoc + totalDeath + totalDon;
+  
+  let html = '';
+  
+  // فلتر السنة
+  html += '<div class="card" style="padding:10px;margin-bottom:8px">';
+  html += '<div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px">📅 السنة</div>';
+  html += '<div class="chips" style="margin-bottom:10px">';
+  [2025,2026,2027,2028,2029].forEach(function(yy){
+    html += '<button class="chip ' + (y === yy ? 'on' : '') + '" onclick="setPayFilter(\'payYear\',' + yy + ')">' + yy + '</button>';
+  });
+  html += '</div>';
+  
+  // فلتر الصندوق
+  html += '<div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px">💰 الصندوق</div>';
+  html += '<div class="chips" style="margin-bottom:0">';
+  html += '<button class="chip ' + (fund === 'all' ? 'on' : '') + '" onclick="setPayFilter(\'payFund\',\'all\')">📋 الكل</button>';
+  html += '<button class="chip ' + (fund === 'assoc' ? 'on' : '') + '" onclick="setPayFilter(\'payFund\',\'assoc\')">💰 جمعية</button>';
+  html += '<button class="chip ' + (fund === 'death' ? 'on' : '') + '" onclick="setPayFilter(\'payFund\',\'death\')">⚰️ وفاة</button>';
+  html += '<button class="chip ' + (fund === 'donation' ? 'on' : '') + '" onclick="setPayFilter(\'payFund\',\'donation\')">💚 تبرعات</button>';
+  html += '</div></div>';
+  
+  // الإحصائيات
+  html += '<div class="stats-scroll">';
+  html += '<div class="stat assoc"><div class="val">' + fmtShort(totalAssoc) + '</div><div class="lbl">💰 جمعية</div></div>';
+  html += '<div class="stat death"><div class="val">' + fmtShort(totalDeath) + '</div><div class="lbl">⚰️ وفاة</div></div>';
+  html += '<div class="stat donation"><div class="val">' + fmtShort(totalDon) + '</div><div class="lbl">💚 تبرعات</div></div>';
+  html += '<div class="stat"><div class="val">' + filtered.length + '</div><div class="lbl">📊 عدد الدفعات</div></div>';
+  html += '</div>';
+  
+  // طريقة العرض
+  html += '<div class="card" style="padding:10px;margin-bottom:8px">';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">';
+  html += '<button class="btn ' + (group === 'raw' ? 'primary' : 'ghost') + ' sm" onclick="setPayGroup(\'raw\')" style="padding:8px;font-size:11px">📋 خام</button>';
+  html += '<button class="btn ' + (group === 'member' ? 'primary' : 'ghost') + ' sm" onclick="setPayGroup(\'member\')" style="padding:8px;font-size:11px">👤 حسب العضو</button>';
+  html += '<button class="btn ' + (group === 'collector' ? 'primary' : 'ghost') + ' sm" onclick="setPayGroup(\'collector\')" style="padding:8px;font-size:11px">💼 حسب المحصّل</button>';
+  html += '</div></div>';
+  
+  // البحث
+  html += '<div class="card" style="padding:10px 14px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px">';
+  html += '<span style="font-size:16px;color:var(--muted-2)">🔍</span>';
+  html += '<input id="paySearchInput" placeholder="ابحث بالاسم أو الكود..." value="' + esc(window._payView.search || '') + '" oninput="onPaySearch(this.value)" style="flex:1;border:0;background:transparent;font-size:14px">';
+  html += '</div></div>';
+  
+  // المحتوى
+  html += '<div id="payContent"></div>';
+  
+  $('pg-payments').innerHTML = html;
+  
+  renderPaymentsContent(filtered, group);
+}
+
+function setPayFilter(key, value){
+  S.filters[key] = value;
+  renderPaymentsPage();
+}
+
+function setPayGroup(g){
+  window._payView.group = g;
+  renderPaymentsPage();
+}
+
+const onPaySearch = debounce(function(q){
+  window._payView.search = q;
+  const y = S.filters.payYear || S.currentYear;
+  const fund = S.filters.payFund || 'all';
+  let filtered = S.payments.filter(p => {
+    const py = Number(p.forYear) || Number(p.year);
+    if(py !== y) return false;
+    if(fund !== 'all' && p.fund !== fund) return false;
+    return true;
+  });
+  renderPaymentsContent(filtered, window._payView.group);
+}, 200);
+
+function renderPaymentsContent(payments, group){
+  const container = $('payContent');
+  if(!container) return;
+  
+  const s = normAr(window._payView.search || '');
+  
+  if(group === 'raw'){
+    renderRawPayments(payments, s, container);
+  } else if(group === 'member'){
+    renderByMember(payments, s, container);
+  } else {
+    renderByCollector(payments, s, container);
+  }
+}
+
+/* 📋 عرض خام */
+function renderRawPayments(payments, s, container){
+  let list = payments;
+  if(s){
+    list = list.filter(p => {
+      const m = p.memberId ? getMemberById(p.memberId) : null;
+      return normAr((m?.name || '') + ' ' + (p.collectorName || '') + ' ' + (p.notes || '')).includes(s);
+    });
+  }
+  
+  list = list.sort((a,b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  
+  if(!list.length){
+    container.innerHTML = '<div class="empty"><span class="ico">💰</span><h3>لا توجد دفعات</h3></div>';
+    return;
+  }
+  
+  let html = '<div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px;padding:0 4px">📊 ' + list.length + ' دفعة</div>';
+  html += '<div class="list">';
+  list.slice(0, 500).forEach(function(p){
+    const m = p.memberId ? getMemberById(p.memberId) : null;
+    const ic = p.fund === 'assoc' ? '💰' : p.fund === 'death' ? '⚰️' : '💚';
+    const cl = p.fund === 'assoc' ? 'blue' : p.fund === 'death' ? 'red' : 'green';
+    html += '<div class="item" onclick="closeSheet();setTimeout(function(){openPaymentDetail(' + p.id + ')},150)">';
+    html += '<div class="av ' + cl + '">' + ic + '</div>';
+    html += '<div class="body">';
+    html += '<div class="ttl">' + esc(m ? m.name : (p.notes || 'دفعة')) + '</div>';
+    html += '<div class="sub">' + fmtDate(p.date) + ' • ' + esc(p.collectorName || '') + '</div>';
+    html += '</div>';
+    html += '<div style="font-weight:800;color:var(--success);font-size:13px">' + fmtNum(p.amount) + '</div>';
+    html += '<span class="trail">›</span></div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+/* 👤 عرض حسب العضو */
+function renderByMember(payments, s, container){
+  const byMember = {};
+  payments.forEach(function(p){
+    if(!p.memberId) return;
+    if(!byMember[p.memberId]) byMember[p.memberId] = { memberId: p.memberId, count: 0, total: 0, byFund: { assoc:0, death:0, donation:0 } };
+    byMember[p.memberId].count++;
+    byMember[p.memberId].total += Number(p.amount) || 0;
+    byMember[p.memberId].byFund[p.fund] = (byMember[p.memberId].byFund[p.fund] || 0) + (Number(p.amount)||0);
+  });
+  
+  let list = Object.values(byMember).map(function(x){
+    return { member: getMemberById(x.memberId), ...x };
+  }).filter(x => x.member);
+  
+  if(s){
+    list = list.filter(x => normAr(x.member.name + ' ' + (x.member.code || '')).includes(s));
+  }
+  
+  list.sort((a,b) => b.total - a.total);
+  
+  if(!list.length){
+    container.innerHTML = '<div class="empty"><span class="ico">👤</span><h3>لا نتائج</h3></div>';
+    return;
+  }
+  
+  let html = '<div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px;padding:0 4px">📊 ' + list.length + ' عضو دفعوا</div>';
+  html += '<div class="list">';
+  list.slice(0, 500).forEach(function(x){
+    const parts = [];
+    if(x.byFund.assoc) parts.push('💰' + fmtShort(x.byFund.assoc));
+    if(x.byFund.death) parts.push('⚰️' + fmtShort(x.byFund.death));
+    if(x.byFund.donation) parts.push('💚' + fmtShort(x.byFund.donation));
+    
+    html += '<div class="item" onclick="closeSheet();setTimeout(function(){openMemberPaymentsList(' + x.member.id + ')},150)">';
+    html += '<div class="av green">👤</div>';
+    html += '<div class="body">';
+    html += '<div class="ttl">' + esc(x.member.name) + '</div>';
+    html += '<div class="sub">' + x.count + ' دفعة • ' + parts.join(' ') + '</div>';
+    html += '</div>';
+    html += '<div style="font-weight:800;color:var(--success);font-size:13px">' + fmtShort(x.total) + '</div>';
+    html += '<span class="trail">›</span></div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+/* 💼 عرض حسب المحصّل */
+function renderByCollector(payments, s, container){
+  const byCollector = {};
+  payments.forEach(function(p){
+    const key = p.collectorId ? 'id:' + p.collectorId : 'name:' + normAr(p.collectorName || 'غير محدد');
+    if(!byCollector[key]){
+      byCollector[key] = { key, name: p.collectorName || 'غير محدد', collectorId: p.collectorId, count: 0, total: 0, byFund: { assoc:0, death:0, donation:0 } };
+    }
+    byCollector[key].count++;
+    byCollector[key].total += Number(p.amount) || 0;
+    byCollector[key].byFund[p.fund] = (byCollector[key].byFund[p.fund] || 0) + (Number(p.amount)||0);
+  });
+  
+  let list = Object.values(byCollector);
+  
+  if(s){
+    list = list.filter(x => normAr(x.name).includes(s));
+  }
+  
+  list.sort((a,b) => b.total - a.total);
+  
+  if(!list.length){
+    container.innerHTML = '<div class="empty"><span class="ico">💼</span><h3>لا نتائج</h3></div>';
+    return;
+  }
+  
+  let html = '<div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px;padding:0 4px">📊 ' + list.length + ' محصّل</div>';
+  html += '<div class="list">';
+  list.forEach(function(x){
+    const user = x.collectorId ? S.users.find(u => u.id === x.collectorId) : null;
+    const roleIcon = user ? (ROLES[user.role]?.icon || '👤') : '👤';
+    
+    const parts = [];
+    if(x.byFund.assoc) parts.push('💰' + fmtShort(x.byFund.assoc));
+    if(x.byFund.death) parts.push('⚰️' + fmtShort(x.byFund.death));
+    if(x.byFund.donation) parts.push('💚' + fmtShort(x.byFund.donation));
+    
+    html += '<div style="border-bottom:1px solid var(--border-2)">';
+    html += '<div class="item" onclick="closeSheet();setTimeout(function(){openCollectorPaymentsList(\'' + x.key + '\', ' + (S.filters.payYear || S.currentYear) + ')},150)">';
+    html += '<div class="av">' + roleIcon + '</div>';
+    html += '<div class="body">';
+    html += '<div class="ttl">' + esc(x.name) + '</div>';
+    html += '<div class="sub">' + x.count + ' دفعة • ' + parts.join(' ') + '</div>';
+    html += '</div>';
+    html += '<div style="font-weight:800;color:var(--success);font-size:13px">' + fmtShort(x.total) + '</div>';
+    html += '<span class="trail">›</span></div>';
+    
+    // أزرار سريعة
+    html += '<div style="display:flex;gap:6px;padding:0 14px 10px">';
+    html += '<button class="btn info sm" style="flex:1;font-size:10px" onclick="event.stopPropagation();shareCollectorReport(\'' + x.key + '\', ' + (S.filters.payYear || S.currentYear) + ')">📱 تقرير واتساب</button>';
+    if(user && S.currentUser.role === 'manager'){
+      html += '<button class="btn primary sm" style="font-size:10px" onclick="event.stopPropagation();closeSheet();setTimeout(function(){impersonateUser(' + user.id + ')},150)">🔑</button>';
+    }
+    html += '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+/* 📱 إرسال تقرير المحصّل */
+function shareCollectorReport(key, year){
+  const y = year || S.currentYear;
+  let targetUser = null, targetName = '';
+  if(key.indexOf('id:') === 0) targetUser = S.users.find(u => u.id === Number(key.slice(3)));
+  else targetName = key.slice(5);
+  
+  const payments = S.payments.filter(function(p){
+    const py = Number(p.forYear) || Number(p.year);
+    if(py !== y) return false;
+    if(targetUser){
+      if(p.collectorId === targetUser.id) return true;
+      if(!p.collectorId && p.collectorName) return normAr(p.collectorName) === normAr(targetUser.name);
+      return false;
+    }
+    if(p.collectorId) return false;
+    return normAr(p.collectorName || '') === normAr(targetName);
+  });
+  
+  if(!payments.length){ toast('لا توجد دفعات', 'warning'); return; }
+  
+  const displayName = targetUser ? targetUser.name : targetName;
+  const totalAssoc = payments.filter(p => p.fund === 'assoc').reduce((s,p) => s + (Number(p.amount)||0), 0);
+  const totalDeath = payments.filter(p => p.fund === 'death').reduce((s,p) => s + (Number(p.amount)||0), 0);
+  const totalDon = payments.filter(p => p.fund === 'donation').reduce((s,p) => s + (Number(p.amount)||0), 0);
+  const total = totalAssoc + totalDeath + totalDon;
+  
+  let txt = '📊 *تقرير تحصيلات ' + displayName + '*\n';
+  txt += '📅 سنة ' + y + '\n';
+  txt += '━━━━━━━━━━━━━━━\n\n';
+  txt += '💰 جمعية: ' + fmtNum(totalAssoc) + ' ل.س\n';
+  txt += '⚰️ وفاة: ' + fmtNum(totalDeath) + ' ل.س\n';
+  if(totalDon > 0) txt += '💚 تبرعات: ' + fmtNum(totalDon) + ' ل.س\n';
+  txt += '━━━━━━━━━━━━━━━\n';
+  txt += '📊 *الإجمالي: ' + fmtNum(total) + ' ل.س*\n';
+  txt += '📋 عدد الدفعات: ' + payments.length + '\n\n';
+  txt += '_صندوق زعورة_';
+  
+  const phone = targetUser && targetUser.phone ? targetUser.phone.replace(/^0/,'').replace(/^\+963/,'') : null;
+  
+  if(phone){
+    if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
+      window.location.href = 'whatsapp://send?phone=963' + phone + '&text=' + encodeURIComponent(txt);
+    } else {
+      window.open('https://wa.me/963' + phone + '?text=' + encodeURIComponent(txt), '_blank');
+    }
+  } else {
+    window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+  }
+}
+
+/* 📱 إرسال تقرير العضو */
+function shareMemberReport(memberId){
+  const m = getMemberById(memberId);
+  if(!m) return;
+  
+  const payments = S.payments.filter(p => p.memberId === memberId);
+  if(!payments.length){ toast('لا توجد دفعات', 'warning'); return; }
+  
+  const totalAssoc = payments.filter(p => p.fund === 'assoc').reduce((s,p) => s + (Number(p.amount)||0), 0);
+  const totalDeath = payments.filter(p => p.fund === 'death').reduce((s,p) => s + (Number(p.amount)||0), 0);
+  const total = totalAssoc + totalDeath;
+  
+  let txt = '📊 *كشف حساب ' + m.name + '*\n';
+  txt += '🆔 ' + (m.code || '—') + '\n';
+  txt += '📍 ' + (m.sector || '—') + '\n';
+  txt += '━━━━━━━━━━━━━━━\n\n';
+  
+  payments.sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 30).forEach(function(p){
+    const ic = p.fund === 'assoc' ? '💰' : p.fund === 'death' ? '⚰️' : '💚';
+    txt += ic + ' ' + fmtDate(p.date) + ' — ' + fmtNum(p.amount) + ' ل.س (سنة ' + (p.forYear || p.year) + ')\n';
+  });
+  
+  txt += '\n━━━━━━━━━━━━━━━\n';
+  txt += '💰 *إجمالي الجمعية: ' + fmtNum(totalAssoc) + '*\n';
+  txt += '⚰️ *إجمالي الوفاة: ' + fmtNum(totalDeath) + '*\n';
+  txt += '🟣 *الإجمالي: ' + fmtNum(total) + ' ل.س*\n\n';
+  txt += '_صندوق زعورة_';
+  
+  const phone = m.phone ? m.phone.replace(/^0/,'').replace(/^\+963/,'') : null;
+  
+  if(phone){
+    if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
+      window.location.href = 'whatsapp://send?phone=963' + phone + '&text=' + encodeURIComponent(txt);
+    } else {
+      window.open('https://wa.me/963' + phone + '?text=' + encodeURIComponent(txt), '_blank');
+    }
+  } else {
+    window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+  }
+}
+
+/* إضافة زر تقرير العضو في تفاصيله */
+const _origMemberDetail38 = openMemberDetail;
+openMemberDetail = function(id){
+  _origMemberDetail38(id);
+  setTimeout(function(){
+    const body = $('sheetBody');
+    if(!body) return;
+    if(body.querySelector('[data-share-member]')) return;
+    
+    const btn = document.createElement('button');
+    btn.setAttribute('data-share-member', 'true');
+    btn.className = 'btn success block';
+    btn.style.cssText = 'margin-top:8px';
+    btn.innerHTML = '📱 إرسال كشف حساب واتساب';
+    btn.onclick = function(){
+      closeSheet();
+      setTimeout(function(){ shareMemberReport(id); }, 150);
+    };
+    
+    const anchor = body.querySelector('.btn.primary.block');
+    if(anchor && anchor.parentElement){
+      anchor.parentElement.appendChild(btn);
+    }
+  }, 300);
+};
+
+/* تحديث القائمة السفلية للمدير والرئيس */
+if(typeof NAV_BY_ROLE !== 'undefined'){
+  const oldMgr = NAV_BY_ROLE.manager;
+  if(oldMgr && oldMgr.length){
+    NAV_BY_ROLE.manager = [
+      { pg:'pg-home',       i:'🏠', l:'الرئيسية' },
+      { pg:'pg-members',    i:'👥', l:'الأعضاء' },
+      { pg:'pg-payments',   i:'💰', l:'الدفعات' },
+      { pg:'pg-funds',      i:'💼', l:'الصناديق' },
+      { pg:'pg-reports',    i:'📊', l:'التقارير' },
+      { pg:'pg-admin',      i:'⚙️', l:'الإدارة' }
+    ];
+  }
+  
+  const oldPres = NAV_BY_ROLE.president;
+  if(oldPres && oldPres.length){
+    NAV_BY_ROLE.president = [
+      { pg:'pg-home',       i:'🏠', l:'الرئيسية' },
+      { pg:'pg-members',    i:'👥', l:'الأعضاء' },
+      { pg:'pg-payments',   i:'💰', l:'الدفعات' },
+      { pg:'pg-funds',      i:'💼', l:'الصناديق' },
+      { pg:'pg-reports',    i:'📊', l:'التقارير' },
+      { pg:'pg-archive',    i:'📚', l:'الأرشيف' }
+    ];
+  }
+}
+
+/* ربط الصفحة */
+const _origGo38 = go;
+go = function(page){
+  _origGo38(page);
+  if(page === 'pg-payments'){
+    renderPaymentsPage();
+  }
+};
+
+/* الافتراضيات */
+if(!S.filters.payYear) S.filters.payYear = S.currentYear;
+if(!S.filters.payFund) S.filters.payFund = 'all';
+
+/* تحديث السنة عند التغيير */
+const _origChangeYear38 = changeYear;
+changeYear = function(y){
+  S.filters.payYear = Number(y);
+  _origChangeYear38(y);
+};
+
+/* ═══ نهاية الإصلاح 38 ═══ */
 
 document.addEventListener('DOMContentLoaded', init);
 
