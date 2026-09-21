@@ -9350,6 +9350,435 @@ function openSettingsSheet(){
 /* loadAll + init موجودة في الجزء 2 — لا نكررها */
 
 /* ═══════════════════════════════════════════════════════════════
+   🛠️ الإصلاح 42 — إصلاح التقارير + جدول المدفوعات المجمّع
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 1️⃣ إصلاح صفحة التقارير */
+window.renderReports = function(){
+  const y = S.currentYear;
+  const stats = getMembersStats(y);
+  const a = getFundActual('assoc');
+  const d = getFundActual('death');
+  const o = getFundActual('donation');
+  
+  let html = '';
+  
+  html += '<div class="card">';
+  html += '<div class="card-head"><h2>📊 التقارير — ' + y + '</h2>';
+  html += '<button class="btn warning sm" onclick="openYearPicker()">📅 ' + y + '</button></div>';
+  
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  html += '<button class="btn primary" style="grid-column:1/-1" onclick="openAnnualReportSheet()">📊 التقرير السنوي الشامل</button>';
+  html += '<button class="btn success" style="grid-column:1/-1;font-size:15px" onclick="openPaymentsTableReport()">📋 تقرير المدفوعات المجمّع (جدول)</button>';
+  html += '<button class="btn warning" onclick="openLatePayersReport()">⏰ المتأخرون</button>';
+  html += '<button class="btn info" onclick="openFamilyReport()">👨‍👩‍👧 العائلات</button>';
+  html += '<button class="btn success" onclick="go(\'pg-collectors\')">💼 المحصّلون</button>';
+  html += '<button class="btn assoc" onclick="openFundReport(\'assoc\')">💰 الجمعية</button>';
+  html += '<button class="btn death" onclick="openFundReport(\'death\')">⚰️ الوفاة</button>';
+  html += '<button class="btn donation" onclick="openFundReport(\'donation\')">💚 التبرعات</button>';
+  html += '<button class="btn ghost" onclick="go(\'pg-logs\')">📋 السجلات</button>';
+  html += '</div></div>';
+  
+  html += '<div class="stats-scroll">';
+  html += '<div class="stat assoc"><div class="val">' + fmtShort(a.balance) + '</div><div class="lbl">💰 الجمعية</div></div>';
+  html += '<div class="stat death"><div class="val">' + fmtShort(d.balance) + '</div><div class="lbl">⚰️ الوفاة</div></div>';
+  html += '<div class="stat donation"><div class="val">' + fmtShort(o.balance) + '</div><div class="lbl">💚 التبرعات</div></div>';
+  html += '<div class="stat red"><div class="val">' + stats.late + '</div><div class="lbl">⚠️ متأخرون</div></div>';
+  html += '</div>';
+  
+  html += '<div class="card">';
+  html += '<div class="card-head"><h2>👥 ملخص الأعضاء</h2></div>';
+  html += '<div class="balance-block">';
+  html += '<div class="balance-row"><span class="lbl">📊 الإجمالي</span><span class="val">' + stats.total + '</span></div>';
+  html += '<div class="balance-row"><span class="lbl">✅ نشط</span><span class="val green">' + stats.active + '</span></div>';
+  html += '<div class="balance-row"><span class="lbl">🆕 جدد ' + y + '</span><span class="val">' + stats.newThisYear + '</span></div>';
+  html += '<div class="balance-row"><span class="lbl">🚪 منسحب</span><span class="val">' + stats.withdrawn + '</span></div>';
+  html += '<div class="balance-row"><span class="lbl">⏸️ متوقف</span><span class="val orange">' + stats.frozen + '</span></div>';
+  html += '<div class="balance-row"><span class="lbl">⚰️ متوفى</span><span class="val red">' + stats.deceased + '</span></div>';
+  html += '</div></div>';
+  
+  $('pg-reports').innerHTML = html;
+};
+
+/* 2️⃣ تقرير المدفوعات المجمّع */
+window._payReportFilters = { year: null, fund: 'all', mode: 'paid', search: '' };
+
+function openPaymentsTableReport(){
+  if(!window._payReportFilters.year) window._payReportFilters.year = S.currentYear;
+  
+  const f = window._payReportFilters;
+  const years = [2025, 2026, 2027, 2028, 2029];
+  
+  let html = '';
+  
+  /* فلاتر */
+  html += '<div class="card" style="padding:10px;margin-bottom:10px">';
+  
+  html += '<div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px">📅 السنة</div>';
+  html += '<div class="chips" style="margin-bottom:10px">';
+  years.forEach(function(y){
+    html += '<button class="chip ' + (f.year === y ? 'on' : '') + '" onclick="setPayReportFilter(\'year\',' + y + ')">' + y + '</button>';
+  });
+  html += '</div>';
+  
+  html += '<div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px">💰 الصندوق</div>';
+  html += '<div class="chips" style="margin-bottom:10px">';
+  html += '<button class="chip ' + (f.fund === 'all' ? 'on' : '') + '" onclick="setPayReportFilter(\'fund\',\'all\')">الكل</button>';
+  html += '<button class="chip ' + (f.fund === 'assoc' ? 'on' : '') + '" onclick="setPayReportFilter(\'fund\',\'assoc\')">💰 جمعية</button>';
+  html += '<button class="chip ' + (f.fund === 'death' ? 'on' : '') + '" onclick="setPayReportFilter(\'fund\',\'death\')">⚰️ وفاة</button>';
+  html += '<button class="chip ' + (f.fund === 'donation' ? 'on' : '') + '" onclick="setPayReportFilter(\'fund\',\'donation\')">💚 تبرعات</button>';
+  html += '</div>';
+  
+  html += '<div style="font-size:11px;color:var(--muted);font-weight:700;margin-bottom:6px">🔍 نوع العرض</div>';
+  html += '<div class="chips" style="margin-bottom:0">';
+  html += '<button class="chip ' + (f.mode === 'paid' ? 'on' : '') + '" onclick="setPayReportFilter(\'mode\',\'paid\')">✅ دفعوا فقط</button>';
+  html += '<button class="chip ' + (f.mode === 'unpaid' ? 'on' : '') + '" onclick="setPayReportFilter(\'mode\',\'unpaid\')">⏳ لم يدفعوا</button>';
+  html += '<button class="chip ' + (f.mode === 'all' ? 'on' : '') + '" onclick="setPayReportFilter(\'mode\',\'all\')">📊 الكل</button>';
+  html += '</div></div>';
+  
+  /* البحث */
+  html += '<div class="card" style="padding:10px 14px;margin-bottom:10px">';
+  html += '<div style="display:flex;align-items:center;gap:10px">';
+  html += '<span style="font-size:16px;color:var(--muted-2)">🔍</span>';
+  html += '<input id="payReportSearch" placeholder="ابحث باسم عضو..." value="' + esc(f.search || '') + '" oninput="onPayReportSearch(this.value)" style="flex:1;border:0;background:transparent;font-size:14px">';
+  html += '</div></div>';
+  
+  /* المحتوى */
+  html += '<div id="payReportContent"></div>';
+  
+  /* أزرار */
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">';
+  html += '<button class="btn success block" onclick="sharePaymentsTableWA()">📱 واتساب</button>';
+  html += '<button class="btn info block" onclick="printPaymentsTable()">🖨️ طباعة</button>';
+  html += '</div>';
+  
+  openSheet('📋 تقرير المدفوعات المجمّع', html, '<button class="btn ghost" onclick="closeSheetAll()">إغلاق</button>', { wide: true });
+  
+  renderPaymentsTableContent();
+}
+
+const onPayReportSearch = debounce(function(q){
+  window._payReportFilters.search = q;
+  renderPaymentsTableContent();
+}, 200);
+
+function setPayReportFilter(key, value){
+  window._payReportFilters[key] = value;
+  openPaymentsTableReport();
+}
+
+/* ⭐ بناء بيانات التقرير */
+function buildPaymentsReportData(){
+  const f = window._payReportFilters;
+  const y = f.year;
+  
+  /* اجمع مدفوعات كل عضو — مع تجميع حسب المحصّل */
+  const memberPayments = {};
+  
+  S.payments.forEach(function(p){
+    const py = Number(p.forYear) || Number(p.year);
+    if(py !== y) return;
+    if(f.fund !== 'all' && p.fund !== f.fund) return;
+    if(!p.memberId) return;
+    
+    if(!memberPayments[p.memberId]){
+      memberPayments[p.memberId] = {
+        memberId: p.memberId,
+        total: 0,
+        count: 0,
+        byFund: { assoc: 0, death: 0, donation: 0 },
+        byCollector: {}
+      };
+    }
+    
+    const amount = Number(p.amount) || 0;
+    memberPayments[p.memberId].total += amount;
+    memberPayments[p.memberId].count++;
+    memberPayments[p.memberId].byFund[p.fund] += amount;
+    
+    /* تجميع حسب المحصّل */
+    const cKey = p.collectorName || 'غير محدد';
+    if(!memberPayments[p.memberId].byCollector[cKey]){
+      memberPayments[p.memberId].byCollector[cKey] = 0;
+    }
+    memberPayments[p.memberId].byCollector[cKey] += amount;
+  });
+  
+  /* كل الأعضاء (بدون منسحب/متوقف/متوفى) */
+  let allMembers = S.members.filter(function(m){
+    const st = m.memberStatus || 'نشط';
+    if(st === 'متوفى' || st === 'منسحب' || st === 'متوقف') return false;
+    if(f.fund === 'assoc') return m.assocStartYear;
+    if(f.fund === 'death') return m.deathStartYear;
+    return m.assocStartYear || m.deathStartYear;
+  });
+  
+  let list = allMembers.map(function(m){
+    const p = memberPayments[m.id];
+    return {
+      member: m,
+      total: p ? p.total : 0,
+      count: p ? p.count : 0,
+      byFund: p ? p.byFund : { assoc: 0, death: 0, donation: 0 },
+      byCollector: p ? p.byCollector : {}
+    };
+  });
+  
+  /* فلترة حسب النمط */
+  if(f.mode === 'paid') list = list.filter(function(x){ return x.total > 0; });
+  else if(f.mode === 'unpaid') list = list.filter(function(x){ return x.total === 0; });
+  
+  /* البحث */
+  if(f.search){
+    const s = normAr(f.search);
+    list = list.filter(function(x){
+      return normAr(x.member.name + ' ' + (x.member.code || '')).indexOf(s) > -1;
+    });
+  }
+  
+  /* ترتيب */
+  list.sort(function(a, b){ return b.total - a.total; });
+  
+  return list;
+}
+
+/* ⭐ عرض الجدول */
+function renderPaymentsTableContent(){
+  const container = $('payReportContent');
+  if(!container) return;
+  
+  const f = window._payReportFilters;
+  const y = f.year;
+  const list = buildPaymentsReportData();
+  
+  const totalSum = list.reduce(function(s, x){ return s + x.total; }, 0);
+  const paidCount = list.filter(function(x){ return x.total > 0; }).length;
+  const unpaidCount = list.filter(function(x){ return x.total === 0; }).length;
+  
+  let html = '';
+  
+  /* الملخص */
+  html += '<div style="padding:14px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border-radius:14px;margin-bottom:12px;text-align:center">';
+  html += '<div style="font-size:11px;opacity:.85;font-weight:700">إجمالي المدفوعات — ' + y + '</div>';
+  html += '<div style="font-size:28px;font-weight:800;font-family:\'SF Mono\',monospace;margin-top:4px">' + fmtNum(totalSum) + '</div>';
+  html += '<div style="display:flex;justify-content:center;gap:16px;margin-top:10px;font-size:11px">';
+  html += '<span>✅ ' + paidCount + ' دفعوا</span>';
+  if(unpaidCount > 0) html += '<span>⏳ ' + unpaidCount + ' لم يدفعوا</span>';
+  html += '<span>📊 ' + list.length + ' إجمالي</span>';
+  html += '</div></div>';
+  
+  if(!list.length){
+    container.innerHTML = html + '<div class="empty"><span class="ico">📋</span><h3>لا توجد بيانات</h3></div>';
+    return;
+  }
+  
+  /* الجدول */
+  html += '<div style="background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--border)">';
+  
+  /* Header */
+  html += '<div style="display:grid;grid-template-columns:36px 1fr 90px;gap:6px;padding:10px 12px;background:var(--primary-soft);font-weight:800;color:var(--primary);font-size:11px;border-bottom:1px solid var(--border)">';
+  html += '<div>#</div>';
+  html += '<div>العضو</div>';
+  html += '<div style="text-align:left">المدفوع</div>';
+  html += '</div>';
+  
+  /* Rows */
+  list.forEach(function(x, i){
+    const m = x.member;
+    
+    /* تفصيل الصناديق */
+    const fundParts = [];
+    if(f.fund === 'all'){
+      if(x.byFund.assoc > 0) fundParts.push('💰 ' + fmtShort(x.byFund.assoc));
+      if(x.byFund.death > 0) fundParts.push('⚰️ ' + fmtShort(x.byFund.death));
+      if(x.byFund.donation > 0) fundParts.push('💚 ' + fmtShort(x.byFund.donation));
+    }
+    
+    /* تفصيل المحصّلين (مجمّع) */
+    const collectorParts = [];
+    Object.keys(x.byCollector).sort(function(a, b){
+      return x.byCollector[b] - x.byCollector[a];
+    }).forEach(function(k){
+      collectorParts.push(k + ': ' + fmtShort(x.byCollector[k]));
+    });
+    
+    html += '<div onclick="openMemberDetail(' + m.id + ')" style="padding:11px 12px;border-bottom:1px solid var(--border-2);cursor:pointer;background:' + (x.total === 0 ? 'var(--warning-soft)' : 'var(--card)') + '">';
+    html += '<div style="display:grid;grid-template-columns:36px 1fr 90px;gap:6px;align-items:center">';
+    
+    html += '<div style="font-weight:800;color:var(--muted-2);font-size:12px">' + (i + 1) + '</div>';
+    
+    html += '<div style="min-width:0">';
+    html += '<div style="font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(m.name) + '</div>';
+    html += '<div style="font-size:9px;color:var(--muted-2);font-family:\'SF Mono\',monospace;margin-top:2px">' + esc(m.code || '—') + ' • ' + esc(m.sector || '—') + '</div>';
+    
+    if(fundParts.length){
+      html += '<div style="font-size:10px;color:var(--muted);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap">';
+      if(x.byFund.assoc > 0) html += '<span>💰 ' + fmtNum(x.byFund.assoc) + '</span>';
+      if(x.byFund.death > 0) html += '<span>⚰️ ' + fmtNum(x.byFund.death) + '</span>';
+      if(x.byFund.donation > 0) html += '<span>💚 ' + fmtNum(x.byFund.donation) + '</span>';
+      html += '</div>';
+    }
+    
+    if(collectorParts.length){
+      html += '<div style="font-size:9.5px;color:var(--primary);margin-top:4px;line-height:1.5;background:var(--primary-soft);padding:4px 8px;border-radius:6px;display:inline-block">👤 ' + collectorParts.join('  •  ') + '</div>';
+    }
+    
+    html += '</div>';
+    
+    html += '<div style="text-align:left">';
+    if(x.total > 0){
+      html += '<div style="font-weight:800;color:var(--success);font-family:\'SF Mono\',monospace;font-size:13px">' + fmtNum(x.total) + '</div>';
+      html += '<div style="font-size:9px;color:var(--muted-2);margin-top:2px">' + x.count + ' دفعة</div>';
+    } else {
+      html += '<div style="font-weight:800;color:var(--warning);font-size:11px">⏳</div>';
+    }
+    html += '</div>';
+    
+    html += '</div></div>';
+  });
+  
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
+
+/* ⭐ مشاركة واتساب */
+function sharePaymentsTableWA(){
+  const f = window._payReportFilters;
+  const y = f.year;
+  const list = buildPaymentsReportData();
+  
+  if(!list.length){ toast('لا توجد بيانات', 'warning'); return; }
+  
+  const totalSum = list.reduce(function(s, x){ return s + x.total; }, 0);
+  const paidCount = list.filter(function(x){ return x.total > 0; }).length;
+  const unpaidCount = list.filter(function(x){ return x.total === 0; }).length;
+  const fundLabel = f.fund === 'all' ? 'الكل' : f.fund === 'assoc' ? 'الجمعية' : f.fund === 'death' ? 'الوفاة' : 'التبرعات';
+  
+  let txt = '📋 *تقرير المدفوعات — ' + y + '*\n';
+  txt += '📦 الصندوق: ' + fundLabel + '\n';
+  txt += '━━━━━━━━━━━━━━━\n\n';
+  txt += '💰 *الإجمالي: ' + fmtNum(totalSum) + ' ل.س*\n';
+  txt += '✅ دفعوا: ' + paidCount + '\n';
+  if(unpaidCount > 0) txt += '⏳ لم يدفعوا: ' + unpaidCount + '\n';
+  txt += '\n━━━━━━━━━━━━━━━\n';
+  txt += '*تفاصيل الأعضاء:*\n\n';
+  
+  /* أول 25 عضو */
+  list.slice(0, 25).forEach(function(x, i){
+    txt += (i + 1) + '. *' + x.member.name + '*';
+    if(x.member.sector) txt += ' (' + x.member.sector + ')';
+    txt += '\n';
+    if(x.total > 0){
+      txt += '   💰 ' + fmtNum(x.total) + ' ل.س • ' + x.count + ' دفعة\n';
+      
+      /* تفصيل المحصّلين المجمّع */
+      const collectorParts = [];
+      Object.keys(x.byCollector).forEach(function(k){
+        collectorParts.push(k + ': ' + fmtNum(x.byCollector[k]));
+      });
+      if(collectorParts.length > 0){
+        txt += '   👤 ' + collectorParts.join(' | ') + '\n';
+      }
+    } else {
+      txt += '   ⏳ لم يدفع\n';
+    }
+    txt += '\n';
+  });
+  
+  if(list.length > 25){
+    txt += '_... + ' + (list.length - 25) + ' عضو آخر_\n\n';
+  }
+  
+  txt += '_صندوق زعورة_';
+  
+  window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank');
+}
+
+/* ⭐ طباعة PDF */
+function printPaymentsTable(){
+  const f = window._payReportFilters;
+  const y = f.year;
+  const list = buildPaymentsReportData();
+  
+  if(!list.length){ toast('لا توجد بيانات', 'warning'); return; }
+  
+  const totalSum = list.reduce(function(s, x){ return s + x.total; }, 0);
+  const paidCount = list.filter(function(x){ return x.total > 0; }).length;
+  const unpaidCount = list.filter(function(x){ return x.total === 0; }).length;
+  const fundLabel = f.fund === 'all' ? 'الكل' : f.fund === 'assoc' ? 'الجمعية' : f.fund === 'death' ? 'الوفاة' : 'التبرعات';
+  
+  let rowsHtml = '';
+  list.forEach(function(x, i){
+    const fundParts = [];
+    if(f.fund === 'all'){
+      if(x.byFund.assoc > 0) fundParts.push('💰 ' + fmtNum(x.byFund.assoc));
+      if(x.byFund.death > 0) fundParts.push('⚰️ ' + fmtNum(x.byFund.death));
+      if(x.byFund.donation > 0) fundParts.push('💚 ' + fmtNum(x.byFund.donation));
+    }
+    
+    const collectorParts = [];
+    Object.keys(x.byCollector).forEach(function(k){
+      collectorParts.push(k + ': ' + fmtNum(x.byCollector[k]));
+    });
+    
+    rowsHtml += '<tr>';
+    rowsHtml += '<td style="text-align:center;font-weight:700">' + (i + 1) + '</td>';
+    rowsHtml += '<td><b>' + esc(x.member.name) + '</b><br><small style="color:#666">' + esc(x.member.code || '') + ' • ' + esc(x.member.sector || '') + '</small>';
+    if(fundParts.length) rowsHtml += '<br><small>' + fundParts.join(' • ') + '</small>';
+    if(collectorParts.length) rowsHtml += '<br><small style="color:#7c3aed">👤 ' + collectorParts.join(' • ') + '</small>';
+    rowsHtml += '</td>';
+    rowsHtml += '<td style="text-align:left;font-weight:800;color:' + (x.total > 0 ? '#16a34a' : '#f59e0b') + '">';
+    if(x.total > 0) rowsHtml += fmtNum(x.total) + '<br><small>' + x.count + ' دفعة</small>';
+    else rowsHtml += '⏳ لم يدفع';
+    rowsHtml += '</td></tr>';
+  });
+  
+  const html = '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقرير المدفوعات ' + y + '</title>' +
+    '<style>' +
+    '@page{size:A4;margin:15mm}' +
+    'body{font-family:system-ui,Tahoma;direction:rtl;padding:15px;color:#1e293b;font-size:12px}' +
+    'h1{font-size:20px;color:#6d28d9;text-align:center;margin:0}' +
+    '.subtitle{text-align:center;color:#64748b;font-size:12px;margin:6px 0 20px}' +
+    '.summary{background:#f5f3ff;padding:16px;border-radius:10px;margin-bottom:20px;text-align:center}' +
+    '.summary .total{font-size:26px;font-weight:800;color:#16a34a;font-family:monospace;margin:6px 0}' +
+    '.summary .stats{display:flex;justify-content:center;gap:20px;font-size:11px;color:#64748b;margin-top:8px}' +
+    'table{width:100%;border-collapse:collapse;font-size:11px}' +
+    'th{background:#6d28d9;color:#fff;padding:10px 8px;text-align:right;font-size:11px}' +
+    'th:first-child{text-align:center;width:40px}' +
+    'th:last-child{text-align:left;width:110px}' +
+    'td{padding:9px 8px;border-bottom:1px solid #e2e8f0;vertical-align:top}' +
+    'tr:nth-child(even){background:#f8fafc}' +
+    '.footer{text-align:center;margin-top:30px;padding-top:14px;border-top:2px solid #e2e8f0;font-size:10px;color:#94a3b8}' +
+    '</style></head><body>' +
+    
+    '<h1>📋 تقرير المدفوعات المجمّع</h1>' +
+    '<div class="subtitle">🏘️ صندوق زعورة — سنة ' + y + ' • الصندوق: ' + fundLabel + '</div>' +
+    
+    '<div class="summary">' +
+    '<div style="font-size:11px;color:#64748b">إجمالي المدفوعات</div>' +
+    '<div class="total">' + fmtNum(totalSum) + ' ل.س</div>' +
+    '<div class="stats"><span>✅ ' + paidCount + ' دفعوا</span>' +
+    (unpaidCount > 0 ? '<span>⏳ ' + unpaidCount + ' لم يدفعوا</span>' : '') +
+    '<span>📊 ' + list.length + ' إجمالي</span></div>' +
+    '</div>' +
+    
+    '<table>' +
+    '<thead><tr><th>#</th><th>العضو — تفصيل</th><th>المبلغ المدفوع</th></tr></thead>' +
+    '<tbody>' + rowsHtml + '</tbody>' +
+    '</table>' +
+    
+    '<div class="footer">صندوق زعورة — قرية زعورة<br>تقرير بتاريخ ' + new Date().toLocaleDateString('ar-EG') + '</div>' +
+    '<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>' +
+    '</body></html>';
+  
+  const w = window.open('', '_blank');
+  if(w){ w.document.write(html); w.document.close(); }
+}
+
+/* ═══ نهاية الإصلاح 42 ═══ */
+
+/* ═══════════════════════════════════════════════════════════════
    ⚠️ [نهاية الملف — v9.0 كامل]
    ═══════════════════════════════════════════════════════════════ */
 
